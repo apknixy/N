@@ -1,35 +1,43 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Login with Google</title>
+  <title>LoginView - Google Auth</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-  <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
-  <script>
-    emailjs.init("YOUR_EMAILJS_PUBLIC_KEY"); // <-- Replace this
-  </script>
+
+  <!-- EmailJS -->
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@2.6.4/dist/email.min.js"></script>
+
   <style>
     body {
       font-family: Arial;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      flex-direction: column;
+      text-align: center;
+      padding: 50px;
+      background: #f0f2f5;
     }
     button {
-      padding: 10px 20px;
-      font-size: 18px;
+      background-color: #4285f4;
+      color: white;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
+
   <h2>Login with Google</h2>
-  <button onclick="signIn()">Sign In</button>
+  <button onclick="signInWithGoogle()">Sign in with Google</button>
 
   <script>
-    // Firebase Config
+    // ✅ 1. Firebase Config
     const firebaseConfig = {
       apiKey: "AIzaSyDes3ioeygnWBqJB6NnHb7xj732JJhOqm8",
       authDomain: "videofire-268ff.firebaseapp.com",
@@ -40,41 +48,47 @@
       appId: "1:910374058927:web:6add3afdea07cfa2914d5a"
     };
     firebase.initializeApp(firebaseConfig);
+
     const auth = firebase.auth();
     const db = firebase.database();
 
-    async function signIn() {
-      const provider = new firebase.auth.GoogleAuthProvider();
+    // ✅ 2. EmailJS Init
+    emailjs.init("YOUR_EMAILJS_PUBLIC_KEY"); // 🔁 Replace this
+
+    async function signInWithGoogle() {
       try {
+        const provider = new firebase.auth.GoogleAuthProvider();
         const result = await auth.signInWithPopup(provider);
         const user = result.user;
+
         const email = user.email;
-        const uid = user.uid;
-
-        // Generate unique username + password
         const username = email.split('@')[0];
-        const password = Math.random().toString(36).substring(2, 8);
+        const password = Math.random().toString(36).substring(2, 10); // 8 char password
 
-        // Save to Realtime Database
-        await db.ref('users/' + username).set({
+        // ✅ 3. Save to Firebase Realtime DB
+        await db.ref("users/" + username).set({
           email: email,
           password: password,
-          uid: uid
+          uid: user.uid
         });
 
-        // Send email via EmailJS
+        // ✅ 4. Send Email using EmailJS
         emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", {
           to_email: email,
           username: username,
           password: password,
           download_link: "https://play.google.com/store/apps/details?id=com.yourapp"
-        }).then(() => {
-          alert("Login info sent to your email.");
-          // Redirect to video site
+        })
+        .then(() => {
+          alert("Login successful. Email sent.");
           window.location.href = "https://apknixy.github.io/videofire";
-        }).catch(e => alert("Email failed: " + e));
-      } catch (err) {
-        alert("Sign-In Failed: " + err.message);
+        })
+        .catch((err) => {
+          alert("Email not sent: " + err);
+        });
+
+      } catch (error) {
+        alert("Error: " + error.message);
       }
     }
   </script>
