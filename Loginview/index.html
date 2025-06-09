@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VideoFire - Get Started</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-functions-compat.js"></script>
+
+    <style>
+        /* General Body Styles */
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #121212; /* Darker background for more depth */
+            color: #e0e0e0; /* Lighter text for contrast */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+            line-height: 1.6;
+        }
+
+        /* Container for the form */
+        .container {
+            background-color: #1f1f1f; /* Slightly lighter than body for subtle contrast */
+            padding: 40px;
+            border-radius: 12px; /* More rounded corners */
+            box-shadow: 0 10px 25px rgba(0,0,0,0.6); /* More pronounced shadow */
+            text-align: center;
+            width: 100%;
+            max-width: 450px; /* Slightly wider */
+            border: 1px solid #333; /* Subtle border */
+        }
+
+        /* Heading */
+        h1 {
+            color: #ff3d00; /* A more vibrant red/orange for branding */
+            margin-bottom: 30px;
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        /* Paragraph text */
+        p {
+            font-size: 16px;
+            color: #b0b0b0;
+            margin-bottom: 25px;
+        }
+
+        /* Google Sign-in Button */
+        .google-btn {
+            background-color: #4285F4; /* Google brand color */
+            color: white;
+            padding: 15px 25px;
+            border: none;
+            border-radius: 8px; /* More rounded */
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            width: fit-content;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        .google-btn:hover {
+            background-color: #357ae8; /* Darker on hover */
+            transform: translateY(-2px); /* Slight lift effect */
+        }
+        .google-btn:active {
+            transform: translateY(0); /* Press down effect */
+        }
+        .google-btn:disabled {
+            background-color: #555;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .google-icon {
+            margin-right: 12px;
+            background: white;
+            padding: 6px; /* Adjust padding to make icon size consistent */
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .google-icon img {
+            width: 20px; /* Slightly larger icon */
+            height: 20px;
+            vertical-align: middle;
+        }
+
+        /* Message Display */
+        #message {
+            margin-top: 25px;
+            color: #ffd700; /* Gold for warnings/info */
+            font-size: 15px;
+            min-height: 20px; /* Prevent layout shift */
+        }
+
+        /* Loading Spinner */
+        .loading-spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid #ff3d00; /* Match brand color */
+            border-radius: 50%;
+            width: 30px; /* Slightly larger */
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto 0;
+            display: none; /* Hidden by default */
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+            body {
+                padding: 15px;
+            }
+            .container {
+                padding: 25px;
+                margin: 0 10px; /* Ensure some margin on smaller screens */
+            }
+            h1 {
+                font-size: 28px;
+                margin-bottom: 20px;
+            }
+            .google-btn {
+                padding: 12px 20px;
+                font-size: 16px;
+            }
+            .google-icon img {
+                width: 18px;
+                height: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Welcome to VideoFire!</h1>
+        <p>Sign up once with Google to get your unique login credentials and start watching.</p>
+        <button id="googleSignInBtn" class="google-btn">
+            <span class="google-icon">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/4/4a/Logo_and_wordmark_of_Google_Identity.svg" alt="Google icon">
+            </span>
+            Sign in with Google
+        </button>
+        <div id="loadingSpinner" class="loading-spinner"></div>
+        <p id="message"></p>
+    </div>
+
+    <script type="module">
+        // Firebase SDKs (using compat for direct script includes on GitHub Pages)
+        // If you were using a build system (Webpack/Rollup), you'd use the non-compat modular imports.
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js';
+        import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js';
+        import { getDatabase, ref, set, serverTimestamp, query, orderByChild, equalTo, get } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js';
+        // If you want to use callable functions, uncomment this:
+        // import { getFunctions, httpsCallable } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-functions-compat.js';
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+          apiKey: "AIzaSyDes3ioeygnWBqJB6NnHb7xj732JJhOqm8",
+          authDomain: "videofire-268ff.firebaseapp.com",
+          databaseURL: "https://videofire-268ff-default-rtdb.firebaseio.com",
+          projectId: "videofire-268ff",
+          storageBucket: "videofire-268ff.firebasestorage.app",
+          messagingSenderId: "910374058927",
+          appId: "1:910374058927:web:6add3afdea07cfa2914d5a"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const database = getDatabase(app);
+        // const functions = getFunctions(app); // Uncomment if using callable functions
+
+        // DOM Elements
+        const googleSignInBtn = document.getElementById('googleSignInBtn');
+        const messageDisplay = document.getElementById('message');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+
+        // Check if user is already logged in (e.g., from previous session)
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                console.log("User already signed in:", user.email);
+                // Redirect immediately if already signed in
+                showMessage('Redirecting to VideoFire...', 'success');
+                setTimeout(() => {
+                    window.location.href = 'https://apknixy.github.io/videofire/';
+                }, 1500); // Give user a moment to see message
+            }
+        });
+
+        // Helper function to display messages
+        function showMessage(text, type = 'info') {
+            messageDisplay.textContent = text;
+            messageDisplay.style.color = {
+                info: '#ffd700', // Gold
+                success: '#4CAF50', // Green
+                error: '#f44336' // Red
+            }[type];
+        }
+
+        // Generate a simple unique username and password
+        function generateCredentials(email) {
+            const baseUsername = email.split('@')[0].replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+            const uniqueSuffix = Math.random().toString(36).substring(2, 8); // 6 random chars
+            const username = `${baseUsername.substring(0, 10)}.${uniqueSuffix}`; // Max 10 chars + suffix
+
+            const password = Math.random().toString(36).substring(2, 12); // 10 random chars
+            return { username, password };
+        }
+
+        googleSignInBtn.addEventListener('click', async () => {
+            showMessage('Initiating Google Sign-in...', 'info');
+            loadingSpinner.style.display = 'block';
+            googleSignInBtn.disabled = true;
+
+            try {
+                const provider = new GoogleAuthProvider();
+                const result = await signInWithPopup(auth, provider);
+                const user = result.user;
+                const isNewUser = result.additionalUserInfo.isNewUser;
+
+                if (isNewUser) {
+                    showMessage('Creating your VideoFire account...', 'info');
+                    const { username: generatedUsername, password: generatedPassword } = generateCredentials(user.email);
+
+                    // Check if this username already exists (unlikely but possible with random suffix)
+                    const usernameQuery = query(ref(database, 'users'), orderByChild('generatedUsername'), equalTo(generatedUsername));
+                    const usernameSnapshot = await get(usernameQuery);
+                    if (usernameSnapshot.exists()) {
+                         // Regenerate if collision (highly rare)
+                         const newCreds = generateCredentials(user.email);
+                         generatedUsername = newCreds.username;
+                         generatedPassword = newCreds.password;
+                    }
+
+
+                    // Save user data to Realtime Database
+                    await set(ref(database, 'users/' + user.uid), {
+                        uid: user.uid,
+                        email: user.email,
+                        displayName: user.displayName || 'User',
+                        photoURL: user.photoURL || '',
+                        generatedUsername: generatedUsername,
+                        generatedPassword: generatedPassword, // Storing for direct login
+                        createdAt: serverTimestamp(),
+                        totalViews: 0 // Initialize total views for this user
+                    });
+
+                    showMessage('Account created! Sending credentials to your email...', 'success');
+                    
+                    // --- IMPORTANT: Trigger Email Sending (Conceptual) ---
+                    // This part depends on your Firebase Cloud Function being deployed and configured.
+                    // Option 1: Call the Firebase Cloud Function directly (recommended for professional apps)
+                    // const sendWelcomeEmailFunction = httpsCallable(functions, 'sendWelcomeEmail');
+                    // await sendWelcomeEmailFunction({ email: user.email, username: generatedUsername, password: generatedPassword, displayName: user.displayName });
+                    // showMessage('Email sent successfully!', 'success');
+
+                    // Option 2: Rely on the Cloud Function listening to Realtime Database writes
+                    // (This is how the provided conceptual Cloud Function works)
+                    // No explicit call needed here, the function will trigger automatically
+                    // when the 'users/{uid}' node is written above.
+                    // This message indicates it's *about* to be sent by the function.
+                    
+                    // Alert user with credentials for immediate access (until email arrives)
+                    alert(`✅ Account Created!\n\nYour VideoFire Username: ${generatedUsername}\nYour Password: ${generatedPassword}\n\nThese details have also been sent to your email: ${user.email}\n\nPlease use these credentials to log in on the next screen.`);
+
+                } else {
+                    showMessage('Welcome back!', 'success');
+                }
+
+                // Redirect to the main app after login/signup (delay slightly to show messages)
+                setTimeout(() => {
+                    window.location.href = 'https://apknixy.github.io/videofire/';
+                }, 2000);
+
+            } catch (error) {
+                console.error("Authentication error:", error);
+                let errorMessage = 'An unknown error occurred.';
+                if (error.code) {
+                    switch (error.code) {
+                        case 'auth/popup-closed-by-user':
+                            errorMessage = 'Sign-in cancelled by user.';
+                            break;
+                        case 'auth/cancelled-popup-request':
+                            errorMessage = 'Sign-in request cancelled (another popup was opened).';
+                            break;
+                        case 'auth/network-request-failed':
+                            errorMessage = 'Network error. Please check your internet connection.';
+                            break;
+                        default:
+                            errorMessage = `Sign-in failed: ${error.message}`;
+                    }
+                }
+                showMessage(`Error: ${errorMessage}`, 'error');
+                googleSignInBtn.disabled = false;
+            } finally {
+                loadingSpinner.style.display = 'none';
+            }
+        });
+    </script>
+    </body>
+</html>
