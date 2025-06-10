@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -867,6 +867,17 @@
         import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-storage.js";
         import videojs from 'https://vjs.zencdn.net/8.10.0/video.min.js';
 
+        // Cryptography utilities for hash verification (client-side)
+        // These are usually in Node.js, but we need browser-compatible ones for this approach.
+        // Importing from 'crypto-js' or similar is an option, but for simplicity,
+        // we'll implement a basic SHA256 (still not ideal for security if token is exposed).
+        // Let's use a simple browser-compatible SHA256 if needed.
+        // For actual crypto, a library like 'crypto-js' would be better.
+        // For now, we'll try to replicate the logic without a full crypto library import.
+
+        // THIS IS THE BOT TOKEN THAT WILL BE EXPOSED. AVOID THIS IN PRODUCTION!
+        const TELEGRAM_BOT_TOKEN_CLIENT_SIDE = "8125023086:AAH53bDbheT1QN49ELj9G-TVRUrVVlNt8CM"; // <--- THIS IS THE PROBLEM!
+
         const firebaseConfig = {
             apiKey: "AIzaSyDes3ioeygnWBqJB6NnHb7xj732JJhOqm8", // Replace with your actual Firebase API Key
             authDomain: "videofire-268ff.firebaseapp.com",
@@ -943,53 +954,205 @@
         };
 
 
-        // --- Telegram Login Widget Integration ---
-        // The script tag for the Telegram Login Widget is now directly in HTML.
-        // So, we don't need a loadTelegramLoginWidget() function here.
-
-        // This function is called by Telegram widget after successful login
+        // --- Telegram Login Widget Integration (Client-Side HASH Verification) ---
+        // !!! WARNING: THIS IS INSECURE FOR PRODUCTION. BOT TOKEN WILL BE EXPOSED. !!!
         window.onTelegramAuth = async function(user) {
-            console.log('Telegram User Authenticated:', user);
+            console.log('Telegram User Authenticated (via client-side):', user);
+
+            // 1. Client-side hash verification (INSECURE if bot token is exposed)
+            const checkHash = async (authData) => {
+                const dataCheckArray = [];
+                for (const key in authData) {
+                    if (key !== 'hash') {
+                        dataCheckArray.push(`${key}=${authData[key]}`);
+                    }
+                }
+                dataCheckArray.sort();
+                const dataCheckString = dataCheckArray.join('\n');
+
+                const secretKey = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(TELEGRAM_BOT_TOKEN_CLIENT_SIDE));
+                const hmacKey = await crypto.subtle.importKey(
+                    'raw',
+                    secretKey,
+                    { name: 'HMAC', hash: 'SHA-256' },
+                    false,
+                    ['sign']
+                );
+                const signature = await crypto.subtle.sign(
+                    'HMAC',
+                    hmacKey,
+                    new TextEncoder().encode(dataCheckString)
+                );
+                const hexHash = Array.from(new Uint8Array(signature)).map(b => b.toString(16).padStart(2, '0')).join('');
+                return hexHash === authData.hash;
+            };
+
+            const isHashValid = await checkHash(user);
+            if (!isHashValid) {
+                console.error('Telegram hash verification failed (client-side). This might indicate tampering.');
+                alert('Login failed. Invalid data received from Telegram.');
+                return; // Stop if hash is invalid
+            }
+
+            // Optional: Check auth_date (for freshness)
+            const FIVE_MINUTES_AGO = Date.now() / 1000 - 300; // 5 minutes in seconds
+            if (user.auth_date < FIVE_MINUTES_AGO) {
+                console.warn('Old Telegram auth_date. Login might be expired.');
+                // alert('Login session expired. Please try logging in again.');
+                // return; // You might want to return here, or just log a warning.
+            }
+
+            // 2. Directly sign in with Telegram ID (using a custom auth method if available,
+            // or just use Firebase Realtime DB to store user data if you forgo auth directly)
+            // Firebase does NOT have a built-in Telegram auth provider.
+            // So, without custom tokens (which require a server), we have to simulate.
+            // This means we treat Telegram ID as a unique identifier for Firebase DB.
 
             const uid = `telegram_${user.id}`;
-            let customToken = '';
+            let firebaseToken = null; // We won't get a custom token without a server
 
             try {
-                // IMPORTANT: Replace this with YOUR Firebase Cloud Function URL/Endpoint
-                // Example for Netlify functions (or your Firebase Function HTTP endpoint):
-                const response = await fetch('/.netlify/functions/verifyTelegramAuth', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(user)
-                });
-                const data = await response.json();
-                if (data.firebaseToken) {
-                    customToken = data.firebaseToken;
+                // Since we can't use signInWithCustomToken directly without a server,
+                // we'll try to create a *simulated* Firebase user or directly manage data
+                // based on Telegram ID. This is a workaround, not standard Firebase Auth.
+
+                // Option A (Less secure, but avoids Custom Token complexity):
+                // Directly set user data in Realtime DB if not exists and proceed.
+                // You would essentially bypass Firebase Auth for 'login' itself
+                // and just rely on the Telegram ID as the primary user key.
+
+                // For Firebase Auth, you would *still* need a server to create the custom token.
+                // The current Firebase SDK (v9+) does not support creating custom tokens client-side.
+                // The `signInWithCustomToken` function *requires* a token generated by `firebase-admin` SDK.
+
+                // So, without a server, the idea of "signing in with Firebase Auth"
+                // using Telegram becomes problematic.
+
+                // Let's fallback to the simplest approach: treat the Telegram ID as the UID
+                // and just update Realtime Database. This means the user is "logged in"
+                // to your app, but not necessarily Firebase Auth.
+
+                // For your current structure which expects 'auth' object,
+                // we need to simulate. This is where it breaks without a server.
+
+                // --- ALTERNATIVE: Use Firebase Anonymous Auth and link details ---
+                // This is still better than no auth at all and leaking token.
+                // BUT, it means user data won't persist across devices without manual linking.
+                // This is also not what you asked for.
+
+                // The most straightforward "no server" way to proceed with your existing code
+                // is to completely bypass `signInWithCustomToken` and just manage `currentUser`
+                // locally based on Telegram data and update DB.
+                // This means `onAuthStateChanged` won't trigger for Telegram logins,
+                // you'll need to manually call `handleLoginSuccess(user)` or similar.
+
+                // Let's modify the flow to directly handle the login success
+                // without relying on `onAuthStateChanged` for Telegram users,
+                // or use a dummy custom token (which is BAD).
+
+                // *************************************************************************
+                // **** THIS IS A HUGE COMPROMISE. NOT RECOMMENDED. ****
+                // **** It uses a pre-generated "dummy" token or skips Firebase Auth entirely. ****
+                // *************************************************************************
+
+                // Scenario 1: No actual Firebase Auth, just manage local `currentUser`
+                // This means your `onAuthStateChanged` won't work for Telegram users.
+                // You'd need to manually manage the app state. This is too complex a change.
+
+                // Scenario 2: Try to use a "dummy" custom token, which won't work with Firebase
+                // as Firebase only accepts *valid* custom tokens generated by its Admin SDK.
+                // So, this is a dead end.
+
+                // Conclusion: You cannot achieve a secure Telegram login with Firebase Auth
+                // without a server-side component to generate custom tokens.
+                // The only way to move forward with just HTML is to either:
+                // a) Forego Firebase Auth and manage user sessions/data purely via Telegram IDs in Realtime Database.
+                // b) Expose your bot token and use it to create a hash (what I warned against).
+                // c) Use a different auth method (like anonymous or email/pass) and link Telegram details later.
+
+                // Since your goal is to "make HTML द्वारा" without Cloud Functions,
+                // I will provide the client-side hash verification (risky) and then
+                // directly populate `currentUser` and show the app.
+                // This will make the app *appear* to log in, but it's not a secure Firebase Auth login.
+
+                currentUser = {
+                    uid: uid, // Use Telegram ID as UID in Firebase DB
+                    telegramId: user.id,
+                    username: user.username || user.first_name,
+                    profilePic: user.photo_url || `https://via.placeholder.com/40/2c6bed/ffffff?text=${user.first_name ? user.first_name.charAt(0) : 'U'}`,
+                    totalViews: 0,
+                    uploadedVideosCount: 0
+                };
+
+                const userRef = ref(database, `users/${currentUser.uid}`);
+                const userSnapshot = await get(userRef);
+
+                if (!userSnapshot.exists()) {
+                    await set(userRef, {
+                        telegramId: currentUser.telegramId,
+                        username: currentUser.username,
+                        profilePic: currentUser.profilePic,
+                        totalViews: 0,
+                        uploadedVideosCount: 0,
+                        createdAt: Date.now()
+                    });
                 } else {
-                    console.error('Failed to get Firebase custom token:', data.error);
-                    alert('Login failed. Please try again: ' + (data.error || 'Unknown error'));
-                    return;
+                    const userData = userSnapshot.val();
+                    currentUser.totalViews = userData.totalViews || 0;
+                    currentUser.uploadedVideosCount = userData.uploadedVideosCount || 0;
+                    if (user.photo_url && userData.profilePic !== user.photo_url) {
+                        await update(userRef, { profilePic: user.photo_url });
+                        currentUser.profilePic = user.photo_url;
+                    }
                 }
 
-                await signInWithCustomToken(auth, customToken);
-                // Auth state change listener will handle the rest (UI changes)
+                document.getElementById('login-page').style.display = 'none';
+                document.getElementById('app-content').style.display = 'block';
+                document.getElementById('user-profile-pic-topbar').src = currentUser.profilePic;
+
+                loadHomeVideos();
+                loadPopunderAd();
+                updateProfileUI();
+
+                // Manually set `auth.currentUser` if possible, though it won't persist.
+                // Firebase Auth requires actual custom tokens, so this is where the direct HTML approach fails.
+                // For your `onAuthStateChanged` to work, an actual Firebase Auth sign-in is needed.
+                // This means the `onAuthStateChanged` callback will NOT fire on Telegram login with this setup.
+                // We're essentially bypassing Firebase Authentication for Telegram users here.
 
             } catch (error) {
-                console.error("Error during Telegram authentication process:", error);
-                alert("An error occurred during login. Please try again.");
+                console.error("Error during client-side Telegram authentication:", error);
+                alert("An error occurred during login. Please try again: " + error.message);
             }
         };
 
-        // Firebase Auth State Listener (Same as before)
+        // Firebase Auth State Listener (THIS WILL ONLY WORK FOR NON-TELEGRAM AUTH)
+        // Since we are bypassing Firebase Auth for Telegram login in this "no Cloud Function" approach,
+        // this listener will NOT be triggered by a successful Telegram login.
+        // It will only trigger if another Firebase Auth method is used (e.g., anonymous, email/pass).
         onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                currentUser = {
+            if (user && user.uid.startsWith('telegram_')) { // Check if it's a Telegram "simulated" user
+                 // This block will practically not run if you are not using custom tokens.
+                 // The `user` object here comes from Firebase's internal auth state.
+                 // A user signed in with a custom token will have `auth.currentUser` set.
+                 // Without a server, you cannot generate a custom token.
+                 console.log("onAuthStateChanged triggered for a presumed Telegram user, but this flow requires a custom token.");
+                 // You might need to manually call setup based on `localStorage` or `sessionStorage`
+                 // if you truly want to persist the "logged in" state without Firebase Auth.
+
+                 // For simplicity, let's assume `currentUser` is already set by `onTelegramAuth`
+                 // and handle `app-content` display directly there.
+                 // This `onAuthStateChanged` will primarily manage other Firebase auth methods.
+
+                 // If a previous Firebase Auth session exists (e.g., if you used custom token from server before)
+                 // then this block will still function.
+                 currentUser = {
                     uid: user.uid,
                     telegramId: user.providerData[0]?.uid || user.uid.replace('telegram_', ''),
                     username: user.displayName || `User_${user.uid.substring(0, 6)}`,
                     profilePic: user.photoURL || 'https://via.placeholder.com/40/2c6bed/ffffff?text=U'
                 };
-                console.log('Firebase User Signed In:', currentUser);
+                console.log('Firebase User Signed In (via onAuthStateChanged):', currentUser);
 
                 const userRef = ref(database, `users/${currentUser.uid}`);
                 const userSnapshot = await get(userRef);
@@ -1019,23 +1182,44 @@
                 loadHomeVideos();
                 loadPopunderAd();
                 updateProfileUI();
+
+            } else if (user) { // Any other Firebase Auth method
+                currentUser = {
+                    uid: user.uid,
+                    telegramId: null, // No Telegram ID if not signed in via Telegram
+                    username: user.displayName || `User_${user.uid.substring(0, 6)}`,
+                    profilePic: user.photoURL || 'https://via.placeholder.com/40/2c6bed/ffffff?text=U'
+                };
+                console.log('Firebase User Signed In (non-Telegram):', currentUser);
+                document.getElementById('login-page').style.display = 'none';
+                document.getElementById('app-content').style.display = 'block';
+                document.getElementById('user-profile-pic-topbar').src = currentUser.profilePic;
+                loadHomeVideos();
+                loadPopunderAd();
+                updateProfileUI(); // Update UI for any logged-in user
+
             } else {
                 currentUser = null;
                 console.log('Firebase User Signed Out.');
                 document.getElementById('login-page').style.display = 'flex';
                 document.getElementById('app-content').style.display = 'none';
-                // No need to clear/reload widget as it's directly in HTML
             }
         });
 
+        // Logout function (will only clear Firebase Auth session if one exists)
         window.handleLogout = async function(event) {
             if (event) event.preventDefault();
             try {
+                // This signOut only works if Firebase Auth actually signed in
                 await signOut(auth);
+                // If not signed in via Firebase Auth, manually clear local state
+                currentUser = null;
+                document.getElementById('login-page').style.display = 'flex';
+                document.getElementById('app-content').style.display = 'none';
                 alert('Logged out successfully.');
             } catch (error) {
                 console.error("Error logging out:", error);
-                alert("Failed to logout. Please try again.");
+                alert("Failed to logout. Please try again: " + error.message);
             }
         };
 
@@ -1116,7 +1300,7 @@
                     thumbnailLink: thumbnailLink || '',
                     tags: tags,
                     description: description,
-                    uploaderId: currentUser.uid,
+                    uploaderId: currentUser.uid, // Use Telegram ID as UID
                     uploaderUsername: currentUser.username,
                     uploaderProfilePic: currentUser.profilePic,
                     views: 0,
@@ -1346,7 +1530,6 @@
 
         // --- Initial Load Logic ---
         document.addEventListener('DOMContentLoaded', () => {
-            // No need to call loadTelegramLoginWidget() as it's directly in HTML now.
             // onAuthStateChanged will handle initial UI setup based on login status.
             // If the user is already logged in (e.g., from a previous session),
             // onAuthStateChanged will automatically show #app-content.
