@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://vjs.zencdn.net/8.10.0/video-js.css" rel="stylesheet" />
     <style>
-        /* Basic Reset & Global Styles (Same as before, with minor tweaks for player) */
+        /* (Your CSS remains the same as before) */
         * {
             margin: 0;
             padding: 0;
@@ -706,7 +706,13 @@
         <p>Share your favorite videos, earn rewards, and discover new content!</p>
         <div class="telegram-login-wrapper">
             <h2>Login with Telegram</h2>
-            <div id="telegram-login-widget"></div>
+            <div id="telegram-login-widget">
+                <script async src="https://telegram.org/js/telegram-widget.js?22"
+                        data-telegram-login="Videofire_bot"  data-size="large"
+                        data-onauth="onTelegramAuth(user)"
+                        data-request-access="write">
+                </script>
+            </div>
             <p style="font-size: 14px; color: #666;">No account needed, just use your Telegram.</p>
         </div>
     </section>
@@ -741,8 +747,6 @@
                 <div class="ad-container banner-468x60">
                     <p>Advertisement</p>
                     <script type="text/javascript">
-                        // This ad will appear here, you can load multiple such iframes.
-                        // For demonstration, one instance. In real app, dynamically inject.
                         atOptions = {
                             'key' : '7cc9b0386975c414c8ab9629f405b0dc',
                             'format' : 'iframe',
@@ -859,16 +863,12 @@
     </div> <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
         import { getDatabase, ref, push, onValue, set, get, update, query, orderByChild, equalTo } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
-        import { getAuth, signInWithCustomToken, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"; // For Firebase Auth
-        import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-storage.js"; // For Firebase Storage
-
-        // Video.js (VAST plugin would be added here in a real scenario)
-        // For demonstration, we'll use base video.js
+        import { getAuth, signInWithCustomToken, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+        import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-storage.js";
         import videojs from 'https://vjs.zencdn.net/8.10.0/video.min.js';
 
-
         const firebaseConfig = {
-            apiKey: "AIzaSyDes3ioeygnWBqJB6NnHb7xj732JJhOqm8",
+            apiKey: "AIzaSyDes3ioeygnWBqJB6NnHb7xj732JJhOqm8", // Replace with your actual Firebase API Key
             authDomain: "videofire-268ff.firebaseapp.com",
             databaseURL: "https://videofire-268ff-default-rtdb.firebaseio.com",
             projectId: "videofire-268ff",
@@ -880,42 +880,40 @@
         const app = initializeApp(firebaseConfig);
         const database = getDatabase(app);
         const auth = getAuth(app);
-        const storage = getStorage(app); // Initialize Firebase Storage
+        const storage = getStorage(app);
 
-        // Global variable for current user, will be populated after Telegram login
         let currentUser = null;
 
         const VIEWS_FOR_WITHDRAWAL = 20000;
         const EARNING_PER_1000_VIEWS_MIN = 10;
         const TELEGRAM_CHANNEL_URL = 'https://t.me/Apknixyapp'; // Your Telegram channel for withdrawal
 
-        // --- UI Section Management ---
+        // --- UI Section Management (Same as before) ---
         window.showSection = function(sectionId, event) {
-            if (event) event.preventDefault(); // Prevent default link behavior
+            if (event) event.preventDefault();
 
             document.querySelectorAll('main section').forEach(section => {
                 section.style.display = 'none';
             });
             document.getElementById('upload-page').style.display = 'none';
             document.getElementById('profile-page').style.display = 'none';
-            document.getElementById('video-player-overlay').style.display = 'none'; // Ensure player is hidden
+            document.getElementById('video-player-overlay').style.display = 'none';
 
             if (sectionId === 'home') {
                 document.getElementById('home-section').style.display = 'grid';
             } else if (sectionId === 'profile') {
                 document.getElementById('profile-page').style.display = 'flex';
-                loadUserProfileData(); // Load and update profile data
+                loadUserProfileData();
             } else if (sectionId === 'settings') {
                 document.getElementById('settings-section').style.display = 'block';
             }
 
-            // Update active link in sidebar
             document.querySelectorAll('.sidebar-nav ul li a').forEach(link => {
                 link.classList.remove('active');
             });
             if (event && event.currentTarget) {
                 event.currentTarget.classList.add('active');
-            } else { // For initial load or programmatic calls
+            } else {
                 document.querySelector(`.sidebar-nav ul li a[onclick*="showSection('${sectionId}')"]`).classList.add('active');
             }
         };
@@ -937,43 +935,29 @@
             const player = videojs.getPlayer('vast-ad-player');
             if (player) {
                 player.pause();
-                player.dispose(); // Dispose of the player instance
+                player.dispose();
             }
-            document.getElementById('telegram-video-iframe').src = ''; // Clear iframe content
+            document.getElementById('telegram-video-iframe').src = '';
             document.getElementById('telegram-video-iframe').style.display = 'none';
             document.getElementById('video-player-overlay').style.display = 'none';
         };
 
 
         // --- Telegram Login Widget Integration ---
-        function loadTelegramLoginWidget() {
-            const script = document.createElement('script');
-            script.async = true;
-            script.src = "https://telegram.org/js/telegram-widget.js?22";
-            script.setAttribute('data-telegram-login', 'Videofire_bot'); // Replace with your bot's username
-            script.setAttribute('data-size', 'large');
-            script.setAttribute('data-onauth', 'onTelegramAuth(user)');
-            script.setAttribute('data-request-access', 'write');
-            document.getElementById('telegram-login-widget').appendChild(script);
-        }
+        // The script tag for the Telegram Login Widget is now directly in HTML.
+        // So, we don't need a loadTelegramLoginWidget() function here.
 
         // This function is called by Telegram widget after successful login
         window.onTelegramAuth = async function(user) {
             console.log('Telegram User Authenticated:', user);
-            // Here, you'd typically send `user` data to a Firebase Function or your backend
-            // to verify the hash and generate a custom Firebase Auth token.
-            // For a simple client-side demo, we'll simulate setting currentUser.
-            // In a real app, DO NOT trust the `hash` on client-side directly for auth.
 
-            const uid = `telegram_${user.id}`; // Unique Firebase UID based on Telegram ID
-            let customToken = ''; // This should come from your backend/Cloud Function
+            const uid = `telegram_${user.id}`;
+            let customToken = '';
 
             try {
-                // Simulate backend call to get custom token (replace with actual fetch)
-                // This is a placeholder for a Firebase Cloud Function endpoint:
-                // `https://YOUR_REGION-YOUR_PROJECT_ID.cloudfunctions.net/verifyTelegramAuth`
-                // This function would take user data, verify the hash, and return a Firebase custom token.
-                const response = await fetch('/.netlify/functions/verifyTelegramAuth', { // Example for Netlify functions
+                // IMPORTANT: Replace this with YOUR Firebase Cloud Function URL/Endpoint
+                // Example for Netlify functions (or your Firebase Function HTTP endpoint):
+                const response = await fetch('/.netlify/functions/verifyTelegramAuth', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(user)
@@ -983,31 +967,30 @@
                     customToken = data.firebaseToken;
                 } else {
                     console.error('Failed to get Firebase custom token:', data.error);
-                    alert('Login failed. Please try again.');
+                    alert('Login failed. Please try again: ' + (data.error || 'Unknown error'));
                     return;
                 }
 
                 await signInWithCustomToken(auth, customToken);
-                // Auth state change listener will handle the rest
+                // Auth state change listener will handle the rest (UI changes)
+
             } catch (error) {
                 console.error("Error during Telegram authentication process:", error);
                 alert("An error occurred during login. Please try again.");
             }
         };
 
-        // Firebase Auth State Listener
+        // Firebase Auth State Listener (Same as before)
         onAuthStateChanged(auth, async (user) => {
             if (user) {
-                // User is signed in.
                 currentUser = {
                     uid: user.uid,
-                    telegramId: user.providerData[0]?.uid || user.uid.replace('telegram_', ''), // Extract Telegram ID
+                    telegramId: user.providerData[0]?.uid || user.uid.replace('telegram_', ''),
                     username: user.displayName || `User_${user.uid.substring(0, 6)}`,
                     profilePic: user.photoURL || 'https://via.placeholder.com/40/2c6bed/ffffff?text=U'
                 };
                 console.log('Firebase User Signed In:', currentUser);
 
-                // Check if user exists in 'users' node, if not, create them
                 const userRef = ref(database, `users/${currentUser.uid}`);
                 const userSnapshot = await get(userRef);
                 if (!userSnapshot.exists()) {
@@ -1020,11 +1003,9 @@
                         createdAt: Date.now()
                     });
                 } else {
-                    // Update current user's data from Firebase
                     const userData = userSnapshot.val();
                     currentUser.totalViews = userData.totalViews || 0;
                     currentUser.uploadedVideosCount = userData.uploadedVideosCount || 0;
-                    // Ensure profile pic is updated if Telegram provides a new one
                     if (user.photoURL && userData.profilePic !== user.photoURL) {
                         await update(userRef, { profilePic: user.photoURL });
                         currentUser.profilePic = user.photoURL;
@@ -1035,19 +1016,15 @@
                 document.getElementById('app-content').style.display = 'block';
                 document.getElementById('user-profile-pic-topbar').src = currentUser.profilePic;
 
-                loadHomeVideos(); // Load videos after login
-                loadPopunderAd(); // Load popunder ad after login
-                updateProfileUI(); // Initial profile UI update
+                loadHomeVideos();
+                loadPopunderAd();
+                updateProfileUI();
             } else {
-                // User is signed out.
                 currentUser = null;
                 console.log('Firebase User Signed Out.');
                 document.getElementById('login-page').style.display = 'flex';
                 document.getElementById('app-content').style.display = 'none';
-                // Reload Telegram widget to allow re-login
-                const widgetContainer = document.getElementById('telegram-login-widget');
-                if (widgetContainer) widgetContainer.innerHTML = '';
-                loadTelegramLoginWidget();
+                // No need to clear/reload widget as it's directly in HTML
             }
         });
 
@@ -1056,25 +1033,19 @@
             try {
                 await signOut(auth);
                 alert('Logged out successfully.');
-                // onAuthStateChanged will handle UI changes
             } catch (error) {
                 console.error("Error logging out:", error);
                 alert("Failed to logout. Please try again.");
             }
         };
 
-      
-         functions:config:set telegram.token="8125023086:AAH53bDbheT1QN49ELj9G-TVRUrVVlNt8CM" 
-        firebase deploy --only functions
-      //  --- Firebase Data Handling ---
+        // --- Firebase Data Handling (Same as before) ---
 
-        // Load Videos for Home Screen
         function loadHomeVideos() {
             const videoGrid = document.getElementById('home-section');
-            // Keep the first ad slot, clear dynamically added videos
             const existingAds = videoGrid.querySelector('.ad-container');
-            videoGrid.innerHTML = ''; // Clear existing videos
-            if (existingAds) videoGrid.appendChild(existingAds); // Re-append the ad
+            videoGrid.innerHTML = '';
+            if (existingAds) videoGrid.appendChild(existingAds);
 
             const videosRef = ref(database, 'videos');
             onValue(videosRef, (snapshot) => {
@@ -1085,11 +1056,9 @@
                     videos.push(video);
                 });
 
-                // Sort by timestamp (newest first)
                 videos.sort((a, b) => b.uploadTimestamp - a.uploadTimestamp);
 
                 videos.forEach(video => {
-                    // Decide which image to use for thumbnail (uploaded, or placeholder)
                     const thumbnailUrl = video.thumbnailLink || `https://via.placeholder.com/320x180/777777/FFFFFF?text=Video`;
                     const viewsText = video.views !== undefined ? video.views.toLocaleString() : '0';
                     const uploadDate = new Date(video.uploadTimestamp).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
@@ -1116,7 +1085,6 @@
             });
         }
 
-        // Handle Video Upload Form Submission
         document.getElementById('video-upload-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!currentUser) {
@@ -1135,19 +1103,17 @@
                 return;
             }
 
-            // Basic validation for telegramLink to be a direct file link (not perfect but better than nothing)
             if (!telegramLink.match(/\.(mp4|mkv|avi|mov)$/i)) {
                 alert('Please provide a direct link to the video file (e.g., ending with .mp4, .mkv).');
                 return;
             }
 
             try {
-                // Create a new video entry in Firebase
                 const newVideoRef = push(ref(database, 'videos'));
                 const videoData = {
                     title: title,
                     telegramLink: telegramLink,
-                    thumbnailLink: thumbnailLink || '', // Save thumbnail link if provided
+                    thumbnailLink: thumbnailLink || '',
                     tags: tags,
                     description: description,
                     uploaderId: currentUser.uid,
@@ -1158,13 +1124,12 @@
                 };
                 await set(newVideoRef, videoData);
 
-                // Update user's uploaded video count
                 const userRef = ref(database, `users/${currentUser.uid}`);
                 await update(userRef, {
                     uploadedVideosCount: (currentUser.uploadedVideosCount || 0) + 1
                 });
-                currentUser.uploadedVideosCount = (currentUser.uploadedVideosCount || 0) + 1; // Update local state
-                updateProfileUI(); // Refresh profile UI
+                currentUser.uploadedVideosCount = (currentUser.uploadedVideosCount || 0) + 1;
+                updateProfileUI();
 
                 alert('Video uploaded successfully!');
                 hideUploadPage();
@@ -1174,7 +1139,6 @@
             }
         });
 
-        // Load User Profile Data
         async function loadUserProfileData() {
             if (!currentUser) return;
 
@@ -1190,14 +1154,12 @@
                 }
             });
 
-            // Load user's uploaded videos for profile section
             const profileVideoGrid = document.getElementById('profile-video-grid');
-            profileVideoGrid.innerHTML = ''; // Clear previous videos
+            profileVideoGrid.innerHTML = '';
 
-            // Query videos uploaded by the current user
             const userVideosQuery = query(ref(database, 'videos'), orderByChild('uploaderId'), equalTo(currentUser.uid));
             onValue(userVideosQuery, (snapshot) => {
-                profileVideoGrid.innerHTML = ''; // Clear for fresh load
+                profileVideoGrid.innerHTML = '';
                 const userVideos = [];
                 snapshot.forEach(childSnapshot => {
                     const video = childSnapshot.val();
@@ -1205,7 +1167,7 @@
                     userVideos.push(video);
                 });
 
-                userVideos.sort((a, b) => b.uploadTimestamp - a.uploadTimestamp); // Newest first
+                userVideos.sort((a, b) => b.uploadTimestamp - a.uploadTimestamp);
 
                 userVideos.forEach(video => {
                     const thumbnailUrl = video.thumbnailLink || `https://via.placeholder.com/320x180/ADD8E6/FFFFFF?text=My+Video`;
@@ -1228,8 +1190,6 @@
             });
         }
 
-
-        // Function to update profile UI with current user data
         function updateProfileUI() {
             if (!currentUser) return;
 
@@ -1255,8 +1215,6 @@
             }
         }
 
-
-        // Handle Withdraw Button Click
         document.getElementById('withdraw-button').addEventListener('click', () => {
             if (!currentUser) {
                 alert('Please login to withdraw earnings.');
@@ -1266,97 +1224,48 @@
             if ((currentUser.totalViews || 0) >= VIEWS_FOR_WITHDRAWAL) {
                 const confirmation = confirm(`Are you sure you want to withdraw your earnings? Your views (${(currentUser.totalViews || 0).toLocaleString()}) will be reset to 0 after manual verification.`);
                 if (confirmation) {
-                    // Send withdrawal request to your backend / Firebase Function
-                    // which then forwards to Telegram channel.
-                    const withdrawalRequest = {
-                        userId: currentUser.uid,
-                        telegramId: currentUser.telegramId,
-                        username: currentUser.username,
-                        currentViews: currentUser.totalViews,
-                        estimatedEarnings: document.getElementById('profile-estimated-earnings').textContent,
-                        requestTimestamp: Date.now()
-                    };
-
-                    // Simulate sending to backend (replace with actual fetch to your Firebase Function)
-                    // fetch('/.netlify/functions/sendTelegramWithdrawal', {
-                    //     method: 'POST',
-                    //     headers: { 'Content-Type': 'application/json' },
-                    //     body: JSON.stringify(withdrawalRequest)
-                    // })
-                    // .then(response => response.json())
-                    // .then(data => {
-                    //     if (data.success) {
-                    //         alert('Your withdrawal request has been sent! Please send a message to our Telegram channel for verification.');
-                    //         window.open(TELEGRAM_CHANNEL_URL, '_blank');
-                    //     } else {
-                    //         alert('Failed to send withdrawal request: ' + data.error);
-                    //     }
-                    // })
-                    // .catch(error => {
-                    //     console.error("Error sending withdrawal request:", error);
-                    //     alert("An error occurred during withdrawal. Please try again.");
-                    // });
-
                     alert('Your withdrawal request has been submitted! Please send a message to our Telegram channel with your details for verification: ' + TELEGRAM_CHANNEL_URL);
                     window.open(TELEGRAM_CHANNEL_URL, '_blank');
-
-                    // In a real scenario, views are reset by YOU (admin) after manual payment
-                    // For now, we simulate a local reset, but Firebase should be updated by admin.
-                    // currentUser.totalViews = 0; // Don't reset locally without backend confirmation
-                    // updateProfileUI();
                 }
             } else {
                 alert(`You need ${VIEWS_FOR_WITHDRAWAL - (currentUser.totalViews || 0)} more views to withdraw.`);
             }
         });
 
-
-        // --- Video Player (VAST Ad + Telegram Video) ---
-        let player = null; // Video.js player instance
+        // --- Video Player (VAST Ad + Telegram Video) (Same as before) ---
+        let player = null;
 
         window.playVideoWrapper = async function(videoId, telegramLink) {
             document.getElementById('video-player-overlay').style.display = 'flex';
 
-            // 1. Initialize Video.js for VAST Ad
             const vastAdPlayerElement = document.getElementById('vast-ad-player');
             if (player) {
-                player.dispose(); // Dispose previous instance if exists
+                player.dispose();
             }
             player = videojs(vastAdPlayerElement, {
-                autoplay: true, // Auto play ad
+                autoplay: true,
                 controls: true,
-                sources: [] // No initial sources, will be set by VAST
+                sources: []
             });
 
-            // This is where you'd integrate a VAST plugin for Video.js
-            // Example: player.vast({ url: 'YOUR_VAST_AD_URL' });
-            // For now, we simulate an ad with a dummy video or just a delay.
-            const vastAdUrl = 'https://s.magsrv.com/v1/vast.php?idzone=5609878'; // Your VAST URL
+            const vastAdUrl = 'https://s.magsrv.com/v1/vast.php?idzone=5609878';
 
-            // Simulating VAST Ad playback
-            vastAdPlayerElement.style.display = 'block'; // Show ad player
-            document.getElementById('telegram-video-iframe').style.display = 'none'; // Hide iframe initially
+            vastAdPlayerElement.style.display = 'block';
+            document.getElementById('telegram-video-iframe').style.display = 'none';
 
-            // In a real VAST integration, Video.js VAST plugin would handle fetching and playing.
-            // For this demo, we'll just show a "loading ad" message and then the Telegram video.
-            // You'd replace this with actual VAST player setup.
             try {
                 alert("Playing VAST Ad now... (This would be an actual video ad)");
                 console.log('Fetching VAST Ad from:', vastAdUrl);
-                // Simulate ad playback delay
-                await new Promise(resolve => setTimeout(resolve, 5000)); // Simulate 5 sec ad
+                await new Promise(resolve => setTimeout(resolve, 5000));
 
-                // After ad finishes, play Telegram video
-                vastAdPlayerElement.style.display = 'none'; // Hide ad player
+                vastAdPlayerElement.style.display = 'none';
                 playTelegramVideo(videoId, telegramLink);
 
-                // Increment views after ad (assuming ad completion means user watched the main video)
                 incrementVideoViews(videoId);
 
             } catch (error) {
                 console.error("Error playing VAST ad or getting VAST data:", error);
                 alert("Failed to play ad. Proceeding to video.");
-                // If ad fails, still attempt to play main video
                 vastAdPlayerElement.style.display = 'none';
                 playTelegramVideo(videoId, telegramLink);
                 incrementVideoViews(videoId);
@@ -1365,15 +1274,9 @@
 
         function playTelegramVideo(videoId, telegramLink) {
             const iframe = document.getElementById('telegram-video-iframe');
-            iframe.src = telegramLink; // Direct video file link
+            iframe.src = telegramLink;
             iframe.style.display = 'block';
             console.log("Playing Telegram video:", telegramLink);
-
-            // You might need to set dynamic height for the iframe
-            // Or embed a custom player that streams from the link if Telegram doesn't provide.
-            // The challenge with Telegram is getting a directly embeddable link that works in an iframe like YouTube.
-            // Often, Telegram links are for messages or for their own internal players.
-            // A direct file link (e.g., .mp4 from a Telegram CDN/Bot) is needed for this.
         }
 
         async function incrementVideoViews(videoId) {
@@ -1391,8 +1294,8 @@
                 let currentUserTotalViews = userTotalViewsSnapshot.val() || 0;
                 await set(userRef, currentUserTotalViews + 1);
 
-                currentUser.totalViews = currentUserTotalViews + 1; // Update local state
-                updateProfileUI(); // Refresh profile UI
+                currentUser.totalViews = currentUserTotalViews + 1;
+                updateProfileUI();
 
                 console.log(`Views for video ${videoId} and user ${currentUser.uid} incremented.`);
             } catch (error) {
@@ -1400,39 +1303,30 @@
             }
         }
 
-
-        // --- Search Functionality ---
+        // --- Search Functionality (Same as before) ---
         document.getElementById('search-input').addEventListener('input', (e) => {
             const searchTerm = e.target.value.toLowerCase().trim();
             const videoCards = document.querySelectorAll('#home-section .video-card');
 
             videoCards.forEach(card => {
                 const title = card.querySelector('.video-title').textContent.toLowerCase();
-                // You'll need to fetch tags and description when you render the card
-                // For now, let's assume they are in data attributes or hidden elements
-                // const tags = card.dataset.tags.toLowerCase(); // Needs to be added to video card HTML
-                // const description = card.dataset.description.toLowerCase(); // Needs to be added to video card HTML
-
-                // Simple search for now, matching title
-                if (title.includes(searchTerm) /* || tags.includes(searchTerm) || description.includes(searchTerm) */) {
-                    card.style.display = 'flex'; // Show
+                if (title.includes(searchTerm)) {
+                    card.style.display = 'flex';
                 } else {
-                    card.style.display = 'none'; // Hide
+                    card.style.display = 'none';
                 }
             });
         });
 
-        // --- Popunder Ad Integration ---
+        // --- Popunder Ad Integration (Same as before) ---
         function loadPopunderAd() {
-            // This script injects the popunder code. It's often triggered on user interaction.
-            // The provided code is for a specific ad network.
             const popunderScript = document.createElement('script');
             popunderScript.type = 'text/javascript';
             popunderScript.innerHTML = `
                 var url = "https://www.profitablegate.com/j48n8l2l?key=67f60700d866a4f5b5f25777b7f94119";
                 var popunder = {
                     click: function() {
-                        if (!localStorage.getItem('popunderSession')) { // Basic session limit
+                        if (!localStorage.getItem('popunderSession')) {
                             window.open(url);
                             localStorage.setItem('popunderSession', 'true');
                         }
@@ -1444,20 +1338,19 @@
                         }
                     }
                 };
-                // Attach event listener for first click on body to trigger popunder
                 document.body.addEventListener('click', popunder.click, { once: true });
-                // Alternatively, some networks automatically trigger on page load or when specific elements are present.
             `;
             document.body.appendChild(popunderScript);
             console.log('Popunder ad script loaded.');
         }
 
-
         // --- Initial Load Logic ---
         document.addEventListener('DOMContentLoaded', () => {
-            // Initial check for Firebase Auth state is handled by onAuthStateChanged
-            // If already logged in, #app-content will show. Otherwise, #login-page will show.
-            loadTelegramLoginWidget(); // Start by loading the Telegram login widget
+            // No need to call loadTelegramLoginWidget() as it's directly in HTML now.
+            // onAuthStateChanged will handle initial UI setup based on login status.
+            // If the user is already logged in (e.g., from a previous session),
+            // onAuthStateChanged will automatically show #app-content.
+            // If not logged in, #login-page will remain visible with the widget.
         });
 
     </script>
