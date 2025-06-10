@@ -3,313 +3,1149 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VideoFire - Get Started</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-
-    <script src="https://cdn.jsdelivr.net/npm/emailjs-com@2.6.4/dist/email.min.js"></script>
-
+    <title>VideoFire - Telegram Video Sharing</title>
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /* General Body Styles */
-        body {
-            font-family: 'Roboto', sans-serif;
+        /* Basic Reset & Global Styles */
+        * {
             margin: 0;
-            padding: 20px;
-            background-color: #121212; /* Darker background for more depth */
-            color: #e0e0e0; /* Lighter text for contrast */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
+            padding: 0;
             box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f0f2f5; /* Light grey background */
+            color: #333;
             line-height: 1.6;
+            display: flex;
+            min-height: 100vh; /* Full viewport height */
+            overflow-x: hidden; /* Prevent horizontal scroll */
         }
 
-        /* Container for the form */
-        .container {
-            background-color: #1f1f1f; /* Slightly lighter than body for subtle contrast */
-            padding: 40px;
-            border-radius: 12px; /* More rounded corners */
-            box-shadow: 0 10px 25px rgba(0,0,0,0.6); /* More pronounced shadow */
+        /* --- Sidebar Navigation (Left) --- */
+        .sidebar {
+            width: 250px;
+            background-color: #ffffff;
+            padding: 20px 0;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            position: fixed; /* Fixed sidebar */
+            height: 100%;
+            z-index: 100;
+        }
+
+        .sidebar-logo {
             text-align: center;
-            width: 100%;
-            max-width: 450px; /* Slightly wider */
-            border: 1px solid #333; /* Subtle border */
-        }
-
-        /* Heading */
-        h1 {
-            color: #ff3d00; /* A more vibrant red/orange for branding */
             margin-bottom: 30px;
-            font-size: 32px;
+            padding: 0 20px;
+        }
+
+        .sidebar-logo h1 {
+            color: #2c6bed; /* Telegram-like blue */
+            font-size: 28px;
             font-weight: 700;
-            letter-spacing: 0.5px;
         }
 
-        /* Paragraph text */
-        p {
-            font-size: 16px;
-            color: #b0b0b0;
-            margin-bottom: 25px;
+        .sidebar-nav ul {
+            list-style: none;
+            padding: 0;
         }
 
-        /* Google Sign-in Button */
-        .google-btn {
-            background-color: #4285F4; /* Google brand color */
-            color: white;
+        .sidebar-nav ul li a {
+            display: flex;
+            align-items: center;
             padding: 15px 25px;
-            border: none;
-            border-radius: 8px; /* More rounded */
-            cursor: pointer;
+            color: #555;
+            text-decoration: none;
+            font-size: 16px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .sidebar-nav ul li a i {
+            margin-right: 15px;
+            font-size: 20px;
+            color: #777;
+        }
+
+        .sidebar-nav ul li a:hover,
+        .sidebar-nav ul li a.active {
+            background-color: #e0f2f7;
+            color: #2c6bed;
+        }
+        .sidebar-nav ul li a:hover i,
+        .sidebar-nav ul li a.active i {
+            color: #2c6bed;
+        }
+
+        /* --- Main Content Area (Right) --- */
+        .main-content {
+            flex-grow: 1;
+            margin-left: 250px; /* Space for the fixed sidebar */
+            padding: 20px;
+            position: relative;
+        }
+
+        /* --- Top Bar / Search Bar --- */
+        .top-bar {
+            background-color: #ffffff;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 25px;
+            position: sticky; /* Sticky top bar */
+            top: 0;
+            z-index: 50;
+        }
+
+        .search-bar {
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 12px 20px 12px 50px; /* Left padding for icon */
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .search-bar input:focus {
+            border-color: #2c6bed;
+        }
+
+        .search-bar i {
+            position: absolute;
+            left: 20px;
+            color: #999;
             font-size: 18px;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto;
-            width: fit-content;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-        }
-        .google-btn:hover {
-            background-color: #357ae8; /* Darker on hover */
-            transform: translateY(-2px); /* Slight lift effect */
-        }
-        .google-btn:active {
-            transform: translateY(0); /* Press down effect */
-        }
-        .google-btn:disabled {
-            background-color: #555;
-            cursor: not-allowed;
-            opacity: 0.7;
         }
 
-        .google-icon {
-            margin-right: 12px;
-            background: white;
-            padding: 6px; /* Adjust padding to make icon size consistent */
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .google-icon img {
-            width: 20px; /* Slightly larger icon */
-            height: 20px;
-            vertical-align: middle;
+        .user-profile-icon {
+            margin-left: 20px;
+            cursor: pointer;
+            position: relative;
         }
 
-        /* Message Display */
-        #message {
-            margin-top: 25px;
-            color: #ffd700; /* Gold for warnings/info */
-            font-size: 15px;
-            min-height: 20px; /* Prevent layout shift */
-        }
-
-        /* Loading Spinner */
-        .loading-spinner {
-            border: 4px solid rgba(255, 255, 255, 0.3);
-            border-top: 4px solid #ff3d00; /* Match brand color */
+        .user-profile-icon img {
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
-            width: 30px; /* Slightly larger */
-            height: 30px;
-            animation: spin 1s linear infinite;
-            margin: 20px auto 0;
-            display: none; /* Hidden by default */
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            object-fit: cover;
+            border: 2px solid #2c6bed;
         }
 
-        /* Responsive adjustments */
-        @media (max-width: 600px) {
-            body {
-                padding: 15px;
+        /* --- Home Section (Video Grid) --- */
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* Responsive grid */
+            gap: 25px;
+            padding: 0 10px;
+        }
+
+        .video-card {
+            background-color: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .video-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+        }
+
+        .video-thumbnail {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+            background-color: #000; /* Placeholder background */
+            overflow: hidden;
+        }
+
+        .video-thumbnail img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .video-info {
+            padding: 15px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .video-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            line-height: 1.3;
+            max-height: 2.6em; /* Limit to 2 lines */
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .video-meta {
+            font-size: 14px;
+            color: #777;
+            margin-bottom: 10px;
+        }
+
+        .video-author {
+            display: flex;
+            align-items: center;
+            margin-top: auto; /* Push to bottom */
+        }
+
+        .video-author img {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 10px;
+        }
+
+        .video-author span {
+            font-weight: 500;
+            color: #555;
+        }
+
+        /* --- Upload Button (Center Bottom) --- */
+        .upload-button-container {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 200;
+        }
+
+        .upload-button {
+            background-color: #2c6bed;
+            color: #ffffff;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            box-shadow: 0 5px 15px rgba(44, 107, 237, 0.4);
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+        .upload-button:hover {
+            background-color: #205ac7;
+            transform: translateY(-3px);
+        }
+
+        /* --- Upload Page (Hidden by default) --- */
+        .upload-page {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: none; /* Hidden by default */
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .upload-form-container {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            width: 90%;
+            max-width: 600px;
+            animation: fadeInScale 0.3s ease-out;
+            position: relative;
+        }
+
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
             }
-            .container {
-                padding: 25px;
-                margin: 0 10px; /* Ensure some margin on smaller screens */
-            }
-            h1 {
-                font-size: 28px;
-                margin-bottom: 20px;
-            }
-            .google-btn {
-                padding: 12px 20px;
-                font-size: 16px;
-            }
-            .google-icon img {
-                width: 18px;
-                height: 18px;
+            to {
+                opacity: 1;
+                transform: scale(1);
             }
         }
+
+        .upload-form-container h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #2c6bed;
+            font-size: 28px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #444;
+        }
+
+        .form-group input[type="text"],
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: 'Poppins', sans-serif;
+            transition: border-color 0.3s;
+            resize: vertical; /* Allow textarea resizing */
+        }
+
+        .form-group input[type="text"]:focus,
+        .form-group textarea:focus {
+            border-color: #2c6bed;
+            outline: none;
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+        }
+
+        .upload-submit-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background-color: #2c6bed;
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .upload-submit-btn:hover {
+            background-color: #205ac7;
+        }
+
+        .close-upload-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 28px;
+            color: #999;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .close-upload-btn:hover {
+            color: #555;
+        }
+
+        /* --- Profile Section (Hidden by default, similar structure to Upload Page) --- */
+        .profile-page {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: none; /* Hidden by default */
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .profile-container {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            width: 90%;
+            max-width: 700px;
+            animation: fadeInScale 0.3s ease-out;
+            position: relative;
+        }
+
+        .profile-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .profile-header img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #2c6bed;
+            margin-bottom: 15px;
+        }
+
+        .profile-header h2 {
+            font-size: 32px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .profile-header p {
+            font-size: 16px;
+            color: #777;
+        }
+
+        .profile-stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .stat-item {
+            background-color: #f0f2f5;
+            padding: 15px;
+            border-radius: 10px;
+            flex: 1;
+            margin: 0 10px;
+        }
+
+        .stat-item h3 {
+            font-size: 24px;
+            color: #2c6bed;
+            margin-bottom: 5px;
+        }
+
+        .stat-item p {
+            font-size: 14px;
+            color: #555;
+        }
+
+        .profile-videos-section {
+            margin-top: 30px;
+        }
+
+        .profile-videos-section h3 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #333;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .profile-video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        /* Reusing video-card styles for profile videos */
+
+        .withdraw-section {
+            background-color: #e6ffe6; /* Light green background */
+            border: 1px solid #ccebcc;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .withdraw-section p {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .withdraw-section span {
+            font-weight: 700;
+            color: #28a745; /* Green for target */
+        }
+
+        .withdraw-button {
+            background-color: #28a745; /* Green for withdraw */
+            color: #ffffff;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: none; /* Hidden by default, show when views met */
+        }
+
+        .withdraw-button:hover {
+            background-color: #218838;
+        }
+
+        /* --- Ad Styles (Placeholders) --- */
+        .ad-container {
+            width: 100%;
+            margin: 20px 0;
+            text-align: center;
+            background-color: #e9e9e9;
+            padding: 15px;
+            border-radius: 8px;
+            color: #555;
+            font-size: 14px;
+        }
+
+        /* Specific ad sizes/types */
+        .banner-468x60 { width: 468px; height: 60px; background-color: #ccc; margin: 15px auto; display: flex; align-items: center; justify-content: center; }
+        .banner-160x30 { width: 160px; height: 30px; background-color: #ccc; margin: 10px auto; display: flex; align-items: center; justify-content: center; }
+        .banner-320x50 { width: 320px; height: 50px; background-color: #ccc; margin: 10px auto; display: flex; align-items: center; justify-content: center; }
+
+
+        /* --- Responsive Adjustments --- */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 80px; /* Collapse sidebar */
+                align-items: center;
+            }
+            .sidebar-logo h1 {
+                font-size: 0; /* Hide text */
+            }
+            .sidebar-nav ul li a {
+                justify-content: center;
+                padding: 15px 0;
+            }
+            .sidebar-nav ul li a span {
+                display: none; /* Hide text labels */
+            }
+            .sidebar-nav ul li a i {
+                margin-right: 0;
+            }
+            .main-content {
+                margin-left: 80px;
+            }
+            .top-bar {
+                padding: 10px 15px;
+            }
+            .search-bar input {
+                padding: 10px 15px; /* Remove left padding for icon if icon is moved */
+                padding-left: 45px; /* Adjust if icon is still there */
+            }
+            .search-bar i {
+                left: 15px;
+            }
+            .user-profile-icon {
+                margin-left: 10px;
+            }
+            .video-grid {
+                grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+                gap: 15px;
+            }
+            .upload-button-container {
+                bottom: 20px;
+                width: 100%;
+                display: flex;
+                justify-content: center;
+            }
+            .upload-button {
+                width: 50px;
+                height: 50px;
+                font-size: 24px;
+            }
+            .upload-form-container, .profile-container {
+                width: 95%;
+                padding: 25px;
+            }
+            .profile-stats {
+                flex-direction: column;
+            }
+            .stat-item {
+                margin: 10px 0;
+            }
+        }
+
+        /* --- Footer (for popunder ad) --- */
+        .footer-ad-placeholder {
+            height: 1px; /* Minimal height */
+            visibility: hidden; /* Hide visually but keep in DOM for popunder */
+            overflow: hidden;
+            pointer-events: none; /* Do not interfere with clicks */
+        }
+
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>Welcome to VideoFire!</h1>
-        <p>Sign up once with Google to get your unique login credentials and start watching.</p>
-        <button id="googleSignInBtn" class="google-btn">
-            <span class="google-icon">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/4/4a/Logo_and_wordmark_of_Google_Identity.svg" alt="Google icon">
-            </span>
-            Sign in with Google
-        </button>
-        <div id="loadingSpinner" class="loading-spinner"></div>
-        <p id="message"></p>
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <h1>VideoFire</h1>
+        </div>
+        <nav class="sidebar-nav">
+            <ul>
+                <li><a href="#" class="active" onclick="showSection('home')"><i class="fas fa-home"></i> <span>Home</span></a></li>
+                <li><a href="#" onclick="showSection('profile')"><i class="fas fa-user"></i> <span>My Profile</span></a></li>
+                <li><a href="#" onclick="showSection('settings')"><i class="fas fa-cog"></i> <span>Settings</span></a></li>
+                <li><a href="#" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <header class="top-bar">
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Search videos by tags, description...">
+            </div>
+            <div class="user-profile-icon" onclick="showSection('profile')">
+                <img src="https://via.placeholder.com/40/2c6bed/ffffff?text=U" alt="User Profile">
+                </div>
+        </header>
+
+        <section id="home-section" class="video-grid">
+            <div class="video-card">
+                <div class="video-thumbnail">
+                    <img src="https://via.placeholder.com/320x180/FF5733/FFFFFF?text=Video+1" alt="Video Thumbnail">
+                </div>
+                <div class="video-info">
+                    <h4 class="video-title">Awesome Travel Vlog in Mountains with Friends!</h4>
+                    <p class="video-meta">5.2K views • 2 days ago</p>
+                    <div class="video-author">
+                        <img src="https://via.placeholder.com/30/33C7FF/FFFFFF?text=A" alt="Author">
+                        <span>TravelerExplorer</span>
+                    </div>
+                </div>
+            </div>
+            <div class="video-card">
+                <div class="video-thumbnail">
+                    <img src="https://via.placeholder.com/320x180/33FF57/FFFFFF?text=Video+2" alt="Video Thumbnail">
+                </div>
+                <div class="video-info">
+                    <h4 class="video-title">Coding Tutorial: Build a Responsive Web App</h4>
+                    <p class="video-meta">12K views • 1 week ago</p>
+                    <div class="video-author">
+                        <img src="https://via.placeholder.com/30/FF33C7/FFFFFF?text=B" alt="Author">
+                        <span>CodeMaster</span>
+                    </div>
+                </div>
+            </div>
+            <div class="video-card">
+                <div class="video-thumbnail">
+                    <img src="https://via.placeholder.com/320x180/5733FF/FFFFFF?text=Video+3" alt="Video Thumbnail">
+                </div>
+                <div class="video-info">
+                    <h4 class="video-title">Delicious Indian Cuisine Recipe: Butter Chicken</h4>
+                    <p class="video-meta">8.9K views • 4 days ago</p>
+                    <div class="video-author">
+                        <img src="https://via.placeholder.com/30/33FFC7/FFFFFF?text=C" alt="Author">
+                        <span>FoodieChef</span>
+                    </div>
+                </div>
+            </div>
+            </section>
+
+        <div class="ad-container" style="margin-top: 30px;">
+            <p>Advertisement</p>
+            <div class="banner-468x60">Native Ad Placeholder (468x60)</div>
+            <script type="text/javascript">
+                atOptions = {
+                    'key' : '7cc9b0386975c414c8ab9629f405b0dc',
+                    'format' : 'iframe',
+                    'height' : 250,
+                    'width' : 300,
+                    'params' : {}
+                };
+                document.write('<scr' + 'ipt type="text/javascript" src="//www.profitableprogram.com/7cc9b0386975c414c8ab9629f405b0dc/invoke.js"></scr' + 'ipt>');
+            </script>
+        </div>
+
+
+    </main>
+
+    <div class="upload-button-container">
+        <div class="upload-button" onclick="showUploadPage()">
+            <i class="fas fa-upload"></i>
+        </div>
     </div>
 
-    <script>
-        // ✅ 1. Firebase Config
+    <section id="upload-page" class="upload-page">
+        <div class="upload-form-container">
+            <button class="close-upload-btn" onclick="hideUploadPage()">&times;</button>
+            <h2>Upload Your Video</h2>
+            <form id="video-upload-form">
+                <div class="form-group">
+                    <label for="video-title">Video Title</label>
+                    <input type="text" id="video-title" placeholder="Enter video title" required>
+                </div>
+                <div class="form-group">
+                    <label for="video-link">Telegram Video Link</label>
+                    <input type="text" id="video-link" placeholder="Paste Telegram video link (e.g., from Telegram channel)" required>
+                </div>
+                <div class="form-group">
+                    <label for="video-tags">Tags (comma separated, max 300 characters)</label>
+                    <input type="text" id="video-tags" placeholder="e.g., travel, vlog, india, mountains" maxlength="300">
+                    <small>Separate tags with commas. Max 300 characters.</small>
+                </div>
+                <div class="form-group">
+                    <label for="video-description">Description (max 400 words)</label>
+                    <textarea id="video-description" placeholder="Describe your video..." maxlength="2400"></textarea> <small>Max 400 words.</small>
+                </div>
+                <button type="submit" class="upload-submit-btn">Upload Video</button>
+            </form>
+        </div>
+    </section>
+
+    <section id="profile-page" class="profile-page">
+        <div class="profile-container">
+            <button class="close-upload-btn" onclick="hideProfilePage()">&times;</button>
+            <div class="profile-header">
+                <img src="https://via.placeholder.com/120/2c6bed/ffffff?text=U" alt="Profile Picture">
+                <h2>Your Telegram Username</h2>
+                <p>@telegram_username_here</p>
+            </div>
+            <div class="profile-stats">
+                <div class="stat-item">
+                    <h3>15</h3>
+                    <p>Videos Uploaded</p>
+                </div>
+                <div class="stat-item">
+                    <h3 id="total-views">5,345</h3>
+                    <p>Total Views</p>
+                </div>
+                <div class="stat-item">
+                    <h3>₹ <span id="estimated-earnings">53.45</span></h3>
+                    <p>Estimated Earnings</p>
+                </div>
+            </div>
+
+            <div class="withdraw-section">
+                <p>Views for next withdrawal: <span id="views-countdown">20,000</span></p>
+                <button id="withdraw-button" class="withdraw-button">Withdraw Earnings</button>
+            </div>
+
+            <div class="profile-videos-section">
+                <h3>My Uploaded Videos</h3>
+                <div class="profile-video-grid">
+                    <div class="video-card">
+                        <div class="video-thumbnail">
+                            <img src="https://via.placeholder.com/320x180/8A2BE2/FFFFFF?text=My+Video+1" alt="My Video 1">
+                        </div>
+                        <div class="video-info">
+                            <h4 class="video-title">My First Telegram Video Upload!</h4>
+                            <p class="video-meta">1.5K views • 3 days ago</p>
+                        </div>
+                    </div>
+                    <div class="video-card">
+                        <div class="video-thumbnail">
+                            <img src="https://via.placeholder.com/320x180/DC143C/FFFFFF?text=My+Video+2" alt="My Video 2">
+                        </div>
+                        <div class="video-info">
+                            <h4 class="video-title">Quick Tip for Better Productivity</h4>
+                            <p class="video-meta">800 views • 1 week ago</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        // Import other Firebase services as needed, e.g., getAuth, getFirestore, getDatabase
+        import { getDatabase, ref, push, onValue, set, get } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+        // Also need Firebase Auth for Telegram login
+        // import { getAuth, signInWithRedirect, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+
+
         const firebaseConfig = {
-          apiKey: "AIzaSyDes3ioeygnWBqJB6NnHb7xj732JJhOqm8",
-          authDomain: "videofire-268ff.firebaseapp.com",
-          databaseURL: "https://videofire-268ff-default-rtdb.firebaseio.com",
-          projectId: "videofire-268ff",
-          storageBucket: "videofire-268ff.appspot.com", // Updated from your previous
-          messagingSenderId: "910374058927",
-          appId: "1:910374058927:web:6add3afdea07cfa2914d5a"
+            apiKey: "AIzaSyDes3ioeygnWBqJB6NnHb7xj732JJhOqm8",
+            authDomain: "videofire-268ff.firebaseapp.com",
+            databaseURL: "https://videofire-268ff-default-rtdb.firebaseio.com",
+            projectId: "videofire-268ff",
+            storageBucket: "videofire-268ff.firebasestorage.app",
+            messagingSenderId: "910374058927",
+            appId: "1:910374058927:web:6add3afdea07cfa29914d5a"
         };
-        firebase.initializeApp(firebaseConfig); // Initialize with compat syntax
 
-        const auth = firebase.auth();
-        const database = firebase.database(); // Use firebase.database() for compat
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
 
-        // ✅ 2. EmailJS Init (REPLACE THESE PLACEHOLDERS)
-        emailjs.init("YOUR_EMAILJS_PUBLIC_KEY"); // <-- IMPORTANT: Replace with your Public Key from EmailJS
+        // --- JavaScript for UI Interactions ---
+        // Function to show/hide sections
+        window.showSection = function(sectionId) {
+            document.querySelectorAll('main section').forEach(section => {
+                section.style.display = 'none'; // Hide all main sections
+            });
+            document.getElementById('home-section').style.display = 'grid'; // Home is always grid layout
+            document.getElementById('upload-page').style.display = 'none'; // Hide modals
+            document.getElementById('profile-page').style.display = 'none'; // Hide modals
 
-        // DOM Elements
-        const googleSignInBtn = document.getElementById('googleSignInBtn');
-        const messageDisplay = document.getElementById('message');
-        const loadingSpinner = document.getElementById('loadingSpinner');
-
-        // Helper function to display messages
-        function showMessage(text, type = 'info') {
-            messageDisplay.textContent = text;
-            messageDisplay.style.color = {
-                info: '#ffd700', // Gold
-                success: '#4CAF50', // Green
-                error: '#f44336' // Red
-            }[type];
-        }
-
-        // Generate a simple unique username and a random one-time password
-        function generateCredentials(email) {
-            const baseUsername = email.split('@')[0].replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-            const uniqueSuffix = Math.random().toString(36).substring(2, 8); // 6 random chars
-            const username = `${baseUsername.substring(0, 10)}.${uniqueSuffix}`; // Max 10 chars from email + suffix
-
-            const password = Math.random().toString(36).substring(2, 12); // 10 random chars for the temporary password
-            return { username, password };
-        }
-
-        // Check if user is already logged in (e.g., from previous session)
-        auth.onAuthStateChanged((user) => {
-            if (user) {
-                console.log("User already signed in:", user.email);
-                showMessage('Redirecting to VideoFire...', 'success');
-                setTimeout(() => {
-                    window.location.href = 'https://apknixy.github.io/videofire/';
-                }, 1500); // Give user a moment to see message
+            if (sectionId === 'home') {
+                document.getElementById('home-section').style.display = 'grid';
+            } else if (sectionId === 'profile') {
+                document.getElementById('profile-page').style.display = 'flex'; // Show profile as flex
+                // Simulate loading profile data
+                updateProfileUI(); // Update profile stats etc.
+            } else {
+                // For settings or other sections, you'd have a dedicated section element
+                // For now, let's just make sure home is visible or handle specific sections
+                console.log(`Navigating to ${sectionId} (functionality not yet implemented)`);
             }
-        });
 
-        googleSignInBtn.addEventListener('click', async () => {
-            showMessage('Initiating Google Sign-in...', 'info');
-            loadingSpinner.style.display = 'block';
-            googleSignInBtn.disabled = true;
+            // Update active link in sidebar
+            document.querySelectorAll('.sidebar-nav ul li a').forEach(link => {
+                link.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
+        };
+
+        window.showUploadPage = function() {
+            document.getElementById('upload-page').style.display = 'flex';
+        };
+
+        window.hideUploadPage = function() {
+            document.getElementById('upload-page').style.display = 'none';
+        };
+
+        window.showProfilePage = function() {
+            document.getElementById('profile-page').style.display = 'flex';
+            updateProfileUI(); // Ensure profile UI is updated when shown
+        };
+
+        window.hideProfilePage = function() {
+            document.getElementById('profile-page').style.display = 'none';
+        };
+
+        // --- Firebase Data Handling (Conceptual) ---
+
+        // Dummy current user for demonstration (replace with actual Telegram user data)
+        let currentUser = {
+            id: "telegramUser123",
+            username: "MyTelegramUser",
+            profilePic: "https://via.placeholder.com/40/2c6bed/ffffff?text=U", // Placeholder
+            totalViews: 5345, // This will come from Firebase
+            uploadedVideos: [ // This will come from Firebase
+                { id: "v1", title: "My First Telegram Video Upload!", views: 1500, uploadDate: "3 days ago", thumbnail: "https://via.placeholder.com/320x180/8A2BE2/FFFFFF?text=My+Video+1" },
+                { id: "v2", title: "Quick Tip for Better Productivity", views: 800, uploadDate: "1 week ago", thumbnail: "https://via.placeholder.com/320x180/DC143C/FFFFFF?text=My+Video+2" }
+            ]
+        };
+
+        const VIEWS_FOR_WITHDRAWAL = 20000;
+        const EARNING_PER_1000_VIEWS_MIN = 10;
+        const EARNING_PER_1000_VIEWS_MAX = 500; // This range makes it complex for UI estimation without backend logic
+
+        // Function to update profile UI
+        function updateProfileUI() {
+            document.querySelector('.profile-header h2').textContent = currentUser.username;
+            document.querySelector('.profile-header p').textContent = `@${currentUser.username.toLowerCase().replace(/\s/g, '_')}`; // Simple username format
+            document.querySelector('.user-profile-icon img').src = currentUser.profilePic;
+            document.querySelector('.profile-header img').src = currentUser.profilePic;
+
+            document.getElementById('total-views').textContent = currentUser.totalViews.toLocaleString();
+
+            // Calculate estimated earnings (this needs proper backend logic for varied earnings)
+            const estimatedEarnings = (currentUser.totalViews / 1000) * EARNING_PER_1000_VIEWS_MIN; // Using min for simple estimate
+            document.getElementById('estimated-earnings').textContent = estimatedEarnings.toFixed(2);
+
+            const viewsRemaining = VIEWS_FOR_WITHDRAWAL - currentUser.totalViews;
+            document.getElementById('views-countdown').textContent = viewsRemaining > 0 ? viewsRemaining.toLocaleString() : "0 (Eligible)";
+
+            const withdrawButton = document.getElementById('withdraw-button');
+            if (currentUser.totalViews >= VIEWS_FOR_WITHDRAWAL) {
+                withdrawButton.style.display = 'block';
+            } else {
+                withdrawButton.style.display = 'none';
+            }
+
+            // Populate user's uploaded videos
+            const profileVideoGrid = document.querySelector('.profile-video-grid');
+            profileVideoGrid.innerHTML = ''; // Clear previous videos
+            currentUser.uploadedVideos.forEach(video => {
+                const videoCard = `
+                    <div class="video-card">
+                        <div class="video-thumbnail">
+                            <img src="${video.thumbnail}" alt="${video.title}">
+                        </div>
+                        <div class="video-info">
+                            <h4 class="video-title">${video.title}</h4>
+                            <p class="video-meta">${video.views.toLocaleString()} views • ${video.uploadDate}</p>
+                        </div>
+                    </div>
+                `;
+                profileVideoGrid.insertAdjacentHTML('beforeend', videoCard);
+            });
+        }
+
+
+        // Handle Video Upload Form Submission
+        document.getElementById('video-upload-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const title = document.getElementById('video-title').value;
+            const videoLink = document.getElementById('video-link').value;
+            const tags = document.getElementById('video-tags').value.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0);
+            const description = document.getElementById('video-description').value;
+
+            // Basic validation
+            if (!title || !videoLink) {
+                alert('Please enter video title and Telegram video link.');
+                return;
+            }
+
+            // Prepare data for Firebase
+            const newVideoRef = push(ref(database, 'videos')); // Push a new video to 'videos' node
+            const videoData = {
+                title: title,
+                telegramLink: videoLink,
+                tags: tags,
+                description: description,
+                uploaderId: currentUser.id, // Store current user's ID
+                uploaderUsername: currentUser.username,
+                views: 0, // Initialize views to 0
+                uploadTimestamp: Date.now()
+            };
 
             try {
-                const provider = new firebase.auth.GoogleAuthProvider();
-                const result = await auth.signInWithPopup(provider);
-                const user = result.user;
-                const isNewUser = result.additionalUserInfo.isNewUser;
-
-                if (isNewUser) {
-                    showMessage('Creating your VideoFire account and sending credentials...', 'info');
-                    const { username: generatedUsername, password: generatedPassword } = generateCredentials(user.email);
-
-                    // Check if generated username already exists in DB (highly unlikely with random suffix)
-                    const userRef = database.ref('users');
-                    const snapshot = await userRef.orderByChild('generatedUsername').equalTo(generatedUsername).once('value');
-                    if (snapshot.exists()) {
-                         // Regenerate if collision (extremely rare)
-                         const newCreds = generateCredentials(user.email);
-                         generatedUsername = newCreds.username;
-                         generatedPassword = newCreds.password;
-                    }
-
-                    // ✅ 3. Save user data to Firebase Realtime DB
-                    // IMPORTANT: We are NOT storing the generated password here for security reasons.
-                    // The user is expected to use Google Sign-in going forward.
-                    // The generated password is a *one-time* credential sent via email.
-                    await database.ref('users/' + user.uid).set({ // Use UID as key, not username for uniqueness
-                        uid: user.uid,
-                        email: user.email,
-                        displayName: user.displayName || 'User',
-                        photoURL: user.photoURL || '',
-                        generatedUsername: generatedUsername, // This is for login page
-                        createdAt: firebase.database.ServerValue.TIMESTAMP,
-                        totalViews: 0 // Initialize total views for this user
-                    });
-
-                    // ✅ 4. Send Email using EmailJS
-                    // REPLACE "YOUR_SERVICE_ID" AND "YOUR_TEMPLATE_ID"
-                    await emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", {
-                        to_email: user.email,
-                        username: generatedUsername,
-                        password: generatedPassword, // Send the one-time generated password
-                        display_name: user.displayName || user.email.split('@')[0],
-                        download_link: "https://apknixy.github.io/videofire/" // Link to your main app
-                    });
-
-                    showMessage('Account created! Your unique username and a temporary password have been sent to your email. Please use Google Sign-in or the provided credentials to log in.', 'success');
-                    
-                    alert(`✅ Account Created!\n\nYour VideoFire Username: ${generatedUsername}\nYour temporary Password: ${generatedPassword}\n\nThese details have been sent to your email: ${user.email}\n\nPlease use these credentials (or simply Sign in with Google) on the next screen.`);
-
-                } else {
-                    showMessage('Welcome back to VideoFire!', 'success');
-                }
-
-                // Redirect to the main app after login/signup (delay slightly to show messages)
-                setTimeout(() => {
-                    window.location.href = 'https://apknixy.github.io/videofire/';
-                }, 2000);
-
+                await set(newVideoRef, videoData);
+                alert('Video uploaded successfully!');
+                document.getElementById('video-upload-form').reset(); // Clear form
+                hideUploadPage();
+                // Optionally, refresh home feed or add to user's uploaded videos list
             } catch (error) {
-                console.error("Authentication or EmailJS error:", error);
-                let errorMessage = 'An unknown error occurred.';
-                if (error.code) {
-                    switch (error.code) {
-                        case 'auth/popup-closed-by-user':
-                            errorMessage = 'Sign-in cancelled by user.';
-                            break;
-                        case 'auth/cancelled-popup-request':
-                            errorMessage = 'Sign-in request cancelled (another popup was opened).';
-                            break;
-                        case 'auth/network-request-failed':
-                            errorMessage = 'Network error. Please check your internet connection.';
-                            break;
-                        case 'auth/account-exists-with-different-credential':
-                            errorMessage = 'An account with this email already exists using a different sign-in method. Please try logging in with that method.';
-                            break;
-                        default:
-                            errorMessage = `Sign-in failed: ${error.message}`;
-                    }
-                } else if (error.status && error.status === 400) { // EmailJS specific errors
-                    errorMessage = `Email sending failed (EmailJS Error: ${error.text}). Please check your EmailJS configuration.`;
-                }
-                showMessage(`Error: ${errorMessage}`, 'error');
-                googleSignInBtn.disabled = false;
-            } finally {
-                loadingSpinner.style.display = 'none';
+                console.error("Error uploading video: ", error);
+                alert('Failed to upload video. Please try again.');
             }
         });
+
+        // Handle Withdraw Button Click
+        document.getElementById('withdraw-button').addEventListener('click', () => {
+            if (currentUser.totalViews >= VIEWS_FOR_WITHDRAWAL) {
+                const confirmation = confirm("Are you sure you want to withdraw your earnings? Your views will be reset to 0.");
+                if (confirmation) {
+                    // Send user details to Telegram channel
+                    const userDetails = `
+                        Withdrawal Request:
+                        User ID: ${currentUser.id}
+                        Telegram Username: @${currentUser.username.toLowerCase().replace(/\s/g, '_')}
+                        Web App Username: ${currentUser.username}
+                        Current Views: ${currentUser.totalViews.toLocaleString()}
+                        Estimated Earnings: ₹${document.getElementById('estimated-earnings').textContent}
+                    `;
+                    // In a real app, you'd send this to a backend that then sends to Telegram
+                    // For now, let's simulate by opening the Telegram channel link and logging details
+                    window.open('https://t.me/Apknixyapp', '_blank');
+                    alert('Your withdrawal request has been sent! Please send a message to our Telegram channel with your details for verification.');
+
+                    // In a real scenario, after manual payment, you (admin) would reset views in Firebase
+                    // For demo, we can simulate resetting:
+                    // currentUser.totalViews = 0;
+                    // updateProfileUI();
+                    // update(ref(database, `users/${currentUser.id}/totalViews`), 0); // Example Firebase update
+
+                }
+            } else {
+                alert(`You need ${VIEWS_FOR_WITHDRAWAL - currentUser.totalViews} more views to withdraw.`);
+            }
+        });
+
+
+        // --- Load Videos for Home Screen from Firebase (Conceptual) ---
+        // This function will fetch videos and render them
+        function loadHomeVideos() {
+            const videoGrid = document.getElementById('home-section');
+            videoGrid.innerHTML = ''; // Clear existing videos
+
+            const videosRef = ref(database, 'videos');
+            onValue(videosRef, (snapshot) => {
+                const videos = [];
+                snapshot.forEach(childSnapshot => {
+                    const video = childSnapshot.val();
+                    video.id = childSnapshot.key; // Get the unique key for the video
+                    videos.push(video);
+                });
+
+                // Sort videos by timestamp (newest first for "kabi koi video aia kabi koi video uper aiye")
+                // For "user interest kai hisaab sai", you'd need a more complex recommendation engine
+                videos.sort((a, b) => b.uploadTimestamp - a.uploadTimestamp);
+
+                videos.forEach(video => {
+                    const viewsText = video.views !== undefined ? video.views.toLocaleString() : '0';
+                    const uploadDate = video.uploadTimestamp ? new Date(video.uploadTimestamp).toLocaleDateString() : 'N/A'; // Or use moment.js for "2 days ago" etc.
+                    const videoCard = `
+                        <div class="video-card" data-video-id="${video.id}" onclick="playVideo('${video.id}', '${video.telegramLink}')">
+                            <div class="video-thumbnail">
+                                <img src="https://via.placeholder.com/320x180/777777/FFFFFF?text=Video" alt="Video Thumbnail">
+                            </div>
+                            <div class="video-info">
+                                <h4 class="video-title">${video.title}</h4>
+                                <p class="video-meta">${viewsText} views • ${uploadDate}</p>
+                                <div class="video-author">
+                                    <img src="https://via.placeholder.com/30/33C7FF/FFFFFF?text=U" alt="Author">
+                                    <span>${video.uploaderUsername || 'Unknown User'}</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    videoGrid.insertAdjacentHTML('beforeend', videoCard);
+                });
+            }, {
+                onlyOnce: false // Listen for real-time updates
+            });
+        }
+
+        // --- Video Playback and Ad Integration ---
+        window.playVideo = async function(videoId, telegramLink) {
+            // 1. Play VAST Ad first
+            alert('Playing VAST Ad before video...'); // Replace with actual VAST player
+            // You'll need a VAST player library (e.g., Google IMA SDK, Video.js with VAST plugin)
+            // For now, just a placeholder alert
+            console.log('Playing VAST Ad from:', 'https://s.magsrv.com/v1/vast.php?idzone=5609878');
+            // Simulate ad playback delay
+            await new Promise(resolve => setTimeout(resolve, 3000)); // Simulate 3 sec ad
+
+            // 2. Open Telegram video link (or embed player if possible)
+            alert('Opening Telegram video: ' + telegramLink); // For now, just an alert
+            window.open(telegramLink, '_blank'); // Opens in new tab/window
+
+            // 3. Increment views in Firebase
+            // This needs to be more robust, potentially checking if the user actually watched.
+            // For simplicity, we'll increment on click.
+            const videoRef = ref(database, `videos/${videoId}/views`);
+            get(videoRef).then((snapshot) => {
+                let currentViews = snapshot.val() || 0;
+                set(videoRef, currentViews + 1);
+                console.log(`Views for video ${videoId} incremented to ${currentViews + 1}`);
+
+                // Also update current user's total views (for profile section)
+                const userViewsRef = ref(database, `users/${currentUser.id}/totalViews`);
+                get(userViewsRef).then((userSnapshot) => {
+                    let currentUserTotalViews = userSnapshot.val() || 0;
+                    set(userViewsRef, currentUserTotalViews + 1);
+                    currentUser.totalViews = currentUserTotalViews + 1; // Update local state
+                    updateProfileUI(); // Refresh profile UI
+                }).catch((error) => {
+                    console.error("Error updating user total views: ", error);
+                });
+
+            }).catch((error) => {
+                console.error("Error incrementing video views: ", error);
+            });
+        };
+
+
+        // --- Popunder Ad Integration ---
+        function loadPopunderAd() {
+            // This is a common way to inject popunder ads.
+            // It creates an invisible iframe or script that triggers the popunder.
+            const popunderScript = document.createElement('script');
+            popunderScript.type = 'text/javascript';
+            popunderScript.innerHTML = `
+                var popunder = {
+                    url: 'https://www.profitablegate.com/j48n8l2l?key=67f60700d866a4f5b5f25777b7f94119', // Your Popunder URL
+                    onClick: function() {
+                        // This function will be called when the popunder is triggered
+                        // You can add analytics or other actions here
+                        console.log('Popunder ad triggered!');
+                    }
+                };
+                // Example of how a popunder might be triggered (often on first click/interaction)
+                document.body.addEventListener('click', function() {
+                    if (popunder.url && !localStorage.getItem('popunderShown')) { // Basic check to not spam
+                        window.open(popunder.url, '_blank');
+                        localStorage.setItem('popunderShown', 'true'); // Set flag
+                    }
+                }, { once: true }); // Only trigger once per session for this example
+            `;
+            document.body.appendChild(popunderScript);
+        }
+
+        // --- Social Bar, Banners (Conceptual placement) ---
+        // These can be placed within the video cards, near the video player (if embedded),
+        // or in a dedicated sidebar/footer. I'll add simple placeholder divs.
+
+        // Initial calls
+        document.addEventListener('DOMContentLoaded', () => {
+            loadHomeVideos(); // Load videos on page load
+            updateProfileUI(); // Initialize profile UI
+            loadPopunderAd(); // Load the popunder ad script
+        });
+
+        // Implement a simple logout for demonstration
+        window.handleLogout = function() {
+            alert('Logging out (Telegram logout not implemented yet)...');
+            // Here you'd handle Firebase Auth logout for Telegram
+            // For now, just refresh or redirect
+            location.reload();
+        };
+
+        // This section will be updated with Firebase Auth for Telegram.
+        // Telegram Login Widget: https://core.telegram.org/widgets/login
+        // You'll need to set up a Telegram bot and get an API token.
+        // Firebase Auth supports custom token authentication, which you might use
+        // after verifying Telegram user on your backend, or if Telegram's widget
+        // directly integrates with Firebase client SDK (less common).
+        // Or use an existing Firebase Auth provider like Google, then link to Telegram.
+        // For 'sign up login telegram kai hoga', you'd use the Telegram Login Widget:
+        /*
+        <script async src="https://telegram.org/js/telegram-widget.js?22" data-telegram-login="YOUR_BOT_USERNAME" data-size="large" data-onauth="onTelegramAuth(user)" data-request-access="write"></script>
+        <script type="text/javascript">
+            function onTelegramAuth(user) {
+                // Here, you'd send 'user' data (id, first_name, photo_url, username, auth_date, hash)
+                // to your Firebase Function/Backend to generate a custom Firebase Auth Token.
+                // Then, you'd sign in with that custom token.
+                // Or if using Firebase Auth, you'd check how to integrate Telegram.
+                // For simplicity, let's just log the user data and update UI.
+                console.log('Telegram User Authenticated:', user);
+                currentUser.id = user.id;
+                currentUser.username = user.username || user.first_name;
+                currentUser.profilePic = user.photo_url || currentUser.profilePic; // Use Telegram photo
+                // After successful Telegram auth and Firebase custom token sign-in:
+                // fetchUserDataFromFirebase(user.id); // Load user's actual data (views, videos)
+                // updateProfileUI(); // Update UI with Telegram data
+                alert(`Welcome, ${currentUser.username}!`);
+                // Hide login, show app
+            }
+        </script>
+        */
+        // I haven't added the Telegram Login Widget HTML directly to avoid clutter,
+        // but remember it's crucial for your "sign up login telegram kai hoga" requirement.
+        // You would typically have a dedicated login/signup page that then redirects
+        // to this main app interface upon successful authentication.
+
     </script>
+
+    <div class="footer-ad-placeholder">
+        <script type="text/javascript">
+            var url = "https://www.profitablegate.com/j48n8l2l?key=67f60700d866a4f5b5f25777b7f94119";
+            var popunder = {
+                click: function() {
+                    window.open(url);
+                },
+                pop: function() {
+                    window.open(url, '', 'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=yes, resizable=yes, width=800, height=600');
+                }
+            };
+            // This script might be triggered on first user interaction or page load depending on ad network
+            // For now, I've integrated a basic 'loadPopunderAd' function in JS above.
+            // Be very careful with aggressive popunders as they can negatively affect user experience.
+        </script>
+    </div>
+
 </body>
 </html>
