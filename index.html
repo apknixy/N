@@ -754,10 +754,16 @@
                             'width' : 468, /* Adjusted width for banner */
                             'params' : {}
                         };
-                        // Note: If you put multiple of these, ensure they don't conflict or use an ad library
-                        // document.write is generally not recommended after initial page load.
-                        // You'd use createElement and appendChild for dynamic loading.
-                        // document.write('<scr' + 'ipt type="text/javascript" src="//www.profitableprogram.com/7cc9b0386975c414c8ab9629f405b0dc/invoke.js"></scr' + 'ipt>');
+                        // You'd typically use a more robust ad loading mechanism,
+                        // e.g., create an iframe dynamically and append the script.
+                        // For demonstration, direct script might work but not ideal for multiple ads.
+                        // Example: Append a script tag with the src
+                        /*
+                        const script = document.createElement('script');
+                        script.type = 'text/javascript';
+                        script.src = '//www.profitableprogram.com/7cc9b0386975c414c8ab9629f405b0dc/invoke.js';
+                        document.currentScript.parentNode.appendChild(script);
+                        */
                     </script>
                     <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center;">AD SLOT</div>
                 </div>
@@ -875,7 +881,7 @@
         // !!! DO NOT USE THIS APPROACH IN PRODUCTION OR FOR SENSITIVE APPLICATIONS. !!!
         // The secure way requires a server-side component (like Firebase Cloud Functions)
         // to verify the Telegram hash and issue a Firebase Custom Token.
-        const TELEGRAM_BOT_TOKEN_CLIENT_SIDE = "8125023086:AAH53bDbheT1QN49ELj9G-TVRUrVVlNt8CM";
+        const TELEGRAM_BOT_TOKEN_CLIENT_SIDE = "8125023086:AAH53bDbheT1QN49ELj9G-TVRUrVVlNt8CM"; // Your provided API Token
 
         const firebaseConfig = {
             apiKey: "AIzaSyDes3ioeygnWBqJB6NnHb7xj732JJhOqm8", // Replace with your actual Firebase API Key
