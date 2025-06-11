@@ -2,270 +2,458 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>VideoFire - Powered by Telegram</title>
-
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
-
+  <title>VideoFire – Telegram Video Platform</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
   <!-- Video.js -->
-  <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet" />
-  <script src="https://vjs.zencdn.net/7.20.3/video.min.js"></script>
-
-  <!-- Telegram Login -->
-  <script async src="https://telegram.org/js/telegram-widget.js?7"
-    data-telegram-login="Videofire_bot"
-    data-size="large"
-    data-userpic="true"
-    data-request-access="write"
-    data-userpic="true"
-    data-on-auth="onTelegramAuth">
-  </script>
-
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: #111;
-      color: #fff;
-    }
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px;
-      background: #1a1a1a;
-    }
-    .logo {
-      font-size: 24px;
-      font-weight: bold;
-    }
-    .search-bar {
-      flex: 1;
-      margin: 0 15px;
-    }
-    .search-bar input {
-      width: 100%;
-      padding: 8px;
-      border-radius: 4px;
-      border: none;
-    }
-    .container {
-      display: flex;
-      height: calc(100vh - 60px);
-    }
-    .sidebar {
-      width: 250px;
-      background: #222;
-      padding: 10px;
-      overflow-y: auto;
-    }
-    .main-content {
-      flex: 1;
-      overflow-y: auto;
-      padding: 10px;
-    }
-    .video-card {
-      background: #333;
-      margin-bottom: 15px;
-      padding: 10px;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-    .video-card img {
-      width: 100%;
-      border-radius: 8px;
-    }
-    .profile-section {
-      text-align: center;
-      padding: 20px;
-    }
-    .profile-section img {
-      border-radius: 50%;
-      width: 100px;
-    }
-    .upload-form {
-      margin-top: 20px;
-    }
-    .upload-form input, .upload-form textarea {
-      width: 100%;
-      margin-bottom: 10px;
-      padding: 8px;
-      border-radius: 4px;
-      border: none;
-    }
-    .upload-form button {
-      padding: 10px;
-      background: #e91e63;
-      border: none;
-      color: white;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-  </style>
-</head>
-
-<body>
-  <header>
-    <div class="logo">VideoFire 🔥</div>
-    <div class="search-bar">
-      <input type="text" id="searchInput" placeholder="Search videos...">
-    </div>
-    <div id="telegramLogin"></div>
-  </header>
-
-  <div class="container">
-    <div class="sidebar">
-      <div class="profile-section">
-        <img id="profilePic" src="https://via.placeholder.com/100" alt="Profile">
-        <h3 id="username">Guest</h3>
-        <p id="viewsCounter">Views: 0</p>
-        <p id="earningsCounter">Earnings: ₹0</p>
-        <button id="withdrawBtn" style="display:none;">Withdraw</button>
-      </div>
-    </div>
-
-    <div class="main-content" id="videoList"></div>
-  </div>
-
-  <div style="position: fixed; bottom: 20px; right: 20px;">
-    <button onclick="showUploadForm()">➕ Upload Video</button>
-  </div>
-
-  <div id="uploadModal" style="display:none; position: fixed; top:10%; left:50%; transform: translateX(-50%); background:#222; padding:20px; border-radius:8px;">
-    <h3>Upload New Video</h3>
-    <div class="upload-form">
-      <input type="text" id="videoTitle" placeholder="Video Title">
-      <textarea id="videoDesc" placeholder="Description (max 400 words)"></textarea>
-      <input type="text" id="videoTags" placeholder="Tags (comma separated, max 300 words)">
-      <input type="text" id="videoLink" placeholder="Telegram Video Link">
-      <button onclick="uploadVideo()">Upload</button>
-    </div>
-  </div>
-
-  <!-- Firebase Config -->
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyDes3ioeygnWBqJB6NnHb7xj732JJhOqm8",
+  <link href="https://vjs.zencdn.net/8.10.0/video-js.css" rel="stylesheet" />
+  <script src="https://vjs.zencdn.net/8.10.0/video.min.js"></script>
+  <!-- Firebase -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+    import { getDatabase } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+    import { getAuth } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+    window.firebaseConfig = {
+      apiKey: "AIzaSyDes3ioeygnWBqJB6f...YOUR_API_KEY...",
       authDomain: "videofire-268ff.firebaseapp.com",
       databaseURL: "https://videofire-268ff-default-rtdb.firebaseio.com",
       projectId: "videofire-268ff",
       storageBucket: "videofire-268ff.appspot.com",
       messagingSenderId: "910374058927",
-      appId: "1:910374058927:web:6add3afdea07cfa2914d5a"
+      appId: "1:910374058927:web:6add3afdea07cfa29914d5a"
     };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
+    window.firebaseApp = initializeApp(window.firebaseConfig);
+    window.firebaseDB  = getDatabase(window.firebaseApp);
+    window.firebaseAuth = getAuth(window.firebaseApp);
   </script>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Poppins',sans-serif; background:#f0f2f5; color:#333; display:flex; min-height:100vh; }
+    /* Sidebar */
+    .sidebar { width:250px; background:#fff; padding:20px 0; box-shadow:2px 0 5px rgba(0,0,0,0.05); position:fixed; height:100%; }
+    .sidebar-logo h1 { text-align:center; color:#2c6bed; font-size:28px; margin-bottom:30px; }
+    .sidebar-nav ul { list-style:none; }
+    .sidebar-nav a { display:flex; align-items:center; padding:15px 25px; color:#555; text-decoration:none; transition:.3s; }
+    .sidebar-nav a i { margin-right:15px; font-size:20px; }
+    .sidebar-nav a.active, .sidebar-nav a:hover { background:#e0f2f7; color:#2c6bed; }
+    /* Main content */
+    .main { margin-left:250px; flex:1; padding:20px; }
+    /* Top bar */
+    .top-bar { display:flex; align-items:center; justify-content:space-between; background:#fff; padding:15px 25px; border-radius:10px; box-shadow:0 2px 5px rgba(0,0,0,0.05); position:sticky; top:0; z-index:50; margin-bottom:25px; }
+    .search-bar { position:relative; flex:1; margin-right:20px; }
+    .search-bar input { width:100%; padding:12px 20px 12px 45px; border:1px solid #ddd; border-radius:25px; font-size:16px; }
+    .search-bar i { position:absolute; left:18px; top:50%; transform:translateY(-50%); color:#999; }
+    .user-icon img { width:40px; height:40px; border-radius:50%; border:2px solid #2c6bed; cursor:pointer; }
+    /* Video grid */
+    .video-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:25px; }
+    .video-card { background:#fff; border-radius:12px; overflow:hidden; box-shadow:0 4px 15px rgba(0,0,0,0.08); cursor:pointer; display:flex; flex-direction:column; transition:.3s; }
+    .video-card:hover { transform:translateY(-5px); box-shadow:0 8px 25px rgba(0,0,0,0.12); }
+    .video-thumb { position:relative; padding-bottom:56.25%; background:#000; }
+    .video-thumb img { position:absolute; width:100%; height:100%; object-fit:cover; }
+    .video-info { padding:15px; flex:1; display:flex; flex-direction:column; }
+    .video-title { font-size:18px; font-weight:600; margin-bottom:8px; line-height:1.3; max-height:2.6em; overflow:hidden; }
+    .video-meta { font-size:14px; color:#777; margin-bottom:10px; }
+    .video-author { margin-top:auto; display:flex; align-items:center; }
+    .video-author img { width:30px; height:30px; border-radius:50%; margin-right:10px; object-fit:cover; }
+    /* Upload btn */
+    .upload-btn { position:fixed; bottom:30px; left:50%; transform:translateX(-50%); background:#2c6bed; width:60px; height:60px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#fff; font-size:28px; box-shadow:0 5px 15px rgba(44,107,237,0.4); cursor:pointer; transition:.3s; }
+    .upload-btn:hover { transform:translate(-50%,-3px); background:#205ac7; }
+    /* Modal */
+    .modal { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); display:none; justify-content:center; align-items:center; z-index:1000; }
+    .modal.open { display:flex; }
+    .modal-content { background:#fff; padding:40px; border-radius:15px; width:90%; max-width:600px; position:relative; animation:fadeIn .3s; }
+    .modal-content h2 { text-align:center; margin-bottom:30px; color:#2c6bed; }
+    .close-btn { position:absolute; top:20px; right:20px; background:none; border:none; font-size:28px; color:#999; cursor:pointer; }
+    .close-btn:hover { color:#555; }
+    .form-group { margin-bottom:20px; }
+    .form-group label { display:block; margin-bottom:8px; font-weight:600; }
+    .form-group input, .form-group textarea { width:100%; padding:12px 15px; border:1px solid #ddd; border-radius:8px; font-size:16px; resize:vertical; }
+    .form-group input:focus, .form-group textarea:focus { border-color:#2c6bed; outline:none; }
+    .submit-btn { width:100%; padding:15px; background:#2c6bed; color:#fff; border:none; border-radius:8px; font-size:18px; font-weight:600; cursor:pointer; }
+    .submit-btn:hover { background:#205ac7; }
+    /* Profile */
+    .profile-page .modal-content { max-width:700px; max-height:90vh; overflow-y:auto; }
+    .profile-header { text-align:center; margin-bottom:30px; }
+    .profile-header img { width:120px; height:120px; border-radius:50%; border:4px solid #2c6bed; margin-bottom:15px; object-fit:cover; }
+    .profile-header h2 { font-size:32px; }
+    .profile-header p { color:#777; }
+    .profile-stats { display:flex; justify-content:space-around; margin-bottom:30px; }
+    .stat-item { flex:1; background:#f0f2f5; padding:15px; border-radius:10px; text-align:center; margin:0 10px; }
+    .stat-item h3 { color:#2c6bed; margin-bottom:5px; }
+    .withdraw-section { text-align:center; background:#e6ffe6; padding:20px; border:1px solid #ccebcc; border-radius:10px; }
+    .withdraw-btn { background:#28a745; color:#fff; padding:12px 25px; border:none; border-radius:8px; font-size:17px; font-weight:600; cursor:pointer; display:none; }
+    .withdraw-btn:hover { background:#218838; }
+    /* Video player overlay */
+    #video-player-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); display:none; justify-content:center; align-items:center; z-index:1500; }
+    #vast-ad-player { width:90%; max-width:900px; }
+    .close-player { position:absolute; top:15px; right:15px; background:rgba(0,0,0,0.5); color:#fff; border:none; border-radius:50%; width:40px; height:40px; font-size:24px; cursor:pointer; }
+    /* Ads placeholders */
+    .ad { text-align:center; padding:15px; background:#e9e9e9; border-radius:8px; margin:20px 0; color:#555; }
+    .banner-468x60 { max-width:468px; height:60px; margin:15px auto; }
+    .banner-160x30 { max-width:160px; height:30px; margin:10px auto; }
+    .banner-320x50 { max-width:320px; height:50px; margin:10px auto; }
+    @keyframes fadeIn { from{opacity:0; transform:scale(.95);} to{opacity:1;transform:scale(1);} }
+  </style>
+</head>
+<body>
 
-  <!-- App Logic -->
-  <script>
-    let currentUser = null;
-    const requiredViews = 20000;
+  <!-- Login -->
+  <section id="login-page" class="sidebar-logo">
+    <h1>VideoFire</h1>
+    <p style="text-align:center; margin:20px 0; font-size:18px;">Login with Telegram</p>
+    <div id="telegram-login-widget" style="text-align:center;"></div>
+  </section>
 
-    function onTelegramAuth(user) {
-      currentUser = user;
-      document.getElementById("telegramLogin").style.display = "none";
-      document.getElementById("username").innerText = user.username;
-      document.getElementById("profilePic").src = user.photo_url;
+  <!-- Main App -->
+  <div id="app-content" style="display:none; width:100%;">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-logo"><h1>VideoFire</h1></div>
+      <nav class="sidebar-nav">
+        <ul>
+          <li><a href="#" class="active" data-sec="home"><i class="fas fa-home"></i>Home</a></li>
+          <li><a href="#" data-sec="profile"><i class="fas fa-user"></i>My Profile</a></li>
+          <li><a href="#" data-sec="settings"><i class="fas fa-cog"></i>Settings</a></li>
+          <li><a href="#" id="logout"><i class="fas fa-sign-out-alt"></i>Logout</a></li>
+        </ul>
+      </nav>
+    </aside>
 
-      db.ref('users/'+user.id).once('value').then(snapshot => {
-        if (!snapshot.exists()) {
-          db.ref('users/'+user.id).set({
-            id: user.id,
-            username: user.username,
-            views: 0
-          });
-        }
-      });
+    <main class="main">
+      <!-- Top Bar -->
+      <div class="top-bar">
+        <div class="search-bar">
+          <i class="fas fa-search"></i>
+          <input type="text" id="search-input" placeholder="Search by tags, title...">
+        </div>
+        <div class="user-icon"><img id="topbar-pic" src="" alt="Profile"></div>
+      </div>
 
-      loadVideos();
-      loadProfile();
+      <!-- Home -->
+      <section id="home" class="video-grid">
+        <div class="ad banner-468x60"><p>Banner 468×60</p></div>
+      </section>
+
+      <!-- Settings -->
+      <section id="settings" style="display:none;">
+        <h2>Settings</h2><p>Coming soon...</p>
+      </section>
+    </main>
+
+    <!-- Upload Button -->
+    <div class="upload-btn" title="Upload"><i class="fas fa-upload"></i></div>
+
+    <!-- Upload Modal -->
+    <section id="upload-modal" class="modal">
+      <div class="modal-content">
+        <button class="close-btn" data-close>&times;</button>
+        <h2>Upload Your Video</h2>
+        <form id="upload-form">
+          <div class="form-group">
+            <label>Telegram Video Link *</label>
+            <input type="text" id="video-link" required>
+            <small>Direct .mp4/.mkv link or t.me/channel/msgID</small>
+          </div>
+          <div class="form-group">
+            <label>Thumbnail URL</label>
+            <input type="text" id="thumbnail-link">
+          </div>
+          <div class="form-group">
+            <label>Tags (comma separated, max 300 chars)</label>
+            <input type="text" id="tags" maxlength="300">
+          </div>
+          <div class="form-group">
+            <label>Description (max 400 words)</label>
+            <textarea id="description" maxlength="2400"></textarea>
+          </div>
+          <button class="submit-btn" type="submit">Upload Video</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- Profile Modal -->
+    <section id="profile-modal" class="modal profile-page">
+      <div class="modal-content">
+        <button class="close-btn" data-close>&times;</button>
+        <div class="profile-header">
+          <img id="profile-pic-main" src="" alt="">
+          <h2 id="profile-name"></h2>
+          <p id="profile-telegram"></p>
+        </div>
+        <div class="profile-stats">
+          <div class="stat-item"><h3 id="stat-videos">0</h3><p>Videos</p></div>
+          <div class="stat-item"><h3 id="stat-views">0</h3><p>Views</p></div>
+          <div class="stat-item"><h3>₹ <span id="stat-earn">0.00</span></h3><p>Earnings</p></div>
+        </div>
+        <div class="withdraw-section">
+          <p>Views to withdraw: <span id="views-left">20000</span></p>
+          <button class="withdraw-btn" id="withdraw-btn">Withdraw</button>
+        </div>
+        <h3>My Videos</h3>
+        <div id="profile-videos" class="video-grid"></div>
+      </div>
+    </section>
+
+    <!-- Video Player Overlay -->
+    <div id="video-player-overlay">
+      <video id="vast-ad-player" class="video-js vjs-default-skin" controls preload="auto"></video>
+      <button class="close-player" title="Close">×</button>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script type="module">
+    import { ref, push, onValue, set, update, query, orderByChild, equalTo, getDatabase } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+    import { getDatabase as gdb } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+    const db = gdb(window.firebaseApp);
+
+    const VAST_URL = "https://s.magsrv.com/v1/vast.php?idzone=5609878";
+    const POPUNDER_KEY = "7cc9b0386975c414c8ab9629f405b0dc";
+    const WITHDRAW_VIEWS = 20000;
+    const CPM_RATE = 10; // ₹10 per 1000 views
+
+    let currentUser = null, player = null;
+
+    // ---------- Telegram Login & Session ----------
+    function loadTelegram() {
+      const cont = document.getElementById("telegram-login-widget");
+      cont.innerHTML = "";
+      const s = document.createElement("script");
+      s.src = "https://telegram.org/js/telegram-widget.js?22";
+      s.setAttribute("data-telegram-login", "Videofire_bot");
+      s.setAttribute("data-size", "large");
+      s.setAttribute("data-userpic", "true");
+      s.setAttribute("data-request-access", "write");
+      s.setAttribute("data-onauth", "onTelegramAuth(user)");
+      cont.appendChild(s);
     }
 
-    function loadVideos() {
-      db.ref('videos').on('value', snapshot => {
-        document.getElementById('videoList').innerHTML = '';
-        snapshot.forEach(child => {
-          const vid = child.val();
-          const card = document.createElement('div');
-          card.className = 'video-card';
-          card.innerHTML = `<img src="https://via.placeholder.com/320x180?text=${vid.title}">
-            <h4>${vid.title}</h4><p>${vid.description.substring(0,50)}...</p>`;
-          card.onclick = () => playVideo(child.key, vid.videoLink);
-          document.getElementById('videoList').appendChild(card);
+    window.onTelegramAuth = async (user) => {
+      currentUser = {
+        uid: `telegram_${user.id}`,
+        username: user.username || user.first_name,
+        profilePic: user.photo_url
+      };
+      await set(ref(db, `users/${currentUser.uid}`), {
+        username: currentUser.username,
+        profilePic: currentUser.profilePic,
+        totalViews: 0,
+        uploaded: 0,
+        created: Date.now()
+      });
+      localStorage.setItem("vf_user", JSON.stringify(currentUser));
+      initApp();
+    };
+
+    function restoreSession() {
+      const u = localStorage.getItem("vf_user");
+      if (u) currentUser = JSON.parse(u);
+    }
+
+    // ---------- Initialize ----------
+    document.addEventListener("DOMContentLoaded", () => {
+      restoreSession();
+      if (!currentUser) {
+        document.getElementById("login-page").style.display = "block";
+        loadTelegram();
+      } else {
+        initApp();
+      }
+    });
+
+    // ---------- App Setup ----------
+    function initApp() {
+      document.getElementById("login-page").style.display = "none";
+      document.getElementById("app-content").style.display = "flex";
+      document.getElementById("topbar-pic").src = currentUser.profilePic;
+      document.getElementById("views-left").textContent = WITHDRAW_VIEWS;
+      setupNav();
+      loadHome();
+      loadPopunder();
+    }
+
+    // ---------- Navigation ----------
+    function setupNav() {
+      document.querySelectorAll(".sidebar-nav a").forEach(a => {
+        a.addEventListener("click", e => {
+          e.preventDefault();
+          document.querySelectorAll(".sidebar-nav a").forEach(x => x.classList.remove("active"));
+          a.classList.add("active");
+          showSection(a.dataset.sec);
+        });
+      });
+      document.getElementById("logout").addEventListener("click", () => {
+        localStorage.removeItem("vf_user");
+        location.reload();
+      });
+      document.querySelector(".upload-btn").addEventListener("click", () => openModal("upload-modal"));
+      document.querySelectorAll("[data-close]").forEach(btn => btn.addEventListener("click", closeModals));
+      document.getElementById("withdraw-btn").addEventListener("click", handleWithdraw);
+      document.getElementById("search-input").addEventListener("input", handleSearch);
+      showSection("home");
+    }
+
+    function showSection(sec) {
+      ["home","settings"].forEach(id => document.getElementById(id).style.display = id===sec?"grid":"none");
+      if (sec==="profile") openProfile();
+    }
+
+    // ---------- Upload ----------
+    document.getElementById("upload-form").addEventListener("submit", async e => {
+      e.preventDefault();
+      const link = e.target["video-link"].value.trim();
+      const thumb = e.target["thumbnail-link"].value.trim() || "";
+      const tags  = e.target["tags"].value.split(",").map(t=>t.trim()).filter(Boolean);
+      const desc  = e.target["description"].value.trim();
+      if (!link || tags.length===0) return alert("Link & tags required");
+      const vidRef = push(ref(db, "videos"));
+      await set(vidRef, {
+        title: desc.split(" ").slice(0,5).join(" ")+"…",
+        telegramLink:link,
+        thumbnail:thumb,
+        tags,
+        description: desc,
+        uploaderId: currentUser.uid,
+        uploaderName: currentUser.username,
+        uploaderPic: currentUser.profilePic,
+        views:0,
+        uploaded:Date.now()
+      });
+      closeModals();
+      loadHome();
+    });
+
+    // ---------- Home Feed ----------
+    function loadHome() {
+      const grid = document.getElementById("home");
+      // clear all but first ad
+      const ad = grid.querySelector(".banner-468x60");
+      grid.innerHTML = ""; grid.appendChild(ad);
+      onValue(ref(db, "videos"), snap => {
+        const arr = [];
+        snap.forEach(c=> arr.push({id:c.key, ...c.val()}));
+        arr.sort((a,b)=>b.uploaded - a.uploaded);
+        arr.forEach(v=>{
+          const d = document.createElement("div");
+          d.className = "video-card";
+          d.innerHTML = `
+            <div class="video-thumb">
+              <img src="${v.thumbnail||"https://via.placeholder.com/320x180"}">
+            </div>
+            <div class="video-info">
+              <h4 class="video-title">${v.title}</h4>
+              <p class="video-meta">${v.views.toLocaleString()} views</p>
+              <div class="video-author">
+                <img src="${v.uploaderPic}">
+                <span>${v.uploaderName}</span>
+              </div>
+            </div>`;
+          d.addEventListener("click", ()=>playWithAd(v.id, v.telegramLink));
+          grid.appendChild(d);
         });
       });
     }
 
-    function loadProfile() {
-      db.ref('users/'+currentUser.id).on('value', snap=>{
-        const data = snap.val();
-        document.getElementById("viewsCounter").innerText = `Views: ${data.views}`;
-        const earning = (data.views/1000)*10;
-        document.getElementById("earningsCounter").innerText = `Earnings: ₹${earning}`;
+    // ---------- Search ----------
+    function handleSearch(e) {
+      const term = e.target.value.toLowerCase();
+      document.querySelectorAll(".video-card").forEach(card=>{
+        const txt = card.querySelector(".video-title").textContent.toLowerCase();
+        card.style.display = txt.includes(term) ? "flex" : "none";
+      });
+    }
 
-        if (data.views >= requiredViews) {
-          document.getElementById("withdrawBtn").style.display = "block";
-          document.getElementById("withdrawBtn").onclick = ()=>{
-            window.open("https://t.me/Apknixyapp", "_blank");
+    // ---------- Profile ----------
+    async function openProfile() {
+      openModal("profile-modal");
+      document.getElementById("profile-pic-main").src = currentUser.profilePic;
+      document.getElementById("profile-name").textContent = currentUser.username;
+      document.getElementById("profile-telegram").textContent = "@"+currentUser.username.toLowerCase();
+      // stats
+      let vids=0, views=0;
+      onValue(ref(db, `users/${currentUser.uid}`), snap=>{
+        const d=snap.val();
+        views = d.totalViews||0;
+        vids  = d.uploaded||0;
+        document.getElementById("stat-videos").textContent = vids;
+        document.getElementById("stat-views").textContent = views.toLocaleString();
+        document.getElementById("stat-earn").textContent = ((views/1000)*CPM_RATE).toFixed(2);
+        document.getElementById("views-left").textContent = Math.max(0, WITHDRAW_VIEWS - views).toLocaleString();
+        document.getElementById("withdraw-btn").style.display = views>=WITHDRAW_VIEWS?"inline-block":"none";
+      });
+      // user videos
+      const profileGrid = document.getElementById("profile-videos");
+      profileGrid.innerHTML = "";
+      onValue(query(ref(db,"videos"), orderByChild("uploaderId"), equalTo(currentUser.uid)), snap=>{
+        snap.forEach(c=>{
+          const v=c.val();
+          const d=document.createElement("div");
+          d.className="video-card";
+          d.innerHTML=`
+            <div class="video-thumb"><img src="${v.thumbnail}"></div>
+            <div class="video-info"><h4 class="video-title">${v.title}</h4><p class="video-meta">${v.views.toLocaleString()} views</p></div>`;
+          d.addEventListener("click", ()=>playWithAd(c.key, v.telegramLink));
+          profileGrid.appendChild(d);
+        });
+      });
+    }
+
+    // ---------- Withdraw ----------
+    function handleWithdraw() {
+      if (confirm("Proceed to withdraw?")) {
+        window.open("https://t.me/Apknixyapp","_blank");
+        set(ref(db,`users/${currentUser.uid}/totalViews`),0);
+      }
+    }
+
+    // ---------- Play with Ad ----------
+    function playWithAd(id, link) {
+      document.getElementById("video-player-overlay").style.display="flex";
+      player = videojs("vast-ad-player", {autoplay:true,controls:true});
+      player.src({src:VAST_URL, type:"application/xml"});
+      player.on("ended", ()=>{
+        player.dispose();
+        window.open(link,"_blank");
+        update(ref(db,`videos/${id}/views`), { ".sv": "increment" });
+        update(ref(db,`users/${currentUser.uid}/totalViews`), { ".sv": "increment" });
+        closePlayer();
+      });
+      player.on("error", ()=>{
+        player.dispose();
+        window.open(link,"_blank");
+        closePlayer();
+      });
+    }
+    function closePlayer(){
+      document.getElementById("video-player-overlay").style.display="none";
+    }
+
+    // ---------- Popunder ----------
+    function loadPopunder(){
+      if(sessionStorage.getItem("pop")) return;
+      const s=document.createElement("script");
+      s.innerHTML = `
+        var url="https://www.profitablegate.com/j48n8l2l?key=${POPUNDER_KEY}";
+        document.body.addEventListener("click",()=>{
+          if(!sessionStorage.getItem("pop")){
+            window.open(url,"_blank");
+            sessionStorage.setItem("pop","1");
           }
-        }
-      });
+        },{once:true});
+      `;
+      document.body.appendChild(s);
     }
 
-    function showUploadForm() {
-      if (!currentUser) return alert("Please login first!");
-      document.getElementById("uploadModal").style.display = "block";
+    // ---------- Modal Helpers ----------
+    function openModal(id){
+      document.getElementById(id).classList.add("open");
     }
-
-    function uploadVideo() {
-      const title = document.getElementById("videoTitle").value;
-      const description = document.getElementById("videoDesc").value;
-      const tags = document.getElementById("videoTags").value;
-      const videoLink = document.getElementById("videoLink").value;
-
-      const vidRef = db.ref('videos').push();
-      vidRef.set({
-        uploaderId: currentUser.id,
-        title, description, tags, videoLink, views: 0
-      }).then(()=>{
-        alert("Video Uploaded Successfully!");
-        document.getElementById("uploadModal").style.display = "none";
-      });
-    }
-
-    function playVideo(videoId, videoLink) {
-      alert("Playing Ad first...");
-      window.open("https://s.magsrv.com/v1/vast.php?idzone=5609878", "_blank");
-
-      setTimeout(()=>{
-        window.open(videoLink, "_blank");
-
-        const vidRef = db.ref(`videos/${videoId}/views`);
-        vidRef.once('value').then(snap=>{
-          const views = (snap.val()||0)+1;
-          vidRef.set(views);
-        });
-
-        const userRef = db.ref(`users/${currentUser.id}/views`);
-        userRef.once('value').then(snap=>{
-          const totalViews = (snap.val()||0)+1;
-          userRef.set(totalViews);
-        });
-
-      }, 3000);
+    function closeModals(){
+      document.querySelectorAll(".modal.open").forEach(m=>m.classList.remove("open"));
     }
   </script>
-
-  <!-- Popunder -->
-  <script>
-    document.body.addEventListener('click', () => {
-      window.open("https://www.profitableratecpm.com/ekqigjxxf?key=7cc9b0386975c414c8ab9629f405b0dc", "_blank");
-    }, { once: true });
-  </script>
-
 </body>
 </html>
