@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Get Your Daily Horoscope</title>
+    <!-- Google Sign-In Client ID meta tag -->
+    <meta name="google-signin-client_id" content="148180057390-l9rmk2h14nc33fusqv9c81ed8lfbibdh.apps.googleusercontent.com">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif; /* Using Inter font */
+            background-color: #e0f2f7; /* Light blue background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            color: #333;
+            padding: 20px; /* Add some padding for smaller screens */
+            box-sizing: border-box; /* Include padding in element's total width and height */
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 35px;
+            border-radius: 15px; /* More rounded corners */
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); /* Enhanced shadow */
+            width: 100%;
+            max-width: 550px;
+            text-align: center;
+            box-sizing: border-box;
+        }
+        h1 {
+            color: #2c3e50; /* Dark blue */
+            margin-bottom: 15px;
+            font-size: 2.2em; /* Slightly larger heading */
+            font-weight: 700;
+        }
+        p {
+            color: #555;
+            margin-bottom: 25px;
+            font-size: 1.1em;
+            line-height: 1.6;
+        }
+        label {
+            display: block;
+            text-align: left;
+            margin-bottom: 8px;
+            color: #444;
+            font-weight: bold;
+            font-size: 1.05em;
+        }
+        input[type="text"],
+        input[type="date"],
+        input[type="time"],
+        input[type="email"],
+        select {
+            width: calc(100% - 22px); /* Adjust for padding */
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #a7d9ed; /* Light blue border */
+            border-radius: 8px; /* Rounded input fields */
+            font-size: 1em;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease;
+        }
+        input[type="text"]:focus,
+        input[type="date"]:focus,
+        input[type="time"]:focus,
+        input[type="email"]:focus,
+        select:focus {
+            border-color: #3498db; /* Highlight on focus */
+            outline: none;
+        }
+        input[type="submit"],
+        button {
+            width: 100%;
+            padding: 14px;
+            background-color: #3498db; /* Blue */
+            color: white;
+            border: none;
+            border-radius: 8px; /* Rounded buttons */
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            margin-top: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        input[type="submit"]:hover,
+        button:hover {
+            background-color: #2980b9; /* Darker blue on hover */
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+        .message {
+            margin-top: 25px;
+            font-weight: bold;
+            padding: 12px;
+            border-radius: 8px;
+            display: none; /* Hidden by default */
+            text-align: center;
+        }
+        .message.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .message.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        #loginButton {
+            background-color: #e74c3c; /* Red for login */
+            margin-bottom: 20px;
+        }
+        #loginButton:hover {
+            background-color: #c0392b;
+        }
+        #formSection {
+            display: none; /* Hidden until logged in */
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            margin-top: 20px;
+        }
+        .email-display {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #2980b9;
+            margin-bottom: 15px;
+            background-color: #ecf0f1;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+            display: none;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        #horoscopePrediction, #chatSection {
+            background-color: #f9f9f9;
+            border: 1px solid #e0e0e0;
+            padding: 20px;
+            margin-top: 25px;
+            border-radius: 10px;
+            text-align: left;
+        }
+        #horoscopePrediction h2, #chatSection h2 {
+            color: #2c3e50;
+            margin-top: 0;
+            font-size: 1.5em;
+        }
+        #predictionText {
+            font-size: 1.1em;
+            line-height: 1.7;
+            color: #444;
+            margin-bottom: 15px;
+        }
+        #listenButton {
+            background-color: #27ae60; /* Green */
+        }
+        #listenButton:hover {
+            background-color: #229a58;
+        }
+        #chatWindow {
+            height: 250px; /* Increased height for chat */
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #ffffff;
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px; /* Space between messages */
+        }
+        .chat-message {
+            padding: 8px 12px;
+            border-radius: 15px;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+        .chat-message.user {
+            background-color: #e0f7fa; /* Light blue for user */
+            align-self: flex-end;
+            text-align: right;
+        }
+        .chat-message.ai {
+            background-color: #e8f5e9; /* Light green for AI */
+            align-self: flex-start;
+            text-align: left;
+        }
+        #chatInput {
+            width: calc(100% - 110px); /* Adjust width for button */
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 10px;
+        }
+        #sendChat {
+            width: 100px;
+            display: inline-block;
+            vertical-align: middle;
+            background-color: #8e44ad; /* Purple */
+        }
+        #sendChat:hover {
+            background-color: #6c3483;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            h1 {
+                font-size: 1.8em;
+            }
+            input[type="text"],
+            input[type="date"],
+            input[type="time"],
+            input[type="email"],
+            select,
+            input[type="submit"],
+            button {
+                font-size: 0.95em;
+                padding: 10px;
+            }
+            #chatInput {
+                width: calc(100% - 90px);
+            }
+            #sendChat {
+                width: 80px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to Your Astrology Guide!</h1>
+        <p>Login with your Google account to get personalized horoscope predictions.</p>
+
+        <!-- Google Sign-In Button -->
+        <button id="loginButton">Login with Google</button>
+        <div id="emailDisplay" class="email-display" style="display:none;"></div>
+        <div class="loader" id="loader"></div>
+
+        <div id="formSection">
+            <p>Please provide your birth details for accurate predictions.</p>
+            <form id="userDataForm" action="https://script.google.com/macros/s/AKfycbzPQ8XxXAUfqCuQDQQ3OR7o1iJKNtmjOIUAbzs5dhJE-OgKGM5z0R1i_gXaJ71z6v3O/exec" method="POST">
+                <label for="Full Name">Full Name:</label>
+                <input type="text" id="Full Name" name="Full Name" placeholder="e.g., John Doe" required>
+
+                <label for="Birth Date">Date of Birth:</label>
+                <input type="date" id="Birth Date" name="Birth Date" required>
+
+                <label for="Birth Time">Time of Birth:</label>
+                <input type="time" id="Birth Time" name="Birth Time" required>
+
+                <label for="Birth Place">Place of Birth (City, Country):</label>
+                <input type="text" id="Birth Place" name="Birth Place" placeholder="e.g., New Delhi, India" required>
+
+                <label for="Marital Status">Marital Status:</label>
+                <select id="Marital Status" name="Marital Status" required>
+                    <option value="">Select...</option>
+                    <option value="Married">Married</option>
+                    <option value="Unmarried">Unmarried</option>
+                </select>
+
+                <!-- Email will be automatically filled via Google Auth -->
+                <input type="hidden" id="Email" name="Email"> 
+
+                <input type="submit" value="Get My Horoscope">
+            </form>
+        </div>
+        
+        <div id="responseMessage" class="message"></div>
+        <div id="horoscopePrediction" class="message" style="display:none;">
+            <h2 style="color: #2c3e50;">Your Daily Horoscope:</h2>
+            <p id="predictionText"></p>
+            <button id="listenButton">Listen to Prediction</button>
+        </div>
+        <div id="chatSection" class="message" style="display:none;">
+            <h2 style="color: #2c3e50;">Chat with AI Astrologer:</h2>
+            <div id="chatWindow"></div>
+            <input type="text" id="chatInput" placeholder="Ask your question...">
+            <button id="sendChat">Send</button>
+        </div>
+
+    </div>
+
+    <!-- Google Platform Library for Sign-In -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    
+    <script>
+        // Your Apps Script Web App URL
+        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzPQ8XxXAUfqCuQDQQ3OR7o1iJKNtmjOIUAbzs5dhJE-OgKGM5z0R1i_gXaJ71z6v3O/exec';
+        // Your Google Cloud Console Client ID
+        const GOOGLE_CLIENT_ID = '148180057390-l9rmk2h14nc33fusqv9c81ed8lfbibdh.apps.googleusercontent.com'; 
+
+        const form = document.getElementById('userDataForm');
+        const responseMessageDiv = document.getElementById('responseMessage');
+        const horoscopePredictionDiv = document.getElementById('horoscopePrediction');
+        const predictionText = document.getElementById('predictionText');
+        const listenButton = document.getElementById('listenButton');
+        const loginButton = document.getElementById('loginButton');
+        const emailDisplay = document.getElementById('emailDisplay');
+        const formSection = document.getElementById('formSection');
+        const hiddenEmailInput = document.getElementById('Email');
+        const loader = document.getElementById('loader');
+        const chatSection = document.getElementById('chatSection');
+        const chatWindow = document.getElementById('chatWindow');
+        const chatInput = document.getElementById('chatInput');
+        const sendChat = document.getElementById('sendChat');
+
+        // --- Google Sign-In Logic ---
+        function handleCredentialResponse(response) {
+            const idToken = response.credential;
+            
+            loader.style.display = 'block';
+            loginButton.style.display = 'none';
+
+            fetch(WEB_APP_URL, { // Send to your Apps Script
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ action: 'verifyToken', idToken: idToken })
+            })
+            .then(res => res.json())
+            .then(data => {
+                loader.style.display = 'none';
+                if (data.email) {
+                    emailDisplay.textContent = `Logged in as: ${data.email}`;
+                    emailDisplay.style.display = 'block';
+                    hiddenEmailInput.value = data.email;
+                    formSection.style.display = 'block'; // Show the form
+                    chatSection.style.display = 'block'; // Show chat
+                    // Store email in local storage to keep user logged in
+                    localStorage.setItem('userEmail', data.email);
+                } else {
+                    responseMessageDiv.textContent = 'Login failed. Please try again.';
+                    responseMessageDiv.className = 'message error';
+                    responseMessageDiv.style.display = 'block';
+                    loginButton.style.display = 'block';
+                }
+            })
+            .catch(error => {
+                loader.style.display = 'none';
+                responseMessageDiv.textContent = 'Error during login: ' + error.message;
+                responseMessageDiv.className = 'message error';
+                responseMessageDiv.style.display = 'block';
+                loginButton.style.display = 'block';
+            });
+        }
+
+        // Initialize Google Sign-In
+        window.onload = function() {
+            // Check if user is already logged in from previous session
+            const storedEmail = localStorage.getItem('userEmail');
+            if (storedEmail) {
+                emailDisplay.textContent = `Logged in as: ${storedEmail}`;
+                emailDisplay.style.display = 'block';
+                hiddenEmailInput.value = storedEmail;
+                formSection.style.display = 'block'; // Show the form
+                chatSection.style.display = 'block'; // Show chat
+                loginButton.style.display = 'none';
+            } else {
+                // Initialize Google Identity Services
+                google.accounts.id.initialize({
+                    client_id: GOOGLE_CLIENT_ID,
+                    callback: handleCredentialResponse // This function will be called after login
+                });
+                // Render the Google Sign-In button
+                google.accounts.id.renderButton(
+                    document.getElementById("loginButton"),
+                    { theme: "outline", size: "large", text: "signin_with", shape: "rectangular", width: "300" }
+                );
+                // Optionally, prompt the user immediately if no stored email
+                // google.accounts.id.prompt(); 
+            }
+        };
+
+        // --- Form Submission Logic ---
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            responseMessageDiv.style.display = 'none';
+            horoscopePredictionDiv.style.display = 'none';
+            loader.style.display = 'block'; // Show loader
+
+            const formData = new FormData(form);
+            const data = { action: 'saveData' }; // Add action for Apps Script
+            formData.forEach((value, key) => { data[key] = value; });
+
+            // Send data to Apps Script with action for saving user data
+            fetch(WEB_APP_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json()) // Expecting JSON response
+            .then(result => {
+                loader.style.display = 'none'; // Hide loader
+                if (result.status === 'success') {
+                    responseMessageDiv.textContent = result.message;
+                    responseMessageDiv.className = 'message success';
+                    responseMessageDiv.style.display = 'block';
+                    form.reset(); // Clear the form
+                    hiddenEmailInput.value = localStorage.getItem('userEmail'); // Keep email pre-filled
+
+                    // Simulate AI prediction based on input (Placeholder)
+                    const horoscope = generateHoroscope(data);
+                    predictionText.textContent = horoscope;
+                    horoscopePredictionDiv.style.display = 'block';
+                    
+                    // --- Unity Ad Integration Placeholder ---
+                    // For MIT App Inventor, you would trigger the Unity Ad here
+                    // This typically involves a JavaScript interface or a WebView string
+                    // that the MIT App Inventor app listens for.
+                    // Example (conceptual, requires MIT App Inventor setup):
+                    // if (window.AppInventor) { // Check if running in MIT App Inventor WebView
+                    //     window.AppInventor.WebViewString = "SHOW_UNITY_AD";
+                    // } else {
+                    //     // For web browser, you might redirect or show a different ad
+                    //     // window.location.href = "https://yoursecondwebsite.com"; 
+                    // }
+                    // --- End Unity Ad Placeholder ---
+
+                } else {
+                    responseMessageDiv.textContent = 'Error: ' + result.message;
+                    responseMessageDiv.className = 'message error';
+                    responseMessageDiv.style.display = 'block';
+                }
+            })
+            .catch(error => {
+                loader.style.display = 'none';
+                responseMessageDiv.textContent = 'Network error: ' + error.message;
+                responseMessageDiv.className = 'message error';
+                responseMessageDiv.style.display = 'block';
+            });
+        });
+
+        // --- Text-to-Speech for Horoscope ---
+        listenButton.addEventListener('click', function() {
+            const textToSpeak = predictionText.textContent;
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(textToSpeak);
+                utterance.lang = 'en-US'; // Set language to English
+                speechSynthesis.speak(utterance);
+            } else {
+                responseMessageDiv.textContent = 'Sorry, your browser does not support text-to-speech.';
+                responseMessageDiv.className = 'message error';
+                responseMessageDiv.style.display = 'block';
+            }
+        });
+
+        // --- Simple AI Horoscope Generation (PLACEHOLDER) ---
+        // *** IMPORTANT: This is a simplified placeholder. For real astrology,
+        // you will need to integrate with a proper AI API (like Google Gemini API)
+        // via your Google Apps Script backend. ***
+        function generateHoroscope(userData) {
+            const name = userData['Full Name'] || 'User';
+            const dob = userData['Birth Date'];
+            const place = userData['Birth Place'];
+            let rashi = "your Zodiac sign"; // Placeholder for Rashi calculation
+
+            // Basic Rashi calculation based on birth month (very simplified)
+            // A real astrology app would use precise date, time, and place for calculation
+            const month = new Date(dob).getMonth() + 1; // getMonth is 0-indexed
+            switch(month) {
+                case 1: rashi = "Capricorn/Aquarius"; break;
+                case 2: rashi = "Aquarius/Pisces"; break;
+                case 3: rashi = "Pisces/Aries"; break;
+                case 4: rashi = "Aries/Taurus"; break;
+                case 5: rashi = "Taurus/Gemini"; break;
+                case 6: rashi = "Gemini/Cancer"; break;
+                case 7: rashi = "Cancer/Leo"; break;
+                case 8: rashi = "Leo/Virgo"; break;
+                case 9: rashi = "Virgo/Libra"; break;
+                case 10: rashi = "Libra/Scorpio"; break;
+                case 11: rashi = "Scorpio/Sagittarius"; break;
+                case 12: rashi = "Sagittarius/Capricorn"; break;
+                default: rashi = "your Zodiac sign";
+            }
+
+            return `Hello ${name} from ${place}! Based on ${rashi}, your day looks promising. You might find new opportunities at work today. Focus on clear communication to avoid misunderstandings. Take some time for yourself in the evening. Trust your instincts and stay positive! This is a general prediction. For a more detailed analysis, consider consulting an astrologer.`;
+        }
+
+        // --- AI Chat Logic (PLACEHOLDER) ---
+        // *** IMPORTANT: This is a simplified placeholder. For real AI chat,
+        // you will need to integrate with a powerful AI API (like Google Gemini API)
+        // via your Google Apps Script backend. ***
+        function appendMessage(sender, message) {
+            const msgElement = document.createElement('div');
+            msgElement.className = `chat-message ${sender}`;
+            msgElement.innerHTML = `<strong>${sender === 'user' ? 'You' : 'AI Astrologer'}:</strong> ${message}`;
+            chatWindow.appendChild(msgElement);
+            chatWindow.scrollTop = chatWindow.scrollHeight; // Scroll to bottom
+        }
+
+        sendChat.addEventListener('click', function() {
+            const userMessage = chatInput.value.trim();
+            if (userMessage) {
+                appendMessage('user', userMessage);
+                chatInput.value = '';
+
+                // Simulate AI response (PLACEHOLDER)
+                appendMessage('ai', 'AI is thinking...');
+                setTimeout(() => {
+                    const aiResponse = getAiChatResponse(userMessage); // Call a function to get AI response
+                    chatWindow.lastChild.remove(); // Remove "AI is thinking..."
+                    appendMessage('ai', aiResponse);
+                }, 1500); // Simulate network delay
+            }
+        });
+
+        // Allow sending message with Enter key
+        chatInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendChat.click();
+            }
+        });
+
+        // Basic AI chat response simulation (real AI would be an API call)
+        function getAiChatResponse(query) {
+            query = query.toLowerCase();
+            if (query.includes("hello") || query.includes("hi")) {
+                return "Hello! How can I assist you with your astrological queries today?";
+            } else if (query.includes("future")) {
+                return "To tell your future, I need your birth details. Please submit them in the form above.";
+            } else if (query.includes("rashi")) {
+                return "Your Rashi is determined by your birth date, time, and place. Please provide those details in the form.";
+            } else if (query.includes("thanks") || query.includes("thank you")) {
+                return "You're most welcome! Feel free to ask more questions.";
+            } else if (query.includes("love")) {
+                return "Astrology can offer insights into relationships. What specifically would you like to know about love and your horoscope?";
+            } else if (query.includes("career")) {
+                return "For career predictions, astrological charts can reveal favorable periods and suitable paths. Have you submitted your birth details?";
+            } else if (query.includes("money") || query.includes("finance")) {
+                return "Financial prospects are often linked to planetary positions. I can give you general insights once your birth details are analyzed.";
+            }
+            else {
+                return "I'm still learning! For complex astrological insights, I'd need to connect to a powerful AI model. Please provide more specific astrological questions or try rephrasing.";
+            }
+        }
+    </script>
+</body>
+</html>
