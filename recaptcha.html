@@ -1,0 +1,42 @@
+ <!DOCTYPE html>
+<html>
+<head>
+    <title>reCAPTCHA Verification</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <script src="https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit" async defer></script>
+    <style>
+        body { display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; margin: 0; background-color: #f0f0f0; font-family: Arial, sans-serif; }
+        #recaptcha-container { background-color: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); text-align: center; }
+        p { margin-top: 15px; color: #555; }
+    </style>
+    <script type="text/javascript">
+        var onloadCallback = function() {
+            grecaptcha.render('recaptcha-div', {
+                'sitekey': '6LfTyokrAAAAAGNIWezLUuSVOp1zzTfZ4lBppRHw', // <<< YAHAN APNI RECATCHA SITE KEY HAI
+                'callback': onRecaptchaSuccess
+            });
+        };
+
+        function onRecaptchaSuccess(token) {
+            console.log("reCAPTCHA token:", token);
+            if (window.AppInventor) {
+                window.AppInventor.setWebViewString(token);
+            } else {
+                alert("Token: " + token + "\n(AppInventor interface not found)");
+            }
+        }
+
+        function recaptchaErrorCallback() {
+            if (window.AppInventor) {
+                window.AppInventor.setWebViewString("ERROR:reCAPTCHA_LOAD_FAILED");
+            }
+        }
+    </script>
+</head>
+<body>
+    <div id="recaptcha-container">
+        <div id="recaptcha-div"></div>
+        <p>Please complete the reCAPTCHA challenge to continue.</p>
+    </div>
+</body>
+</html>
