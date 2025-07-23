@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admint Posts</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 10px;
+            background-color: #f0f2f5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .post-container {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 15px;
+            padding: 15px;
+            width: 100%;
+            max-width: 500px; /* Max width for better readability on large screens */
+            box-sizing: border-box; /* Include padding in width */
+        }
+        .post-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .post-header img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+            object-fit: cover;
+            background-color: #eee; /* Placeholder for profile pic */
+        }
+        .post-header span {
+            font-weight: bold;
+            color: #333;
+        }
+        .post-image {
+            width: 100%;
+            height: auto;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            display: block; /* Ensures no extra space below image */
+            max-height: 300px; /* Limit image height */
+            object-fit: contain; /* Contain whole image within bounds */
+            background-color: #eee; /* Placeholder */
+        }
+        .post-content {
+            color: #555;
+            line-height: 1.5;
+            margin-bottom: 10px;
+            white-space: pre-wrap; /* Preserves line breaks */
+            word-wrap: break-word; /* Breaks long words */
+        }
+        .post-footer {
+            display: flex;
+            justify-content: space-around;
+            padding-top: 10px;
+            border-top: 1px solid #eee;
+        }
+        .contact-button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background-color 0.2s;
+            margin: 0 5px;
+        }
+        .contact-button:hover {
+            background-color: #0056b3;
+        }
+        .edit-delete-button {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background-color 0.2s;
+            margin: 0 5px;
+        }
+        .edit-delete-button:hover {
+            background-color: #5a6268;
+        }
+        .error-message, .loading-message {
+            color: #dc3545;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+        .loading-message {
+            color: #007bff;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="posts-container">
+        <p class="loading-message">Loading posts...</p>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+
+    <script>
+        // Your Firebase project configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDlZA4grzF3fx95-11E4s7ASXwkIij1k1w",
+            authDomain: "addmint-7ab6b.firebaseapp.com",
+            databaseURL: "https://addmint-7ab6b-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "addmint-7ab6b",
+            storageBucket: "addmint-7ab6b.firebasestorage.app",
+            messagingSenderId: "504015450137",
+            appId: "1:504015450137:web:694b176313582cce1e7a88",
+            measurementId: "G-H7J7M23Z82"
+        };
+
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth(); // Initialize auth for future use (e.g., getting current user)
+
+        const postsContainer = document.getElementById('posts-container');
+        let allPosts = []; // To store all fetched posts
+
+        // Function to shuffle an array (Fisher-Yates algorithm)
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]]; // Swap elements
+            }
+            return array;
+        }
+
+        // Function to display posts
+        function displayPosts() {
+            postsContainer.innerHTML = ''; // Clear existing posts
+
+            if (allPosts.length === 0) {
+                postsContainer.innerHTML = '<p class="error-message">No posts found.</p>';
+                return;
+            }
+
+            // Get a random subset or continuously random posts
+            // For true Instagram-like random continuous feed, you'd load more as user scrolls
+            // For now, let's just pick a few random ones from the fetched list
+            const postsToDisplay = [];
+            const displayCount = Math.min(5, allPosts.length); // Display 5 posts at a time, or fewer if less available
+
+            // Select random posts (with potential duplicates if allPosts.length is small)
+            for (let i = 0; i < displayCount; i++) {
+                const randomIndex = Math.floor(Math.random() * allPosts.length);
+                postsToDisplay.push(allPosts[randomIndex]);
+            }
+            
+            // Or, if you prefer, shuffle the whole list and display top N unique ones:
+            // const shuffledPosts = shuffleArray([...allPosts]); // Create a copy and shuffle
+            // const postsToDisplay = shuffledPosts.slice(0, displayCount); // Get top N unique after shuffle
+
+
+            postsToDisplay.forEach(postDoc => {
+                const postData = postDoc.data();
+                const postId = postDoc.id; // Get the document ID
+                const postUserId = postData.userId; // Creator's UID
+
+                const postDiv = document.createElement('div');
+                postDiv.className = 'post-container';
+
+                // Post Header (profile name and picture - placeholder for now)
+                const headerDiv = document.createElement('div');
+                headerDiv.className = 'post-header';
+                const profilePic = document.createElement('img');
+                profilePic.src = postData.profilePicture || 'https://via.placeholder.com/40'; // Placeholder
+                profilePic.alt = 'Profile Picture';
+                const profileName = document.createElement('span');
+                profileName.textContent = postData.profileName || 'Anonymous User'; // Placeholder
+                headerDiv.appendChild(profilePic);
+                headerDiv.appendChild(profileName);
+                postDiv.appendChild(headerDiv);
+
+                // Post Image (if available)
+                if (postData.imageUrl && postData.imageUrl !== "") {
+                    const postImage = document.createElement('img');
+                    postImage.src = postData.imageUrl;
+                    postImage.alt = 'Post Image';
+                    postImage.className = 'post-image';
+                    postDiv.appendChild(postImage);
+                }
+
+                // Post Content
+                const postContent = document.createElement('p');
+                postContent.className = 'post-content';
+                postContent.textContent = postData.postContent;
+                postDiv.appendChild(postContent);
+
+                // Post Footer with Buttons
+                const footerDiv = document.createElement('div');
+                footerDiv.className = 'post-footer';
+
+                // Check if the post belongs to the currently logged-in user
+                // IMPORTANT: This 'currentUser' is Firebase Auth's currentUser.
+                // We need to pass the Mit App Inventor loggedInUserId to this HTML if using separate auth.
+                // For simplicity now, let's assume `auth.currentUser.uid` is available or
+                // we'll get `null` if not logged in via Firebase JS SDK directly.
+                const loggedInUserId = auth.currentUser ? auth.currentUser.uid : null; 
+                // Alternatively, Mit App Inventor can pass the UID via webViewString:
+                // const loggedInUserId = window.AppInventor && window.AppInventor.getWebViewString();
+
+                if (postUserId && loggedInUserId && postUserId === loggedInUserId) {
+                    // Current user's post: Show Edit/Delete
+                    const editBtn = document.createElement('button');
+                    editBtn.className = 'edit-delete-button';
+                    editBtn.textContent = 'Edit';
+                    editBtn.onclick = () => {
+                        // Implement Edit logic (e.g., send data back to App Inventor)
+                        // window.AppInventor.setWebViewString('EDIT_POST:' + postId);
+                        alert('Edit Post: ' + postId);
+                    };
+                    footerDiv.appendChild(editBtn);
+
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.className = 'edit-delete-button';
+                    deleteBtn.textContent = 'Delete';
+                    deleteBtn.onclick = () => {
+                        // Implement Delete logic (e.g., send data back to App Inventor)
+                        // window.AppInventor.setWebViewString('DELETE_POST:' + postId);
+                        alert('Delete Post: ' + postId);
+                    };
+                    footerDiv.appendChild(deleteBtn);
+
+                } else {
+                    // Other user's post: Show Contact Buttons
+                    const whatsappBtn = document.createElement('button');
+                    whatsappBtn.className = 'contact-button';
+                    whatsappBtn.textContent = 'WhatsApp';
+                    whatsappBtn.onclick = () => {
+                        // Pass post creator's UID to App Inventor to open WhatsApp
+                        // Mit App Inventor will have ActivityStarter to open WhatsApp
+                        if (window.AppInventor) {
+                            window.AppInventor.setWebViewString('CONTACT:WHATSAPP:' + postUserId);
+                        } else {
+                            alert('WhatsApp button clicked for user: ' + postUserId);
+                        }
+                    };
+                    footerDiv.appendChild(whatsappBtn);
+
+                    const instagramBtn = document.createElement('button');
+                    instagramBtn.className = 'contact-button';
+                    instagramBtn.textContent = 'Instagram';
+                    instagramBtn.onclick = () => {
+                        // Pass post creator's UID to App Inventor to open Instagram
+                        if (window.AppInventor) {
+                            window.AppInventor.setWebViewString('CONTACT:INSTAGRAM:' + postUserId);
+                        } else {
+                            alert('Instagram button clicked for user: ' + postUserId);
+                        }
+                    };
+                    footerDiv.appendChild(instagramBtn);
+
+                    const messageBtn = document.createElement('button');
+                    messageBtn.className = 'contact-button';
+                    messageBtn.textContent = 'Message';
+                    messageBtn.onclick = () => {
+                        // Pass post creator's UID to App Inventor for in-app messaging
+                        if (window.AppInventor) {
+                            window.AppInventor.setWebViewString('CONTACT:MESSAGE:' + postUserId);
+                        } else {
+                            alert('Message button clicked for user: ' + postUserId);
+                        }
+                    };
+                    footerDiv.appendChild(messageBtn);
+                }
+
+                postDiv.appendChild(footerDiv);
+                postsContainer.appendChild(postDiv);
+            });
+        }
+
+        // Fetch posts from Firestore
+        async function fetchPosts() {
+            try {
+                // Ensure user is authenticated for Firestore rules
+                // If using Mit App Inventor's anonymous auth, this HTML needs to perform anonymous auth too
+                // or Mit App Inventor needs to pass the token.
+                // For simplicity, we'll try to listen to auth state or do anonymous auth here if needed.
+                
+                // You might need to sign in anonymously here if Mit App Inventor doesn't pass a token
+                // and your Firestore rules require request.auth != null
+                if (!auth.currentUser) {
+                     await auth.signInAnonymously();
+                     console.log("Signed in anonymously from HTML.");
+                }
+
+                const postsRef = db.collection('posts');
+                // You can add orderBy and limit here if needed, e.g., postsRef.orderBy('timestamp', 'desc').limit(100);
+                const snapshot = await postsRef.get(); // Get all posts
+
+                allPosts = []; // Clear previous posts
+                snapshot.forEach(doc => {
+                    allPosts.push(doc); // Store the full doc object to access ID and data
+                });
+
+                displayPosts(); // Display the fetched posts
+            } catch (error) {
+                console.error("Error fetching posts:", error);
+                postsContainer.innerHTML = '<p class="error-message">Error loading posts: ' + error.message + '</p>';
+            }
+        }
+
+        // Fetch posts when the page loads
+        document.addEventListener('DOMContentLoaded', fetchPosts);
+
+        // Function to receive messages from App Inventor (e.g., user ID after login)
+        // You can use this to pass the logged-in user's ID from App Inventor to HTML
+        function setLoggedInUser(userId) {
+            console.log("Logged in user ID received from App Inventor:", userId);
+            // This global var can be used by the displayPosts function for conditional buttons
+            // You might want to re-run fetchPosts or displayPosts after setting this
+            // if you need immediate UI update based on user login.
+            // For now, it's just a log.
+        }
+
+        // To allow App Inventor to call setLoggedInUser:
+        // window.AppInventor.setWebViewString will be used by App Inventor
+        // and window.AppInventor.getWebViewString will be called by HTML.
+        // Or if using JavaScript interface (Android specific):
+        // window.myAppInterface = {
+        //     setLoggedInUser: function(userId) { /* ... */ }
+        // };
+
+        // For now, we'll rely on Firebase JS SDK's auth.currentUser for button logic.
+        // If your App Inventor login is separate, you'll need a mechanism to pass its token/UID.
+
+    </script>
+</body>
+</html>
