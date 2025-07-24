@@ -1974,34 +1974,52 @@
 
         // --- Initial Load ---
         document.addEventListener('DOMContentLoaded', () => {
-            showPreloader();
-            auth.onAuthStateChanged(async (user) => {
-                if (user) {
-                    currentUserId = user.uid;
-                    // For email/password users, check email verification status
-                    if (user.emailVerified) {
-                        const userDoc = await db.collection('users').doc(currentUserId).get();
-                        if (!userDoc.exists || !userDoc.data().username) {
-                            showSection('setup-profile');
-                             // Pre-fill username for Google users if exists
-                            if (user.displayName) {
-                                document.getElementById('newUsername').value = user.displayName;
-                            }
-                        } else {
-                            await fetchUserProfile(currentUserId);
-                            showMainAppUI();
-                        }
-                    } else {
-                        // Email not verified, direct to verification page
-                        showSection('email-verify');
-                        document.getElementById('verify-email-message').textContent = `Your email ${user.email} is not verified. Please check your inbox for the verification link. After verifying, please sign in again.`;
+    showPreloader();
+    auth.onAuthStateChanged(async (user) => {
+        if (user) {
+            currentUserId = user.uid;
+            if (user.emailVerified) {
+                const userDoc = await db.collection('users').doc(currentUserId).get();
+                if (!userDoc.exists || !userDoc.data().username) {
+                    showSection('setup-profile');
+                    if (user.displayName) {
+                        document.getElementById('newUsername').value = user.displayName;
                     }
                 } else {
+                    await fetchUserProfile(currentUserId);
+                    showMainAppUI();
+                }
+            } else {
+                showSection('email-verify');
+                document.getElementById('verify-email-message').textContent = `Your email ${user.email} is not verified. Please check your inbox for the verification link. After verifying, please sign in again.`;
+            }
+            hidePreloader(); // Hide preloader once user state is determined
+        } else {
+            // **Handle Redirect Result Here**
+            firebase.auth().getRedirectResult().then(function(result) {
+                if (result.credential) {
+                    // This is a Google Sign-in.
+                    const user = result.user;
+                    currentUserId = user.uid; // Set current user ID
+                    // Now, proceed as if a user just signed in (check for profile, etc.)
+                    // The onAuthStateChanged listener above should catch this anyway,
+                    // but this ensures you explicitly handle the redirect result.
+                    console.log("Google Sign-in via Redirect successful!", user);
+                    // The onAuthStateChanged listener will likely fire again and handle the rest.
+                } else {
+                    // No redirect result, user not logged in.
                     showSection('signin-auth'); // Show sign-in form if no user
                 }
-                hidePreloader();
+            }).catch(function(error) {
+                console.error("Error during redirect result:", error);
+                document.getElementById('auth-status-message').textContent = 'Google Sign-in failed: ' + error.message;
+                showSection('signin-auth'); // Show sign-in form if error
+            }).finally(() => {
+                hidePreloader(); // Hide preloader after everything
             });
-        });
+        }
+    });
+});
 
     </script>
 </body>
