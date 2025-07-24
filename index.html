@@ -1962,30 +1962,38 @@
 
         // --- Initial Load & Auth State Handling ---
         document.addEventListener('DOMContentLoaded', () => {
-            // Hide preloader first, splash screen will be visible
+            // Ensure preloader is off initially, splash screen is the first thing visible
             preloader.style.display = 'none';
-            splashScreen.style.display = 'flex';
+            splashScreen.style.display = 'flex'; // Make sure splash is visible immediately
 
+            // Set a timeout for the splash screen to fade out
             setTimeout(() => {
-                splashScreen.classList.add('fade-out');
-                // Allow some time for splash to fade before checking auth
+                splashScreen.classList.add('fade-out'); // Start fade-out animation
+                
+                // After the fade-out transition finishes (1 second as per CSS)
                 setTimeout(() => {
-                    splashScreen.style.display = 'none';
+                    splashScreen.style.display = 'none'; // Completely hide splash screen
+                    
+                    // Now, start the preloader and proceed with authentication check
+                    showPreloader(); // Show preloader while auth state is being determined
 
                     // Firebase Auth State Listener
                     auth.onAuthStateChanged(async (user) => {
+                        hidePreloader(); // Hide preloader once user state is determined
+
                         if (user) {
                             currentUserId = user.uid;
+                            
                             // **Handle Redirect Result for Google Sign-in**
-                            firebase.auth().getRedirectResult().then(function(result) {
+                            // This part is crucial for signInWithRedirect to process the return from Google
+                            firebase.auth().getRedirectResult().then(async function(result) { // Added async here
                                 if (result.credential) {
                                     // Google Sign-in via Redirect successful!
                                     console.log("Google Sign-in via Redirect successful!", result.user);
-                                    // This means `user` object is already correctly populated.
-                                    // No need to set `currentUserId` again as it's set by onAuthStateChanged.
-                                    // Just proceed with the normal flow.
+                                    // The `user` object passed to `onAuthStateChanged` is now the authenticated user.
+                                    // No additional `currentUserId` setting needed here.
                                 }
-                                // Whether it was a redirect result or normal login, check email verification.
+                                // Proceed with email verification check for any login method (email/password or Google)
                                 if (user.emailVerified) {
                                     const userDoc = await db.collection('users').doc(currentUserId).get();
                                     if (!userDoc.exists || !userDoc.data().username) {
@@ -2002,6 +2010,7 @@
                                     document.getElementById('verify-email-message').textContent = `Your email ${user.email} is not verified. Please check your inbox (and spam folder) for the verification link. After verifying, please sign in again.`;
                                 }
                             }).catch(function(error) {
+                                // This catch block will handle errors from getRedirectResult()
                                 console.error("Error during redirect result or initial auth check:", error);
                                 document.getElementById('auth-status-message').textContent = 'Authentication failed: ' + error.message;
                                 showSection('signin-auth'); // Go to sign-in on error
@@ -2013,10 +2022,9 @@
                         }
                     });
 
-                }, 1000); // Wait for splash fade-out (1s) + a little buffer
-            }, 2000); // Display splash for 2 seconds before fading
+                }, 1000); // This should match the `transition` duration in CSS for `fade-out` class (1s)
+            }, 2000); // Display splash for 2 seconds before starting to fade (total 2s + 1s fade = 3s visible)
         });
-
     </script>
 </body>
 </html>
