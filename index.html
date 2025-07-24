@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Addmint Pro - The Ultimate App</title>
+    <title>Addmint Pro</title>
     <style>
         /* Base Styles - Dark Mode */
         :root {
@@ -31,7 +31,52 @@
             min-height: 100vh;
             overflow-x: hidden;
             -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+            position: relative; /* For splash screen positioning */
         }
+
+        /* Splash Screen */
+        #splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-dark);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            opacity: 1;
+            transition: opacity 1s ease-out;
+        }
+        #splash-screen.fade-out {
+            opacity: 0;
+            pointer-events: none; /* Disable interaction during fade */
+        }
+        .splash-logo {
+            font-size: 4em; /* Larger logo for splash */
+            font-weight: 800;
+            color: var(--primary-color);
+            text-shadow: 0 0 10px rgba(0, 230, 118, 0.7);
+            letter-spacing: 2px;
+            animation: bounce 2s infinite ease-in-out;
+        }
+        .splash-tagline {
+            font-size: 1.2em;
+            color: #ccc;
+            margin-top: 15px;
+            opacity: 0;
+            animation: fadeIn 1s forwards 0.5s; /* Fade in after logo */
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
 
         /* Header */
         header {
@@ -47,16 +92,11 @@
             z-index: 1000;
         }
         header .logo-section {
-            /* Styles for text-based logo */
-            font-size: 1.8em; /* Make it larger */
-            font-weight: 800; /* Bolder */
-            color: var(--primary-color); /* Addmint Green */
-            text-shadow: 0 0 5px rgba(0, 230, 118, 0.5); /* Subtle glow */
+            font-size: 1.8em;
+            font-weight: 800;
+            color: var(--primary-color);
+            text-shadow: 0 0 5px rgba(0, 230, 118, 0.5);
             letter-spacing: 1px;
-        }
-        /* Hide image if it exists in HTML, but we're not using it */
-        header .logo-section img {
-            display: none;
         }
         .header-right {
             display: flex;
@@ -77,13 +117,14 @@
             color: var(--primary-color);
             font-weight: bold;
         }
-        .stat-item-header img {
-            height: 18px;
-            width: 18px;
+        .stat-item-header .plus-icon {
+            font-size: 1.2em;
+            color: var(--primary-color);
             cursor: pointer;
+            margin-left: 5px;
             transition: transform 0.2s;
         }
-        .stat-item-header img:hover {
+        .stat-item-header .plus-icon:hover {
             transform: scale(1.1);
         }
         .search-container {
@@ -132,12 +173,17 @@
         .search-results div:hover {
             background-color: var(--surface-dark);
         }
-        .search-results img {
+        .search-results .profile-pic-placeholder {
             width: 30px;
             height: 30px;
             border-radius: 50%;
             margin-right: 10px;
-            object-fit: cover;
+            background-color: #555; /* Placeholder background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.8em;
+            color: #bbb;
         }
         .search-results p {
             margin: 0;
@@ -170,18 +216,17 @@
             flex-direction: column;
             align-items: center;
         }
-        nav button img {
-            height: 24px;
-            width: 24px;
+        nav button .nav-icon {
+            font-size: 24px;
             margin-bottom: 5px;
-            filter: invert(100%) grayscale(100%); /* Make icons light */
+            color: #eee; /* Default icon color */
         }
         nav button.active {
             color: var(--primary-color);
             background-color: #3a3a3a;
         }
-        nav button.active img {
-            filter: none; /* Original color for active icon */
+        nav button.active .nav-icon {
+            color: var(--primary-color); /* Active icon color */
         }
 
 
@@ -189,7 +234,7 @@
         #app-container {
             flex-grow: 1;
             width: 100%;
-            max-width: 650px; /* Slightly wider for better content display */
+            max-width: 650px;
             padding: 20px 15px;
             box-sizing: border-box;
             overflow-y: auto;
@@ -216,15 +261,15 @@
             color: #888;
             font-size: 1.1em;
         }
-        .empty-state img {
-            width: 80px;
-            height: 80px;
+        .empty-state .empty-icon {
+            font-size: 60px;
             opacity: 0.6;
             margin-bottom: 15px;
+            display: block;
         }
         .scroll-top-button {
             position: fixed;
-            bottom: 80px; /* Above nav */
+            bottom: 80px;
             right: 20px;
             background-color: var(--accent-color);
             color: white;
@@ -263,14 +308,20 @@
             align-items: center;
             margin-bottom: 12px;
         }
-        .post-header img {
+        .profile-pic-placeholder {
             width: 45px;
             height: 45px;
             border-radius: 50%;
             margin-right: 12px;
-            object-fit: cover;
             background-color: #555;
             border: 2px solid var(--primary-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1em;
+            color: #ccc;
+            font-weight: bold;
+            overflow: hidden; /* Ensure text doesn't spill out */
         }
         .post-header span {
             font-weight: 600;
@@ -280,7 +331,7 @@
         .post-image {
             width: 100%;
             max-height: 400px;
-            object-fit: contain; /* Changed to contain to show full image */
+            object-fit: contain;
             border-radius: 8px;
             margin-bottom: 15px;
             background-color: #333;
@@ -294,8 +345,8 @@
         }
         .post-footer {
             display: flex;
-            flex-wrap: wrap; /* Allow wrapping */
-            gap: 10px; /* Space between buttons */
+            flex-wrap: wrap;
+            gap: 10px;
             padding-top: 15px;
             border-top: 1px solid var(--border-color);
         }
@@ -312,20 +363,18 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            min-width: 100px; /* Minimum width for buttons */
-            flex-grow: 1; /* Allow buttons to expand */
+            min-width: 100px;
+            flex-grow: 1;
         }
-        .action-button img {
-            height: 20px;
-            width: 20px;
+        .action-button .button-icon {
+            font-size: 20px;
             margin-right: 8px;
-            filter: brightness(0) invert(1); /* White icon for buttons */
         }
         .action-button.whatsapp { background-color: #25D366; }
         .action-button.instagram { background-color: #E1306C; }
-        .action-button.message { background-color: #007bff; } /* Appmint Blue */
+        .action-button.message { background-color: #007bff; }
         .action-button.edit { background-color: #ffc107; color: #333; }
-        .action-button.edit img { filter: none; } /* Dark icon for edit */
+        .action-button.edit .button-icon { color: #333; }
         .action-button.delete { background-color: var(--danger-color); }
         .action-button:hover {
             transform: translateY(-2px);
@@ -351,7 +400,7 @@
             flex-grow: 1;
         }
         .like-button.liked {
-            background-color: #e74c3c; /* Red for liked */
+            background-color: #e74c3c;
         }
         .like-button:hover {
             transform: translateY(-2px);
@@ -367,7 +416,7 @@
             background-color: #555;
             color: white;
             border: none;
-            padding: 8px 12px; /* Adjusted padding */
+            padding: 8px 12px;
             border-radius: 8px;
             cursor: pointer;
             font-size: 0.95em;
@@ -376,8 +425,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            min-width: 40px; /* Smaller */
-            margin-left: auto; /* Push to right in header */
+            min-width: 40px;
+            margin-left: auto;
         }
         .sound-button.playing {
             background-color: var(--primary-color);
@@ -401,7 +450,7 @@
         .form-group input[type="email"],
         .form-group input[type="password"],
         .form-group textarea {
-            width: calc(100% - 24px); /* Account for padding */
+            width: calc(100% - 24px);
             padding: 12px;
             border: 1px solid var(--border-color);
             border-radius: 8px;
@@ -464,10 +513,10 @@
             cursor: pointer;
             transition: background-color 0.3s;
         }
-        .social-signin-button img {
-            width: 24px;
-            height: 24px;
+        .social-signin-button .social-icon {
+            font-size: 24px;
             margin-right: 10px;
+            color: white; /* For Unicode/text icons */
         }
         .social-signin-button:hover {
             background-color: #357ae8;
@@ -591,8 +640,9 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 9999;
+            z-index: 9998; /* Below splash */
             transition: opacity 0.5s ease-out;
+            pointer-events: none; /* Allow clicks to pass through when hidden */
         }
         .spinner {
             border: 4px solid rgba(255, 255, 255, 0.3);
@@ -616,11 +666,11 @@
             text-align: center;
             width: 90%;
             max-width: 400px;
-            margin: auto; /* Center the auth box */
+            margin: auto;
             display: flex;
             flex-direction: column;
             justify-content: center;
-            min-height: 80vh; /* Make it take most of the screen height */
+            min-height: 80vh;
         }
         #auth-section h2, #signup-section h2, #forgot-password-section h2, #email-verify-section h2 {
             color: var(--primary-color);
@@ -637,7 +687,7 @@
         }
 
         #setup-profile-section {
-            display: none; /* Hidden until initial login/signup */
+            display: none;
             background-color: var(--card-dark);
             padding: 30px;
             border-radius: 10px;
@@ -657,7 +707,13 @@
 </head>
 <body>
 
-    <div id="preloader">
+    <div id="splash-screen">
+        <div class="splash-logo">Addmint</div>
+        <div class="splash-tagline">Connect, Share, Grow.</div>
+        <div class="spinner" style="margin-top: 40px;"></div>
+    </div>
+
+    <div id="preloader" style="display: none;">
         <div class="spinner"></div>
     </div>
 
@@ -681,7 +737,7 @@
         <p style="margin-top: 20px; color: #bbb;">Don't have an account? <button class="link-button" onclick="showSection('signup-auth')">Sign Up</button></p>
         
         <button class="social-signin-button" onclick="signInWithGoogle()">
-            <img src="https://img.icons8.com/color/48/000000/google-logo.png" alt="Google Logo"/> Sign In with Google
+            <span class="social-icon">G</span> Sign In with Google
         </button>
     </div>
 
@@ -756,11 +812,11 @@
             <div class="header-stats">
                 <div class="stat-item-header">
                     <span id="header-coins">0</span> Coins
-                    <img src="https://img.icons8.com/ios-glyphs/30/00e676/plus.png" alt="Add Coin" onclick="requestAd('coins')"/>
+                    <span class="plus-icon" onclick="requestAd('coins')">➕</span>
                 </div>
                 <div class="stat-item-header">
                     <span id="header-credits">0</span> Credits
-                    <img src="https://img.icons8.com/ios-glyphs/30/00e676/plus.png" alt="Add Credit" onclick="requestAd('credits')"/>
+                    <span class="plus-icon" onclick="requestAd('credits')">➕</span>
                 </div>
             </div>
             <div class="search-container">
@@ -776,7 +832,7 @@
             <h2>Recent Posts</h2>
             <div id="posts-list">
                 <p class="empty-state">
-                    <img src="https://img.icons8.com/ios-filled/50/888888/spiral-bound-book.png" alt="No Posts"/>
+                    <span class="empty-icon">📰</span>
                     No posts found yet. Be the first to share something amazing!
                 </p>
             </div>
@@ -859,7 +915,7 @@
             <h2>Messages</h2>
             <div id="messages-list" class="message-list-container">
                 <p class="empty-state">
-                    <img src="https://img.icons8.com/ios-filled/50/888888/chat.png" alt="No Messages"/>
+                    <span class="empty-icon">💬</span>
                     Start a conversation by contacting a user!
                 </p>
             </div>
@@ -871,23 +927,23 @@
         </div>
     </div>
 
-    <button class="scroll-top-button" id="scrollTopBtn">&#9650;</button>
+    <button class="scroll-top-button" id="scrollTopBtn">⬆️</button>
 
     <nav id="main-nav" style="display: none;">
         <button id="nav-feed" class="active" onclick="showSection('feed')">
-            <img src="https://img.icons8.com/ios-glyphs/30/FFFFFF/home.png" alt="Feed Icon"/>
+            <span class="nav-icon">🏠</span>
             Feed
         </button>
         <button id="nav-create-post" onclick="showSection('create-post')">
-            <img src="https://img.icons8.com/ios-glyphs/30/FFFFFF/plus.png" alt="New Post Icon"/>
+            <span class="nav-icon">➕</span>
             New Post
         </button>
         <button id="nav-profile" onclick="showSection('profile')">
-            <img src="https://img.icons8.com/ios-glyphs/30/FFFFFF/user.png" alt="Profile Icon"/>
+            <span class="nav-icon">👤</span>
             Profile
         </button>
         <button id="nav-messages" onclick="showSection('messages')">
-            <img src="https://img.icons8.com/ios-glyphs/30/FFFFFF/filled-message.png" alt="Messages Icon"/>
+            <span class="nav-icon">✉️</span>
             Messages
         </button>
     </nav>
@@ -901,14 +957,14 @@
     <script>
         // Your Firebase project configuration
         const firebaseConfig = {
-            apiKey: "AIzaSyDlZA4grzF3fx95-11E4s7ASXwkIij1k1w", // REPLACE WITH YOUR ACTUAL API KEY
-            authDomain: "addmint-7ab6b.firebaseapp.com", // REPLACE WITH YOUR ACTUAL AUTH DOMAIN
-            databaseURL: "https://addmint-7ab6b-default-rtdb.asia-southeast1.firebasedatabase.app", // REPLACE WITH YOUR ACTUAL DATABASE URL
-            projectId: "addmint-7ab6b", // REPLACE WITH YOUR ACTUAL PROJECT ID
-            storageBucket: "addmint-7ab6b.appspot.com", // REPLACE WITH YOUR ACTUAL STORAGE BUCKET
-            messagingSenderId: "504015450137", // REPLACE WITH YOUR ACTUAL SENDER ID
-            appId: "1:504015450137:web:694b176313582cce1e7a88", // REPLACE WITH YOUR ACTUAL APP ID
-            measurementId: "G-H7J7M23Z82" // REPLACE WITH YOUR ACTUAL MEASUREMENT ID (optional)
+            apiKey: "YOUR_FIREBASE_API_KEY", // REPLACE WITH YOUR ACTUAL API KEY
+            authDomain: "YOUR_FIREBASE_PROJECT_ID.firebaseapp.com", // REPLACE WITH YOUR ACTUAL AUTH DOMAIN
+            databaseURL: "https://YOUR_FIREBASE_PROJECT_ID-default-rtdb.asia-southeast1.firebasedatabase.app", // REPLACE WITH YOUR ACTUAL DATABASE URL
+            projectId: "YOUR_FIREBASE_PROJECT_ID", // REPLACE WITH YOUR ACTUAL PROJECT ID
+            storageBucket: "YOUR_FIREBASE_PROJECT_ID.appspot.com", // REPLACE WITH YOUR ACTUAL STORAGE BUCKET
+            messagingSenderId: "YOUR_FIREBASE_MESSAGING_SENDER_ID", // REPLACE WITH YOUR ACTUAL SENDER ID
+            appId: "YOUR_FIREBASE_APP_ID", // REPLACE WITH YOUR ACTUAL APP ID
+            measurementId: "YOUR_FIREBASE_MEASUREMENT_ID" // REPLACE WITH YOUR ACTUAL MEASUREMENT ID (optional)
         };
 
         // Initialize Firebase
@@ -919,26 +975,27 @@
         const googleProvider = new firebase.auth.GoogleAuthProvider(); // Initialize Google Auth Provider
 
         let currentUserId = null;
-        let currentUserData = { username: 'Guest', coins: 0, credits: 0, whatsappNumber: '', instagramHandle: '' };
+        let currentUserData = { username: 'Guest', coins: 0, credits: 0, whatsappNumber: '', instagramHandle: '', profilePicture: '' };
         let allFetchedPosts = [];
         let displayedPostIds = new Set();
         const postsPerLoad = 5;
 
-        let adsWatchedForCurrentPost = 0; // Tracks ads watched for the post being created
-        const BASE_EXPIRY_HOURS = 12; // Default post expiry
-        const HOURS_PER_AD = 6;     // Each ad adds 6 hours
-        const MAX_ADS_FOR_POST = 3; // Maximum 3 ads for expiry boost
+        let adsWatchedForCurrentPost = 0;
+        const BASE_EXPIRY_HOURS = 12;
+        const HOURS_PER_AD = 6;
+        const MAX_ADS_FOR_POST = 3;
 
-        let currentChatUser = null; // To keep track of who the user is chatting with
+        let currentChatUser = null;
 
-        let currentSpeakingUtterance = null; // For Speech Synthesis
+        let currentSpeakingUtterance = null;
 
         // --- UI Elements ---
+        const splashScreen = document.getElementById('splash-screen');
         const preloader = document.getElementById('preloader');
         const authSection = document.getElementById('auth-section');
         const signupSection = document.getElementById('signup-section');
         const forgotPasswordSection = document.getElementById('forgot-password-section');
-        const emailVerifySection = document.getElementById('email-verify-section'); // New
+        const emailVerifySection = document.getElementById('email-verify-section');
         const setupProfileSection = document.getElementById('setup-profile-section');
 
         const mainHeader = document.getElementById('main-header');
@@ -951,7 +1008,7 @@
         const sendMessageBtn = document.getElementById('sendMessageBtn');
         const currentChatStatus = document.getElementById('current-chat-status');
 
-        // --- Preloader Logic ---
+        // --- Preloader & Splash Screen Logic ---
         function showPreloader() { preloader.style.display = 'flex'; preloader.style.opacity = '1'; }
         function hidePreloader() {
             preloader.style.opacity = '0';
@@ -964,7 +1021,7 @@
             'signin-auth': authSection,
             'signup-auth': signupSection,
             'forgot-password-auth': forgotPasswordSection,
-            'email-verify': emailVerifySection, // New
+            'email-verify': emailVerifySection,
             'setup-profile': setupProfileSection
         };
         const navButtons = {
@@ -975,27 +1032,24 @@
         };
 
         function showSection(id) {
-            // Hide all main app sections
             sections.forEach(sectionId => {
                 document.getElementById(sectionId + '-section').style.display = 'none';
                 if (navButtons[sectionId]) navButtons[sectionId].classList.remove('active');
             });
 
-            // Hide all auth related sections
             Object.values(authForms).forEach(formSection => {
                 formSection.style.display = 'none';
             });
 
-            // Show specific section
-            if (sections.includes(id)) { // Main app sections
+            if (sections.includes(id)) {
                 document.getElementById(id + '-section').style.display = 'block';
                 if (navButtons[id]) navButtons[id].classList.add('active');
                 
                 if (id === 'feed') {
-                    if (allFetchedPosts.length === 0) fetchPosts();
-                    displayRandomPosts();
+                    if (allFetchedPosts.length === 0) fetchPosts(); // Initial fetch if empty
+                    displayRandomPosts(true); // Always re-display feed on navigation
                 } else if (id === 'create-post') {
-                    adsWatchedForCurrentPost = 0; // Reset ad count when opening create post
+                    adsWatchedForCurrentPost = 0;
                     updateAdCountDisplay();
                     document.getElementById('postWhatsappNum').value = currentUserData.whatsappNumber || '';
                     document.getElementById('postInstagramHandle').value = currentUserData.instagramHandle || '';
@@ -1004,16 +1058,20 @@
                 } else if (id === 'messages') {
                     messagesListDiv.innerHTML = `
                         <p class="empty-state">
-                            <img src="https://img.icons8.com/ios-filled/50/888888/chat.png" alt="No Messages"/>
+                            <span class="empty-icon">💬</span>
                             Select a user from a post to start chatting!
                         </p>`;
                     messageInput.disabled = true;
                     sendMessageBtn.disabled = true;
                     currentChatStatus.textContent = "Select a user to chat.";
+                    currentChatUser = null; // Reset current chat
+                    if (chatUnsubscribe) { // Unsubscribe from previous chat listener
+                        chatUnsubscribe();
+                    }
                 }
 
-            } else if (authForms[id]) { // Auth related sections
-                authForms[id].style.display = 'flex'; // Use flex for centering
+            } else if (authForms[id]) {
+                authForms[id].style.display = 'flex';
             }
         }
 
@@ -1024,7 +1082,7 @@
             mainHeader.style.display = 'flex';
             appContainer.style.display = 'block';
             mainNav.style.display = 'flex';
-            showSection('feed'); // Go to feed after login/setup
+            showSection('feed');
         }
 
         // --- Authentication (Email/Password & Google) ---
@@ -1041,7 +1099,7 @@
                 const userCredential = await auth.signInWithEmailAndPassword(email, password);
                 if (!userCredential.user.emailVerified) {
                     document.getElementById('auth-status-message').textContent = 'Please verify your email to log in.';
-                    await auth.signOut(); // Force sign out if email not verified
+                    await auth.signOut();
                     showSection('email-verify');
                     document.getElementById('verify-email-message').textContent = `Your email ${email} is not verified. Please check your inbox for the verification link.`;
                     return;
@@ -1068,10 +1126,10 @@
             try {
                 const userCredential = await auth.createUserWithEmailAndPassword(email, password);
                 await userCredential.user.sendEmailVerification();
-                document.getElementById('signup-status-message').textContent = 'Account created. Verification email sent. Please verify your email to log in.';
-                alert('Account created. Verification email sent. Please verify your email to log in.');
-                await auth.signOut(); // Sign out the user after sending verification email
-                showSection('email-verify'); // Direct to verification instruction page
+                document.getElementById('signup-status-message').textContent = 'Account created. Verification email sent.';
+                alert('Account created. Verification email sent. Please check your inbox (and spam folder) for the verification link. After verifying, please sign in.');
+                await auth.signOut();
+                showSection('email-verify');
                 document.getElementById('verify-email-message').textContent = `A verification email has been sent to ${email}. Please click the link in the email to verify your account. After verifying, you can sign in.`;
             } catch (error) {
                 console.error("Sign-up error:", error);
@@ -1096,31 +1154,9 @@
         async function signInWithGoogle() {
             document.getElementById('auth-status-message').textContent = 'Signing in with Google...';
             try {
-                const result = await auth.signInWithPopup(googleProvider);
-                currentUserId = result.user.uid;
-                const userDoc = await db.collection('users').doc(currentUserId).get();
-
-                if (!userDoc.exists) {
-                    // New Google user, prompt for profile setup
-                    await db.collection('users').doc(currentUserId).set({
-                        username: result.user.displayName || result.user.email.split('@')[0], // Default username
-                        email: result.user.email,
-                        profilePicture: result.user.photoURL,
-                        coins: 0,
-                        credits: 0,
-                        whatsappNumber: '',
-                        instagramHandle: '',
-                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                    }, { merge: true });
-                    // Still go to setup profile, user can refine username
-                    showSection('setup-profile');
-                    document.getElementById('newUsername').value = result.user.displayName || result.user.email.split('@')[0];
-                    document.getElementById('profile-setup-status').textContent = 'Welcome! Please complete your profile.';
-                } else {
-                    // Existing user
-                    await fetchUserProfile(currentUserId);
-                    showMainAppUI();
-                }
+                // Use signInWithRedirect for WebView compatibility
+                await auth.signInWithRedirect(googleProvider);
+                // The result will be handled on page load via getRedirectResult()
             } catch (error) {
                 console.error("Google sign-in error:", error);
                 document.getElementById('auth-status-message').textContent = 'Google Sign-in failed: ' + error.message;
@@ -1146,18 +1182,20 @@
             }
 
             try {
+                // A simple placeholder for profile picture if none exists
+                const defaultProfilePic = 'https://via.placeholder.com/150/00e676/000000?text=' + username.substring(0,1).toUpperCase(); // Placeholder image with first letter of username
+
                 await db.collection('users').doc(currentUserId).set({
                     username: username,
                     email: auth.currentUser.email,
                     whatsappNumber: whatsappNum,
                     instagramHandle: instagramHandle,
-                    // Preserve existing coins/credits if merging, or initialize if new
                     coins: currentUserData.coins || 0,
                     credits: currentUserData.credits || 0,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    profilePicture: auth.currentUser.photoURL || 'https://img.icons8.com/ios-filled/50/00e676/user-male-circle.png' // Use Google PhotoURL if available
-                }, { merge: true }); // Use merge to avoid overwriting if doc already exists
-                await fetchUserProfile(currentUserId); // Update currentUserData
+                    profilePicture: defaultProfilePic // Using a simple placeholder
+                }, { merge: true });
+                await fetchUserProfile(currentUserId);
                 showMainAppUI();
                 alert('Profile setup complete!');
             } catch (error) {
@@ -1170,16 +1208,16 @@
         async function signOutUser() {
             try {
                 if (currentSpeakingUtterance) {
-                    speechSynthesis.cancel(); // Stop any ongoing speech
+                    speechSynthesis.cancel();
                     currentSpeakingUtterance = null;
                     document.querySelectorAll('.sound-button.playing').forEach(btn => btn.classList.remove('playing'));
                 }
                 await auth.signOut();
                 currentUserId = null;
-                currentUserData = { username: 'Guest', coins: 0, credits: 0, whatsappNumber: '', instagramHandle: '' };
+                currentUserData = { username: 'Guest', coins: 0, credits: 0, whatsappNumber: '', instagramHandle: '', profilePicture: '' };
                 updateHeaderStats();
                 alert('You have been signed out.');
-                showSection('signin-auth'); // Go back to sign-in page
+                showSection('signin-auth');
             } catch (error) {
                 console.error("Error signing out:", error);
                 alert('Sign out failed: ' + error.message);
@@ -1202,8 +1240,6 @@
 
         const infiniteScrollSentinel = document.createElement('div');
         infiniteScrollSentinel.id = 'infinite-scroll-sentinel';
-        // Add it to the feed-section's parent, which is app-container or posts-list-container
-        // For simplicity, let's put it just after the posts-list div.
         postsListDiv.parentNode.appendChild(infiniteScrollSentinel);
         observer.observe(infiniteScrollSentinel);
 
@@ -1213,30 +1249,25 @@
                  postsListDiv.innerHTML = '<p class="empty-state"><div class="spinner"></div> Loading posts...</p>';
             }
             try {
-                // Fetch all posts, and filter expired ones client-side
                 const snapshot = await db.collection('posts').orderBy('timestamp', 'desc').get();
                 allFetchedPosts = [];
                 snapshot.forEach(doc => {
                     const postData = doc.data();
-                    // Filter out expired posts. If you want actual deletion, this needs Cloud Functions.
                     if (postData.expiryTime && postData.expiryTime < Date.now()) {
                         console.log("Skipping expired post (client-side):", doc.id);
-                        // Optional: if you desire actual deletion from DB and acknowledge
-                        // it's not guaranteed without a server:
-                        // db.collection('posts').doc(doc.id).delete().then(() => console.log("Expired post deleted:", doc.id));
                     } else {
                         allFetchedPosts.push({ id: doc.id, data: postData });
                     }
                 });
                 console.log("Total non-expired posts fetched:", allFetchedPosts.length);
                 if (allFetchedPosts.length > 0) {
-                     displayRandomPosts(true); // Clear and re-display
+                     displayRandomPosts(true);
                 } else {
-                     postsListDiv.innerHTML = '<p class="empty-state"><img src="https://img.icons8.com/ios-filled/50/888888/spiral-bound-book.png" alt="No Posts"/>No posts found yet. Be the first to share something amazing!</p>';
+                     postsListDiv.innerHTML = '<p class="empty-state"><span class="empty-icon">📰</span>No posts found yet. Be the first to share something amazing!</p>';
                 }
             } catch (error) {
                 console.error("Error fetching posts:", error);
-                postsListDiv.innerHTML = '<p class="empty-state error-message"><img src="https://img.icons8.com/ios-filled/50/FA5252/error.png" alt="Error"/>Error loading posts: ' + error.message + '</p>';
+                postsListDiv.innerHTML = '<p class="empty-state error-message"><span class="empty-icon">❌</span>Error loading posts: ' + error.message + '</p>';
             }
         }
 
@@ -1244,17 +1275,23 @@
             if (clearAll) {
                 postsListDiv.innerHTML = '';
                 displayedPostIds.clear();
+                // Clear any ongoing speech if refreshing posts
+                if (currentSpeakingUtterance) {
+                    speechSynthesis.cancel();
+                    currentSpeakingUtterance = null;
+                }
+                document.querySelectorAll('.sound-button.playing').forEach(btn => btn.classList.remove('playing'));
             }
 
             if (allFetchedPosts.length === 0) {
-                if (postsListDiv.innerHTML === '' || postsListDiv.innerHTML.includes('spinner')) { // Check for initial load spinner
-                   postsListDiv.innerHTML = '<p class="empty-state"><img src="https://img.icons8.com/ios-filled/50/888888/spiral-bound-book.png" alt="No Posts"/>No posts found yet. Be the first to share something amazing!</p>';
+                if (postsListDiv.innerHTML === '' || postsListDiv.innerHTML.includes('spinner')) {
+                   postsListDiv.innerHTML = '<p class="empty-state"><span class="empty-icon">📰</span>No posts found yet. Be the first to share something amazing!</p>';
                 }
                 return;
             }
 
             let availablePosts = allFetchedPosts.filter(p => !displayedPostIds.has(p.id));
-            if (availablePosts.length < postsPerLoad / 2 && allFetchedPosts.length > 0) { // Reset if less than half a load
+            if (availablePosts.length < postsPerLoad / 2 && allFetchedPosts.length > 0) {
                 console.log("Resetting displayed posts for more variety.");
                 displayedPostIds.clear();
                 availablePosts = allFetchedPosts;
@@ -1271,8 +1308,6 @@
             }
 
             if (postsToRender.length === 0 && allFetchedPosts.length > 0) {
-                // Fallback: if somehow no unique posts could be picked, just pick randomly from all
-                console.log("No new unique posts found for display, picking randomly from all.");
                 for (let i = 0; i < postsPerLoad && i < allFetchedPosts.length; i++) {
                     postsToRender.push(allFetchedPosts[Math.floor(Math.random() * allFetchedPosts.length)]);
                 }
@@ -1286,71 +1321,51 @@
                 const postDiv = document.createElement('div');
                 postDiv.className = 'post-container';
 
-                // Randomly choose post style (simple for now: standard, horizontal image, or text-only)
-                // For "vertical vich vich horizontal vich mai tabe Ho eyc ok" - this implies more complex layout
-                // which is beyond simple CSS flex/grid and often requires specific design frameworks or
-                // more intricate HTML generation. For this example, I'll demonstrate a simple variation.
-                const postStyle = Math.floor(Math.random() * 3); // 0, 1, 2 for different styles
-
                 const headerDiv = document.createElement('div');
                 headerDiv.className = 'post-header';
-                const profilePic = document.createElement('img');
-                profilePic.src = postData.profilePicture || 'https://img.icons8.com/ios-filled/50/00e676/user-male-circle.png';
-                profilePic.alt = 'Profile Picture';
+
+                const profilePicPlaceholder = document.createElement('div');
+                profilePicPlaceholder.className = 'profile-pic-placeholder';
+                profilePicPlaceholder.textContent = postData.profileName ? postData.profileName.substring(0, 1).toUpperCase() : 'U'; // First letter of username
+                headerDiv.appendChild(profilePicPlaceholder);
+
                 const profileName = document.createElement('span');
                 profileName.textContent = postData.profileName || 'Loading User...';
                 if (!postData.profileName) {
                     db.collection('users').doc(postUserId).get().then(userDoc => {
                         if (userDoc.exists) {
                             profileName.textContent = userDoc.data().username || 'Unknown User';
+                            profilePicPlaceholder.textContent = userDoc.data().username.substring(0, 1).toUpperCase();
                         } else {
                             profileName.textContent = 'User Removed';
+                            profilePicPlaceholder.textContent = 'X';
                         }
                     }).catch(err => console.error("Error fetching post creator's name:", err));
                 }
-                headerDiv.appendChild(profilePic);
                 headerDiv.appendChild(profileName);
                 
-                // Add sound button here
                 const soundButton = document.createElement('button');
                 soundButton.className = 'sound-button';
                 soundButton.innerHTML = '🔊';
-                // Escape single quotes in postContent for the onclick attribute
                 soundButton.onclick = (event) => toggleSpeech(event.target, postData.postContent.replace(/'/g, "\\'"));
-                headerDiv.appendChild(soundButton); // Append to header or directly after header for better placement
+                headerDiv.appendChild(soundButton);
 
                 postDiv.appendChild(headerDiv);
 
-                // Image display based on style
                 if (postData.imageUrl && postData.imageUrl !== "") {
                     const postImage = document.createElement('img');
                     postImage.src = postData.imageUrl;
                     postImage.alt = 'Post Image';
                     postImage.className = 'post-image';
-                    
-                    // Simple example of "different styles" based on image presence/placement
-                    if (postStyle === 0) { // Standard: Image above text
-                        postDiv.appendChild(postImage);
-                    } else if (postStyle === 1 && Math.random() < 0.5) { // Try horizontal for some posts
-                         // This would require more complex CSS (e.g., flex container for image and text)
-                         // For now, let's keep it simple: if 'horizontal', just show standard.
-                         // True horizontal "vich vich" would mean restructuring post-container or a sub-div.
-                         postDiv.appendChild(postImage); // Fallback to standard for simplicity
-                    } else { // Text only or just image without specific layout
-                         postDiv.appendChild(postImage);
-                    }
+                    postDiv.appendChild(postImage);
                 }
 
                 const postContent = document.createElement('p');
                 postContent.className = 'post-content';
-                postContent.textContent = postData.postContent; // Set textContent first to safely get raw text
+                postContent.textContent = postData.postContent;
                 
-                // Scan post content for URLs and make them clickable/copyable
                 const urlRegex = /(https?:\/\/[^\s]+)/g;
                 postContent.innerHTML = postContent.textContent.replace(urlRegex, (url) => {
-                    // The onclick prevents the link from being opened directly by the WebViewer's default handler
-                    // and instead sends a command to App Inventor to open the URL in an external browser
-                    // and copy it to the clipboard.
                     return `<a href="${url}" target="_blank" onclick="event.stopPropagation(); sendCommandToAppInventor('OPEN_AND_COPY_URL:${url}');">${url}</a>`;
                 });
 
@@ -1360,11 +1375,8 @@
                 const footerDiv = document.createElement('div');
                 footerDiv.className = 'post-footer';
 
-                // Like button
                 const likeButton = document.createElement('button');
                 likeButton.className = 'like-button';
-                // Check if user has liked this post (you'd need a 'likes' subcollection or array in post)
-                // For simplicity, let's assume `postData.likes` is an array of UIDs
                 const isLiked = postData.likes && postData.likes.includes(currentUserId);
                 likeButton.classList.toggle('liked', isLiked);
                 likeButton.innerHTML = `❤️ <span id="like-count-${postId}">${(postData.likes ? postData.likes.length : 0)}</span>`;
@@ -1375,13 +1387,13 @@
                 if (currentUserId && postUserId === currentUserId) {
                     const editBtn = document.createElement('button');
                     editBtn.className = 'action-button edit';
-                    editBtn.innerHTML = '<img src="https://img.icons8.com/ios-filled/24/000000/edit--v1.png" alt="Edit"/> Edit';
-                    editBtn.onclick = () => alert('Edit Post functionality to be implemented.'); // For later
+                    editBtn.innerHTML = '<span class="button-icon">✏️</span> Edit';
+                    editBtn.onclick = () => alert('Edit Post functionality to be implemented.');
                     footerDiv.appendChild(editBtn);
 
                     const deleteBtn = document.createElement('button');
                     deleteBtn.className = 'action-button delete';
-                    deleteBtn.innerHTML = '<img src="https://img.icons8.com/ios-glyphs/24/FFFFFF/trash.png" alt="Delete"/> Delete';
+                    deleteBtn.innerHTML = '<span class="button-icon">🗑️</span> Delete';
                     deleteBtn.onclick = () => {
                         if (confirm('Are you sure you want to delete this post?')) {
                             deletePost(postId);
@@ -1398,20 +1410,20 @@
                             if (whatsappNum) {
                                 const whatsappBtn = document.createElement('button');
                                 whatsappBtn.className = 'action-button whatsapp';
-                                whatsappBtn.innerHTML = '<img src="https://img.icons8.com/ios-filled/24/FFFFFF/whatsapp.png" alt="WhatsApp"/> WhatsApp';
-                                whatsappBtn.onclick = () => sendCommandToAppInventor('CONTACT:WHATSAPP', whatsappNum); // Send number directly
+                                whatsappBtn.innerHTML = '<span class="button-icon">💬</span> WhatsApp';
+                                whatsappBtn.onclick = () => sendCommandToAppInventor('CONTACT:WHATSAPP', whatsappNum);
                                 footerDiv.appendChild(whatsappBtn);
                             }
                             if (instagramHandle) {
                                 const instagramBtn = document.createElement('button');
                                 instagramBtn.className = 'action-button instagram';
-                                instagramBtn.innerHTML = '<img src="https://img.icons8.com/ios-filled/24/FFFFFF/instagram-new.png" alt="Instagram"/> Instagram';
-                                instagramBtn.onclick = () => sendCommandToAppInventor('CONTACT:INSTAGRAM', instagramHandle); // Send handle directly
+                                instagramBtn.innerHTML = '<span class="button-icon">📸</span> Instagram';
+                                instagramBtn.onclick = () => sendCommandToAppInventor('CONTACT:INSTAGRAM', instagramHandle);
                                 footerDiv.appendChild(instagramBtn);
                             }
                             const messageBtn = document.createElement('button');
                             messageBtn.className = 'action-button message';
-                            messageBtn.innerHTML = '<img src="https://img.icons8.com/ios-filled/24/FFFFFF/chat.png" alt="Message"/> Message'; // Addmint logo on message
+                            messageBtn.innerHTML = '<span class="button-icon">✉️</span> Message';
                             messageBtn.onclick = () => startChatWithUser(postUserId, contactData.username || 'User');
                             footerDiv.appendChild(messageBtn);
                         } else {
@@ -1446,11 +1458,9 @@
                     const likeCountSpan = document.getElementById(`like-count-${postId}`);
 
                     if (likes.includes(currentUserId)) {
-                        // User already liked, so unlike
                         likes = likes.filter(uid => uid !== currentUserId);
                         buttonElement.classList.remove('liked');
                     } else {
-                        // User has not liked, so like
                         likes.push(currentUserId);
                         buttonElement.classList.add('liked');
                     }
@@ -1470,21 +1480,18 @@
         function toggleSpeech(button, text) {
             if ('speechSynthesis' in window) {
                 if (speechSynthesis.speaking) {
-                    // If something is already speaking, stop it
                     speechSynthesis.cancel();
-                    // Remove 'playing' class from all buttons
                     document.querySelectorAll('.sound-button.playing').forEach(btn => btn.classList.remove('playing'));
                     if (currentSpeakingUtterance && currentSpeakingUtterance.text === text) {
-                        currentSpeakingUtterance = null; // If it was the same post, stop
-                        return; // Exit after stopping the current one
+                        currentSpeakingUtterance = null;
+                        return;
                     }
                 }
 
-                // If no speech, or different post, start new speech
                 const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'en-US'; // Or 'hi-IN' for Hindi, 'en-GB', etc.
-                utterance.rate = 1.0; // Speed of speech
-                utterance.pitch = 1.0; // Pitch of speech
+                utterance.lang = 'en-US';
+                utterance.rate = 1.0;
+                utterance.pitch = 1.0;
 
                 utterance.onstart = () => {
                     button.classList.add('playing');
@@ -1510,19 +1517,23 @@
 
         async function deletePost(postId) {
             try {
-                // If the post has an image, delete it from storage first
                 const postDoc = await db.collection('posts').doc(postId).get();
                 if (postDoc.exists && postDoc.data().imageUrl) {
                     const imageUrl = postDoc.data().imageUrl;
-                    const imageRef = storage.refFromURL(imageUrl);
-                    await imageRef.delete();
-                    console.log("Image deleted from storage:", imageUrl);
+                    // Note: If you used a simple placeholder image for profile,
+                    // ensure you're not trying to delete Firebase Storage hosted images.
+                    // This assumes imageUrl points to a Firebase Storage path.
+                    if (imageUrl.includes('firebasestorage.googleapis.com')) {
+                        const imageRef = storage.refFromURL(imageUrl);
+                        await imageRef.delete();
+                        console.log("Image deleted from storage:", imageUrl);
+                    }
                 }
 
                 await db.collection('posts').doc(postId).delete();
                 alert('Post deleted successfully!');
-                fetchPosts(); // Refresh feed
-                fetchUserProfile(currentUserId); // Update post count
+                fetchPosts();
+                fetchUserProfile(currentUserId);
             } catch (error) {
                 console.error("Error deleting post:", error);
                 alert('Failed to delete post: ' + error.message);
@@ -1542,9 +1553,8 @@
         const postImageUploadInput = document.getElementById('postImageUpload');
         const uploadStatusText = document.getElementById('upload-status');
         const contactValidationMessage = document.getElementById('contact-validation-message');
-        const postContentInput = document.getElementById('postContent'); // Get the textarea
+        const postContentInput = document.getElementById('postContent');
 
-        // Add event listener for character count validation
         postContentInput.addEventListener('input', () => {
             const currentLength = postContentInput.value.length;
             const minLength = parseInt(postContentInput.minLength);
@@ -1568,22 +1578,14 @@
                 alert(`You have already watched ${adNumber} ads for this post. Cannot watch more for this post creation.`);
                 return;
             }
-            // Request ad from App Inventor, specifying it's for post expiry
             sendCommandToAppInventor('SHOW_AD_POST_EXPIRY', adNumber);
-            // The ad completion will trigger window.adWatchedForPostExpiry(adNumber) from App Inventor
         }
 
-        // Function called by App Inventor when an ad for post expiry is watched
         window.adWatchedForPostExpiry = function(watchedAdNumber) {
-            // This function should be called by App Inventor with the specific ad number completed
             if (watchedAdNumber > adsWatchedForCurrentPost) {
                  adsWatchedForCurrentPost = watchedAdNumber;
                  updateAdCountDisplay();
                  alert(`Ad ${watchedAdNumber} watched! Post expiry extended.`);
-            } else if (watchedAdNumber === adsWatchedForCurrentPost) {
-                 // Already recorded this ad level
-            } else {
-                 // This shouldn't happen if logic is sequential
             }
         };
 
@@ -1596,7 +1598,6 @@
 
             contactValidationMessage.style.display = 'none';
 
-            // Character count validation
             const minLength = parseInt(postContentInput.minLength);
             const maxLength = parseInt(postContentInput.maxLength);
             if (postContent.length < minLength || postContent.length > maxLength) {
@@ -1636,14 +1637,15 @@
                 }
             }
 
-            // Calculate expiry time
             let expiryHours = BASE_EXPIRY_HOURS + (adsWatchedForCurrentPost * HOURS_PER_AD);
-            if (expiryHours > 30) expiryHours = 30; // Max 30 hours
-            const expiryTime = Date.now() + (expiryHours * 60 * 60 * 1000); // Convert hours to milliseconds
+            if (expiryHours > 30) expiryHours = 30;
+            const expiryTime = Date.now() + (expiryHours * 60 * 60 * 1000);
 
             try {
                 const profileName = currentUserData.username || 'Anonymous User';
-                const profilePicture = currentUserData.profilePicture || auth.currentUser.photoURL || ''; // Use Google PhotoURL if available
+                // Use stored profilePicture from currentUserData if it exists, otherwise a simple placeholder
+                const profilePicture = currentUserData.profilePicture || `https://via.placeholder.com/150/00e676/000000?text=${profileName.substring(0,1).toUpperCase()}`;
+
 
                 await db.collection('posts').add({
                     userId: currentUserId,
@@ -1651,15 +1653,15 @@
                     profilePicture: profilePicture,
                     postContent: postContent,
                     imageUrl: imageUrl,
-                    whatsappNumber: postWhatsappNum,      // Store in post for easy access
-                    instagramHandle: postInstagramHandle, // Store in post for easy access
+                    whatsappNumber: postWhatsappNum,
+                    instagramHandle: postInstagramHandle,
                     timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                     expiryTime: expiryTime,
-                    likes: [] // Initialize likes array for new posts
+                    likes: []
                 });
                 alert('Post created successfully! It will expire in ' + expiryHours + ' hours.');
                 newPostForm.reset();
-                adsWatchedForCurrentPost = 0; // Reset for next post
+                adsWatchedForCurrentPost = 0;
                 updateAdCountDisplay();
                 showSection('feed');
                 fetchPosts();
@@ -1678,7 +1680,7 @@
                 if (userDoc.exists) {
                     currentUserData = userDoc.data();
                     document.getElementById('profile-username').textContent = currentUserData.username || 'N/A';
-                    document.getElementById('profile-email').textContent = auth.currentUser ? auth.currentUser.email : 'N/A'; // Email is only for profile owner
+                    document.getElementById('profile-email').textContent = auth.currentUser ? auth.currentUser.email : 'N/A';
                     document.getElementById('stat-coins').textContent = currentUserData.coins || 0;
                     document.getElementById('stat-credits').textContent = currentUserData.credits || 0;
                     document.getElementById('whatsappNumInput').value = currentUserData.whatsappNumber || '';
@@ -1699,14 +1701,13 @@
                     console.warn("User profile not found in Firestore. Showing setup.");
                     showSection('setup-profile');
                     document.getElementById('profile-setup-status').textContent = 'Your profile needs to be set up.';
-                    // Pre-fill username for Google users if exists
                     if (auth.currentUser && auth.currentUser.displayName) {
                         document.getElementById('newUsername').value = auth.currentUser.displayName;
                     }
                 }
             } catch (error) {
                 console.error("Error fetching user profile:", error);
-                document.getElementById('profile-details').innerHTML = '<p class="empty-state error-message"><img src="https://img.icons8.com/ios-filled/50/FA5252/error.png" alt="Error"/>Error loading profile: ' + error.message + '</p>';
+                document.getElementById('profile-details').innerHTML = '<p class="empty-state error-message"><span class="empty-icon">❌</span>Error loading profile: ' + error.message + '</p>';
             }
         }
 
@@ -1717,7 +1718,6 @@
             }
             const whatsappNum = document.getElementById('whatsappNumInput').value.trim();
             const instagramHandle = document.getElementById('instagramHandleInput').value.trim();
-            // Optional: allow username update. For simplicity, just contact info for now.
 
             try {
                 await db.collection('users').doc(currentUserId).update({
@@ -1733,7 +1733,7 @@
         }
 
         // --- Messaging Logic ---
-        let chatUnsubscribe = null; // To store Firestore listener unsubscribe function
+        let chatUnsubscribe = null;
 
         async function startChatWithUser(targetUserId, targetUsername) {
             if (!currentUserId) {
@@ -1745,23 +1745,19 @@
                 return;
             }
 
-            showSection('messages'); // Navigate to messages section
+            showSection('messages');
             currentChatUser = { id: targetUserId, username: targetUsername };
             currentChatStatus.textContent = `Chatting with: ${targetUsername}`;
             messagesListDiv.innerHTML = '<p class="empty-state"><div class="spinner"></div> Loading messages...</p>';
             messageInput.disabled = false;
             sendMessageBtn.disabled = false;
 
-            // Clear previous listener if any
             if (chatUnsubscribe) {
                 chatUnsubscribe();
             }
 
-            // Define chat path - use a consistent ordering for chat IDs
-            const chatPath = [currentUserId, targetUserId].sort().join('_'); // e.g., "UID1_UID2"
+            const chatPath = [currentUserId, targetUserId].sort().join('_');
 
-            // Check if chat document exists. If not, create it.
-            // This is important for Firestore Rules that might check `request.resource.data.userId1`
             const chatDocRef = db.collection('chats').doc(chatPath);
             const chatDoc = await chatDocRef.get();
             if (!chatDoc.exists) {
@@ -1773,11 +1769,10 @@
                 });
             }
 
-            // Listen for new messages
             chatUnsubscribe = chatDocRef.collection('messages')
                 .orderBy('timestamp', 'asc')
                 .onSnapshot(snapshot => {
-                    messagesListDiv.innerHTML = ''; // Clear existing messages
+                    messagesListDiv.innerHTML = '';
                     if (snapshot.empty) {
                         messagesListDiv.innerHTML = '<p class="empty-state">No messages yet. Send your first message!</p>';
                     } else {
@@ -1793,7 +1788,6 @@
                             `;
                             messagesListDiv.appendChild(messageDiv);
                         });
-                        // Scroll to the bottom of the message list
                         messagesListDiv.scrollTop = messagesListDiv.scrollHeight;
                     }
                 }, error => {
@@ -1820,18 +1814,17 @@
             try {
                 await db.collection('chats').doc(chatPath).collection('messages').add({
                     senderId: currentUserId,
-                    senderName: currentUserData.username, // Use current user's actual username
+                    senderName: currentUserData.username,
                     receiverId: currentChatUser.id,
                     receiverName: currentChatUser.username,
                     content: messageContent,
                     timestamp: firebase.firestore.FieldValue.serverTimestamp()
                 });
-                // Also update the parent chat document's last message timestamp
                 await db.collection('chats').doc(chatPath).update({
                     lastMessageTimestamp: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
-                messageInput.value = ''; // Clear input
+                messageInput.value = '';
             } catch (error) {
                 console.error("Error sending message:", error);
                 alert('Failed to send message: ' + error.message);
@@ -1847,8 +1840,8 @@
         userSearchInput.addEventListener('keyup', () => {
             clearTimeout(searchTimeout);
             const query = userSearchInput.value.trim();
-            if (query.length > 1) { // Start search after 1 character
-                searchTimeout = setTimeout(() => searchUsers(query), 300); // Debounce
+            if (query.length > 1) {
+                searchTimeout = setTimeout(() => searchUsers(query), 300);
             } else {
                 searchResultsDiv.style.display = 'none';
                 searchResultsDiv.innerHTML = '';
@@ -1865,8 +1858,6 @@
             searchResultsDiv.innerHTML = '<p class="empty-state" style="padding:10px; font-size:0.9em;">Searching...</p>';
             searchResultsDiv.style.display = 'block';
             try {
-                // For a more robust "contains" search, a dedicated search service or cloud function is ideal.
-                // This is a basic prefix search.
                 const snapshot = await db.collection('users')
                                         .where('username', '>=', query)
                                         .where('username', '<=', query + '\uf8ff')
@@ -1881,11 +1872,11 @@
                 searchResultsDiv.innerHTML = '';
                 snapshot.forEach(doc => {
                     const userData = doc.data();
-                    if (doc.id === currentUserId) return; // Don't show current user in search results
+                    if (doc.id === currentUserId) return;
 
                     const userResultDiv = document.createElement('div');
                     userResultDiv.innerHTML = `
-                        <img src="${userData.profilePicture || 'https://img.icons8.com/ios-filled/50/00e676/user-male-circle.png'}" alt="Profile"/>
+                        <div class="profile-pic-placeholder">${userData.username.substring(0,1).toUpperCase()}</div>
                         <p>${userData.username}</p>
                     `;
                     userResultDiv.onclick = () => {
@@ -1912,7 +1903,6 @@
             }
         }
 
-        // Functions called by App Inventor for coin/credit updates
         window.updateCoins = function(amount) {
             if (currentUserId) {
                 db.collection('users').doc(currentUserId).update({
@@ -1941,16 +1931,14 @@
             }
         };
 
-        // Command to request ad from App Inventor (e.g., for coins/credits)
         function requestAd(type) {
              sendCommandToAppInventor('SHOW_AD', type);
         }
-        // Callback from App Inventor when a general ad is watched (e.g., for coins/credits)
         window.adWatched = function(adType) {
             if (adType === 'coins') {
-                window.updateCoins(5); // Example: 5 coins per ad
+                window.updateCoins(5);
             } else if (adType === 'credits') {
-                window.updateCredits(1); // Example: 1 credit per ad
+                window.updateCredits(1);
             }
         };
 
@@ -1972,54 +1960,62 @@
         });
 
 
-        // --- Initial Load ---
+        // --- Initial Load & Auth State Handling ---
         document.addEventListener('DOMContentLoaded', () => {
-    showPreloader();
-    auth.onAuthStateChanged(async (user) => {
-        if (user) {
-            currentUserId = user.uid;
-            if (user.emailVerified) {
-                const userDoc = await db.collection('users').doc(currentUserId).get();
-                if (!userDoc.exists || !userDoc.data().username) {
-                    showSection('setup-profile');
-                    if (user.displayName) {
-                        document.getElementById('newUsername').value = user.displayName;
-                    }
-                } else {
-                    await fetchUserProfile(currentUserId);
-                    showMainAppUI();
-                }
-            } else {
-                showSection('email-verify');
-                document.getElementById('verify-email-message').textContent = `Your email ${user.email} is not verified. Please check your inbox for the verification link. After verifying, please sign in again.`;
-            }
-            hidePreloader(); // Hide preloader once user state is determined
-        } else {
-            // **Handle Redirect Result Here**
-            firebase.auth().getRedirectResult().then(function(result) {
-                if (result.credential) {
-                    // This is a Google Sign-in.
-                    const user = result.user;
-                    currentUserId = user.uid; // Set current user ID
-                    // Now, proceed as if a user just signed in (check for profile, etc.)
-                    // The onAuthStateChanged listener above should catch this anyway,
-                    // but this ensures you explicitly handle the redirect result.
-                    console.log("Google Sign-in via Redirect successful!", user);
-                    // The onAuthStateChanged listener will likely fire again and handle the rest.
-                } else {
-                    // No redirect result, user not logged in.
-                    showSection('signin-auth'); // Show sign-in form if no user
-                }
-            }).catch(function(error) {
-                console.error("Error during redirect result:", error);
-                document.getElementById('auth-status-message').textContent = 'Google Sign-in failed: ' + error.message;
-                showSection('signin-auth'); // Show sign-in form if error
-            }).finally(() => {
-                hidePreloader(); // Hide preloader after everything
-            });
-        }
-    });
-});
+            // Hide preloader first, splash screen will be visible
+            preloader.style.display = 'none';
+            splashScreen.style.display = 'flex';
+
+            setTimeout(() => {
+                splashScreen.classList.add('fade-out');
+                // Allow some time for splash to fade before checking auth
+                setTimeout(() => {
+                    splashScreen.style.display = 'none';
+
+                    // Firebase Auth State Listener
+                    auth.onAuthStateChanged(async (user) => {
+                        if (user) {
+                            currentUserId = user.uid;
+                            // **Handle Redirect Result for Google Sign-in**
+                            firebase.auth().getRedirectResult().then(function(result) {
+                                if (result.credential) {
+                                    // Google Sign-in via Redirect successful!
+                                    console.log("Google Sign-in via Redirect successful!", result.user);
+                                    // This means `user` object is already correctly populated.
+                                    // No need to set `currentUserId` again as it's set by onAuthStateChanged.
+                                    // Just proceed with the normal flow.
+                                }
+                                // Whether it was a redirect result or normal login, check email verification.
+                                if (user.emailVerified) {
+                                    const userDoc = await db.collection('users').doc(currentUserId).get();
+                                    if (!userDoc.exists || !userDoc.data().username) {
+                                        showSection('setup-profile');
+                                        if (user.displayName) {
+                                            document.getElementById('newUsername').value = user.displayName;
+                                        }
+                                    } else {
+                                        await fetchUserProfile(currentUserId);
+                                        showMainAppUI();
+                                    }
+                                } else {
+                                    showSection('email-verify');
+                                    document.getElementById('verify-email-message').textContent = `Your email ${user.email} is not verified. Please check your inbox (and spam folder) for the verification link. After verifying, please sign in again.`;
+                                }
+                            }).catch(function(error) {
+                                console.error("Error during redirect result or initial auth check:", error);
+                                document.getElementById('auth-status-message').textContent = 'Authentication failed: ' + error.message;
+                                showSection('signin-auth'); // Go to sign-in on error
+                            });
+
+                        } else {
+                            // No user signed in, show sign-in screen.
+                            showSection('signin-auth');
+                        }
+                    });
+
+                }, 1000); // Wait for splash fade-out (1s) + a little buffer
+            }, 2000); // Display splash for 2 seconds before fading
+        });
 
     </script>
 </body>
