@@ -3,64 +3,161 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AddMint - Pro Feed</title>
-    <link rel="icon" href="https://img.icons8.com/ios-filled/50/ffffff/diamond--v1.png" type="image/x-icon">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>AddMint Pro</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path fill='%23007bff' d='M50 0L100 50L50 100L0 50Z'/><path fill='%23e0e0e0' d='M50 10L90 50L50 90L10 50Z'/></svg>">
+    
     <style>
-        /* Global Styles */
+        /* Global Styles & Variables */
         :root {
-            --bg-color-dark: #1a1a1a;
-            --text-color-light: #f0f0f0;
-            --primary-color: #007bff; /* Blue */
-            --accent-color: #1e90ff; /* Dodger Blue */
-            --card-bg: #2a2a2a;
-            --border-color: #3a3a3a;
-            --input-bg: #333;
-            --button-bg-primary: #007bff;
-            --button-bg-secondary: #4a4a4a;
+            --dark-bg: #121212; /* Deeper dark background */
+            --dark-fg: #1e1e1e; /* Slightly lighter for foreground elements */
+            --text-color: #e0e0e0;
+            --primary-color: #007bff; /* Bright Blue */
+            --primary-dark: #0056b3; /* Darker Blue */
+            --accent-color: #ffc107; /* Bright Yellow/Amber */
+            --accent-dark: #cc9a00; /* Darker Yellow */
+            --border-color: #333;
+            --shadow-color: rgba(0, 0, 0, 0.7);
             --success-color: #28a745;
             --error-color: #dc3545;
-            --warning-color: #ffc107;
-            --gradient-start: #1e90ff;
-            --gradient-end: #007bff;
-            --scroll-thumb: #555;
-            --scroll-track: #333;
-            --header-height: 60px;
-            --footer-height: 60px;
+            --info-color: #17a2b8;
+            --transition-speed: 0.3s ease;
+            --border-radius-sm: 8px;
+            --border-radius-md: 12px;
+            --border-radius-lg: 16px;
         }
 
-        body {
-            font-family: 'Poppins', sans-serif;
+        * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            background-color: var(--bg-color-dark);
-            color: var(--text-color-light);
-            overflow-x: hidden;
+            font-family: 'Segoe UI', 'Roboto', sans-serif; /* Professional font stack */
             -webkit-tap-highlight-color: transparent; /* Remove tap highlight on mobile */
         }
 
-        /* Utility Classes */
-        .hidden { display: none !important; }
-        .text-center { text-align: center; }
-        .text-primary { color: var(--primary-color); }
-        .mb-2 { margin-bottom: 1rem; }
-        .mt-2 { margin-top: 1rem; }
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-color);
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overflow-x: hidden;
+            font-size: 16px; /* Base font size */
+            -webkit-font-smoothing: antialiased; /* Better text rendering */
+            -moz-osx-font-smoothing: grayscale;
+        }
 
-        /* Scrollbar Styling (for desktop) */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
+        a {
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: color var(--transition-speed);
         }
-        ::-webkit-scrollbar-track {
-            background: var(--scroll-track);
+
+        a:hover {
+            color: var(--accent-color);
+            text-decoration: underline;
         }
-        ::-webkit-scrollbar-thumb {
-            background: var(--scroll-thumb);
-            border-radius: 4px;
+
+        button, input[type="submit"] {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: var(--border-radius-sm);
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: background-color var(--transition-speed), transform 0.15s ease, box-shadow var(--transition-speed);
+            box-shadow: 0 4px 10px var(--shadow-color);
+            letter-spacing: 0.5px;
         }
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--accent-color);
+
+        button:hover, input[type="submit"]:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.8);
+        }
+
+        button:active, input[type="submit"]:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+        }
+
+        input[type="email"],
+        input[type="password"],
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 12px 15px;
+            margin-bottom: 15px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-sm);
+            background-color: var(--dark-bg); /* Match body background for deeper immersion */
+            color: var(--text-color);
+            font-size: 1rem;
+            transition: border-color var(--transition-speed), box-shadow var(--transition-speed);
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4); /* Inner shadow for depth */
+        }
+
+        input[type="email"]:focus,
+        input[type="password"]:focus,
+        input[type="text"]:focus,
+        textarea:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25), inset 0 1px 3px rgba(0, 0, 0, 0.4);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-color);
+            font-size: 0.95rem;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 480px; /* Slightly wider for modern feel */
+            margin: auto;
+            padding: 30px;
+            background-color: var(--dark-fg);
+            border-radius: var(--border-radius-lg);
+            box-shadow: 0 10px 25px var(--shadow-color);
+            animation: fadeIn 0.6s ease-out;
+            border: 1px solid var(--border-color); /* Subtle border */
+        }
+
+        .message {
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: var(--border-radius-sm);
+            font-size: 0.95rem;
+            word-wrap: break-word;
+            border: 1px solid transparent; /* Default transparent border */
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .message.success {
+            background-color: rgba(40, 167, 69, 0.2);
+            color: var(--success-color);
+            border-color: var(--success-color);
+        }
+
+        .message.error {
+            background-color: rgba(220, 53, 69, 0.2);
+            color: var(--error-color);
+            border-color: var(--error-color);
+        }
+        .message.info {
+            background-color: rgba(23, 162, 184, 0.2);
+            color: var(--info-color);
+            border-color: var(--info-color);
+        }
+
+        .hidden {
+            display: none !important;
         }
 
         /* Splash Screen */
@@ -70,461 +167,387 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            background: linear-gradient(135deg, var(--dark-bg), #0f0f0f);
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             z-index: 1000;
-            animation: fadeOutSplash 0.5s forwards 1.5s; /* Fade out after 1.5s delay */
+            transition: opacity 1.2s ease-out; /* Longer fade out */
+            opacity: 1;
         }
 
         .splash-logo-container {
-            width: 150px;
-            height: 150px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
-            animation: pulse 1.5s infinite alternate;
+            width: 120px;
+            height: 120px;
+            position: relative;
         }
 
-        .splash-logo {
-            font-size: 4em;
-            color: var(--text-color-light);
-            font-weight: 700;
+        .splash-logo-diamond {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(45deg);
+            border-radius: 20px;
+            box-shadow: 0 0 30px rgba(0, 123, 255, 0.7);
+            animation: splashDiamondPulse 2s infinite alternate ease-in-out;
+        }
+
+        .splash-logo-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3.5rem;
+            font-weight: 800; /* Ultra bold */
+            color: white;
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.6), 0 0 25px rgba(255, 255, 255, 0.4);
+            z-index: 1;
             letter-spacing: 2px;
-            text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-            animation: bounceIn 0.8s ease-out;
         }
 
-        @keyframes fadeOutSplash {
-            from { opacity: 1; visibility: visible; }
-            to { opacity: 0; visibility: hidden; }
-        }
-
-        @keyframes pulse {
-            from { transform: scale(0.95); box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); }
-            to { transform: scale(1.05); box-shadow: 0 0 30px rgba(0, 0, 0, 0.5); }
-        }
-
-        @keyframes bounceIn {
-            0% { transform: scale(0.1); opacity: 0; }
-            60% { transform: scale(1.2); opacity: 1; }
-            100% { transform: scale(1); }
-        }
-
-        /* Preloader */
-        #preloader {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(26, 26, 26, 0.9);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 999;
-            transition: opacity 0.5s ease;
-        }
-
-        .spinner {
-            border: 4px solid rgba(255, 255, 255, 0.3);
+        .splash-loader {
+            border: 4px solid var(--border-color);
             border-top: 4px solid var(--primary-color);
             border-radius: 50%;
             width: 50px;
             height: 50px;
-            animation: spin 1s linear infinite;
-        }
-
-        .preloader-text {
-            margin-top: 20px;
-            font-size: 1.1em;
-            color: var(--text-color-light);
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Main App Container */
-        .app-container {
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            padding-top: var(--header-height);
-            padding-bottom: var(--footer-height);
-            box-sizing: border-box;
-            background-color: var(--bg-color-dark);
-            position: relative;
+            animation: spin 1s linear infinite, glow 1.5s infinite alternate;
+            margin-top: 40px;
+            box-shadow: 0 0 15px rgba(0, 123, 255, 0.5);
         }
 
         /* Header */
         header {
-            background-color: var(--card-bg);
-            color: var(--text-color-light);
-            padding: 10px 15px;
+            background-color: var(--dark-fg);
+            padding: 15px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-            position: fixed;
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: 0 2px 15px var(--shadow-color);
+            position: sticky;
             top: 0;
-            left: 0;
-            width: 100%;
-            z-index: 100;
-            height: var(--header-height);
-            box-sizing: border-box;
+            z-index: 99;
+            animation: slideDown 0.5s ease-out;
         }
 
-        .header-logo {
-            font-size: 1.8em;
-            font-weight: 700;
-            color: var(--primary-color);
-            letter-spacing: 1px;
-            animation: breathe 2s infinite alternate; /* Header logo animation */
-        }
-
-        @keyframes breathe {
-            from { transform: scale(1); opacity: 0.8; }
-            to { transform: scale(1.05); opacity: 1; }
-        }
-
-        .header-icons {
+        .app-logo {
             display: flex;
-            gap: 15px;
+            align-items: center;
+            font-size: 1.9rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            text-shadow: 0 0 8px rgba(0, 123, 255, 0.6);
+            letter-spacing: 1px;
         }
 
-        .header-icons .icon-button {
-            background: none;
-            border: none;
-            color: var(--text-color-light);
-            font-size: 1.2em;
+        .app-logo .shape {
+            width: 35px;
+            height: 35px;
+            background: linear-gradient(45deg, var(--accent-color), #ffd700); /* Gold color */
+            transform: rotate(45deg);
+            border-radius: 8px;
+            margin-right: 12px;
+            box-shadow: 0 0 15px rgba(255, 193, 7, 0.6);
+            animation: headerLogoSpin 4s infinite linear;
+        }
+
+        .header-menu-icon {
+            font-size: 2rem;
             cursor: pointer;
+            color: var(--text-color);
+            transition: color var(--transition-speed), transform 0.2s ease;
             padding: 5px;
-            transition: color 0.3s ease, transform 0.2s ease;
+            border-radius: 5px;
         }
 
-        .header-icons .icon-button:hover {
+        .header-menu-icon:hover {
             color: var(--primary-color);
             transform: scale(1.1);
         }
 
-        /* Main Content Sections */
-        .section {
-            padding: 20px;
+        /* Main Content */
+        main {
             flex-grow: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 25px; /* Increased space between sections */
             overflow-y: auto;
+            width: 100%;
+            max-width: 1200px; /* Max width for content on large screens */
+            margin: 0 auto;
         }
 
-        /* Forms (Auth, Profile) */
-        .form-container {
-            max-width: 400px;
-            margin: 40px auto;
-            background-color: var(--card-bg);
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-            animation: fadeIn 0.5s ease-out;
+        section {
+            display: none;
+            padding: 25px;
+            background-color: var(--dark-fg);
+            border-radius: var(--border-radius-lg);
+            box-shadow: 0 6px 15px var(--shadow-color);
+            animation: fadeIn 0.6s ease-out;
+            border: 1px solid var(--border-color);
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        section.active {
+            display: block;
         }
 
-        .form-container h2 {
-            text-align: center;
+        h2 {
             color: var(--primary-color);
             margin-bottom: 25px;
-            font-weight: 600;
+            text-align: center;
+            font-size: 2rem;
+            font-weight: 700;
+            text-shadow: 0 0 8px rgba(0, 123, 255, 0.4);
+            letter-spacing: 1px;
         }
 
-        .input-group {
-            margin-bottom: 15px;
+        /* Password input with eye icon */
+        .password-input-container {
             position: relative;
+            margin-bottom: 15px;
         }
 
-        .input-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: var(--text-color-light);
-            font-size: 0.95em;
+        .password-input-container input {
+            padding-right: 50px; /* Space for the icon */
         }
 
-        .input-group input[type="text"],
-        .input-group input[type="email"],
-        .input-group input[type="password"],
-        .input-group textarea {
-            width: calc(100% - 20px);
-            padding: 12px;
-            background-color: var(--input-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 5px;
-            color: var(--text-color-light);
-            font-size: 1em;
-            outline: none;
-            transition: border-color 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .input-group input:focus,
-        .input-group textarea:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.3);
-        }
-
-        .password-toggle {
+        .toggle-password {
             position: absolute;
-            right: 10px;
-            top: 70%; /* Adjust based on label height */
+            right: 15px;
+            top: 50%;
             transform: translateY(-50%);
-            background: none;
-            border: none;
-            color: #888;
             cursor: pointer;
-            font-size: 0.9em;
+            color: var(--border-color);
+            font-size: 1.3rem;
+            transition: color var(--transition-speed);
             padding: 5px;
-            transition: color 0.3s ease;
+            border-radius: 5px;
         }
-        .password-toggle:hover {
+
+        .toggle-password:hover {
             color: var(--primary-color);
         }
-        
-        .message {
-            margin-top: 15px;
-            padding: 10px;
-            border-radius: 5px;
-            font-size: 0.9em;
-            text-align: center;
-        }
-        .message.success { background-color: rgba(40, 167, 69, 0.2); color: var(--success-color); }
-        .message.error { background-color: rgba(220, 53, 69, 0.2); color: var(--error-color); }
-        .message.info { background-color: rgba(0, 123, 255, 0.2); color: var(--primary-color); }
 
-
-        .button {
-            width: 100%;
-            padding: 12px;
-            background-color: var(--button-bg-primary);
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-size: 1.1em;
-            cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-            margin-top: 15px;
-            display: block;
-            text-align: center;
-            text-decoration: none;
-        }
-        .button:hover {
-            background-color: var(--accent-color);
-            transform: translateY(-2px);
-        }
-        .button:disabled {
-            background-color: var(--button-bg-secondary);
-            cursor: not-allowed;
+        /* Post Creation Section */
+        #create-post-section label {
+            margin-bottom: 10px;
+            font-size: 1rem;
         }
 
-        .link-text {
-            display: block;
-            text-align: center;
-            margin-top: 15px;
-            color: var(--primary-color);
-            cursor: pointer;
-            font-size: 0.9em;
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
-        .link-text:hover {
-            text-decoration: underline;
-            color: var(--accent-color);
+        #post-content {
+            min-height: 120px;
+            resize: vertical;
+            margin-bottom: 20px;
         }
 
-        /* Main App UI (Home Feed, Create Post, Profile) */
-        .main-content {
-            flex-grow: 1;
-            padding: 20px;
-            overflow-y: auto;
-            scroll-behavior: smooth;
-        }
-
-        /* Post Cards */
-        .posts-container {
+        /* Post Display Section */
+        #posts-list {
             display: grid;
-            gap: 20px;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Responsive grid */
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Larger min-width for posts */
+            gap: 30px; /* More space between posts */
+            padding-top: 10px; /* Breathing room at the top */
         }
 
         .post-card {
-            background-color: var(--card-bg);
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
-            overflow: hidden;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            background-color: var(--dark-bg);
+            border-radius: var(--border-radius-lg);
+            padding: 25px;
+            box-shadow: 0 8px 20px var(--shadow-color);
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
             display: flex;
             flex-direction: column;
-            animation: slideInUp 0.5s ease-out forwards;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            position: relative;
+            animation: slideInUp 0.6s ease-out; /* Animation for new posts */
         }
 
         .post-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.6);
+            transform: translateY(-8px) scale(1.01);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.9);
+            border-color: var(--primary-color); /* Highlight on hover */
         }
 
-        .post-header {
-            display: flex;
-            align-items: center;
-            padding: 15px;
-            border-bottom: 1px solid var(--border-color);
+        .post-card h3 {
+            color: var(--accent-color);
+            margin-bottom: 12px;
+            font-size: 1.4rem;
+            font-weight: 700;
+            text-shadow: 0 0 5px rgba(255, 193, 7, 0.4);
         }
-        .post-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background-color: var(--primary-color);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-weight: 600;
-            margin-right: 10px;
-            color: white;
-            font-size: 1.1em;
-        }
-        .post-info {
+
+        .post-card p {
+            font-size: 1.05rem;
+            margin-bottom: 20px;
             flex-grow: 1;
-        }
-        .post-username {
-            font-weight: 600;
-            color: var(--primary-color);
-            font-size: 1.05em;
-        }
-        .post-time {
-            font-size: 0.8em;
-            color: #bbb;
+            word-wrap: break-word;
+            color: var(--text-color);
         }
 
-        .post-content {
-            padding: 15px;
-            font-size: 0.95em;
-            line-height: 1.6;
-            word-wrap: break-word; /* Ensure long words wrap */
+        .post-meta {
+            font-size: 0.88rem;
+            color: #aaa;
+            margin-top: auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 10px;
+            border-top: 1px dashed rgba(255, 255, 255, 0.1);
+            margin-bottom: 15px; /* Space before actions */
         }
 
         .post-actions {
             display: flex;
-            justify-content: space-around;
-            padding: 10px 15px;
-            border-top: 1px solid var(--border-color);
-        }
-        .action-button {
-            background: none;
-            border: none;
-            color: #ccc;
-            font-size: 1.1em;
-            cursor: pointer;
-            padding: 8px 12px;
-            border-radius: 5px;
-            transition: color 0.3s ease, background-color 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        .action-button.liked {
-            color: var(--error-color); /* Red for liked */
-        }
-        .action-button:hover:not(.liked) {
-            color: var(--primary-color);
-            background-color: rgba(0, 123, 255, 0.1);
+            flex-wrap: wrap; /* Allow wrapping on small screens */
+            gap: 10px;
+            justify-content: flex-end;
         }
 
-        /* Create Post Section */
-        #create-post-section .form-container {
-            max-width: 600px;
-            margin: 20px auto;
-        }
-        #createPostText {
-            min-height: 100px;
-            resize: vertical;
-        }
-
-        /* Profile Section */
-        #profile-section .form-container {
-            max-width: 500px;
-        }
-        .profile-info {
-            padding: 20px;
-            text-align: center;
-        }
-        .profile-avatar-large {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
+        .post-actions button {
+            padding: 8px 18px;
+            font-size: 0.9rem;
+            border-radius: 6px;
             background-color: var(--primary-color);
-            display: inline-flex;
-            justify-content: center;
-            align-items: center;
-            font-weight: 700;
-            font-size: 2.5em;
-            color: white;
-            margin-bottom: 20px;
-        }
-        .profile-detail {
-            margin-bottom: 10px;
-            font-size: 1.1em;
-        }
-        .profile-detail strong {
-            color: var(--primary-color);
-            margin-right: 5px;
+            box-shadow: none;
+            transition: background-color 0.2s ease, transform 0.1s ease;
         }
 
-        .social-buttons-container {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 20px;
-            flex-wrap: wrap; /* Allow wrapping on smaller screens */
+        .post-actions button:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-1px);
         }
-        .social-button {
-            background-color: var(--button-bg-secondary);
-            color: var(--text-color-light);
-            padding: 10px 15px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-size: 1em;
-            display: flex;
-            align-items: center;
+
+        .post-actions button.delete-btn {
+            background-color: var(--error-color);
+        }
+        .post-actions button.delete-btn:hover {
+            background-color: #b02a37;
+        }
+
+        /* Unique Post Styles - Dynamic Examples */
+        /* Horizontal Card */
+        .post-card.horizontal {
+            flex-direction: row;
+            align-items: flex-start; /* Align content to top */
+            gap: 20px;
+            padding: 25px;
+            min-height: 160px;
+            border-left: 5px solid var(--accent-color);
+            animation: slideInRight 0.7s ease-out;
+        }
+        .post-card.horizontal .post-content-wrapper {
+            flex-grow: 1;
+        }
+        .post-card.horizontal .post-meta {
+            flex-direction: column;
+            align-items: flex-end;
+            text-align: right;
+            min-width: 100px;
+            border-top: none; /* No top border for horizontal */
+            padding-top: 0;
+            margin-bottom: 0;
+        }
+        .post-card.horizontal .post-actions {
+            flex-direction: column; /* Stack buttons vertically in horizontal layout */
             gap: 8px;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-        }
-        .social-button.whatsapp { background-color: #25D366; }
-        .social-button.instagram { background-color: #E1306C; }
-        .social-button.call { background-color: #007bff; }
-
-        .social-button:hover {
-            transform: translateY(-3px);
-            opacity: 0.9;
         }
 
-        /* Footer (Bottom Navigation) */
+        /* Square Card */
+        .post-card.square {
+            aspect-ratio: 1 / 1; /* Maintain square aspect ratio */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            border-radius: 50%; /* Circle shape example */
+            animation: zoomIn 0.8s ease-out;
+            border: 2px solid var(--info-color);
+        }
+        .post-card.square .post-content-wrapper {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 5; /* Limit lines for square */
+            -webkit-box-orient: vertical;
+            margin-bottom: 10px;
+        }
+        .post-card.square .post-meta, .post-card.square .post-actions {
+            margin-top: 10px;
+            justify-content: center;
+        }
+
+        /* Neon Effect */
+        .post-card.neon {
+            box-shadow: 0 0 15px var(--primary-color), 0 0 25px var(--primary-color) inset;
+            border-color: var(--primary-color);
+            position: relative;
+            overflow: hidden;
+            animation: neonGlow 1.5s infinite alternate ease-in-out;
+        }
+        .post-card.neon::before { /* Border glow effect */
+            content: '';
+            position: absolute;
+            top: -2px; left: -2px; right: -2px; bottom: -2px;
+            background: linear-gradient(45deg, var(--primary-color), var(--accent-color), var(--primary-color));
+            z-index: -1;
+            filter: blur(8px);
+            opacity: 0.7;
+            border-radius: var(--border-radius-lg);
+            animation: neonBorderPulse 3s infinite linear;
+        }
+        .post-card.neon h3, .post-card.neon p, .post-card.neon .post-meta {
+            text-shadow: 0 0 10px rgba(0, 123, 255, 0.8), 0 0 20px rgba(0, 123, 255, 0.6);
+        }
+        .post-card.neon .post-actions button {
+            background-color: var(--accent-color);
+            box-shadow: 0 0 10px rgba(255, 193, 7, 0.7);
+        }
+        .post-card.neon .post-actions button:hover {
+            background-color: var(--accent-dark);
+        }
+
+        /* Table Post Card (Conceptual - requires more structured data) */
+        /* If your post data had 'items' array, this could display as a mini table */
+        /*
+        .post-card.table-style {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            align-items: center;
+            padding: 20px;
+            border: 1px solid var(--info-color);
+        }
+        .post-card.table-style h3 { grid-column: 1 / -1; text-align: center; }
+        .post-card.table-style .table-row {
+            display: contents; // Makes child elements participate in the grid
+        }
+        .post-card.table-style .table-label { font-weight: bold; color: var(--accent-color); }
+        .post-card.table-style .table-value { text-align: right; }
+        .post-card.table-style .post-meta { grid-column: 1 / -1; border-top: 1px solid var(--border-color); padding-top: 10px;}
+        .post-card.table-style .post-actions { grid-column: 1 / -1; justify-content: center;}
+        */
+
+
+        /* Bottom Navigation */
         footer {
-            background-color: var(--card-bg);
-            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.3);
+            background-color: var(--dark-fg);
+            padding: 15px 0;
             display: flex;
             justify-content: space-around;
-            align-items: center;
-            position: fixed;
+            border-top: 1px solid var(--border-color);
+            box-shadow: 0 -2px 15px var(--shadow-color);
+            position: sticky;
             bottom: 0;
-            left: 0;
             width: 100%;
-            z-index: 100;
-            height: var(--footer-height);
-            box-sizing: border-box;
+            z-index: 99;
+            animation: slideUp 0.5s ease-out;
         }
 
         .nav-item {
@@ -532,282 +555,322 @@
             flex-direction: column;
             align-items: center;
             color: #aaa;
-            font-size: 0.8em;
-            text-decoration: none;
-            padding: 5px;
-            border-radius: 5px;
-            transition: color 0.3s ease, background-color 0.3s ease;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: color var(--transition-speed), transform 0.2s ease;
+            padding: 8px 12px;
+            border-radius: var(--border-radius-sm);
+            flex: 1; /* Distribute space evenly */
+            max-width: 100px; /* Max width for nav items */
         }
-        .nav-item i {
-            font-size: 1.4em;
-            margin-bottom: 3px;
-        }
+
         .nav-item.active {
             color: var(--primary-color);
-        }
-        .nav-item:hover {
-            color: var(--primary-color);
+            transform: translateY(-3px); /* Slight lift */
             background-color: rgba(0, 123, 255, 0.1);
         }
 
-        /* Mixed Post Layouts - Examples */
-        /* You will need more specific CSS classes and JS logic to assign these dynamically */
-
-        .post-card.horizontal-layout {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            padding: 15px;
-            gap: 15px;
-        }
-        .post-card.horizontal-layout .post-content {
-            flex-grow: 1;
-            padding: 0;
-        }
-        .post-card.horizontal-layout .post-header {
-            border-bottom: none;
-            padding: 0;
-            flex-direction: column;
-            align-items: flex-start;
+        .nav-item:hover {
+            color: var(--primary-color);
+            background-color: rgba(0, 123, 255, 0.05);
         }
 
-        .post-card.neon-effect {
-            box-shadow: 0 0 10px var(--accent-color), 0 0 20px var(--accent-color);
-            border: 1px solid var(--accent-color);
-            animation: neonGlow 1.5s infinite alternate;
+        .nav-item .icon {
+            font-size: 1.6rem;
+            margin-bottom: 5px;
+            width: 28px;
+            height: 28px;
+            background-color: currentColor; /* Use current text color for SVG masks */
+            -webkit-mask-size: cover;
+            mask-size: cover;
+            transition: transform 0.2s ease;
         }
+
+        .nav-item:hover .icon {
+            transform: scale(1.1);
+        }
+
+        /* Custom SVG Icons (used as mask-image for better styling) */
+        /* Home Icon */
+        .icon-home { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M10 20v-6h4v6h5v-8h3L12 3L2 12h3v8h5z'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M10 20v-6h4v6h5v-8h3L12 3L2 12h3v8h5z'/%3E%3C/svg%3E"); }
+        /* Plus/Create Icon */
+        .icon-plus { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z'/%3E%3C/svg%3E"); }
+        /* User/Profile Icon */
+        .icon-user { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M12 4a4 4 0 0 1 4 4a4 4 0 0 1-4 4a4 4 0 0 1-4-4a4 4 0 0 1 4-4m0 10c4.42 0 8 1.79 8 4v2H4v-2c0-2.21 3.58-4 8-4z'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M12 4a4 4 0 0 1 4 4a4 4 0 0 1-4 4a4 4 0 0 1-4-4a4 4 0 0 1 4-4m0 10c4.42 0 8 1.79 8 4v2H4v-2c0-2.21 3.58-4 8-4z'/%3E%3C/svg%3E"); }
+        /* Settings Icon */
+        .icon-settings { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M12 15.5A3.5 3.5 0 0 1 8.5 12A3.5 3.5 0 0 1 12 8.5A3.5 3.5 0 0 1 15.5 12A3.5 3.5 0 0 1 12 15.5M12 5c.45 0 .9-.04 1.34.12l.62-1.63l1.88.7L16.92 5.5l1.63-.62l.7 1.88l-1.07 1.07l.12 1.34h2.09c.07.45.07.9 0 1.35h-2.09l-.12 1.34l1.07 1.07l-.7 1.88l-1.63-.62l-1.88.7l-.62 1.63c-.45.16-.9.16-1.35 0l-.62-1.63l-1.88-.7l-1.63.62l-.7-1.88l1.07-1.07l-.12-1.34H2.91c-.07-.45-.07-.9 0-1.35h2.09l.12-1.34l-1.07-1.07l.7-1.88l1.63.62l1.88-.7l.62-1.63c.45-.16.9-.16 1.35 0z'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M12 15.5A3.5 3.5 0 0 1 8.5 12A3.5 3.5 0 0 1 12 8.5A3.5 3.5 0 0 1 15.5 12A3.5 3.5 0 0 1 12 15.5M12 5c.45 0 .9-.04 1.34.12l.62-1.63l1.88.7L16.92 5.5l1.63-.62l.7 1.88l-1.07 1.07l.12 1.34h2.09c.07.45.07.9 0 1.35h-2.09l-.12 1.34l1.07 1.07l-.7 1.88l-1.63-.62l-1.88.7l-.62 1.63c-.45.16-.9.16-1.35 0l-.62-1.63l-1.88-.7l-1.63.62l-.7-1.88l1.07-1.07l-.12-1.34H2.91c-.07-.45-.07-.9 0-1.35h2.09l.12-1.34l-1.07-1.07l.7-1.88l1.63.62l1.88-.7l.62-1.63c.45-.16.9-.16 1.35 0z'/%3E%3C/svg%3E"); }
+
+
+        /* Desktop Adjustments */
+        @media (min-width: 768px) {
+            body {
+                font-size: 17px;
+            }
+            .container {
+                padding: 40px;
+                max-width: 580px; /* Larger max-width for forms on desktop */
+            }
+            header {
+                padding: 20px 40px;
+            }
+            main {
+                padding: 30px 40px;
+                max-width: 1400px; /* Wider content area for desktop */
+            }
+            footer {
+                padding: 15px 40px;
+            }
+            .post-card.horizontal {
+                grid-column: span 2; /* Make horizontal cards span 2 columns on desktop */
+                max-width: none;
+            }
+            .post-card.square {
+                max-width: 320px; /* Fixed size on desktop */
+                justify-self: center; /* Center align square cards in their grid cell */
+            }
+             #posts-list {
+                grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); /* Adjust post grid for wider screens */
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideInUp {
+            from { opacity: 0; transform: translateY(50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes zoomIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes glow {
+            0% { box-shadow: 0 0 5px var(--primary-color); }
+            50% { box-shadow: 0 0 20px var(--primary-color), 0 0 30px var(--accent-color); }
+            100% { box-shadow: 0 0 5px var(--primary-color); }
+        }
+
+        @keyframes splashDiamondPulse {
+            0%, 100% { transform: translate(-50%, -50%) rotate(45deg) scale(1); opacity: 1; }
+            50% { transform: translate(-50%, -50%) rotate(45deg) scale(1.08); opacity: 0.8; }
+        }
+
+        @keyframes headerLogoSpin {
+            0% { transform: rotate(45deg) scale(1); }
+            25% { transform: rotate(135deg) scale(1.05); }
+            50% { transform: rotate(225deg) scale(1); }
+            75% { transform: rotate(315deg) scale(1.05); }
+            100% { transform: rotate(405deg) scale(1); } /* 360 + 45 to keep initial orientation */
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
         @keyframes neonGlow {
-            from { box-shadow: 0 0 5px var(--accent-color), 0 0 10px var(--accent-color); }
-            to { box-shadow: 0 0 15px var(--accent-color), 0 0 30px var(--accent-color); }
+            0% { box-shadow: 0 0 10px var(--primary-color), 0 0 20px var(--primary-color) inset; }
+            50% { box-shadow: 0 0 25px var(--primary-color), 0 0 40px var(--primary-color) inset; }
+            100% { box-shadow: 0 0 10px var(--primary-color), 0 0 20px var(--primary-color) inset; }
+        }
+        @keyframes neonBorderPulse {
+            0%, 100% { opacity: 0.7; filter: blur(8px) brightness(1); }
+            50% { opacity: 1; filter: blur(12px) brightness(1.2); }
         }
 
-        .post-card.triangle-shape {
-            /* This is a complex CSS shape, needs specific div structure */
-            /* For simplicity, we'll just style the card itself */
-            position: relative;
-            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
-            border-radius: 0; /* Override default border-radius */
-            padding: 20px; /* Adjust padding for shape */
-        }
-
-        .post-card.square-shape {
-            /* Already somewhat square in grid */
-            /* You can define specific aspect ratio or fixed size for these */
-        }
-
-        /* Media Queries for Responsiveness */
-        @media (max-width: 768px) {
-            .posts-container {
-                grid-template-columns: 1fr; /* Single column on smaller screens */
-            }
-            .form-container {
-                margin: 20px 10px;
-                padding: 20px;
-            }
-            .header-logo {
-                font-size: 1.5em;
-            }
-            .header-icons .icon-button {
-                font-size: 1em;
-            }
-            .splash-logo-container {
-                width: 120px;
-                height: 120px;
-            }
-            .splash-logo {
-                font-size: 3em;
-            }
-            .app-container {
-                padding-top: var(--header-height);
-                padding-bottom: var(--footer-height);
-            }
-        }
+        /* Utility classes */
+        .text-center { text-align: center; }
+        .mb-4 { margin-bottom: 20px; }
+        .mt-4 { margin-top: 20px; }
     </style>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
 </head>
 <body>
 
     <div id="splash-screen">
         <div class="splash-logo-container">
-            <span class="splash-logo">A</span> </div>
+            <div class="splash-logo-diamond"></div>
+            <div class="splash-logo-text">A</div>
+        </div>
+        <div class="splash-loader"></div>
+        <p style="margin-top: 20px; font-size: 1.1rem; color: #bbb;">Loading AddMint Pro...</p>
     </div>
 
-    <div id="preloader" class="hidden">
-        <div class="spinner"></div>
-        <p class="preloader-text">Loading...</p>
-    </div>
-
-    <div class="app-container hidden" id="main-app-container">
-
+    <div id="app-container" class="hidden">
         <header>
-            <div class="header-logo">AddMint</div>
-            <div class="header-icons">
-                <button id="refreshPostsBtn" class="icon-button"><i class="fas fa-sync-alt"></i></button>
-                <button id="logoutBtn" class="icon-button"><i class="fas fa-sign-out-alt"></i></button>
+            <div class="app-logo">
+                <span class="shape"></span> AddMint
             </div>
+            <div class="header-menu-icon" onclick="toggleSettingsMenu()">
+                &#x22EE; </div>
         </header>
 
-        <main class="main-content">
-            <section id="signin-auth" class="section hidden">
-                <div class="form-container">
-                    <h2>Welcome Back</h2>
-                    <p id="auth-status-message" class="message info hidden"></p>
-                    <div class="input-group">
-                        <label for="signInEmail">Email</label>
-                        <input type="email" id="signInEmail" placeholder="your@example.com" required>
+        <main>
+            <section id="signin-auth" class="container active">
+                <h2>Welcome Back!</h2>
+                <div id="auth-status-message" class="message hidden"></div>
+                <form id="signin-form">
+                    <input type="email" id="signin-email" placeholder="Your Email" required>
+                    <div class="password-input-container">
+                        <input type="password" id="signin-password" placeholder="Password" required>
+                        <span class="toggle-password" onclick="togglePasswordVisibility('signin-password', this)">&#128065;</span> </div>
+                    <button type="submit">Sign In</button>
+                    <p class="text-center mt-4">Don't have an account? <a href="#" onclick="showSection('signup-auth'); return false;">Sign Up Here</a></p>
+                </form>
+            </section>
+
+            <section id="signup-auth" class="container">
+                <h2>Join AddMint Today!</h2>
+                <div id="signup-status-message" class="message hidden"></div>
+                <form id="signup-form">
+                    <input type="email" id="signup-email" placeholder="Your Email" required>
+                    <div class="password-input-container">
+                        <input type="password" id="signup-password" placeholder="Create Password (min 6 chars)" required>
+                        <span class="toggle-password" onclick="togglePasswordVisibility('signup-password', this)">&#128065;</span>
                     </div>
-                    <div class="input-group">
-                        <label for="signInPassword">Password</label>
-                        <input type="password" id="signInPassword" placeholder="********" required>
-                        <button type="button" class="password-toggle" data-target="signInPassword"><i class="fas fa-eye"></i></button>
+                    <div class="password-input-container">
+                        <input type="password" id="signup-confirm-password" placeholder="Confirm Password" required>
+                        <span class="toggle-password" onclick="togglePasswordVisibility('signup-confirm-password', this)">&#128065;</span>
                     </div>
-                    <button id="signInButton" class="button">Sign In</button>
-                    <a href="#" class="link-text" id="showSignUp">Don't have an account? Sign Up</a>
-                    <a href="#" class="link-text" id="resetPasswordLink">Forgot Password?</a>
+                    <button type="submit">Sign Up</button>
+                    <p class="text-center mt-4">Already have an account? <a href="#" onclick="showSection('signin-auth'); return false;">Sign In</a></p>
+                </form>
+            </section>
+
+            <section id="email-verify" class="container">
+                <h2>Verify Your Email</h2>
+                <div id="verify-email-message" class="message error"></div>
+                <p class="text-center mb-4">A verification link has been sent to your email. Please check your inbox (and spam folder) to activate your account. Then sign in again.</p>
+                <button onclick="sendVerificationEmail()">Resend Verification Email</button>
+                <button onclick="auth.signOut(); showSection('signin-auth');" class="mt-4" style="background-color: var(--error-color);">Sign Out</button>
+            </section>
+
+            <section id="setup-profile" class="container">
+                <h2>Complete Your Profile</h2>
+                <div id="profile-setup-message" class="message hidden"></div>
+                <form id="profile-setup-form">
+                    <label for="profileUsername">Choose a Username:</label>
+                    <input type="text" id="profileUsername" placeholder="e.g., AddMintUser" required>
+
+                    <label for="profilePhone" class="mt-4">Phone Number (Optional):</label>
+                    <input type="text" id="profilePhone" placeholder="e.g., +919876543210">
+
+                    <label for="profileWhatsApp" class="mt-4">WhatsApp Number (Optional):</label>
+                    <input type="text" id="profileWhatsApp" placeholder="e.g., +919876543210 (for direct chats)">
+
+                    <label for="profileInstagram" class="mt-4">Instagram Handle (Optional):</label>
+                    <input type="text" id="profileInstagram" placeholder="e.g., @yourhandle">
+
+                    <button type="submit" class="mt-4">Save Profile & Continue</button>
+                </form>
+            </section>
+
+            <section id="home-posts">
+                <h2>Recent Updates</h2>
+                <button class="mb-4" onclick="fetchPosts()">Refresh Feed</button>
+                <div id="posts-list">
+                    <p class="text-center" id="no-posts-message" style="margin-top: 30px; font-style: italic; color: #aaa;">Fetching exciting posts...</p>
                 </div>
             </section>
 
-            <section id="signup-auth" class="section hidden">
-                <div class="form-container">
-                    <h2>Create Account</h2>
-                    <p id="signup-status-message" class="message info hidden"></p>
-                    <div class="input-group">
-                        <label for="signUpEmail">Email</label>
-                        <input type="email" id="signUpEmail" placeholder="your@example.com" required>
-                    </div>
-                    <div class="input-group">
-                        <label for="signUpPassword">Password</label>
-                        <input type="password" id="signUpPassword" placeholder="********" required>
-                        <button type="button" class="password-toggle" data-target="signUpPassword"><i class="fas fa-eye"></i></button>
-                    </div>
-                    <div class="input-group">
-                        <label for="confirmPassword">Confirm Password</label>
-                        <input type="password" id="confirmPassword" placeholder="********" required>
-                        <button type="button" class="password-toggle" data-target="confirmPassword"><i class="fas fa-eye"></i></button>
-                    </div>
-                    <button id="signUpButton" class="button">Sign Up</button>
-                    <a href="#" class="link-text" id="showSignIn">Already have an account? Sign In</a>
+            <section id="create-post-section">
+                <h2>Share Your Thoughts</h2>
+                <div id="create-post-message" class="message hidden"></div>
+                <form id="create-post-form">
+                    <label for="post-content">What's on your mind today?</label>
+                    <textarea id="post-content" placeholder="Type your message here..." required></textarea>
+                    <button type="submit" class="mt-4">Publish Post</button>
+                </form>
+            </section>
+
+            <section id="user-profile-section">
+                <h2>My Personal Profile</h2>
+                <div id="user-profile-details">
+                    <p><strong>Email:</strong> <span id="profile-email"></span></p>
+                    <p><strong>Username:</strong> <span id="profile-display-name"></span></p>
+                    <p><strong>Phone:</strong> <span id="profile-phone-number">N/A</span></p>
+                    <p><strong>WhatsApp:</strong> <span id="profile-whatsapp-number">N/A</span></p>
+                    <p><strong>Instagram:</strong> <span id="profile-instagram-handle">N/A</span></p>
+                    <button onclick="showSection('edit-profile-section')" class="mt-4">Edit Profile</button>
+                    <button onclick="auth.signOut()" class="mt-4" style="background-color: var(--error-color);">Sign Out</button>
                 </div>
             </section>
 
-            <section id="email-verify" class="section hidden">
-                <div class="form-container">
-                    <h2>Verify Your Email</h2>
-                    <p id="verify-email-message" class="message info">A verification link has been sent to your email. Please check your inbox (and spam folder) and click the link to verify your account. After verifying, please sign in again.</p>
-                    <button id="sendVerificationAgain" class="button">Resend Verification Email</button>
-                    <button id="goToSignInFromVerify" class="button button-secondary">Go to Sign In</button>
-                </div>
+            <section id="edit-profile-section" class="container">
+                <h2>Update Your Profile Details</h2>
+                <div id="edit-profile-message" class="message hidden"></div>
+                <form id="edit-profile-form">
+                    <label for="editUsername">Username:</label>
+                    <input type="text" id="editUsername" required>
+
+                    <label for="editPhone" class="mt-4">Phone Number (Optional):</label>
+                    <input type="text" id="editPhone">
+
+                    <label for="editWhatsApp" class="mt-4">WhatsApp Number (Optional):</label>
+                    <input type="text" id="editWhatsApp">
+
+                    <label for="editInstagram" class="mt-4">Instagram Handle (Optional):</label>
+                    <input type="text" id="editInstagram">
+
+                    <button type="submit" class="mt-4">Save Changes</button>
+                    <button type="button" onclick="showSection('user-profile-section')" class="mt-4" style="background-color: #6c757d;">Cancel</button>
+                </form>
             </section>
 
-            <section id="reset-password-section" class="section hidden">
-                <div class="form-container">
-                    <h2>Reset Password</h2>
-                    <p id="reset-password-message" class="message info hidden"></p>
-                    <div class="input-group">
-                        <label for="resetEmail">Email</label>
-                        <input type="email" id="resetEmail" placeholder="your@example.com" required>
-                    </div>
-                    <button id="sendResetEmailButton" class="button">Send Reset Email</button>
-                    <a href="#" class="link-text" id="backToSignInFromReset">Back to Sign In</a>
-                </div>
-            </section>
-
-
-            <section id="setup-profile" class="section hidden">
-                <div class="form-container">
-                    <h2>Setup Your Profile</h2>
-                    <p id="profile-setup-message" class="message info hidden"></p>
-                    <div class="input-group">
-                        <label for="newUsername">Username</label>
-                        <input type="text" id="newUsername" placeholder="Enter your unique username" required>
-                    </div>
-                    <div class="input-group">
-                        <label for="newWhatsapp">WhatsApp Number (e.g., +919876543210)</label>
-                        <input type="text" id="newWhatsapp" placeholder="Optional">
-                    </div>
-                    <div class="input-group">
-                        <label for="newInstagram">Instagram Handle (e.g., @yourhandle)</label>
-                        <input type="text" id="newInstagram" placeholder="Optional">
-                    </div>
-                    <div class="input-group">
-                        <label for="newPhoneNumber">Phone Number (Direct Call, e.g., +919876543210)</label>
-                        <input type="text" id="newPhoneNumber" placeholder="Optional">
-                    </div>
-                    <button id="saveProfileButton" class="button">Save Profile</button>
-                </div>
-            </section>
-
-            <section id="home-feed-section" class="section hidden">
-                <h2 class="text-center text-primary mb-2">Latest Posts</h2>
-                <div id="posts-list" class="posts-container">
-                    <p class="text-center" id="no-posts-message">No posts to display. Be the first to create one!</p>
-                </div>
-                <div class="text-center mt-2">
-                    <button id="loadMorePostsBtn" class="button hidden" style="width: auto; padding: 10px 20px;">Load More Posts</button>
-                </div>
-            </section>
-
-            <section id="create-post-section" class="section hidden">
-                <div class="form-container">
-                    <h2>Create New Post</h2>
-                    <p id="create-post-message" class="message info hidden"></p>
-                    <div class="input-group">
-                        <label for="createPostText">Your Post Content</label>
-                        <textarea id="createPostText" placeholder="What's on your mind? Keep it concise and impactful!" rows="5" required></textarea>
-                    </div>
-                    <button id="publishPostButton" class="button">Publish Post</button>
-                </div>
-            </section>
-
-            <section id="profile-details-section" class="section hidden">
-                <div class="form-container">
-                    <div class="profile-info">
-                        <div class="profile-avatar-large" id="profileDetailAvatar">U</div>
-                        <h2 id="profileDetailUsername">Loading...</h2>
-                        <div class="profile-detail" id="profileDetailEmail"><strong>Email:</strong> loading@example.com</div>
-                        
-                        <div class="social-buttons-container">
-                            <a href="#" class="social-button whatsapp hidden" id="profileWhatsappBtn">
-                                <i class="fab fa-whatsapp"></i> WhatsApp
-                            </a>
-                            <a href="#" class="social-button instagram hidden" id="profileInstagramBtn">
-                                <i class="fab fa-instagram"></i> Instagram
-                            </a>
-                            <a href="#" class="social-button call hidden" id="profileCallBtn">
-                                <i class="fas fa-phone"></i> Call
-                            </a>
-                        </div>
-                    </div>
-                    <button id="editProfileButton" class="button">Edit Profile</button>
-                    <button id="deleteAccountButton" class="button" style="background-color: var(--error-color); margin-top: 10px;">Delete Account</button>
-                </div>
+            <section id="settings-section" class="container">
+                <h2>App Settings</h2>
+                <p class="text-center mt-4">This is your settings panel. More options coming soon!</p>
+                <p class="text-center mt-2">App Version: 1.0.0 Pro</p>
+                <button onclick="auth.signOut()" class="mt-4" style="background-color: var(--error-color);">Sign Out</button>
             </section>
 
         </main>
 
         <footer>
-            <a href="#" class="nav-item active" data-section="home-feed-section" id="nav-home">
-                <i class="fas fa-home"></i>
+            <div class="nav-item active" data-section="home-posts">
+                <span class="icon icon-home"></span>
                 <span>Home</span>
-            </a>
-            <a href="#" class="nav-item" data-section="create-post-section" id="nav-create">
-                <i class="fas fa-plus-circle"></i>
+            </div>
+            <div class="nav-item" data-section="create-post-section">
+                <span class="icon icon-plus"></span>
                 <span>Create</span>
-            </a>
-            <a href="#" class="nav-item" data-section="profile-details-section" id="nav-profile">
-                <i class="fas fa-user"></i>
+            </div>
+            <div class="nav-item" data-section="user-profile-section">
+                <span class="icon icon-user"></span>
                 <span>Profile</span>
-            </a>
+            </div>
+            <div class="nav-item" data-section="settings-section">
+                <span class="icon icon-settings"></span>
+                <span>Settings</span>
+            </div>
         </footer>
-
     </div>
 
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
-
     <script>
-        // Firebase Configuration
+        // Firebase Configuration (YOURS)
         const firebaseConfig = {
             apiKey: "AIzaSyDlZA4grzF3fx95-11E4s7ASXwkIij1k1w",
             authDomain: "addmint-7ab6b.firebaseapp.com",
@@ -823,606 +886,480 @@
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
-        const storage = firebase.storage(); // Still initialize for future use, even if not directly used for uploads yet
+        const storage = firebase.storage(); // Initialize storage, even if not used immediately
 
         let currentUserId = null;
-        let currentUserName = "User"; // Default name
-        let lastVisiblePost = null; // For pagination/infinite scroll
+        let currentUsername = null;
+        let userProfileData = {}; // To store full user profile data
 
-        // --- Utility Functions ---
-
+        // --- UI Utility Functions ---
         function showSection(sectionId) {
-            document.querySelectorAll('.section').forEach(section => {
+            document.querySelectorAll('section').forEach(section => {
+                section.classList.remove('active');
                 section.classList.add('hidden');
             });
             document.getElementById(sectionId).classList.remove('hidden');
+            document.getElementById(sectionId).classList.add('active');
 
             // Update active nav item
             document.querySelectorAll('.nav-item').forEach(item => {
                 item.classList.remove('active');
             });
-            const activeNavItem = document.querySelector(`[data-section="${sectionId}"]`);
+            const activeNavItem = document.querySelector(`.nav-item[data-section="${sectionId}"]`);
             if (activeNavItem) {
                 activeNavItem.classList.add('active');
             }
         }
 
-        function showPreloader(message = "Loading...") {
-            document.getElementById('preloader').classList.remove('hidden');
-            document.querySelector('.preloader-text').textContent = message;
-        }
-
-        function hidePreloader() {
-            document.getElementById('preloader').classList.add('hidden');
-        }
-
         function showMessage(elementId, message, type = 'info') {
             const element = document.getElementById(elementId);
             element.textContent = message;
-            element.className = `message ${type}`; // Reset and apply type
+            element.className = `message ${type}`; // Reset classes and add new ones
             element.classList.remove('hidden');
-            setTimeout(() => {
-                element.classList.add('hidden');
-            }, 5000); // Hide after 5 seconds
         }
 
-        function clearForm(formId) {
-            const form = document.getElementById(formId);
-            if (form) {
-                form.querySelectorAll('input, textarea').forEach(input => {
-                    input.value = '';
-                });
+        function hideMessage(elementId) {
+            document.getElementById(elementId).classList.add('hidden');
+        }
+
+        function togglePasswordVisibility(inputId, iconElement) {
+            const input = document.getElementById(inputId);
+            if (input.type === "password") {
+                input.type = "text";
+                iconElement.innerHTML = "&#128064;"; // Open eye
+            } else {
+                input.type = "password";
+                iconElement.innerHTML = "&#128065;"; // Closed eye
             }
         }
 
-        // --- Authentication Functions ---
+        function showMainAppUI() {
+            document.getElementById('app-container').classList.remove('hidden');
+            showSection('home-posts'); // Default to home/posts section
+        }
 
-        document.getElementById('showSignUp').addEventListener('click', (e) => {
+        function hidePreloader() {
+            const splash = document.getElementById('splash-screen');
+            splash.style.opacity = '0';
+            setTimeout(() => {
+                splash.classList.add('hidden');
+                document.body.style.overflow = 'auto'; // Allow scrolling after splash
+            }, 1200); // Fade out over 1.2 seconds
+        }
+
+        // --- Authentication ---
+        document.getElementById('signup-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            showSection('signup-auth');
-            clearForm('signup-auth');
-        });
-
-        document.getElementById('showSignIn').addEventListener('click', (e) => {
-            e.preventDefault();
-            showSection('signin-auth');
-            clearForm('signin-auth');
-        });
-
-        document.getElementById('resetPasswordLink').addEventListener('click', (e) => {
-            e.preventDefault();
-            showSection('reset-password-section');
-            clearForm('reset-password-section');
-        });
-
-        document.getElementById('backToSignInFromReset').addEventListener('click', (e) => {
-            e.preventDefault();
-            showSection('signin-auth');
-        });
-
-        document.getElementById('goToSignInFromVerify').addEventListener('click', (e) => {
-            e.preventDefault();
-            showSection('signin-auth');
-        });
-
-        // Password visibility toggle
-        document.querySelectorAll('.password-toggle').forEach(button => {
-            button.addEventListener('click', () => {
-                const targetId = button.dataset.target;
-                const targetInput = document.getElementById(targetId);
-                const icon = button.querySelector('i');
-
-                if (targetInput.type === 'password') {
-                    targetInput.type = 'text';
-                    icon.classList.remove('fa-eye');
-                    icon.classList.add('fa-eye-slash');
-                } else {
-                    targetInput.type = 'password';
-                    icon.classList.remove('fa-eye-slash');
-                    icon.classList.add('fa-eye');
-                }
-            });
-        });
-
-        document.getElementById('signUpButton').addEventListener('click', async () => {
-            const email = document.getElementById('signUpEmail').value;
-            const password = document.getElementById('signUpPassword').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
+            hideMessage('signup-status-message');
+            const email = document.getElementById('signup-email').value.trim();
+            const password = document.getElementById('signup-password').value;
+            const confirmPassword = document.getElementById('signup-confirm-password').value;
 
             if (password !== confirmPassword) {
                 showMessage('signup-status-message', 'Passwords do not match.', 'error');
                 return;
             }
             if (password.length < 6) {
-                showMessage('signup-status-message', 'Password should be at least 6 characters.', 'error');
+                showMessage('signup-status-message', 'Password must be at least 6 characters long.', 'error');
                 return;
             }
 
-            showPreloader("Creating account...");
             try {
                 const userCredential = await auth.createUserWithEmailAndPassword(email, password);
                 await userCredential.user.sendEmailVerification();
-                showMessage('signup-status-message', 'Account created! Verification email sent. Please check your inbox.', 'success');
-                showSection('email-verify'); // Direct to email verification screen
+                showMessage('signup-status-message', 'Account created! Verification email sent. Please check your inbox and sign in after verifying.', 'success');
+                // Switch to email verify section after successful signup and email sent
+                showSection('email-verify');
+                document.getElementById('verify-email-message').textContent = `A verification email has been sent to ${email}. Please verify your email to continue.`;
             } catch (error) {
-                console.error("Sign Up Error:", error);
-                showMessage('signup-status-message', `Error: ${error.message}`, 'error');
-            } finally {
-                hidePreloader();
+                console.error("Signup Error:", error.code, error.message);
+                let displayMessage = error.message;
+                if (error.code === 'auth/email-already-in-use') {
+                    displayMessage = 'This email is already registered. Please sign in or use a different email.';
+                } else if (error.code === 'auth/invalid-email') {
+                    displayMessage = 'The email address is not valid.';
+                }
+                showMessage('signup-status-message', displayMessage, 'error');
             }
         });
 
-        document.getElementById('signInButton').addEventListener('click', async () => {
-            const email = document.getElementById('signInEmail').value;
-            const password = document.getElementById('signInPassword').value;
+        document.getElementById('signin-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            hideMessage('auth-status-message');
+            const email = document.getElementById('signin-email').value.trim();
+            const password = document.getElementById('signin-password').value;
 
-            showPreloader("Signing in...");
             try {
                 const userCredential = await auth.signInWithEmailAndPassword(email, password);
                 if (!userCredential.user.emailVerified) {
-                    showMessage('auth-status-message', 'Please verify your email first. A verification link has been sent.', 'warning');
-                    await auth.signOut(); // Sign out unverified user
+                    showMessage('auth-status-message', 'Your email is not verified. Please verify it to continue.', 'error');
+                    auth.signOut(); // Force sign out if email not verified
                     showSection('email-verify');
+                    document.getElementById('verify-email-message').textContent = `Your email ${email} is not verified. Please check your inbox (and spam folder) for the verification link. After verifying, please sign in again.`;
                     return;
                 }
-                // Auth state listener will handle UI update
+                // If email is verified, auth state listener will handle showing main UI
             } catch (error) {
-                console.error("Sign In Error:", error);
-                showMessage('auth-status-message', `Error: ${error.message}`, 'error');
-            } finally {
-                hidePreloader();
+                console.error("Signin Error:", error.code, error.message);
+                let displayMessage = error.message;
+                if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+                    displayMessage = 'Invalid email or password. Please try again.';
+                } else if (error.code === 'auth/invalid-email') {
+                    displayMessage = 'The email address is not valid.';
+                }
+                showMessage('auth-status-message', displayMessage, 'error');
             }
         });
 
-        document.getElementById('sendVerificationAgain').addEventListener('click', async () => {
+        async function sendVerificationEmail() {
             const user = auth.currentUser;
             if (user) {
-                showPreloader("Resending verification...");
                 try {
                     await user.sendEmailVerification();
-                    showMessage('verify-email-message', 'Verification email resent! Please check your inbox.', 'success');
+                    showMessage('verify-email-message', 'Verification email re-sent! Check your inbox (and spam folder).', 'success');
                 } catch (error) {
-                    console.error("Resend Verification Error:", error);
-                    showMessage('verify-email-message', `Error: ${error.message}`, 'error');
-                } finally {
-                    hidePreloader();
+                    console.error("Error sending verification email:", error.message);
+                    showMessage('verify-email-message', `Error sending verification email: ${error.message}`, 'error');
                 }
             } else {
-                showMessage('verify-email-message', 'No user logged in to resend verification.', 'error');
-                showSection('signin-auth');
-            }
-        });
-
-        document.getElementById('sendResetEmailButton').addEventListener('click', async () => {
-            const email = document.getElementById('resetEmail').value;
-            if (!email) {
-                showMessage('reset-password-message', 'Please enter your email.', 'error');
-                return;
-            }
-
-            showPreloader("Sending reset email...");
-            try {
-                await auth.sendPasswordResetEmail(email);
-                showMessage('reset-password-message', 'Password reset email sent! Check your inbox.', 'success');
-            } catch (error) {
-                console.error("Password Reset Error:", error);
-                showMessage('reset-password-message', `Error: ${error.message}`, 'error');
-            } finally {
-                hidePreloader();
-            }
-        });
-
-        document.getElementById('logoutBtn').addEventListener('click', async () => {
-            showPreloader("Logging out...");
-            try {
-                await auth.signOut();
-                // Auth state listener will handle UI update
-                showMessage('auth-status-message', 'Logged out successfully.', 'info');
-            } catch (error) {
-                console.error("Logout Error:", error);
-                showMessage('auth-status-message', `Error: ${error.message}`, 'error');
-            } finally {
-                hidePreloader();
-            }
-        });
-
-        // --- User Profile Functions ---
-
-        async function fetchUserProfile(userId) {
-            showPreloader("Fetching profile...");
-            try {
-                const doc = await db.collection('users').doc(userId).get();
-                if (doc.exists) {
-                    const userData = doc.data();
-                    currentUserName = userData.username || "User";
-
-                    // Update profile setup fields
-                    document.getElementById('newUsername').value = userData.username || '';
-                    document.getElementById('newWhatsapp').value = userData.whatsapp || '';
-                    document.getElementById('newInstagram').value = userData.instagram || '';
-                    document.getElementById('newPhoneNumber').value = userData.phoneNumber || '';
-
-                    // Update profile details section
-                    document.getElementById('profileDetailAvatar').textContent = currentUserName.charAt(0).toUpperCase();
-                    document.getElementById('profileDetailUsername').textContent = currentUserName;
-                    document.getElementById('profileDetailEmail').innerHTML = `<strong>Email:</strong> ${auth.currentUser.email}`;
-
-                    const whatsappBtn = document.getElementById('profileWhatsappBtn');
-                    const instagramBtn = document.getElementById('profileInstagramBtn');
-                    const callBtn = document.getElementById('profileCallBtn');
-
-                    if (userData.whatsapp) {
-                        whatsappBtn.classList.remove('hidden');
-                        // No direct `href` here, will be handled by AppInventor
-                        whatsappBtn.onclick = () => { AppInventor.setWebViewString(`CONTACT:WHATSAPP:${userData.whatsapp}`); };
-                    } else {
-                        whatsappBtn.classList.add('hidden');
-                    }
-                    if (userData.instagram) {
-                        instagramBtn.classList.remove('hidden');
-                        // No direct `href` here, will be handled by AppInventor
-                        instagramBtn.onclick = () => { AppInventor.setWebViewString(`CONTACT:INSTAGRAM:${userData.instagram}`); };
-                    } else {
-                        instagramBtn.classList.add('hidden');
-                    }
-                    if (userData.phoneNumber) {
-                        callBtn.classList.remove('hidden');
-                        // No direct `href` here, will be handled by AppInventor
-                        callBtn.onclick = () => { AppInventor.setWebViewString(`CONTACT:PHONE:${userData.phoneNumber}`); };
-                    } else {
-                        callBtn.classList.add('hidden');
-                    }
-                } else {
-                    // Profile not found, prompt for setup
-                    currentUserName = "New User";
-                    showSection('setup-profile');
-                }
-            } catch (error) {
-                console.error("Error fetching user profile:", error);
-                showMessage('profile-setup-message', `Error loading profile: ${error.message}`, 'error');
-            } finally {
-                hidePreloader();
+                 showMessage('verify-email-message', 'No user logged in to send verification email.', 'error');
             }
         }
 
-        document.getElementById('saveProfileButton').addEventListener('click', async () => {
-            const username = document.getElementById('newUsername').value.trim();
-            const whatsapp = document.getElementById('newWhatsapp').value.trim();
-            const instagram = document.getElementById('newInstagram').value.trim();
-            const phoneNumber = document.getElementById('newPhoneNumber').value.trim();
+        // --- Profile Management ---
+        document.getElementById('profile-setup-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            hideMessage('profile-setup-message');
+            const username = document.getElementById('profileUsername').value.trim();
+            const phone = document.getElementById('profilePhone').value.trim();
+            const whatsapp = document.getElementById('profileWhatsApp').value.trim();
+            const instagram = document.getElementById('profileInstagram').value.trim();
 
             if (!username) {
-                showMessage('profile-setup-message', 'Username is required.', 'error');
+                showMessage('profile-setup-message', 'Username is required to identify you.', 'error');
                 return;
             }
 
-            showPreloader("Saving profile...");
             try {
                 await db.collection('users').doc(currentUserId).set({
                     username: username,
-                    whatsapp: whatsapp,
-                    instagram: instagram,
-                    phoneNumber: phoneNumber,
                     email: auth.currentUser.email,
+                    phone: phone || null, // Store null if empty
+                    whatsapp: whatsapp || null,
+                    instagram: instagram || null,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                }, { merge: true }); // Use merge to avoid overwriting other fields
+                }, { merge: true }); // Use merge to avoid overwriting existing fields
 
-                currentUserName = username; // Update global variable
-                showMessage('profile-setup-message', 'Profile saved successfully!', 'success');
-                showMainAppUI(); // Go to main UI after profile setup
+                currentUsername = username; // Update global username
+                showMessage('profile-setup-message', 'Profile saved successfully! Redirecting...', 'success');
+                await fetchUserProfile(currentUserId); // Refetch profile to update UI
+                showMainAppUI(); // Go to main app
             } catch (error) {
-                console.error("Error saving profile:", error);
-                showMessage('profile-setup-message', `Error saving profile: ${error.message}`, 'error');
-            } finally {
-                hidePreloader();
+                console.error("Error setting up profile:", error.message);
+                showMessage('profile-setup-message', `Failed to save profile: ${error.message}`, 'error');
             }
         });
 
-        document.getElementById('editProfileButton').addEventListener('click', () => {
-            showSection('setup-profile'); // Re-use setup profile form for editing
-            showMessage('profile-setup-message', 'Edit your profile details.', 'info');
-        });
+        document.getElementById('edit-profile-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            hideMessage('edit-profile-message');
+            const username = document.getElementById('editUsername').value.trim();
+            const phone = document.getElementById('editPhone').value.trim();
+            const whatsapp = document.getElementById('editWhatsApp').value.trim();
+            const instagram = document.getElementById('editInstagram').value.trim();
 
-        document.getElementById('deleteAccountButton').addEventListener('click', async () => {
-            if (!confirm('Are you sure you want to delete your account? This action is irreversible.')) {
+            if (!username) {
+                showMessage('edit-profile-message', 'Username is required.', 'error');
                 return;
             }
 
-            showPreloader("Deleting account...");
             try {
-                // Delete user data from Firestore first (optional, but good practice)
-                await db.collection('users').doc(currentUserId).delete();
-                // Then delete the Firebase Auth user
-                await auth.currentUser.delete();
-                showMessage('auth-status-message', 'Your account has been deleted successfully.', 'success');
-                showSection('signin-auth'); // Go back to sign-in screen
+                await db.collection('users').doc(currentUserId).update({
+                    username: username,
+                    phone: phone || null,
+                    whatsapp: whatsapp || null,
+                    instagram: instagram || null
+                });
+                currentUsername = username; // Update global username
+                showMessage('edit-profile-message', 'Profile updated successfully!', 'success');
+                await fetchUserProfile(currentUserId); // Refetch profile to update UI
+                showSection('user-profile-section'); // Go back to profile view
             } catch (error) {
-                console.error("Error deleting account:", error);
-                // Important: If auth.currentUser.delete() fails due to "recent login required",
-                // instruct the user to re-authenticate.
-                if (error.code === 'auth/requires-recent-login') {
-                    showMessage('profile-setup-message', 'Please re-authenticate to delete your account. Sign out and sign in again, then try deleting.', 'error');
-                } else {
-                    showMessage('profile-setup-message', `Error deleting account: ${error.message}`, 'error');
-                }
-            } finally {
-                hidePreloader();
+                console.error("Error updating profile:", error.message);
+                showMessage('edit-profile-message', `Failed to update profile: ${error.message}`, 'error');
             }
         });
 
-        // --- Post Handling Functions ---
+        async function fetchUserProfile(uid) {
+            try {
+                const userDoc = await db.collection('users').doc(uid).get();
+                if (userDoc.exists) {
+                    userProfileData = userDoc.data();
+                    currentUsername = userProfileData.username; // Update global username
+                    document.getElementById('profile-email').textContent = userProfileData.email || 'N/A';
+                    document.getElementById('profile-display-name').textContent = userProfileData.username || 'N/A';
+                    document.getElementById('profile-phone-number').textContent = userProfileData.phone || 'N/A';
+                    document.getElementById('profile-whatsapp-number').textContent = userProfileData.whatsapp || 'N/A';
+                    document.getElementById('profile-instagram-handle').textContent = userProfileData.instagram || 'N/A';
 
-        // Function to create a post HTML element with different styles
-        function createPostElement(post) {
-            const postCard = document.createElement('div');
-            let cardClass = 'post-card';
+                    // Populate edit form
+                    document.getElementById('editUsername').value = userProfileData.username || '';
+                    document.getElementById('editPhone').value = userProfileData.phone || '';
+                    document.getElementById('editWhatsApp').value = userProfileData.whatsapp || '';
+                    document.getElementById('editInstagram').value = userProfileData.instagram || '';
 
-            // Randomly apply different styles for varied look
-            const randomStyle = Math.floor(Math.random() * 5); // 0-4
-            switch (randomStyle) {
-                case 0: cardClass += ' horizontal-layout'; break;
-                case 1: cardClass += ' neon-effect'; break;
-                // case 2: cardClass += ' triangle-shape'; break; // More complex, needs specific internal structure
-                case 3: cardClass += ' square-shape'; break;
-                case 4: /* default */ break;
+                } else {
+                    console.log("User profile not found in Firestore. Prompting for setup.");
+                    userProfileData = {}; // Clear previous data
+                    // This scenario should ideally be caught by the auth state listener to show setup-profile
+                }
+            } catch (error) {
+                console.error("Error fetching user profile:", error);
             }
-            postCard.className = cardClass;
-            
-            const avatarChar = post.username ? post.username.charAt(0).toUpperCase() : 'U';
-            const timeAgo = getTimeAgo(post.createdAt.toDate());
-
-            postCard.innerHTML = `
-                <div class="post-header">
-                    <div class="post-avatar">${avatarChar}</div>
-                    <div class="post-info">
-                        <div class="post-username">${post.username || 'Anonymous'}</div>
-                        <div class="post-time">${timeAgo}</div>
-                    </div>
-                </div>
-                <div class="post-content">${post.postText}</div>
-                <div class="post-actions">
-                    <button class="action-button like-button ${post.likes && post.likes[currentUserId] ? 'liked' : ''}" data-post-id="${post.id}">
-                        <i class="fas fa-thumbs-up"></i> <span class="like-count">${Object.keys(post.likes || {}).length}</span>
-                    </button>
-                    <button class="action-button comment-button" data-post-id="${post.id}">
-                        <i class="fas fa-comment"></i> Comments
-                    </button>
-                    <button class="action-button share-button" data-post-id="${post.id}" data-post-text="${encodeURIComponent(post.postText)}">
-                        <i class="fas fa-share-alt"></i> Share
-                    </button>
-                </div>
-            `;
-
-            // Event Listeners for action buttons
-            postCard.querySelector('.like-button').addEventListener('click', (e) => toggleLike(e.currentTarget));
-            postCard.querySelector('.share-button').addEventListener('click', (e) => sharePost(e.currentTarget));
-            postCard.querySelector('.comment-button').addEventListener('click', (e) => showMessage('posts-list', 'Comments feature coming soon!', 'info')); // Placeholder
-
-            return postCard;
         }
 
-        function getTimeAgo(date) {
-            const seconds = Math.floor((new Date() - date) / 1000);
-            let interval = seconds / 31536000;
-            if (interval > 1) return Math.floor(interval) + " years ago";
-            interval = seconds / 2592000;
-            if (interval > 1) return Math.floor(interval) + " months ago";
-            interval = seconds / 86400;
-            if (interval > 1) return Math.floor(interval) + " days ago";
-            interval = seconds / 3600;
-            if (interval > 1) return Math.floor(interval) + " hours ago";
-            interval = seconds / 60;
-            if (interval > 1) return Math.floor(interval) + " minutes ago";
-            return Math.floor(seconds) + " seconds ago";
-        }
+        // --- Post Management ---
+        document.getElementById('create-post-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            hideMessage('create-post-message');
+            const content = document.getElementById('post-content').value.trim();
 
-        async function fetchPosts(loadMore = false) {
-            showPreloader("Loading posts...");
-            const postsList = document.getElementById('posts-list');
-            const noPostsMessage = document.getElementById('no-posts-message');
-            const loadMoreBtn = document.getElementById('loadMorePostsBtn');
-
-            if (!loadMore) {
-                postsList.innerHTML = ''; // Clear existing posts if not loading more
-                lastVisiblePost = null; // Reset for fresh fetch
+            if (!content) {
+                showMessage('create-post-message', 'Post content cannot be empty. Please type something.', 'error');
+                return;
             }
-
-            let query = db.collection('posts')
-                          .orderBy('createdAt', 'desc')
-                          .limit(10); // Fetch 10 posts at a time
-
-            if (lastVisiblePost) {
-                query = query.startAfter(lastVisiblePost);
+            if (!currentUserId || !currentUsername) {
+                showMessage('create-post-message', 'User not logged in or username not set. Please refresh and try again.', 'error');
+                return;
             }
 
             try {
-                const snapshot = await query.get();
-                if (snapshot.empty && !loadMore) {
-                    noPostsMessage.classList.remove('hidden');
-                    loadMoreBtn.classList.add('hidden');
-                    hidePreloader();
+                // Calculate expiry time (12 hours from now)
+                const expiryTime = Date.now() + (12 * 60 * 60 * 1000); // 12 hours in milliseconds
+
+                await db.collection('posts').add({
+                    content: content,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    expiryTime: expiryTime, // Add expiry time for client-side filtering and future cleanup
+                    userId: currentUserId,
+                    username: currentUsername,
+                    likes: 0 // Initialize likes
+                    // imageUrl: '...' // Future: Add imageUrl here
+                });
+                showMessage('create-post-message', 'Post published successfully! Your thoughts are now live.', 'success');
+                document.getElementById('post-content').value = ''; // Clear textarea
+                fetchPosts(); // Refresh posts list to show new post
+                showSection('home-posts'); // Go back to home
+            } catch (error) {
+                console.error("Error creating post:", error.message);
+                showMessage('create-post-message', `Failed to publish post: ${error.message}`, 'error');
+            }
+        });
+
+        async function fetchPosts() {
+            const postsListDiv = document.getElementById('posts-list');
+            // Clear current posts and show loading message
+            postsListDiv.innerHTML = '<p class="text-center" id="no-posts-message" style="margin-top: 30px; font-style: italic; color: #aaa;">Fetching exciting posts...</p>';
+            const noPostsMessage = document.getElementById('no-posts-message');
+            noPostsMessage.classList.remove('hidden');
+
+            try {
+                // Fetch posts, ordered by timestamp. Firebase Security Rules will filter out expired posts.
+                const snapshot = await db.collection('posts')
+                                         .orderBy('timestamp', 'desc') // Get latest posts first
+                                         .get();
+
+                if (snapshot.empty) {
+                    noPostsMessage.textContent = "No posts yet. Be the first to share something amazing!";
                     return;
                 }
 
-                noPostsMessage.classList.add('hidden'); // Hide "No posts" message if posts are found
-                let addedPostsCount = 0;
+                postsListDiv.innerHTML = ''; // Clear loading message and prepare for posts
+                let hasVisiblePosts = false;
+
+                // Define different post styles. Expand this array for more variety.
+                const postStyles = ['', 'horizontal', 'square', 'neon']; // Example styles
+                let lastRandomIndex = -1; // To try and avoid immediate duplicates of style
 
                 snapshot.forEach(doc => {
-                    // Check expiryTime on client-side as well, though security rules handle reads
-                    const postData = doc.data();
-                    const now = Date.now();
-                    // Firebase timestamp to JS timestamp (milliseconds)
-                    const expiryTimeMs = postData.expiryTime ? postData.expiryTime : Infinity; // If no expiry, treat as never expires
+                    const post = doc.data();
+                    const postId = doc.id;
 
-                    if (expiryTimeMs > now) { // Only display non-expired posts
-                        const post = { id: doc.id, ...postData };
-                        postsList.appendChild(createPostElement(post));
-                        addedPostsCount++;
-                    } else {
-                        console.log(`Skipping expired post ${doc.id}`);
-                        // Optionally trigger deletion for this expired post if not already handled by cleanupOldPosts
-                        // (cleanupOldPosts will handle this in batches)
+                    // Although Security Rules filter, a client-side check is harmless redundancy
+                    if (post.expiryTime && post.expiryTime < Date.now()) {
+                        return; // Skip expired posts (should already be filtered by rules)
                     }
+
+                    hasVisiblePosts = true;
+
+                    // Randomly select a style for each post
+                    let randomIndex;
+                    do {
+                        randomIndex = Math.floor(Math.random() * postStyles.length);
+                    } while (randomIndex === lastRandomIndex && postStyles.length > 1); // Avoid immediate style repetition
+                    lastRandomIndex = randomIndex;
+
+                    const randomStyle = postStyles[randomIndex];
+                    const postCard = document.createElement('div');
+                    postCard.className = `post-card ${randomStyle}`;
+                    postCard.id = `post-${postId}`; // Add ID for easy manipulation
+
+                    // Contact Buttons - these will contact the POST CREATOR.
+                    // This requires fetching the post creator's profile data.
+                    // For simplicity and immediate functionality, we'll fetch creator's profile on demand.
+                    // A more efficient way would be to store limited contact info directly on the post,
+                    // or batch fetch creator profiles. For now, on-click will fetch.
+
+                    let contactButtonsHtml = '';
+                    if (post.userId === currentUserId) {
+                        // If it's the current user's post, allow them to delete
+                        contactButtonsHtml += `<button class="delete-btn" onclick="deletePost('${postId}')">Delete My Post</button>`;
+                    } else {
+                        // For other users, show contact buttons that will attempt to fetch creator's details
+                        contactButtonsHtml += `
+                            <button onclick="contactUser('${post.userId}', 'whatsapp')">WhatsApp</button>
+                            <button onclick="contactUser('${post.userId}', 'instagram')">Instagram</button>
+                            <button onclick="contactUser('${post.userId}', 'phone')">Call</button>
+                        `;
+                    }
+
+                    postCard.innerHTML = `
+                        <div class="post-content-wrapper">
+                            <h3>${post.username || 'Anonymous User'}</h3>
+                            <p>${post.content}</p>
+                            ${post.imageUrl ? `<img src="${post.imageUrl}" alt="Post Image" style="max-width: 100%; border-radius: 8px; margin-top: 10px;">` : ''}
+                        </div>
+                        <div class="post-meta">
+                            <span>Published: ${post.timestamp ? new Date(post.timestamp.toDate()).toLocaleString() : 'N/A'}</span>
+                            <span>Likes: <span id="likes-${postId}">${post.likes || 0}</span></span>
+                        </div>
+                        <div class="post-actions">
+                            <button onclick="likePost('${postId}')">Like Post</button>
+                            ${contactButtonsHtml}
+                        </div>
+                    `;
+                    postsListDiv.appendChild(postCard);
                 });
 
-                if (addedPostsCount > 0) {
-                    lastVisiblePost = snapshot.docs[snapshot.docs.length - 1]; // Save last doc for pagination
-                    loadMoreBtn.classList.remove('hidden'); // Show Load More button if posts were added
-                } else if (loadMore && snapshot.empty) {
-                    showMessage('posts-list', 'No more posts to load.', 'info');
-                    loadMoreBtn.classList.add('hidden'); // Hide if no more posts at all
-                }
-
-                if (snapshot.docs.length < 10 && addedPostsCount < 10) { // If fetched less than limit, probably no more
-                     loadMoreBtn.classList.add('hidden');
+                if (!hasVisiblePosts) {
+                    noPostsMessage.textContent = "No posts available at the moment. Check back later or create your own!";
+                    noPostsMessage.classList.remove('hidden');
+                } else {
+                    noPostsMessage.classList.add('hidden'); // Hide if posts are displayed
                 }
 
             } catch (error) {
                 console.error("Error fetching posts:", error);
-                showMessage('posts-list', `Error loading posts: ${error.message}`, 'error');
-            } finally {
-                hidePreloader();
+                noPostsMessage.textContent = `Error loading posts: ${error.message}. Please refresh.`;
+                noPostsMessage.classList.remove('hidden');
             }
         }
 
-        document.getElementById('loadMorePostsBtn').addEventListener('click', () => fetchPosts(true));
-        document.getElementById('refreshPostsBtn').addEventListener('click', () => {
-            fetchPosts(); // Reload all posts
-            cleanupOldPosts(); // Also run cleanup on refresh
-        });
-
-        async function toggleLike(button) {
-            const postId = button.dataset.postId;
+        // Function to handle contact buttons (fetches creator's details)
+        async function contactUser(creatorId, type) {
             if (!currentUserId) {
-                showMessage('home-feed-section', 'Please sign in to like posts.', 'warning');
+                showMessage('auth-status-message', 'Please sign in to contact users.', 'error');
+                showSection('signin-auth');
                 return;
             }
+            try {
+                const creatorDoc = await db.collection('users').doc(creatorId).get();
+                if (creatorDoc.exists) {
+                    const creatorData = creatorDoc.data();
+                    let contactInfo = '';
+                    let webviewCommand = '';
 
+                    switch (type) {
+                        case 'whatsapp':
+                            contactInfo = creatorData.whatsapp;
+                            if (contactInfo) {
+                                webviewCommand = `CONTACT:WHATSAPP:${contactInfo}`;
+                            } else {
+                                alert(`${creatorData.username} has not provided a WhatsApp number.`);
+                            }
+                            break;
+                        case 'instagram':
+                            contactInfo = creatorData.instagram;
+                            if (contactInfo) {
+                                webviewCommand = `CONTACT:INSTAGRAM:${contactInfo}`;
+                            } else {
+                                alert(`${creatorData.username} has not provided an Instagram handle.`);
+                            }
+                            break;
+                        case 'phone':
+                            contactInfo = creatorData.phone;
+                            if (contactInfo) {
+                                webviewCommand = `CONTACT:PHONE:${contactInfo}`;
+                            } else {
+                                alert(`${creatorData.username} has not provided a phone number.`);
+                            }
+                            break;
+                    }
+
+                    if (webviewCommand && window.AppInventor && window.AppInventor.setWebViewString) {
+                        window.AppInventor.setWebViewString(webviewCommand);
+                    } else if (webviewCommand) {
+                        alert(`App command not available (AppInventor not detected). Would open: ${webviewCommand.split(':')[0]} with ${contactInfo}`);
+                    }
+
+                } else {
+                    alert('Could not find user contact details.');
+                }
+            } catch (error) {
+                console.error("Error contacting user:", error);
+                alert(`Failed to get contact info: ${error.message}`);
+            }
+        }
+
+
+        async function likePost(postId) {
+            if (!currentUserId) {
+                showMessage('auth-status-message', 'Please sign in to like posts.', 'error');
+                showSection('signin-auth');
+                return;
+            }
             const postRef = db.collection('posts').doc(postId);
-            showPreloader("Updating like...");
-
             try {
                 await db.runTransaction(async (transaction) => {
                     const postDoc = await transaction.get(postRef);
                     if (!postDoc.exists) {
                         throw "Post does not exist!";
                     }
-
-                    const postData = postDoc.data();
-                    let likes = postData.likes || {};
-
-                    if (likes[currentUserId]) {
-                        // User has liked, so unlike
-                        delete likes[currentUserId];
-                        button.classList.remove('liked');
-                    } else {
-                        // User has not liked, so like
-                        likes[currentUserId] = true;
-                        button.classList.add('liked');
-                    }
-
-                    transaction.update(postRef, { likes: likes });
-                    button.querySelector('.like-count').textContent = Object.keys(likes).length;
+                    // Implement per-user like tracking to prevent multiple likes by same user
+                    // For now, simple increment:
+                    const newLikes = (postDoc.data().likes || 0) + 1;
+                    transaction.update(postRef, { likes: newLikes });
+                    document.getElementById(`likes-${postId}`).textContent = newLikes; // Update UI immediately
                 });
-                showMessage('home-feed-section', 'Like updated!', 'success');
-            } catch (e) {
-                console.error("Error toggling like: ", e);
-                showMessage('home-feed-section', `Error updating like: ${e.message || e}`, 'error');
-            } finally {
-                hidePreloader();
-            }
-        }
-
-        function sharePost(button) {
-            const postText = decodeURIComponent(button.dataset.postText);
-            const shareContent = `Check out this post from AddMint: "${postText}"`;
-            
-            // Send to App Inventor via WebViewString
-            // App Inventor will handle native sharing dialog
-            if (typeof AppInventor !== 'undefined' && AppInventor.setWebViewString) {
-                AppInventor.setWebViewString(`SHARE_POST:${shareContent}`);
-            } else {
-                // Fallback for web browser or if AppInventor interface is not available
-                alert('Share functionality is only available in the AddMint app. You can copy the text: ' + shareContent);
-                console.warn('AppInventor.setWebViewString is not available. Cannot trigger native share.');
-            }
-        }
-
-        document.getElementById('publishPostButton').addEventListener('click', async () => {
-            const postText = document.getElementById('createPostText').value.trim();
-
-            if (!postText) {
-                showMessage('create-post-message', 'Post content cannot be empty.', 'error');
-                return;
-            }
-            if (postText.length > 500) { // Example limit
-                showMessage('create-post-message', 'Post is too long (max 500 characters).', 'error');
-                return;
-            }
-
-            showPreloader("Publishing post...");
-            try {
-                // Set expiry time 12 hours (12 * 60 * 60 * 1000 milliseconds) from now
-                const expiryTime = Date.now() + (12 * 60 * 60 * 1000);
-
-                await db.collection('posts').add({
-                    userId: currentUserId,
-                    username: currentUserName, // Store username with post
-                    postText: postText,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    expiryTime: expiryTime, // Add expiry time
-                    likes: {} // Initialize likes object
-                });
-
-                showMessage('create-post-message', 'Post published successfully!', 'success');
-                clearForm('create-post-section');
-                showSection('home-feed-section'); // Go back to home feed
-                fetchPosts(); // Refresh posts to show new one
+                console.log(`Post ${postId} liked!`);
             } catch (error) {
-                console.error("Error publishing post:", error);
-                showMessage('create-post-message', `Error publishing post: ${error.message}`, 'error');
-            } finally {
-                hidePreloader();
-            }
-        });
-
-        // --- Ad Triggering from HTML ---
-        function showRewardedAd() {
-            if (typeof AppInventor !== 'undefined' && AppInventor.setWebViewString) {
-                // Example: asking for ad for "some_reward_id"
-                AppInventor.setWebViewString("SHOW_AD:some_reward_id"); 
-            } else {
-                console.log("Simulating ad request: SHOW_AD:some_reward_id");
-                alert("Ad would have been shown here in the app!");
-                // For testing in browser, you can manually trigger ad success callback
-                // window.adRequested('OK');
+                console.error("Error liking post:", error.message);
+                // Can add a UI message here: "Failed to like post:..."
             }
         }
 
-        // Functions for App Inventor to call back into HTML
-        // These are global functions so AppInventor.RunJavaScript can find them
-        window.adRequested = function(status) {
-            console.log("Ad request status received from App Inventor:", status);
-            if (status === 'OK') {
-                showMessage('home-feed-section', 'Ad shown successfully!', 'success');
-                // You can add logic here if the ad completion needs to update UI immediately
-                // For example, if ad watch rewards coins, you'd call a function like window.updateCoins();
-                // However, the actual reward handling is better in App Inventor's AdClosed event.
-            } else {
-                showMessage('home-feed-section', 'Ad could not be shown. Try again later.', 'error');
+        async function deletePost(postId) {
+            if (!currentUserId) {
+                alert("Please sign in to delete posts.");
+                showSection('signin-auth');
+                return;
             }
-        };
-
-        window.adRequestedForExpiry = function(status) {
-            console.log("Ad for expiry status received from App Inventor:", status);
-            if (status === 'OK') {
-                 showMessage('home-feed-section', 'Ad shown for post expiry extension.', 'success');
-            } else {
-                showMessage('home-feed-section', 'Ad could not be shown for expiry extension.', 'error');
+            if (!confirm("Are you sure you want to permanently delete this post? This action cannot be undone.")) {
+                return;
             }
-        };
+            try {
+                await db.collection('posts').doc(postId).delete();
+                console.log(`Post ${postId} deleted.`);
+                document.getElementById(`post-${postId}`).remove(); // Remove from UI
+                // Consider adding animation for removal
+                fetchPosts(); // Refresh in case the list needs re-evaluation (e.g., only one post left)
+            } catch (error) {
+                console.error("Error deleting post:", error.message);
+                alert(`Failed to delete post: ${error.message}`);
+            }
+        }
 
-        // --- Cleanup Old Posts (Client-Side) ---
+        // --- Post Cleanup (Client-side initiated) ---
         async function cleanupOldPosts() {
             if (!currentUserId) {
                 console.log("Not logged in, skipping cleanup.");
@@ -1432,13 +1369,15 @@
             console.log("Attempting to clean up old posts...");
             const now = Date.now();
             let cleanedUpCount = 0;
-            const BATCH_LIMIT = 50; // Max number of posts to delete in one batch
 
             try {
-                // Fetch up to BATCH_LIMIT + 1 posts that *might* be expired
+                // Fetch up to 50 posts that have an expiryTime in the past.
+                // orderBy('expiryTime', 'asc') is crucial for efficient cleanup if you have many posts
+                // as it targets the oldest expired posts first.
                 const snapshot = await db.collection('posts')
                                          .where('expiryTime', '<', now)
-                                         .limit(BATCH_LIMIT + 1) // Fetch one more than batch limit to see if there are more
+                                         .orderBy('expiryTime', 'asc')
+                                         .limit(50) // Limit the number of posts to delete per cleanup run
                                          .get();
 
                 if (snapshot.empty) {
@@ -1447,9 +1386,9 @@
                 }
 
                 const batch = db.batch();
-                const deleteImagePromises = [];
+                const deleteImagePromises = []; // For storage deletions (future use)
 
-                snapshot.docs.slice(0, BATCH_LIMIT).forEach(doc => { // Process up to BATCH_LIMIT
+                snapshot.forEach(doc => {
                     const postData = doc.data();
                     const postId = doc.id;
 
@@ -1458,27 +1397,23 @@
                         batch.delete(db.collection('posts').doc(postId));
                         cleanedUpCount++;
 
-                        // Placeholder for image deletion (when storage is enabled)
+                        // *** FUTURE: Uncomment this block when you enable image upload ***
+                        /*
                         if (postData.imageUrl && postData.imageUrl.includes('firebasestorage.googleapis.com')) {
-                            // const imageRef = storage.refFromURL(postData.imageUrl);
-                            // deleteImagePromises.push(imageRef.delete().catch(err => console.error("Error deleting old post image:", err)));
-                            console.log(`(Image deletion for ${postId} skipped - Storage not fully implemented)`);
+                            const imageRef = storage.refFromURL(postData.imageUrl);
+                            deleteImagePromises.push(imageRef.delete().catch(err => console.error("Error deleting old post image from Storage:", err)));
                         }
+                        */
                     }
                 });
 
                 if (cleanedUpCount > 0) {
-                    await batch.commit();
-                    await Promise.all(deleteImagePromises); // Wait for image deletions (if any)
-                    console.log(`Cleaned up ${cleanedUpCount} expired posts.`);
-                    // Recursively call cleanup if there might be more expired posts
-                    if (snapshot.docs.length > BATCH_LIMIT) {
-                         console.log("More expired posts might exist, running cleanup again.");
-                         setTimeout(cleanupOldPosts, 1000); // Wait a bit before next batch
-                    }
-                    fetchPosts(); // Refresh posts after cleanup
+                    await batch.commit(); // Commit the batch deletions to Firestore
+                    await Promise.all(deleteImagePromises); // Wait for image deletions to complete
+                    console.log(`Successfully cleaned up ${cleanedUpCount} expired posts.`);
+                    fetchPosts(); // Re-fetch posts to update UI after cleanup
                 } else {
-                    console.log("No actually expired posts found in this batch after re-checking.");
+                    console.log("No eligible expired posts found in this batch after final check.");
                 }
 
             } catch (error) {
@@ -1486,86 +1421,135 @@
             }
         }
 
-        // --- UI Navigation ---
-        document.querySelectorAll('.nav-item').forEach(item => {
-            item.addEventListener('click', (e) => {
-                e.preventDefault();
-                const sectionId = e.currentTarget.dataset.section;
-                showSection(sectionId);
-                // If navigating to home, refresh posts
-                if (sectionId === 'home-feed-section') {
-                    fetchPosts();
-                } else if (sectionId === 'profile-details-section') {
-                    fetchUserProfile(currentUserId); // Refetch profile when navigating to it
-                }
-            });
-        });
 
-        function showMainAppUI() {
-            document.getElementById('main-app-container').classList.remove('hidden');
-            showSection('home-feed-section');
-            fetchPosts(); // Initial fetch of posts
-        }
+        // --- AppInventor WebViewStringChange Communication ---
+        // These are global functions that App Inventor (via RunJavaScript) will call.
 
-        // --- Initial Load & Auth State Handling ---
+        window.adRequested = (status) => {
+            console.log(`App Inventor confirmed ad request status: ${status}`);
+            // This function could be used to update UI in HTML if ad was successfully shown or not
+            // e.g., if status is 'OK', you might hide a "watch ad" button
+        };
+
+        window.adRequestedForExpiry = (status) => {
+            console.log(`App Inventor confirmed ad for expiry status: ${status}`);
+            // This is for a specific ad scenario, adapt as needed
+        };
+
+        window.updateCoins = () => {
+            console.log("App Inventor says: User watched ad, update coins!");
+            // Example: Increment coins in Firestore or local storage
+            // This would typically involve a transaction or update to the current user's document
+            if (currentUserId) {
+                const userRef = db.collection('users').doc(currentUserId);
+                db.runTransaction(async (transaction) => {
+                    const userDoc = await transaction.get(userRef);
+                    if (!userDoc.exists) {
+                        throw "User does not exist for coin update!";
+                    }
+                    const currentCoins = (userDoc.data().coins || 0);
+                    transaction.update(userRef, { coins: currentCoins + 10 }); // Add 10 coins
+                    alert(`You earned 10 coins!`);
+                    // Update UI if you have a coin display
+                }).then(() => {
+                    console.log("Coins updated successfully!");
+                }).catch((error) => {
+                    console.error("Coin update failed:", error);
+                });
+            }
+        };
+
+        window.updateCredits = () => {
+            console.log("App Inventor says: User watched ad, update credits!");
+            // Similar logic for credits
+            if (currentUserId) {
+                const userRef = db.collection('users').doc(currentUserId);
+                db.runTransaction(async (transaction) => {
+                    const userDoc = await transaction.get(userRef);
+                    if (!userDoc.exists) {
+                        throw "User does not exist for credit update!";
+                    }
+                    const currentCredits = (userDoc.data().credits || 0);
+                    transaction.update(userRef, { credits: currentCredits + 1 }); // Add 1 credit
+                    alert(`You earned 1 credit!`);
+                }).then(() => {
+                    console.log("Credits updated successfully!");
+                }).catch((error) => {
+                    console.error("Credit update failed:", error);
+                });
+            }
+        };
+
+
+        // --- Event Listeners and Initial Load ---
         document.addEventListener('DOMContentLoaded', () => {
-            // Splash screen logic
-            setTimeout(() => {
-                document.getElementById('splash-screen').classList.add('hidden'); // Fully hide splash screen
-                document.getElementById('main-app-container').classList.remove('hidden'); // Show main app container initially
-            }, 2000); // Adjust duration as needed for animation
+            // Manage bottom navigation clicks
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const sectionId = item.dataset.section;
+                    showSection(sectionId);
+                    // Perform actions specific to the section being shown
+                    if (sectionId === 'home-posts') {
+                        fetchPosts(); // Always refresh posts when going to home
+                        cleanupOldPosts(); // Run cleanup on home screen load
+                    } else if (sectionId === 'user-profile-section' && currentUserId) {
+                        fetchUserProfile(currentUserId); // Fetch latest profile data
+                    }
+                });
+            });
 
             // Firebase Auth State Listener
             auth.onAuthStateChanged(async (user) => {
-                hidePreloader(); // Hide preloader once user state is determined
+                // Wait for a short duration to ensure splash screen is fully visible
+                setTimeout(() => {
+                    hidePreloader(); // Fade out splash screen
 
-                if (user) {
-                    currentUserId = user.uid;
-                    // Check if email is verified
-                    if (user.emailVerified) {
-                        // Check if user profile exists
-                        const userDoc = await db.collection('users').doc(currentUserId).get();
-                        if (!userDoc.exists || !userDoc.data().username) {
-                            showSection('setup-profile');
-                            // Pre-fill username if Google/other auth provider had it (though we removed Google)
-                            if (user.displayName) {
-                                document.getElementById('newUsername').value = user.displayName;
-                            }
+                    if (user) {
+                        currentUserId = user.uid;
+                        if (user.emailVerified) {
+                            // User is logged in and email verified
+                            fetchUserProfile(currentUserId)
+                                .then(() => {
+                                    if (!userProfileData || !userProfileData.username) {
+                                        // User profile not set up yet (username missing)
+                                        showSection('setup-profile');
+                                        // Pre-fill username if available from Firebase Auth display name (e.g., from Google sign-in which we removed, but good practice)
+                                        document.getElementById('profileUsername').value = user.displayName || '';
+                                    } else {
+                                        // User is fully set up, show main app
+                                        showMainAppUI();
+                                        cleanupOldPosts(); // Initiate cleanup when app loads for logged-in user
+                                        fetchPosts(); // Load posts for the first time
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error("Error during profile fetch after login:", error);
+                                    // Fallback: If profile fetch fails, still try to show main UI or handle gracefully
+                                    showMainAppUI();
+                                    cleanupOldPosts();
+                                    fetchPosts();
+                                });
                         } else {
-                            await fetchUserProfile(currentUserId);
-                            showMainAppUI();
-                            cleanupOldPosts(); // Call cleanup when user logs in/app starts
+                            // User logged in but email not verified
+                            showSection('email-verify');
+                            document.getElementById('verify-email-message').textContent = `Your email ${user.email} is not verified. Please check your inbox (and spam folder) for the verification link. After verifying, please sign in again.`;
                         }
                     } else {
-                        showSection('email-verify');
-                        document.getElementById('verify-email-message').textContent = `Your email ${user.email} is not verified. Please check your inbox (and spam folder) for the verification link. After verifying, please sign in again.`;
+                        // No user signed in, show authentication section
+                        currentUserId = null;
+                        currentUsername = null;
+                        userProfileData = {}; // Clear user data
+                        document.getElementById('app-container').classList.remove('hidden'); // Show auth sections
+                        showSection('signin-auth'); // Default to sign-in
                     }
-                } else {
-                    currentUserId = null;
-                    showSection('signin-auth');
-                }
+                }, 1500); // Splash screen visible for 1.5 seconds, then fades out
             });
         });
 
-        // Optional: Implement window.adRequested and window.adRequestedForExpiry
-        // These are called by App Inventor after an ad event.
-        // For testing outside App Inventor, define them as empty or with console logs.
-        if (typeof AppInventor === 'undefined') {
-            window.AppInventor = {
-                setWebViewString: function(str) {
-                    console.log("AppInventor.setWebViewString called with:", str);
-                    // Simulate a response for testing in browser
-                    if (str.startsWith("SHOW_AD:")) {
-                        console.log("Simulating ad shown from App Inventor.");
-                        setTimeout(() => window.adRequested('OK'), 1000); // Simulate ad success
-                    } else if (str.startsWith("SHARE_POST:")) {
-                        alert("Simulating share: " + str.replace("SHARE_POST:", ""));
-                    } else if (str.startsWith("CONTACT:")) {
-                         alert("Simulating contact action: " + str);
-                    }
-                }
-            };
-            console.warn("AppInventor object not found. Running in browser simulation mode.");
+        // Function for header menu icon (currently a placeholder alert)
+        function toggleSettingsMenu() {
+            // Instead of alert, you might want to show a side navigation menu or settings section
+            showSection('settings-section');
         }
 
     </script>
