@@ -2,34 +2,38 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AddMint - Your Social Hub</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AddMint Pro</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%2300ff00' d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15H9V9h2v8zm4 0h-2V9h2v8z'/%3E%3C/svg%3E">
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-storage-compat.js"></script>
+
     <style>
-        /* Global Styles & Dark Mode */
         :root {
-            --background-color: #121212;
-            --surface-color: #1E1E1E;
-            --primary-color: #BB86FC;
-            --on-background: #E0E0E0;
-            --on-surface: #E0E0E0;
-            --text-color-light: #B0B0B0;
-            --text-color-dark: #FFFFFF;
-            --border-color: #333333;
-            --button-bg: #BB86FC;
-            --button-text: #000000;
-            --input-bg: #2C2C2C;
-            --input-border: #444444;
-            --error-color: #CF6679;
-            --success-color: #03DAC6;
+            --primary-color: #00ff00; /* Green */
+            --secondary-color: #00b300; /* Darker Green */
+            --background-color: #1a1a1a; /* Dark Grey */
+            --card-background: #2a2a2a; /* Slightly Lighter Dark Grey */
+            --text-color: #e0e0e0; /* Light Grey */
+            --input-background: #3a3a3a;
+            --border-color: #4a4a4a;
+            --error-color: #ff4d4d;
+            --success-color: #4CAF50;
             --shadow-color: rgba(0, 0, 0, 0.5);
-            --placeholder-color: #666;
-            --ad-animation-color: #00BCD4; /* Cyan for ad animation */
+            --gradient-start: #00cc00;
+            --gradient-end: #008000;
+            --header-height: 60px;
+            --nav-height: 60px;
         }
 
+        /* Base styles */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--background-color);
-            color: var(--on-background);
+            color: var(--text-color);
             margin: 0;
             padding: 0;
             display: flex;
@@ -39,12 +43,6 @@
             -webkit-tap-highlight-color: transparent; /* Remove tap highlight on mobile */
         }
 
-        /* Utility Classes */
-        .hidden { display: none !important; }
-        .flex-center { display: flex; justify-content: center; align-items: center; }
-        .full-screen { width: 100vw; height: 100vh; }
-        .fade-out { opacity: 0; transition: opacity 0.5s ease-out; }
-
         /* Splash Screen */
         #splash-screen {
             position: fixed;
@@ -52,44 +50,49 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: var(--background-color);
-            z-index: 1000;
+            background: linear-gradient(45deg, var(--background-color), #000);
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            transition: opacity 0.5s ease-out;
-            animation: fadeIn 0.5s ease-in;
+            z-index: 1000;
+            transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+            opacity: 1;
+            visibility: visible;
         }
 
-        .splash-logo {
-            font-family: 'Pacifico', cursive; /* Example: A fancy font for logo */
-            font-size: 3em;
-            color: var(--primary-color);
-            text-shadow: 0 0 10px rgba(187, 134, 252, 0.7);
-            animation: pulse 2s infinite ease-in-out;
-            margin-bottom: 20px;
-        }
-        .splash-tagline {
-            font-size: 1em;
-            color: var(--text-color-light);
-            animation: slideUp 1s ease-out forwards;
+        #splash-screen.hidden {
             opacity: 0;
-            animation-delay: 0.3s;
+            visibility: hidden;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+        .app-logo-splash {
+            width: 120px;
+            height: 120px;
+            background-color: var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 60px;
+            font-weight: bold;
+            color: var(--background-color);
+            box-shadow: 0 0 30px rgba(0, 255, 0, 0.7);
+            animation: pulse 1.5s infinite ease-in-out;
         }
+
         @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
+            0% { transform: scale(1); box-shadow: 0 0 20px rgba(0, 255, 0, 0.5); }
+            50% { transform: scale(1.05); box-shadow: 0 0 40px rgba(0, 255, 0, 0.9); }
+            100% { transform: scale(1); box-shadow: 0 0 20px rgba(0, 255, 0, 0.5); }
         }
-        @keyframes slideUp {
-            from { transform: translateY(20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+
+        .splash-text {
+            margin-top: 20px;
+            font-size: 24px;
+            color: var(--text-color);
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
         }
 
         /* Preloader */
@@ -99,15 +102,21 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: var(--background-color);
-            z-index: 999;
+            background-color: rgba(0, 0, 0, 0.8);
             display: flex;
             justify-content: center;
             align-items: center;
-            flex-direction: column;
-            color: var(--primary-color);
-            font-size: 1.2em;
+            z-index: 999;
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
         }
+
+        #preloader.visible {
+            visibility: visible;
+            opacity: 1;
+        }
+
         .spinner {
             border: 4px solid rgba(255, 255, 255, 0.3);
             border-top: 4px solid var(--primary-color);
@@ -115,435 +124,423 @@
             width: 40px;
             height: 40px;
             animation: spin 1s linear infinite;
-            margin-bottom: 15px;
         }
+
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
 
-        /* Main Sections Styling */
-        .app-section {
-            background-color: var(--background-color);
+        /* Section Styling */
+        .section {
+            display: none;
+            flex-direction: column;
+            width: 100%;
+            flex-grow: 1; /* Allow sections to take available space */
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .section.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Auth Form Styles */
+        .auth-container {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             padding: 20px;
             box-sizing: border-box;
-            flex-grow: 1;
-            display: none; /* Hidden by default */
-            animation: slideInFromRight 0.5s ease-out;
-            width: 100%;
-            max-width: 800px; /* Max width for desktop */
-            margin: 0 auto;
-        }
-        @keyframes slideInFromRight {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        .app-section.active {
-            display: flex;
-            flex-direction: column;
+            background-color: var(--background-color);
         }
 
-        /* Headers */
-        header {
-            background-color: var(--surface-color);
-            padding: 15px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 5px var(--shadow-color);
-            z-index: 10;
-            position: sticky;
-            top: 0;
-            width: 100%;
-            box-sizing: border-box;
-            max-width: 800px; /* Match app-section max-width */
-            margin: 0 auto;
-            border-bottom: 1px solid var(--border-color);
-        }
-        .header-logo {
-            font-family: 'Pacifico', cursive; /* Example: A fancy font for logo */
-            font-size: 1.8em;
-            color: var(--primary-color);
-            animation: adPulse 2s infinite alternate; /* Continuous animation */
-        }
-        @keyframes adPulse {
-            0% { transform: scale(1); color: var(--primary-color); text-shadow: 0 0 5px var(--primary-color); }
-            50% { transform: scale(1.03); color: var(--ad-animation-color); text-shadow: 0 0 10px var(--ad-animation-color); }
-            100% { transform: scale(1); color: var(--primary-color); text-shadow: 0 0 5px var(--primary-color); }
-        }
-        .header-buttons button {
-            background: none;
-            border: none;
-            color: var(--on-surface);
-            font-size: 1.2em;
-            cursor: pointer;
-            margin-left: 15px;
-            transition: color 0.3s ease;
-        }
-        .header-buttons button:hover {
-            color: var(--primary-color);
-        }
-
-        /* Forms Styling */
-        .form-container {
-            background-color: var(--surface-color);
+        .auth-card {
+            background-color: var(--card-background);
             padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px var(--shadow-color);
-            margin: auto; /* Center the form */
+            border-radius: 10px;
+            box-shadow: 0 5px 20px var(--shadow-color);
             width: 100%;
             max-width: 400px;
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-        .form-container h2 {
             text-align: center;
+            box-sizing: border-box;
+        }
+
+        .auth-card h2 {
             color: var(--primary-color);
             margin-bottom: 25px;
-            font-size: 1.8em;
+            font-size: 26px;
         }
+
         .input-group {
-            position: relative;
             margin-bottom: 20px;
+            position: relative;
+            text-align: left;
         }
+
         .input-group label {
             display: block;
             margin-bottom: 8px;
-            color: var(--on-surface);
-            font-size: 0.9em;
+            color: var(--text-color);
+            font-size: 14px;
         }
+
         .input-group input[type="email"],
         .input-group input[type="password"],
-        .input-group input[type="text"],
-        .input-group input[type="number"],
-        .input-group textarea {
+        .input-group input[type="text"] {
             width: calc(100% - 20px);
             padding: 12px 10px;
-            border: 1px solid var(--input-border);
+            background-color: var(--input-background);
+            border: 1px solid var(--border-color);
             border-radius: 6px;
-            background-color: var(--input-bg);
-            color: var(--on-surface);
-            font-size: 1em;
-            transition: border-color 0.3s ease;
-            box-sizing: border-box;
+            color: var(--text-color);
+            font-size: 16px;
+            transition: border-color 0.3s, box-shadow 0.3s;
         }
-        .input-group input:focus,
-        .input-group textarea:focus {
-            outline: none;
+
+        .input-group input[type="email"]:focus,
+        .input-group input[type="password"]:focus,
+        .input-group input[type="text"]:focus {
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 2px rgba(187, 134, 252, 0.3);
+            box-shadow: 0 0 0 3px rgba(0, 255, 0, 0.3);
+            outline: none;
         }
-        .input-group input::placeholder,
-        .input-group textarea::placeholder {
-            color: var(--placeholder-color);
-        }
+
         .password-toggle {
             position: absolute;
             right: 10px;
-            top: 70%; /* Adjust based on label and input height */
+            top: 50%; /* Adjusted for better alignment */
             transform: translateY(-50%);
             background: none;
             border: none;
-            color: var(--text-color-light);
+            color: var(--text-color);
             cursor: pointer;
-            font-size: 1em;
+            font-size: 18px;
             padding: 5px;
-            z-index: 2;
-        }
-        .password-toggle:hover {
-            color: var(--primary-color);
         }
 
-        button.primary-btn {
-            background-color: var(--button-bg);
-            color: var(--button-text);
-            padding: 12px 20px;
+        .auth-button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(to right, var(--gradient-start), var(--gradient-end));
             border: none;
             border-radius: 6px;
-            font-size: 1.1em;
-            cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-            width: 100%;
+            color: var(--background-color);
+            font-size: 18px;
             font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 10px;
         }
-        button.primary-btn:hover {
-            background-color: #A06FEF; /* Slightly darker purple */
+
+        .auth-button:hover {
             transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 255, 0, 0.4);
         }
-        button.primary-btn:active {
-            transform: translateY(0);
-        }
-        .form-link {
-            text-align: center;
+
+        .auth-link {
+            display: block;
             margin-top: 15px;
-        }
-        .form-link a {
             color: var(--primary-color);
             text-decoration: none;
-            font-size: 0.9em;
-            transition: color 0.3s ease;
+            font-size: 14px;
+            transition: color 0.2s;
         }
-        .form-link a:hover {
-            text-decoration: underline;
-            color: #BB86FC;
+
+        .auth-link:hover {
+            color: var(--secondary-color);
         }
+
         .message {
-            text-align: center;
-            margin-bottom: 15px;
-            padding: 10px;
-            border-radius: 5px;
-            font-size: 0.9em;
+            margin-top: 15px;
+            font-size: 14px;
+            color: var(--text-color);
         }
-        .message.error {
-            background-color: rgba(207, 102, 121, 0.2);
-            color: var(--error-color);
-        }
-        .message.success {
-            background-color: rgba(3, 218, 198, 0.2);
-            color: var(--success-color);
-        }
+        .message.error { color: var(--error-color); }
+        .message.success { color: var(--success-color); }
 
-        /* Post Feed Styling */
-        #post-feed {
-            display: grid;
-            gap: 20px;
-            padding-bottom: 70px; /* Space for bottom navigation */
-        }
-        .post-card {
-            background-color: var(--surface-color);
-            border-radius: 8px;
-            box-shadow: 0 4px 10px var(--shadow-color);
-            overflow: hidden;
-            transition: transform 0.3s ease;
-        }
-        .post-card:hover {
-            transform: translateY(-5px);
-        }
-        .post-header {
-            display: flex;
-            align-items: center;
-            padding: 15px;
-            border-bottom: 1px solid var(--border-color);
-        }
-        .post-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background-color: var(--primary-color); /* Placeholder */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-weight: bold;
-            font-size: 1.2em;
-            color: var(--button-text);
-            margin-right: 10px;
-        }
-        .post-username {
-            font-weight: bold;
-            color: var(--on-surface);
-        }
-        .post-content {
-            padding: 15px;
-            color: var(--on-background);
-            line-height: 1.6;
-            word-wrap: break-word;
-        }
-        .post-image {
-            width: 100%;
-            max-height: 400px; /* Limit image height */
-            object-fit: cover;
-            display: block;
-        }
-        .post-actions {
-            display: flex;
-            justify-content: space-around;
-            padding: 10px 15px;
-            border-top: 1px solid var(--border-color);
-        }
-        .post-actions button {
-            background: none;
-            border: none;
-            color: var(--text-color-light);
-            font-size: 1em;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            transition: color 0.3s ease;
-        }
-        .post-actions button:hover {
-            color: var(--primary-color);
-        }
-        .post-actions button.liked {
-            color: var(--error-color); /* Red for liked */
-        }
-        .post-timestamp {
-            font-size: 0.8em;
-            color: var(--text-color-light);
-            margin-left: auto;
-        }
-
-        /* Floating Action Button (FAB) */
-        .fab {
-            position: fixed;
-            bottom: 80px; /* Above bottom nav */
-            right: 20px;
-            background-color: var(--primary-color);
-            color: var(--button-text);
-            border-radius: 50%;
-            width: 56px;
-            height: 56px;
-            font-size: 2em;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            box-shadow: 0 4px 10px var(--shadow-color);
-            cursor: pointer;
-            z-index: 50;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-        }
-        .fab:hover {
-            background-color: #A06FEF;
-            transform: translateY(-2px);
-        }
-
-        /* Bottom Navigation */
-        footer {
-            background-color: var(--surface-color);
-            padding: 10px 0;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            box-shadow: 0 -2px 5px var(--shadow-color);
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            z-index: 100;
-            box-sizing: border-box;
-            max-width: 800px; /* Match app-section max-width */
-            margin: 0 auto;
-            border-top: 1px solid var(--border-color);
-        }
-        .nav-item {
+        /* Main App UI */
+        #main-app {
             display: flex;
             flex-direction: column;
-            align-items: center;
-            color: var(--text-color-light);
-            font-size: 0.7em;
-            text-decoration: none;
-            cursor: pointer;
-            padding: 5px 10px;
-            transition: color 0.3s ease;
-        }
-        .nav-item i {
-            font-size: 1.4em;
-            margin-bottom: 3px;
-        }
-        .nav-item:hover, .nav-item.active {
-            color: var(--primary-color);
+            flex-grow: 1;
+            padding-bottom: var(--nav-height); /* Space for bottom nav */
         }
 
-        /* Modal / Dialog Styling */
-        .modal {
-            display: none; /* Hidden by default */
-            position: fixed;
-            z-index: 200;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0,0,0,0.6);
-            backdrop-filter: blur(5px);
-            justify-content: center;
-            align-items: center;
-            animation: fadeIn 0.3s ease-in-out;
-        }
-        .modal-content {
-            background-color: var(--surface-color);
-            margin: auto;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.7);
-            width: 90%;
-            max-width: 500px;
-            animation: slideInFromTop 0.3s ease-out;
-            box-sizing: border-box;
-        }
-        @keyframes slideInFromTop {
-            from { transform: translateY(-50px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        .modal-header {
+        /* Header */
+        header {
+            background-color: var(--card-background);
+            color: var(--text-color);
+            padding: 0 15px;
+            height: var(--header-height);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 10px;
+            box-shadow: 0 2px 10px var(--shadow-color);
+            position: sticky;
+            top: 0;
+            z-index: 50;
         }
-        .modal-header h3 {
-            margin: 0;
-            color: var(--primary-color);
-            font-size: 1.5em;
-        }
-        .close-button {
-            color: var(--text-color-light);
-            font-size: 1.8em;
+
+        .app-logo-header {
+            width: 40px;
+            height: 40px;
+            background-color: var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 22px;
             font-weight: bold;
-            cursor: pointer;
-            transition: color 0.3s ease;
+            color: var(--background-color);
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.7);
+            animation: pulse-small 2s infinite ease-in-out;
         }
-        .close-button:hover,
-        .close-button:focus {
-            color: var(--error-color);
-            text-decoration: none;
-            cursor: pointer;
+
+        @keyframes pulse-small {
+            0% { transform: scale(1); box-shadow: 0 0 5px rgba(0, 255, 0, 0.5); }
+            50% { transform: scale(1.03); box-shadow: 0 0 15px rgba(0, 255, 0, 0.9); }
+            100% { transform: scale(1); box-shadow: 0 0 5px rgba(0, 255, 0, 0.5); }
         }
-        .modal-body {
+
+
+        .header-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary-color);
+            text-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
+        }
+
+        /* Main Content Area */
+        .content-area {
+            flex-grow: 1;
+            overflow-y: auto; /* Enable scrolling for content */
+            padding: 15px;
+            box-sizing: border-box;
+            background-color: var(--background-color);
+        }
+
+        /* Post Feed */
+        #posts-list {
             display: flex;
             flex-direction: column;
             gap: 15px;
-        }
-        .modal-body .input-group {
-            margin-bottom: 0; /* Override default margin */
-        }
-        .modal-body textarea {
-            min-height: 100px;
-            resize: vertical;
-        }
-        .modal-footer {
-            margin-top: 20px;
-            text-align: right;
-        }
-        .modal-footer button {
-            background-color: var(--primary-color);
-            color: var(--button-text);
-            padding: 10px 20px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-        .modal-footer button:hover {
-            background-color: #A06FEF;
+            max-width: 800px;
+            margin: 0 auto;
         }
 
-        /* AI Chat Specific Styles */
-        #ai-chat-messages {
-            flex-grow: 1;
-            overflow-y: auto;
+        .post-card {
+            background-color: var(--card-background);
             padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px var(--shadow-color);
+            transition: transform 0.2s ease;
+        }
+        .post-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .post-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .post-avatar {
+            width: 40px;
+            height: 40px;
+            background-color: var(--secondary-color);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--background-color);
+            margin-right: 10px;
+            flex-shrink: 0;
+        }
+
+        .post-username {
+            font-weight: bold;
+            color: var(--primary-color);
+            font-size: 16px;
+        }
+        .post-time {
+            font-size: 12px;
+            color: #888;
+            margin-left: auto;
+        }
+
+        .post-content {
+            font-size: 15px;
+            line-height: 1.5;
+            color: var(--text-color);
+            white-space: pre-wrap; /* Preserves whitespace and line breaks */
+            word-wrap: break-word; /* Breaks long words */
+        }
+
+        .post-actions {
+            display: flex;
+            justify-content: flex-end; /* Align actions to the right */
+            margin-top: 15px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 10px;
+        }
+
+        .post-action-button {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            margin-left: 15px; /* Spacing between buttons */
+            transition: color 0.2s;
+        }
+        .post-action-button:hover {
+            color: var(--primary-color);
+        }
+        .post-action-button svg {
+            margin-right: 5px;
+            fill: currentColor;
+        }
+        .post-action-button.liked svg {
+            fill: #ff4d4d; /* Red for liked */
+        }
+        .post-action-button.liked {
+            color: #ff4d4d;
+        }
+
+        /* Create Post Form */
+        #create-post-form {
+            background-color: var(--card-background);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px var(--shadow-color);
+            margin-bottom: 20px;
+            max-width: 800px;
+            margin: 0 auto 20px auto;
+        }
+
+        #create-post-form textarea {
+            width: calc(100% - 20px);
+            min-height: 100px;
+            padding: 10px;
+            background-color: var(--input-background);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-color);
+            font-size: 16px;
+            resize: vertical;
+            margin-bottom: 15px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        #create-post-form textarea:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0, 255, 0, 0.3);
+            outline: none;
+        }
+
+        .form-action-button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(to right, var(--gradient-start), var(--gradient-end));
+            border: none;
+            border-radius: 6px;
+            color: var(--background-color);
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .form-action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 255, 0, 0.4);
+        }
+
+        /* Profile Section */
+        #profile-section {
+            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        #profile-section h2 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .profile-info {
+            background-color: var(--card-background);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px var(--shadow-color);
+            margin-bottom: 20px;
+        }
+        .profile-info p {
+            margin-bottom: 10px;
+            font-size: 15px;
+        }
+        .profile-info p strong {
+            color: var(--primary-color);
+            margin-right: 5px;
+        }
+
+        .profile-update-form .input-group {
+            margin-bottom: 15px;
+        }
+
+        .profile-update-form button {
+            margin-top: 20px;
+        }
+
+        .logout-button {
+            background-color: var(--error-color);
+            color: var(--text-color);
+            margin-top: 20px;
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .logout-button:hover {
+            background-color: #cc3333;
+        }
+
+        /* AI Chat Section */
+        #ai-chat-section {
+            display: flex;
+            flex-direction: column;
+            padding: 15px;
+            max-width: 800px;
+            margin: 0 auto;
+            flex-grow: 1; /* Allow chat to expand */
+        }
+
+        #chat-messages {
+            flex-grow: 1;
+            background-color: var(--input-background);
+            border-radius: 8px;
+            padding: 15px;
+            overflow-y: auto;
+            margin-bottom: 15px;
             display: flex;
             flex-direction: column;
             gap: 10px;
-            background-color: var(--input-bg);
-            border-radius: 8px;
-            margin-bottom: 15px;
         }
+
         .chat-message {
             max-width: 80%;
             padding: 10px 15px;
@@ -552,268 +549,388 @@
         }
         .chat-message.user {
             background-color: var(--primary-color);
-            color: var(--button-text);
+            color: var(--background-color);
             align-self: flex-end;
-            border-bottom-right-radius: 5px;
+            border-bottom-right-radius: 2px;
         }
         .chat-message.ai {
-            background-color: #444;
-            color: var(--on-surface);
+            background-color: var(--card-background);
+            color: var(--text-color);
             align-self: flex-start;
-            border-bottom-left-radius: 5px;
+            border: 1px solid var(--border-color);
+            border-bottom-left-radius: 2px;
         }
-        #ai-chat-input-container {
+
+        #chat-input-container {
             display: flex;
             gap: 10px;
         }
+
         #ai-chat-input {
             flex-grow: 1;
             padding: 12px;
-            border: 1px solid var(--input-border);
-            border-radius: 20px;
-            background-color: var(--input-bg);
-            color: var(--on-surface);
-            font-size: 1em;
+            background-color: var(--input-background);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-color);
+            font-size: 16px;
+            resize: none;
         }
-        #ai-chat-send-btn {
-            background-color: var(--primary-color);
-            color: var(--button-text);
+        #ai-chat-input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0, 255, 0, 0.3);
+            outline: none;
+        }
+
+        #send-chat-button {
+            background: linear-gradient(to right, var(--gradient-start), var(--gradient-end));
             border: none;
-            border-radius: 50%;
-            width: 45px;
-            height: 45px;
+            border-radius: 6px;
+            color: var(--background-color);
+            padding: 10px 15px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.2s;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 1.2em;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
         }
-        #ai-chat-send-btn:hover {
-            background-color: #A06FEF;
+        #send-chat-button:hover {
+            transform: translateY(-1px);
         }
 
-        /* Responsive Design (Desktop adjustments) */
+        /* Bottom Navigation */
+        footer {
+            background-color: var(--card-background);
+            height: var(--nav-height);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            box-shadow: 0 -2px 10px var(--shadow-color);
+            position: sticky;
+            bottom: 0;
+            width: 100%;
+            z-index: 50;
+        }
+
+        .nav-button {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 12px;
+            cursor: pointer;
+            padding: 5px;
+            width: 25%; /* Divide space equally */
+            transition: color 0.2s, transform 0.2s;
+        }
+        .nav-button:hover {
+            color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+        .nav-button.active {
+            color: var(--primary-color);
+        }
+        .nav-button svg {
+            width: 24px;
+            height: 24px;
+            margin-bottom: 3px;
+            fill: currentColor;
+        }
+
+        /* Utility classes */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Desktop Specific Styles */
         @media (min-width: 768px) {
             body {
-                justify-content: center;
+                flex-direction: row;
             }
-            main {
-                max-width: 800px; /* Limit content width on desktop */
+
+            header {
+                position: relative; /* Not sticky on desktop for simpler layout */
+                width: 250px; /* Sidebar width */
+                height: 100vh;
+                flex-direction: column;
+                justify-content: flex-start;
+                align-items: flex-start;
+                padding-top: 30px;
+                padding-bottom: 30px;
+                box-shadow: 2px 0 10px var(--shadow-color);
+            }
+
+            .header-title {
+                margin-top: 20px;
+                margin-bottom: 40px;
+                font-size: 30px;
+            }
+
+            .app-logo-header {
+                width: 60px;
+                height: 60px;
+                font-size: 30px;
+            }
+
+            footer {
+                display: none; /* No bottom nav on desktop, use sidebar */
+            }
+
+            .content-wrapper {
+                flex-grow: 1;
+                display: flex;
+                flex-direction: column;
+                max-height: 100vh;
+                overflow-y: hidden; /* Main wrapper should not scroll */
+            }
+
+            .section {
+                overflow-y: auto; /* Sections themselves will scroll */
+            }
+
+            .nav-desktop {
+                display: flex; /* Show desktop nav */
+                flex-direction: column;
                 width: 100%;
-                box-shadow: 0 0 20px rgba(0,0,0,0.5); /* Add subtle shadow to whole app */
-                border-radius: 10px;
-                overflow: hidden;
+                margin-top: 20px;
             }
-            header, footer, .app-section {
-                max-width: 100%; /* Occupy full width within main container */
-                border-radius: 0;
+
+            .nav-desktop .nav-button {
+                width: auto;
+                flex-direction: row;
+                justify-content: flex-start;
+                padding: 15px 20px;
+                font-size: 16px;
+                margin-bottom: 10px;
+                border-radius: 8px;
+                transition: background-color 0.2s, color 0.2s;
             }
-            .app-section {
-                padding: 30px;
+            .nav-desktop .nav-button:hover {
+                background-color: var(--input-background);
+                transform: none; /* No vertical transform on desktop hover */
             }
-            .form-container {
+            .nav-desktop .nav-button.active {
+                background-color: var(--primary-color);
+                color: var(--background-color);
+            }
+            .nav-desktop .nav-button.active svg {
+                fill: var(--background-color);
+            }
+            .nav-desktop .nav-button svg {
+                margin-right: 10px;
+                margin-bottom: 0;
+            }
+
+            .content-area {
+                padding-top: 20px; /* Add some top padding as header is now a sidebar */
+            }
+
+            .auth-card {
+                max-width: 500px;
                 padding: 40px;
             }
-            .fab {
-                right: calc(50% - 400px + 20px); /* Position relative to main container */
+            .auth-card h2 {
+                font-size: 32px;
             }
-            /* Adjust chat section for better desktop view */
-            #ai-chat-section {
-                flex-direction: column;
-                height: 100%; /* Take full height for better scroll */
-            }
-            #ai-chat-messages {
-                height: 500px; /* Fixed height for chat history on desktop */
+
+            #create-post-form, #posts-list, #profile-section, #ai-chat-section {
+                padding: 20px;
+                margin: 0 auto;
             }
         }
     </style>
-    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
 </head>
 <body>
-
-    <div id="splash-screen" class="full-screen">
-        <div class="splash-logo">AddMint</div>
-        <div class="splash-tagline">Connect. Share. Explore.</div>
+    <div id="splash-screen">
+        <div class="app-logo-splash">AD</div>
+        <p class="splash-text">AddMint Pro</p>
     </div>
 
-    <div id="preloader" class="full-screen hidden">
+    <div id="preloader">
         <div class="spinner"></div>
-        <p>Loading...</p>
     </div>
 
-    <main>
-        <section id="signup-auth-section" class="app-section flex-center active">
-            <div class="form-container">
-                <h2>Create Account</h2>
-                <p id="signup-status-message" class="message hidden"></p>
-                <div class="input-group">
-                    <label for="signupEmail">Email</label>
-                    <input type="email" id="signupEmail" placeholder="your_email@example.com">
-                </div>
-                <div class="input-group">
-                    <label for="signupPassword">Password</label>
-                    <input type="password" id="signupPassword" placeholder="Minimum 6 characters">
-                    <button type="button" class="password-toggle" onclick="togglePasswordVisibility('signupPassword')"><i class="far fa-eye"></i></button>
-                </div>
-                <div class="input-group">
-                    <label for="signupConfirmPassword">Confirm Password</label>
-                    <input type="password" id="signupConfirmPassword" placeholder="Re-enter password">
-                    <button type="button" class="password-toggle" onclick="togglePasswordVisibility('signupConfirmPassword')"><i class="far fa-eye"></i></button>
-                </div>
-                <button class="primary-btn" id="signupButton">Sign Up</button>
-                <p class="form-link">Already have an account? <a href="#" onclick="showSection('signin-auth-section'); return false;">Sign In</a></p>
+    <section id="signin-auth" class="section auth-container">
+        <div class="auth-card">
+            <h2>Sign In</h2>
+            <div class="input-group">
+                <label for="signinEmail">Email</label>
+                <input type="email" id="signinEmail" placeholder="your@example.com">
             </div>
-        </section>
+            <div class="input-group">
+                <label for="signinPassword">Password</label>
+                <input type="password" id="signinPassword" placeholder="********">
+                <button type="button" class="password-toggle" data-target="signinPassword">👁️</button>
+            </div>
+            <p id="signin-status-message" class="message"></p>
+            <button class="auth-button" id="signin-button">Sign In</button>
+            <a href="#" class="auth-link" id="show-signup">Don't have an account? Sign Up</a>
+            <a href="#" class="auth-link" id="forgot-password">Forgot Password?</a>
+        </div>
+    </section>
 
-        <section id="signin-auth-section" class="app-section flex-center hidden">
-            <div class="form-container">
-                <h2>Welcome Back!</h2>
-                <p id="auth-status-message" class="message hidden"></p>
-                <div class="input-group">
-                    <label for="signinEmail">Email</label>
-                    <input type="email" id="signinEmail" placeholder="your_email@example.com">
-                </div>
-                <div class="input-group">
-                    <label for="signinPassword">Password</label>
-                    <input type="password" id="signinPassword" placeholder="Your password">
-                    <button type="button" class="password-toggle" onclick="togglePasswordVisibility('signinPassword')"><i class="far fa-eye"></i></button>
-                </div>
-                <button class="primary-btn" id="signinButton">Sign In</button>
-                <p class="form-link">Don't have an account? <a href="#" onclick="showSection('signup-auth-section'); return false;">Sign Up</a></p>
-                <p class="form-link"><a href="#" onclick="showSection('reset-password-section'); return false;">Forgot Password?</a></p>
+    <section id="signup-auth" class="section auth-container">
+        <div class="auth-card">
+            <h2>Sign Up</h2>
+            <div class="input-group">
+                <label for="signupEmail">Email</label>
+                <input type="email" id="signupEmail" placeholder="your@example.com">
             </div>
-        </section>
+            <div class="input-group">
+                <label for="signupPassword">Password</label>
+                <input type="password" id="signupPassword" placeholder="********">
+                <button type="button" class="password-toggle" data-target="signupPassword">👁️</button>
+            </div>
+            <div class="input-group">
+                <label for="signupConfirmPassword">Confirm Password</label>
+                <input type="password" id="signupConfirmPassword" placeholder="********">
+                <button type="button" class="password-toggle" data-target="signupConfirmPassword">👁️</button>
+            </div>
+            <p id="signup-status-message" class="message"></p>
+            <button class="auth-button" id="signup-button">Sign Up</button>
+            <a href="#" class="auth-link" id="show-signin">Already have an account? Sign In</a>
+        </div>
+    </section>
 
-        <section id="email-verify-section" class="app-section flex-center hidden">
-            <div class="form-container">
-                <h2>Email Verification</h2>
-                <p id="verify-email-message" class="message success"></p>
-                <button class="primary-btn" id="resendVerifyEmailButton">Resend Verification Email</button>
-                <p class="form-link">Already verified? <a href="#" onclick="showSection('signin-auth-section'); return false;">Sign In</a></p>
-            </div>
-        </section>
+    <section id="email-verify" class="section auth-container">
+        <div class="auth-card">
+            <h2>Verify Your Email</h2>
+            <p id="verify-email-message" class="message"></p>
+            <button class="auth-button" id="resend-verify-email">Resend Verification Email</button>
+            <button class="auth-button" id="reload-user-status">I have verified, sign in again</button>
+            <a href="#" class="auth-link" id="logout-from-verify">Log Out</a>
+        </div>
+    </section>
 
-        <section id="reset-password-section" class="app-section flex-center hidden">
-            <div class="form-container">
-                <h2>Reset Password</h2>
-                <p id="reset-password-message" class="message hidden"></p>
-                <div class="input-group">
-                    <label for="resetEmail">Email</label>
-                    <input type="email" id="resetEmail" placeholder="your_email@example.com">
-                </div>
-                <button class="primary-btn" id="resetPasswordButton">Send Reset Link</button>
-                <p class="form-link">Remembered your password? <a href="#" onclick="showSection('signin-auth-section'); return false;">Sign In</a></p>
+    <section id="forgot-password-section" class="section auth-container">
+        <div class="auth-card">
+            <h2>Reset Password</h2>
+            <div class="input-group">
+                <label for="resetEmail">Email</label>
+                <input type="email" id="resetEmail" placeholder="your@example.com">
             </div>
-        </section>
+            <p id="reset-status-message" class="message"></p>
+            <button class="auth-button" id="send-reset-email">Send Reset Email</button>
+            <a href="#" class="auth-link" id="back-to-signin">Back to Sign In</a>
+        </div>
+    </section>
 
-        <section id="setup-profile-section" class="app-section flex-center hidden">
-            <div class="form-container">
-                <h2>Setup Your Profile</h2>
-                <p id="profile-status-message" class="message hidden"></p>
-                <div class="input-group">
-                    <label for="newUsername">Username</label>
-                    <input type="text" id="newUsername" placeholder="Enter your unique username">
-                </div>
-                <div class="input-group">
-                    <label for="whatsappNumber">WhatsApp Number (Optional)</label>
-                    <input type="number" id="whatsappNumber" placeholder="e.g., +919876543210">
-                </div>
-                <div class="input-group">
-                    <label for="instagramHandle">Instagram Handle (Optional)</label>
-                    <input type="text" id="instagramHandle" placeholder="e.g., @yourhandle">
-                </div>
-                <div class="input-group">
-                    <label for="phoneNumber">Contact Number (Optional)</label>
-                    <input type="number" id="phoneNumber" placeholder="e.g., +919876543210">
-                </div>
-                <button class="primary-btn" id="saveProfileButton">Save Profile</button>
-            </div>
-        </section>
 
-        <header id="main-header" class="hidden">
-            <div class="header-logo">AddMint</div>
-            <div class="header-buttons">
-                <button id="refreshPostsBtn" title="Refresh Feed"><i class="fas fa-sync-alt"></i></button>
-                <button id="adsButton" title="Show Ad (Test)"><i class="fas fa-ad"></i></button>
-                <button id="profileButton" title="Your Profile"><i class="fas fa-user-circle"></i></button>
-                <button id="logoutButton" title="Logout"><i class="fas fa-sign-out-alt"></i></button>
-            </div>
+    <div id="main-app" class="hidden">
+        <header>
+            <div class="app-logo-header">AD</div>
+            <h1 class="header-title">AddMint Pro</h1>
+            <nav class="nav-desktop hidden">
+                <button class="nav-button" data-section="home-feed">
+                    <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8h5z"/></svg>
+                    Home
+                </button>
+                <button class="nav-button" data-section="create-post">
+                    <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                    Create Post
+                </button>
+                <button class="nav-button" data-section="profile-section">
+                    <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                    Profile
+                </button>
+                <button class="nav-button" data-section="ai-chat-section">
+                    <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/></svg>
+                    AI Chat
+                </button>
+            </nav>
         </header>
 
-        <section id="main-feed-section" class="app-section hidden">
-            <div id="post-feed">
-                <div class="message" id="feed-status-message">Loading posts...</div>
-            </div>
-            <div class="fab" id="createPostFab" title="Create New Post">
-                <i class="fas fa-plus"></i>
-            </div>
-        </section>
-
-        <section id="ai-chat-section" class="app-section hidden">
-            <h2>AI Chat</h2>
-            <div id="ai-chat-messages">
-                <div class="chat-message ai">Hello! How can I assist you today?</div>
-            </div>
-            <div id="ai-chat-input-container">
-                <input type="text" id="ai-chat-input" placeholder="Ask me anything...">
-                <button id="ai-chat-send-btn"><i class="fas fa-paper-plane"></i></button>
-            </div>
-        </section>
-
-        <section id="view-profile-section" class="app-section hidden">
-            <h2>Your Profile</h2>
-            <p><strong>Username:</strong> <span id="displayUsername"></span></p>
-            <p><strong>Email:</strong> <span id="displayEmail"></span></p>
-            <p><strong>WhatsApp:</strong> <span id="displayWhatsapp">N/A</span> <button class="social-btn" id="whatsappShareBtn" title="Chat on WhatsApp"><i class="fab fa-whatsapp"></i></button></p>
-            <p><strong>Instagram:</strong> <span id="displayInstagram">N/A</span> <button class="social-btn" id="instagramShareBtn" title="View Instagram Profile"><i class="fab fa-instagram"></i></button></p>
-            <p><strong>Phone:</strong> <span id="displayPhone">N/A</span> <button class="social-btn" id="phoneCallBtn" title="Call User"><i class="fas fa-phone"></i></button></p>
-            <button class="primary-btn" onclick="showSection('setup-profile-section')">Edit Profile</button>
-        </section>
-
-        <div id="newPostModal" class="modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3>Create New Post</h3>
-                    <span class="close-button" onclick="closeModal('newPostModal')">&times;</span>
+        <div class="content-wrapper">
+            <section id="home-feed" class="section active content-area">
+                <h2>Recent Posts</h2>
+                <div id="posts-list">
+                    <p class="message" id="no-posts-message">No posts yet. Be the first to create one!</p>
                 </div>
-                <div class="modal-body">
+            </section>
+
+            <section id="create-post" class="section content-area">
+                <h2>Create New Post</h2>
+                <form id="create-post-form">
                     <div class="input-group">
-                        <label for="postContent">What's on your mind?</label>
-                        <textarea id="postContent" placeholder="Write your post here..."></textarea>
+                        <label for="post-content">What's on your mind?</label>
+                        <textarea id="post-content" placeholder="Type your post here..."></textarea>
                     </div>
-                    <p class="message" id="new-post-status-message"></p>
-                </div>
-                <div class="modal-footer">
-                    <button id="submitPostButton">Post</button>
-                </div>
-            </div>
-        </div>
-    </main>
+                    <p id="create-post-message" class="message"></p>
+                    <button type="submit" class="form-action-button">Post Now</button>
+                </form>
+            </section>
 
-    <footer id="main-footer" class="hidden">
-        <a href="#" class="nav-item active" onclick="showSection('main-feed-section'); return false;">
-            <i class="fas fa-home"></i>
-            <span>Home</span>
-        </a>
-        <a href="#" class="nav-item" onclick="showSection('ai-chat-section'); return false;">
-            <i class="fas fa-robot"></i>
-            <span>AI Chat</span>
-        </a>
-        <a href="#" class="nav-item" onclick="showSection('view-profile-section'); return false;">
-            <i class="fas fa-user"></i>
-            <span>Profile</span>
-        </a>
-    </footer>
+            <section id="profile-section" class="section content-area">
+                <h2>Your Profile</h2>
+                <div class="profile-info">
+                    <p><strong>Email:</strong> <span id="profile-email"></span></p>
+                    <p><strong>User ID:</strong> <span id="profile-uid"></span></p>
+                    <p><strong>Username:</strong> <span id="profile-username-display">Not Set</span></p>
+                    <p><strong>Phone:</strong> <span id="profile-phone-display">Not Set</span></p>
+                    <p><strong>Instagram:</strong> <span id="profile-instagram-display">Not Set</span></p>
+                </div>
+
+                <h3>Update Profile</h3>
+                <form id="update-profile-form" class="profile-update-form">
+                    <div class="input-group">
+                        <label for="updateUsername">Username</label>
+                        <input type="text" id="updateUsername" placeholder="Enter your username">
+                    </div>
+                    <div class="input-group">
+                        <label for="updatePhone">Phone Number (WhatsApp)</label>
+                        <input type="text" id="updatePhone" placeholder="+91XXXXXXXXXX">
+                    </div>
+                    <div class="input-group">
+                        <label for="updateInstagram">Instagram Handle</label>
+                        <input type="text" id="updateInstagram" placeholder="@yourhandle">
+                    </div>
+                    <p id="profile-update-message" class="message"></p>
+                    <button type="submit" class="form-action-button">Update Profile</button>
+                </form>
+
+                <button class="logout-button" id="logout-button">Log Out</button>
+            </section>
+
+            <section id="ai-chat-section" class="section content-area">
+                <h2>AI Chat Assistant</h2>
+                <div id="chat-messages">
+                    <div class="chat-message ai">Hello! How can I assist you today?</div>
+                </div>
+                <div id="chat-input-container">
+                    <textarea id="ai-chat-input" placeholder="Ask me anything..." rows="1"></textarea>
+                    <button id="send-chat-button">
+                        <svg viewBox="0 0 24 24" width="24" height="24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" fill="currentColor"/></svg>
+                    </button>
+                </div>
+                <p id="ai-chat-status" class="message"></p>
+            </section>
+        </div>
+
+        <footer>
+            <button class="nav-button active" data-section="home-feed">
+                <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8h5z"/></svg>
+                Home
+            </button>
+            <button class="nav-button" data-section="create-post">
+                <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                Create
+            </button>
+            <button class="nav-button" data-section="profile-section">
+                <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                Profile
+            </button>
+            <button class="nav-button" data-section="ai-chat-section">
+                <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/></svg>
+                AI Chat
+            </button>
+        </footer>
+    </div>
 
     <script>
-        // Firebase Config (YOUR DETAILS HERE)
+        // --- Firebase Configuration ---
         const firebaseConfig = {
             apiKey: "AIzaSyDlZA4grzF3fx95-11E4s7ASXwkIij1k1w",
             authDomain: "addmint-7ab6b.firebaseapp.com",
@@ -829,105 +946,111 @@
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
-        const storage = firebase.storage(); // Initialize storage
-
-        // AI API Key (YOURS)
-        const AI_API_KEY = "AIzaSyCh6psPdamA8ygJz0qRoEEzMB9Dcd4YI_Q"; // Your Google AI Studio API Key
+        const storage = firebase.storage(); // Still initialize for future image deletions if imageUrl exists
 
         let currentUserId = null;
-        let currentUsername = null;
-        let currentUserProfile = {}; // Store full user profile
+        let currentUsername = "Anonymous";
+        let currentUserPhone = "";
+        let currentUserInstagram = "";
+        let postUnsubscribe = null; // To unsubscribe from Firestore listener
 
-        const SPLASH_SCREEN_DURATION = 2000; // 2 seconds
-        const POST_EXPIRY_HOURS = 12; // Posts expire after 12 hours
+        // Gemini API Key
+        const GEMINI_API_KEY = "AIzaSyCh6psPdamA8ygJz0qRoEEzMB9Dcd4YI_Q";
+        let aiChatHistory = []; // Stores chat history for Gemini API
 
-        // --- UI Utility Functions ---
-        function showPreloader() {
-            document.getElementById('preloader').classList.remove('hidden');
-        }
+        // --- Utility Functions ---
+        function showPreloader() { document.getElementById('preloader').classList.add('visible'); }
+        function hidePreloader() { document.getElementById('preloader').classList.remove('visible'); }
 
-        function hidePreloader() {
-            document.getElementById('preloader').classList.add('hidden');
-        }
-
-        function showSection(sectionId) {
-            const sections = document.querySelectorAll('.app-section');
-            sections.forEach(section => section.classList.add('hidden'));
-            document.getElementById(sectionId).classList.remove('hidden');
-
-            // Handle active class for bottom navigation
-            const navItems = document.querySelectorAll('.nav-item');
-            navItems.forEach(item => item.classList.remove('active'));
-            if (sectionId === 'main-feed-section') {
-                document.querySelector('.nav-item i.fa-home').parentNode.classList.add('active');
-            } else if (sectionId === 'ai-chat-section') {
-                document.querySelector('.nav-item i.fa-robot').parentNode.classList.add('active');
-            } else if (sectionId === 'view-profile-section') {
-                document.querySelector('.nav-item i.fa-user').parentNode.classList.add('active');
-            }
-
-            // Hide/Show header/footer based on section
-            const header = document.getElementById('main-header');
-            const footer = document.getElementById('main-footer');
-            if (['signup-auth-section', 'signin-auth-section', 'email-verify-section', 'reset-password-section', 'setup-profile-section'].includes(sectionId)) {
-                header.classList.add('hidden');
-                footer.classList.add('hidden');
+        function showSection(id) {
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(id).classList.add('active');
+            // Hide main app if not on a main app section
+            if (['signin-auth', 'signup-auth', 'email-verify', 'forgot-password-section'].includes(id)) {
+                document.getElementById('main-app').classList.add('hidden');
             } else {
-                header.classList.remove('hidden');
-                footer.classList.remove('hidden');
+                document.getElementById('main-app').classList.remove('hidden');
+                // Update active nav button
+                document.querySelectorAll('.nav-button').forEach(btn => {
+                    btn.classList.remove('active');
+                    if (btn.dataset.section === id) {
+                        btn.classList.add('active');
+                    }
+                });
             }
         }
 
-        function showMessage(elementId, message, type) {
+        function displayMessage(elementId, message, type = 'info') {
             const element = document.getElementById(elementId);
             element.textContent = message;
             element.className = `message ${type}`;
-            element.classList.remove('hidden');
-            setTimeout(() => {
-                element.classList.add('hidden');
-            }, 5000); // Hide message after 5 seconds
+            setTimeout(() => { element.textContent = ''; element.className = 'message'; }, 5000);
         }
 
-        function togglePasswordVisibility(inputId) {
-            const input = document.getElementById(inputId);
-            const icon = input.nextElementSibling.querySelector('i'); // Assuming icon is direct child of button
+        // Password visibility toggle
+        document.querySelectorAll('.password-toggle').forEach(button => {
+            button.addEventListener('click', () => {
+                const targetId = button.dataset.target;
+                const targetInput = document.getElementById(targetId);
+                if (targetInput.type === 'password') {
+                    targetInput.type = 'text';
+                    button.textContent = '🙈'; // Hide icon
+                } else {
+                    targetInput.type = 'password';
+                    button.textContent = '👁️'; // Show icon
+                }
+            });
+        });
 
-            if (input.type === 'password') {
-                input.type = 'text';
-                icon.classList.remove('fa-eye');
-                icon.classList.add('fa-eye-slash');
-            } else {
-                input.type = 'password';
-                icon.classList.remove('fa-eye-slash');
-                icon.classList.add('fa-eye');
+        // --- Authentication Logic ---
+
+        // Sign In
+        document.getElementById('signin-button').addEventListener('click', async () => {
+            const email = document.getElementById('signinEmail').value;
+            const password = document.getElementById('signinPassword').value;
+            if (!email || !password) {
+                displayMessage('signin-status-message', 'Please fill in all fields.', 'error');
+                return;
             }
-        }
+            showPreloader();
+            try {
+                const userCredential = await auth.signInWithEmailAndPassword(email, password);
+                if (userCredential.user.emailVerified) {
+                    currentUserId = userCredential.user.uid;
+                    await fetchUserProfile(currentUserId);
+                    showMainAppUI();
+                    cleanupOldPosts(); // Call cleanup on successful login
+                } else {
+                    displayMessage('signin-status-message', 'Please verify your email address.', 'error');
+                    showSection('email-verify');
+                    document.getElementById('verify-email-message').textContent = `Your email ${email} is not verified. Please check your inbox (and spam folder) for the verification link. After verifying, please sign in again.`;
+                }
+            } catch (error) {
+                console.error("Sign-in error:", error);
+                displayMessage('signin-status-message', `Error: ${error.message}`, 'error');
+            } finally {
+                hidePreloader();
+            }
+        });
 
-        function openModal(modalId) {
-            document.getElementById(modalId).style.display = 'flex';
-        }
-
-        function closeModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
-        }
-
-        function showMainAppUI() {
-            showSection('main-feed-section');
-            fetchPosts(); // Load posts when main UI is shown
-        }
-
-        // --- Authentication Functions ---
-        document.getElementById('signupButton').addEventListener('click', async () => {
+        // Sign Up
+        document.getElementById('signup-button').addEventListener('click', async () => {
             const email = document.getElementById('signupEmail').value;
             const password = document.getElementById('signupPassword').value;
             const confirmPassword = document.getElementById('signupConfirmPassword').value;
 
+            if (!email || !password || !confirmPassword) {
+                displayMessage('signup-status-message', 'Please fill in all fields.', 'error');
+                return;
+            }
             if (password !== confirmPassword) {
-                showMessage('signup-status-message', 'Passwords do not match.', 'error');
+                displayMessage('signup-status-message', 'Passwords do not match.', 'error');
                 return;
             }
             if (password.length < 6) {
-                showMessage('signup-status-message', 'Password must be at least 6 characters.', 'error');
+                displayMessage('signup-status-message', 'Password should be at least 6 characters.', 'error');
                 return;
             }
 
@@ -935,381 +1058,383 @@
             try {
                 const userCredential = await auth.createUserWithEmailAndPassword(email, password);
                 await userCredential.user.sendEmailVerification();
-                showMessage('signup-status-message', 'Account created! Verification email sent. Please check your inbox.', 'success');
-                showSection('email-verify-section');
-                document.getElementById('verify-email-message').textContent = `A verification link has been sent to ${email}. Please check your inbox (and spam folder). After verifying, please sign in again.`;
+                await db.collection('users').doc(userCredential.user.uid).set({
+                    email: email,
+                    username: `User-${userCredential.user.uid.substring(0, 5)}`, // Default username
+                    phone: '',
+                    instagram: '',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                displayMessage('signup-status-message', 'Sign up successful! Please check your email for verification.', 'success');
+                showSection('email-verify');
+                document.getElementById('verify-email-message').textContent = `A verification email has been sent to ${email}. Please verify your email to continue.`;
             } catch (error) {
-                console.error("Signup error:", error);
-                showMessage('signup-status-message', error.message, 'error');
+                console.error("Sign-up error:", error);
+                displayMessage('signup-status-message', `Error: ${error.message}`, 'error');
             } finally {
                 hidePreloader();
             }
         });
 
-        document.getElementById('signinButton').addEventListener('click', async () => {
-            const email = document.getElementById('signinEmail').value;
-            const password = document.getElementById('signinPassword').value;
-
-            showPreloader();
-            try {
-                const userCredential = await auth.signInWithEmailAndPassword(email, password);
-                if (!userCredential.user.emailVerified) {
-                    showMessage('auth-status-message', 'Please verify your email first. A verification link was sent.', 'error');
-                    showSection('email-verify-section');
-                    document.getElementById('verify-email-message').textContent = `Your email ${email} is not verified. Please check your inbox (and spam folder) for the verification link. After verifying, please sign in again.`;
-                    await auth.signOut(); // Log out unverified user
-                    return;
-                }
-                currentUserId = userCredential.user.uid;
-                // Check if profile is set up
-                const userDoc = await db.collection('users').doc(currentUserId).get();
-                if (!userDoc.exists || !userDoc.data().username) {
-                    showSection('setup-profile-section');
-                    // Pre-fill username if Google Display Name exists
-                    if (userCredential.user.displayName) {
-                        document.getElementById('newUsername').value = userCredential.user.displayName;
-                    }
-                } else {
-                    await fetchUserProfile(currentUserId);
-                    showMainAppUI();
-                    cleanupOldPosts(); // Call cleanup on successful login
-                }
-            } catch (error) {
-                console.error("Signin error:", error);
-                showMessage('auth-status-message', error.message, 'error');
-            } finally {
-                hidePreloader();
-            }
-        });
-
-        document.getElementById('resendVerifyEmailButton').addEventListener('click', async () => {
+        // Email Verification Actions
+        document.getElementById('resend-verify-email').addEventListener('click', async () => {
             const user = auth.currentUser;
             if (user) {
                 showPreloader();
                 try {
                     await user.sendEmailVerification();
-                    showMessage('verify-email-message', 'Verification email resent! Please check your inbox.', 'success');
+                    displayMessage('verify-email-message', 'Verification email resent!', 'success');
                 } catch (error) {
-                    console.error("Resend verification email error:", error);
-                    showMessage('verify-email-message', error.message, 'error');
+                    console.error("Resend verification error:", error);
+                    displayMessage('verify-email-message', `Error: ${error.message}`, 'error');
                 } finally {
                     hidePreloader();
                 }
             }
         });
 
-        document.getElementById('resetPasswordButton').addEventListener('click', async () => {
+        document.getElementById('reload-user-status').addEventListener('click', async () => {
+            const user = auth.currentUser;
+            if (user) {
+                showPreloader();
+                try {
+                    await user.reload(); // Reload user state from Firebase
+                    if (user.emailVerified) {
+                        currentUserId = user.uid;
+                        await fetchUserProfile(currentUserId);
+                        showMainAppUI();
+                        cleanupOldPosts(); // Call cleanup on successful login after verification
+                    } else {
+                        displayMessage('verify-email-message', 'Email is still not verified. Please check your inbox again.', 'error');
+                    }
+                } catch (error) {
+                    console.error("Reload user error:", error);
+                    displayMessage('verify-email-message', `Error: ${error.message}`, 'error');
+                } finally {
+                    hidePreloader();
+                }
+            }
+        });
+
+        document.getElementById('logout-from-verify').addEventListener('click', async () => {
+            showPreloader();
+            try {
+                await auth.signOut();
+                showSection('signin-auth');
+                displayMessage('signin-status-message', 'Logged out successfully.', 'success');
+            } catch (error) {
+                console.error("Logout error:", error);
+                displayMessage('signin-status-message', `Error: ${error.message}`, 'error');
+            } finally {
+                hidePreloader();
+            }
+        });
+
+
+        // Forgot Password
+        document.getElementById('forgot-password').addEventListener('click', (e) => {
+            e.preventDefault();
+            showSection('forgot-password-section');
+        });
+
+        document.getElementById('back-to-signin').addEventListener('click', (e) => {
+            e.preventDefault();
+            showSection('signin-auth');
+        });
+
+        document.getElementById('send-reset-email').addEventListener('click', async () => {
             const email = document.getElementById('resetEmail').value;
             if (!email) {
-                showMessage('reset-password-message', 'Please enter your email.', 'error');
+                displayMessage('reset-status-message', 'Please enter your email.', 'error');
                 return;
             }
             showPreloader();
             try {
                 await auth.sendPasswordResetEmail(email);
-                showMessage('reset-password-message', 'Password reset email sent! Please check your inbox.', 'success');
+                displayMessage('reset-status-message', 'Password reset email sent! Check your inbox.', 'success');
             } catch (error) {
                 console.error("Password reset error:", error);
-                showMessage('reset-password-message', error.message, 'error');
+                displayMessage('reset-status-message', `Error: ${error.message}`, 'error');
             } finally {
                 hidePreloader();
             }
         });
 
-        document.getElementById('logoutButton').addEventListener('click', async () => {
-            showPreloader();
-            try {
-                await auth.signOut();
-                currentUserId = null;
-                currentUsername = null;
-                currentUserProfile = {};
-                showMessage('auth-status-message', 'Logged out successfully!', 'success');
-                showSection('signin-auth-section'); // Go back to sign-in screen
-            } catch (error) {
-                console.error("Logout error:", error);
-                showMessage('auth-status-message', 'Failed to log out.', 'error');
-            } finally {
-                hidePreloader();
+        // Show/Hide Auth Sections
+        document.getElementById('show-signup').addEventListener('click', (e) => { e.preventDefault(); showSection('signup-auth'); });
+        document.getElementById('show-signin').addEventListener('click', (e) => { e.preventDefault(); showSection('signin-auth'); });
+
+        // --- Main App UI Handling ---
+        function showMainAppUI() {
+            showSection('home-feed'); // Default to home feed
+            document.getElementById('main-app').classList.remove('hidden');
+            // Check for desktop view and show desktop nav
+            if (window.innerWidth >= 768) {
+                document.querySelector('.nav-desktop').classList.remove('hidden');
+            } else {
+                document.querySelector('.nav-desktop').classList.add('hidden');
+            }
+        }
+
+        // Handle window resize for desktop nav visibility
+        window.addEventListener('resize', () => {
+            if (document.getElementById('main-app').classList.contains('hidden')) return; // Only apply if main app is visible
+            if (window.innerWidth >= 768) {
+                document.querySelector('.nav-desktop').classList.remove('hidden');
+            } else {
+                document.querySelector('.nav-desktop').classList.add('hidden');
             }
         });
 
-        // --- Profile Management ---
-        document.getElementById('saveProfileButton').addEventListener('click', async () => {
-            const username = document.getElementById('newUsername').value.trim();
-            const whatsapp = document.getElementById('whatsappNumber').value.trim();
-            const instagram = document.getElementById('instagramHandle').value.trim();
-            const phone = document.getElementById('phoneNumber').value.trim();
-
-            if (!username) {
-                showMessage('profile-status-message', 'Username is required!', 'error');
-                return;
-            }
-
-            showPreloader();
-            try {
-                await db.collection('users').doc(currentUserId).set({
-                    username: username,
-                    email: auth.currentUser.email, // Store email for easier lookup
-                    whatsapp: whatsapp,
-                    instagram: instagram,
-                    phone: phone,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                }, { merge: true }); // Use merge to update existing fields or create new
-
-                showMessage('profile-status-message', 'Profile saved successfully!', 'success');
-                await fetchUserProfile(currentUserId); // Refresh profile data
-                showMainAppUI(); // Go to main feed
-            } catch (error) {
-                console.error("Error saving profile:", error);
-                showMessage('profile-status-message', error.message, 'error');
-            } finally {
-                hidePreloader();
-            }
+        // Navigation buttons
+        document.querySelectorAll('.nav-button').forEach(button => {
+            button.addEventListener('click', () => {
+                showSection(button.dataset.section);
+            });
         });
 
+        // --- Post Handling ---
         async function fetchUserProfile(userId) {
             try {
-                const doc = await db.collection('users').doc(userId).get();
-                if (doc.exists) {
-                    currentUserProfile = doc.data();
-                    currentUsername = currentUserProfile.username; // Set global username
-                    document.getElementById('displayUsername').textContent = currentUserProfile.username || 'N/A';
-                    document.getElementById('displayEmail').textContent = auth.currentUser.email || 'N/A';
-                    document.getElementById('displayWhatsapp').textContent = currentUserProfile.whatsapp || 'N/A';
-                    document.getElementById('displayInstagram').textContent = currentUserProfile.instagram || 'N/A';
-                    document.getElementById('displayPhone').textContent = currentUserProfile.phone || 'N/A';
+                const userDoc = await db.collection('users').doc(userId).get();
+                if (userDoc.exists) {
+                    const data = userDoc.data();
+                    currentUsername = data.username || `User-${userId.substring(0, 5)}`;
+                    currentUserPhone = data.phone || '';
+                    currentUserInstagram = data.instagram || '';
 
-                    // Update button visibility based on data
-                    document.getElementById('whatsappShareBtn').style.display = currentUserProfile.whatsapp ? 'inline-block' : 'none';
-                    document.getElementById('instagramShareBtn').style.display = currentUserProfile.instagram ? 'inline-block' : 'none';
-                    document.getElementById('phoneCallBtn').style.display = currentUserProfile.phone ? 'inline-block' : 'none';
+                    // Update profile section fields
+                    document.getElementById('profile-email').textContent = auth.currentUser.email;
+                    document.getElementById('profile-uid').textContent = userId;
+                    document.getElementById('profile-username-display').textContent = currentUsername;
+                    document.getElementById('profile-phone-display').textContent = currentUserPhone || 'Not Set';
+                    document.getElementById('profile-instagram-display').textContent = currentUserInstagram || 'Not Set';
+                    document.getElementById('updateUsername').value = currentUsername;
+                    document.getElementById('updatePhone').value = currentUserPhone;
+                    document.getElementById('updateInstagram').value = currentUserInstagram;
+                } else {
+                    console.warn("User profile not found, creating default.");
+                    await db.collection('users').doc(userId).set({
+                        email: auth.currentUser.email,
+                        username: `User-${userId.substring(0, 5)}`,
+                        phone: '',
+                        instagram: '',
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    currentUsername = `User-${userId.substring(0, 5)}`;
+                    document.getElementById('profile-email').textContent = auth.currentUser.email;
+                    document.getElementById('profile-uid').textContent = userId;
+                    document.getElementById('profile-username-display').textContent = currentUsername;
+                    document.getElementById('profile-phone-display').textContent = 'Not Set';
+                    document.getElementById('profile-instagram-display').textContent = 'Not Set';
+                    document.getElementById('updateUsername').value = currentUsername;
                 }
             } catch (error) {
                 console.error("Error fetching user profile:", error);
             }
         }
 
-        // --- Post Feed Management ---
-        document.getElementById('createPostFab').addEventListener('click', () => {
-            openModal('newPostModal');
-            document.getElementById('postContent').value = ''; // Clear previous content
-            document.getElementById('new-post-status-message').classList.add('hidden'); // Clear status
-        });
+        function renderPosts(posts) {
+            const postsList = document.getElementById('posts-list');
+            postsList.innerHTML = ''; // Clear existing posts
+            if (posts.length === 0) {
+                document.getElementById('no-posts-message').style.display = 'block';
+                return;
+            }
+            document.getElementById('no-posts-message').style.display = 'none';
 
-        document.getElementById('submitPostButton').addEventListener('click', async () => {
-            const postContent = document.getElementById('postContent').value.trim();
-            if (!postContent) {
-                showMessage('new-post-status-message', 'Post content cannot be empty!', 'error');
+            posts.forEach(post => {
+                const postCard = document.createElement('div');
+                postCard.className = 'post-card';
+                postCard.dataset.postId = post.id; // Store post ID
+
+                const timestamp = post.timestamp ? post.timestamp.toDate() : new Date(); // Convert Firestore Timestamp to Date
+                const timeString = timestamp.toLocaleString(); // Format date and time
+
+                const likesCount = post.likes ? post.likes.length : 0;
+                const isLiked = post.likes && post.likes.includes(currentUserId);
+
+                const firstChar = post.username ? post.username.charAt(0).toUpperCase() : 'U';
+
+                postCard.innerHTML = `
+                    <div class="post-header">
+                        <div class="post-avatar">${firstChar}</div>
+                        <span class="post-username">${post.username || 'Anonymous'}</span>
+                        <span class="post-time">${timeString}</span>
+                    </div>
+                    <p class="post-content">${post.content}</p>
+                    <div class="post-actions">
+                        <button class="post-action-button like-button ${isLiked ? 'liked' : ''}" data-post-id="${post.id}">
+                            <svg viewBox="0 0 24 24" width="20" height="20">
+                                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                            </svg>
+                            <span class="likes-count">${likesCount}</span>
+                        </button>
+                        <button class="post-action-button" onclick="window.AppInventor.setWebViewString('SHOW_AD:post_share')">
+                            <svg viewBox="0 0 24 24" width="20" height="20"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.52.48 1.2.77 1.96.77 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L7.05 10.02a3.001 3.001 0 1 0 0 4.04l7.05 4.11c-.05.23-.09.46-.09.7 0 1.66 1.34 3 3 3s3-1.34 3-3-1.34-3-3-3z"/></svg>
+                            Share
+                        </button>
+                        ${post.userId === currentUserId ? `
+                            <button class="post-action-button delete-button" data-post-id="${post.id}">
+                                <svg viewBox="0 0 24 24" width="20" height="20"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                                Delete
+                            </button>
+                        ` : ''}
+                    </div>
+                `;
+                postsList.appendChild(postCard);
+            });
+
+            // Attach event listeners after rendering
+            document.querySelectorAll('.like-button').forEach(button => {
+                button.addEventListener('click', (e) => toggleLike(e.currentTarget.dataset.postId));
+            });
+            document.querySelectorAll('.delete-button').forEach(button => {
+                button.addEventListener('click', (e) => deletePost(e.currentTarget.dataset.postId));
+            });
+        }
+
+
+        async function fetchPosts() {
+            if (postUnsubscribe) {
+                postUnsubscribe(); // Unsubscribe from previous listener if any
+            }
+            if (!currentUserId) {
+                console.log("Not logged in, cannot fetch posts.");
                 return;
             }
 
-            if (!currentUserId || !currentUsername) {
-                showMessage('new-post-status-message', 'Please log in to post.', 'error');
+            // Get current time to filter out expired posts
+            const now = Date.now();
+
+            // Set up a real-time listener for posts
+            postUnsubscribe = db.collection('posts')
+                .orderBy('timestamp', 'desc') // Order by latest first
+                .onSnapshot(snapshot => {
+                    const posts = [];
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+                        // Client-side filter for posts where expiryTime is within 12 hours from creation
+                        // Or if expiryTime is in the future
+                        const expiryTimeMs = data.expiryTime; // Already in milliseconds from server
+                        if (!expiryTimeMs || expiryTimeMs > now) {
+                            posts.push({ id: doc.id, ...data });
+                        }
+                    });
+                    renderPosts(posts);
+                }, error => {
+                    console.error("Error fetching posts: ", error);
+                    displayMessage('no-posts-message', 'Failed to load posts.', 'error');
+                });
+        }
+
+        // Post creation
+        document.getElementById('create-post-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const postContent = document.getElementById('post-content').value.trim();
+
+            if (!postContent) {
+                displayMessage('create-post-message', 'Post content cannot be empty.', 'error');
+                return;
+            }
+            if (!currentUserId) {
+                displayMessage('create-post-message', 'You must be logged in to create a post.', 'error');
                 return;
             }
 
             showPreloader();
             try {
-                const now = Date.now();
-                const expiryTime = now + (POST_EXPIRY_HOURS * 60 * 60 * 1000); // 12 hours from now
+                // Calculate expiry time (12 hours from now)
+                const expiryTime = Date.now() + (12 * 60 * 60 * 1000); // 12 hours in milliseconds
 
                 await db.collection('posts').add({
                     userId: currentUserId,
-                    username: currentUsername, // Store username for display
+                    username: currentUsername,
                     content: postContent,
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp(), // Firestore server timestamp
-                    expiryTime: expiryTime, // Milliseconds timestamp for client-side check
-                    likes: 0,
-                    likedBy: [] // Array to store UIDs of users who liked
-                    // imageUrl: 'URL_TO_IMAGE_IF_UPLOADED' // Add this when image upload is enabled
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    likes: [],
+                    expiryTime: expiryTime // Store expiry time as a timestamp in milliseconds
                 });
-                showMessage('new-post-status-message', 'Post created successfully!', 'success');
-                closeModal('newPostModal');
-                fetchPosts(); // Refresh posts after new post
+                document.getElementById('post-content').value = '';
+                displayMessage('create-post-message', 'Post created successfully!', 'success');
+                // No need to call fetchPosts, onSnapshot will update automatically
             } catch (error) {
                 console.error("Error creating post:", error);
-                showMessage('new-post-status-message', error.message, 'error');
+                displayMessage('create-post-message', `Error creating post: ${error.message}`, 'error');
             } finally {
                 hidePreloader();
             }
         });
 
-        async function fetchPosts() {
-            const postFeed = document.getElementById('post-feed');
-            postFeed.innerHTML = '<div class="message" id="feed-status-message">Loading posts...</div>';
-            
+        // Like/Unlike Post
+        async function toggleLike(postId) {
             if (!currentUserId) {
-                postFeed.innerHTML = '<div class="message error">Please log in to view posts.</div>';
+                displayMessage('signin-status-message', 'Please sign in to like posts.', 'error');
+                showSection('signin-auth');
                 return;
             }
-
-            try {
-                const now = Date.now(); // Client-side check for display
-                const snapshot = await db.collection('posts')
-                                         .orderBy('timestamp', 'desc') // Latest posts first
-                                         .get();
-                postFeed.innerHTML = ''; // Clear loading message
-
-                if (snapshot.empty) {
-                    postFeed.innerHTML = '<div class="message">No posts yet. Be the first to post!</div>';
-                    return;
-                }
-
-                snapshot.forEach(doc => {
-                    const post = doc.data();
-                    const postId = doc.id;
-                    
-                    // Client-side check based on expiryTime
-                    if (post.expiryTime && post.expiryTime < now) {
-                        // This post is expired. It should not be displayed.
-                        // Firebase Security Rules should already prevent reading this,
-                        // but this is an extra layer.
-                        console.log(`Skipping expired post: ${postId}`);
-                        return;
-                    }
-
-                    const postElement = document.createElement('div');
-                    postElement.classList.add('post-card');
-                    postElement.setAttribute('data-post-id', postId);
-
-                    const isLiked = post.likedBy && post.likedBy.includes(currentUserId);
-                    const likeButtonClass = isLiked ? 'liked' : '';
-                    const likeIconClass = isLiked ? 'fas' : 'far'; // Solid for liked, regular for not
-
-                    const postTimestamp = post.timestamp ? new Date(post.timestamp.toDate()).toLocaleString() : 'Just now';
-
-                    postElement.innerHTML = `
-                        <div class="post-header">
-                            <div class="post-avatar">${post.username ? post.username[0].toUpperCase() : 'U'}</div>
-                            <span class="post-username">${post.username || 'Anonymous'}</span>
-                            <span class="post-timestamp">${postTimestamp}</span>
-                        </div>
-                        ${post.imageUrl ? `<img src="${post.imageUrl}" alt="Post Image" class="post-image">` : ''}
-                        <div class="post-content">
-                            <p>${escapeHTML(post.content)}</p>
-                        </div>
-                        <div class="post-actions">
-                            <button class="like-button ${likeButtonClass}" data-post-id="${postId}">
-                                <i class="${likeIconClass} fa-heart"></i>
-                                <span>${post.likes || 0}</span>
-                            </button>
-                            <button class="share-button" data-content="${escapeHTML(post.content)}" data-post-id="${postId}">
-                                <i class="fas fa-share-alt"></i>
-                                <span>Share</span>
-                            </button>
-                            ${post.userId === currentUserId ? `<button class="delete-button" data-post-id="${postId}"><i class="fas fa-trash-alt"></i><span>Delete</span></button>` : ''}
-                        </div>
-                    `;
-                    postFeed.appendChild(postElement);
-                });
-
-                // Add event listeners for new buttons
-                document.querySelectorAll('.like-button').forEach(button => {
-                    button.addEventListener('click', handleLike);
-                });
-                document.querySelectorAll('.share-button').forEach(button => {
-                    button.addEventListener('click', handleShare);
-                });
-                document.querySelectorAll('.delete-button').forEach(button => {
-                    button.addEventListener('click', handleDeletePost);
-                });
-
-            } catch (error) {
-                console.error("Error fetching posts:", error);
-                postFeed.innerHTML = `<div class="message error">Error loading posts: ${error.message}</div>`;
-            }
-        }
-
-        async function handleLike(event) {
-            const button = event.currentTarget;
-            const postId = button.dataset.postId;
             const postRef = db.collection('posts').doc(postId);
-
             try {
                 await db.runTransaction(async (transaction) => {
-                    const doc = await transaction.get(postRef);
-                    if (!doc.exists) {
-                        throw "Document does not exist!";
+                    const postDoc = await transaction.get(postRef);
+                    if (!postDoc.exists) {
+                        throw "Post does not exist!";
                     }
-
-                    let likes = doc.data().likes || 0;
-                    let likedBy = doc.data().likedBy || [];
-                    const isLiked = likedBy.includes(currentUserId);
-
-                    if (isLiked) {
-                        // Unlike post
-                        likes--;
-                        likedBy = likedBy.filter(uid => uid !== currentUserId);
+                    const currentLikes = postDoc.data().likes || [];
+                    if (currentLikes.includes(currentUserId)) {
+                        // User already liked, so unlike
+                        transaction.update(postRef, {
+                            likes: firebase.firestore.FieldValue.arrayRemove(currentUserId)
+                        });
                     } else {
-                        // Like post
-                        likes++;
-                        likedBy.push(currentUserId);
-                    }
-
-                    transaction.update(postRef, { likes: likes, likedBy: likedBy });
-                    
-                    // Update UI immediately (optimistic update)
-                    button.querySelector('span').textContent = likes;
-                    if (isLiked) {
-                        button.classList.remove('liked');
-                        button.querySelector('i').classList.replace('fas', 'far');
-                    } else {
-                        button.classList.add('liked');
-                        button.querySelector('i').classList.replace('far', 'fas');
+                        // User hasn't liked, so like
+                        transaction.update(postRef, {
+                            likes: firebase.firestore.FieldValue.arrayUnion(currentUserId)
+                        });
                     }
                 });
+                console.log("Like toggled successfully.");
             } catch (error) {
-                console.error("Error liking post:", error);
-                alert("Failed to update like: " + error.message);
-                // Re-fetch posts to revert UI if transaction failed
-                fetchPosts();
+                console.error("Error toggling like:", error);
             }
         }
 
-        async function handleShare(event) {
-            const button = event.currentTarget;
-            const postId = button.dataset.postId;
-            const postContent = button.dataset.content;
-            
-            // This is where we call App Inventor to use its sharing capabilities
-            // The string format should be consistent with what you expect in App Inventor
-            const shareString = `SHARE_POST:${postId}|${postContent.substring(0, 100)}... (Read more on AddMint!)`;
-            window.AppInventor.setWebViewString(shareString);
-            alert("Share options opened via App!"); // User feedback
-        }
-
-        async function handleDeletePost(event) {
+        // Delete Post
+        async function deletePost(postId) {
+            if (!currentUserId) {
+                displayMessage('signin-status-message', 'Please sign in to delete posts.', 'error');
+                showSection('signin-auth');
+                return;
+            }
             if (!confirm('Are you sure you want to delete this post?')) {
                 return;
             }
-            const button = event.currentTarget;
-            const postId = button.dataset.postId;
-            
+
             showPreloader();
             try {
-                // First, get the post to check for image URL
-                const postDoc = await db.collection('posts').doc(postId).get();
-                if (postDoc.exists && postDoc.data().imageUrl) {
-                    const imageUrl = postDoc.data().imageUrl;
-                    const imageRef = storage.refFromURL(imageUrl);
-                    await imageRef.delete();
-                    console.log("Image deleted from storage.");
+                const postRef = db.collection('posts').doc(postId);
+                const postDoc = await postRef.get();
+                if (postDoc.exists && postDoc.data().userId === currentUserId) {
+                    const postData = postDoc.data();
+                    // Delete image from storage if imageUrl exists (future proofing)
+                    if (postData.imageUrl && postData.imageUrl.includes('firebasestorage.googleapis.com')) {
+                        const imageRef = storage.refFromURL(postData.imageUrl);
+                        await imageRef.delete().catch(err => console.error("Error deleting image from storage:", err));
+                    }
+                    await postRef.delete();
+                    displayMessage('no-posts-message', 'Post deleted successfully.', 'success');
+                } else {
+                    displayMessage('no-posts-message', 'You can only delete your own posts.', 'error');
                 }
-
-                await db.collection('posts').doc(postId).delete();
-                showMessage('feed-status-message', 'Post deleted successfully!', 'success');
-                fetchPosts(); // Refresh posts
             } catch (error) {
                 console.error("Error deleting post:", error);
-                showMessage('feed-status-message', 'Failed to delete post: ' + error.message, 'error');
+                displayMessage('no-posts-message', `Error deleting post: ${error.message}`, 'error');
             } finally {
                 hidePreloader();
             }
         }
 
-        document.getElementById('refreshPostsBtn').addEventListener('click', fetchPosts);
-
-        // --- Post Cleanup Function (from previous discussion) ---
+        // Client-side cleanup for old posts (without Node.js)
         async function cleanupOldPosts() {
             if (!currentUserId) {
                 console.log("Not logged in, skipping cleanup.");
@@ -1321,9 +1446,10 @@
             let cleanedUpCount = 0;
 
             try {
+                // Fetch up to 50 posts that *might* be expired
                 const snapshot = await db.collection('posts')
                                          .where('expiryTime', '<', now)
-                                         .limit(50) // Limit to 50 for a batch cleanup
+                                         .limit(50) // Limit the number of posts to check at once
                                          .get();
 
                 if (snapshot.empty) {
@@ -1332,7 +1458,7 @@
                 }
 
                 const batch = db.batch();
-                const deleteImagePromises = [];
+                const deletePromises = [];
 
                 snapshot.forEach(doc => {
                     const postData = doc.data();
@@ -1343,23 +1469,19 @@
                         batch.delete(db.collection('posts').doc(postId));
                         cleanedUpCount++;
 
-                        // Schedule image deletion if imageUrl exists
+                        // Also delete image from storage if exists (even if storage not upgraded yet, for future)
                         if (postData.imageUrl && postData.imageUrl.includes('firebasestorage.googleapis.com')) {
-                            try {
-                                const imageRef = storage.refFromURL(postData.imageUrl);
-                                deleteImagePromises.push(imageRef.delete().catch(err => console.warn("Could not delete old post image:", err)));
-                            } catch (e) {
-                                console.warn("Invalid image URL for deletion:", postData.imageUrl, e);
-                            }
+                            const imageRef = storage.refFromURL(postData.imageUrl);
+                            deletePromises.push(imageRef.delete().catch(err => console.warn("Error deleting old post image (may not exist or storage not enabled):", err)));
                         }
                     }
                 });
 
                 if (cleanedUpCount > 0) {
                     await batch.commit();
-                    await Promise.all(deleteImagePromises); // Wait for all image deletions
+                    await Promise.all(deletePromises);
                     console.log(`Cleaned up ${cleanedUpCount} expired posts.`);
-                    fetchPosts(); // Refresh UI after cleanup
+                    // No need to call fetchPosts explicitly, onSnapshot will handle UI update
                 } else {
                     console.log("No actually expired posts found in this batch after checking.");
                 }
@@ -1370,180 +1492,213 @@
         }
 
 
-        // --- AI Chat Functionality ---
-        const aiChatInput = document.getElementById('ai-chat-input');
-        const aiChatSendBtn = document.getElementById('ai-chat-send-btn');
-        const aiChatMessages = document.getElementById('ai-chat-messages');
+        // --- Profile Update ---
+        document.getElementById('update-profile-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!currentUserId) {
+                displayMessage('profile-update-message', 'Please log in to update your profile.', 'error');
+                return;
+            }
 
-        aiChatSendBtn.addEventListener('click', sendAIChatMessage);
-        aiChatInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                sendAIChatMessage();
+            const newUsername = document.getElementById('updateUsername').value.trim();
+            const newPhone = document.getElementById('updatePhone').value.trim();
+            const newInstagram = document.getElementById('updateInstagram').value.trim();
+
+            showPreloader();
+            try {
+                await db.collection('users').doc(currentUserId).update({
+                    username: newUsername || `User-${currentUserId.substring(0, 5)}`,
+                    phone: newPhone,
+                    instagram: newInstagram,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                displayMessage('profile-update-message', 'Profile updated successfully!', 'success');
+                // Update local variables and UI
+                await fetchUserProfile(currentUserId);
+            } catch (error) {
+                console.error("Error updating profile:", error);
+                displayMessage('profile-update-message', `Error updating profile: ${error.message}`, 'error');
+            } finally {
+                hidePreloader();
             }
         });
 
-        async function sendAIChatMessage() {
-            const userMessage = aiChatInput.value.trim();
-            if (!userMessage) return;
-
-            appendMessage(userMessage, 'user');
-            aiChatInput.value = '';
-            aiChatInput.disabled = true;
-            aiChatSendBtn.disabled = true;
-
+        // --- Logout ---
+        document.getElementById('logout-button').addEventListener('click', async () => {
+            showPreloader();
             try {
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${AI_API_KEY}`, {
+                await auth.signOut();
+                // Clear UI, show sign-in screen
+                currentUserId = null;
+                currentUsername = "Anonymous";
+                currentUserPhone = "";
+                currentUserInstagram = "";
+                if (postUnsubscribe) {
+                    postUnsubscribe(); // Stop listening to posts
+                    postUnsubscribe = null;
+                }
+                showSection('signin-auth');
+                document.getElementById('main-app').classList.add('hidden'); // Hide main app
+                displayMessage('signin-status-message', 'Logged out successfully!', 'success');
+            } catch (error) {
+                console.error("Logout error:", error);
+                displayMessage('signin-status-message', `Error logging out: ${error.message}`, 'error');
+            } finally {
+                hidePreloader();
+            }
+        });
+
+        // --- AI Chat Logic (Gemini API) ---
+        async function getGeminiResponse(message) {
+            displayMessage('ai-chat-status', 'AI is typing...', 'info');
+            try {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        contents: [{
-                            parts: [{ text: userMessage }]
-                        }]
+                        contents: aiChatHistory.map(item => ({
+                            role: item.role,
+                            parts: [{ text: item.text }]
+                        })).concat([{ role: 'user', parts: [{ text: message }] }]), // Add current message
                     })
                 });
 
                 if (!response.ok) {
                     const errorData = await response.json();
-                    throw new Error(`AI API error: ${response.status} - ${errorData.error.message}`);
+                    throw new Error(`Gemini API error: ${response.status} - ${errorData.error.message || 'Unknown error'}`);
                 }
 
                 const data = await response.json();
-                const aiResponse = data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0] ? data.candidates[0].content.parts[0].text : 'No response from AI.';
-                appendMessage(aiResponse, 'ai');
+                const aiText = data.candidates[0].content.parts[0].text;
+                displayMessage('ai-chat-status', ''); // Clear status
+                return aiText;
             } catch (error) {
-                console.error("Error fetching AI response:", error);
-                appendMessage("Sorry, I couldn't get a response. Please try again later.", 'ai');
+                console.error("Gemini API call failed:", error);
+                displayMessage('ai-chat-status', `AI Error: ${error.message}. Try again later.`, 'error');
+                return "Sorry, I'm having trouble connecting to the AI. Please try again later.";
+            }
+        }
+
+        async function sendChatMessage() {
+            const chatInput = document.getElementById('ai-chat-input');
+            const message = chatInput.value.trim();
+            if (!message) return;
+
+            addChatMessage('user', message);
+            chatInput.value = '';
+            chatInput.style.height = 'auto'; // Reset textarea height
+
+            aiChatHistory.push({ role: 'user', text: message }); // Add user message to history
+
+            showPreloader();
+            try {
+                const aiResponse = await getGeminiResponse(message);
+                addChatMessage('ai', aiResponse);
+                aiChatHistory.push({ role: 'model', text: aiResponse }); // Add AI response to history
             } finally {
-                aiChatInput.disabled = false;
-                aiChatSendBtn.disabled = false;
-                aiChatMessages.scrollTop = aiChatMessages.scrollHeight; // Scroll to bottom
-                aiChatInput.focus();
+                hidePreloader();
+                // Scroll to bottom after AI response
+                const chatMessagesDiv = document.getElementById('chat-messages');
+                chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
             }
         }
 
-        function appendMessage(message, sender) {
-            const msgDiv = document.createElement('div');
-            msgDiv.classList.add('chat-message', sender);
-            msgDiv.textContent = message;
-            aiChatMessages.appendChild(msgDiv);
-            aiChatMessages.scrollTop = aiChatMessages.scrollHeight;
+        function addChatMessage(role, text) {
+            const chatMessagesDiv = document.getElementById('chat-messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-message ${role}`;
+            messageDiv.textContent = text;
+            chatMessagesDiv.appendChild(messageDiv);
+            chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight; // Scroll to bottom
         }
 
-        // --- App Inventor Communication ---
-        // Functions to be called by App Inventor (e.g., after ad completion)
-        window.adRequested = function(status) {
-            console.log("Ad requested status from App Inventor:", status);
-            // You can add logic here if needed, e.g., show a message to the user
-            // based on ad readiness.
-        };
-
-        window.adRequestedForExpiry = function(status) {
-            console.log("Ad requested for expiry from App Inventor:", status);
-        };
-
-        // Example: If a rewarded ad completes successfully, App Inventor could call this:
-        window.adCompletedSuccessfully = function(rewardType, rewardAmount) {
-            console.log(`Ad completed! Rewarded ${rewardAmount} ${rewardType}.`);
-            // Here, you could update a user's balance in Firestore, e.g.:
-            /*
-            if (currentUserId) {
-                db.collection('users').doc(currentUserId).update({
-                    coins: firebase.firestore.FieldValue.increment(parseInt(rewardAmount))
-                }).then(() => {
-                    alert(`You received ${rewardAmount} coins!`);
-                    fetchUserProfile(currentUserId); // Update UI
-                }).catch(err => console.error("Error updating user coins:", err));
-            }
-            */
-        };
-
-        // --- Social/Contact Sharing ---
-        document.getElementById('whatsappShareBtn').addEventListener('click', () => {
-            const number = currentUserProfile.whatsapp;
-            if (number) {
-                window.AppInventor.setWebViewString(`CONTACT:WHATSAPP:${number}`);
-            } else {
-                alert('WhatsApp number not available.');
+        document.getElementById('send-chat-button').addEventListener('click', sendChatMessage);
+        document.getElementById('ai-chat-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault(); // Prevent new line
+                sendChatMessage();
             }
         });
-
-        document.getElementById('instagramShareBtn').addEventListener('click', () => {
-            const handle = currentUserProfile.instagram;
-            if (handle) {
-                window.AppInventor.setWebViewString(`CONTACT:INSTAGRAM:${handle}`);
-            } else {
-                alert('Instagram handle not available.');
-            }
+        // Auto-resize textarea
+        document.getElementById('ai-chat-input').addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
         });
-
-        document.getElementById('phoneCallBtn').addEventListener('click', () => {
-            const number = currentUserProfile.phone;
-            if (number) {
-                window.AppInventor.setWebViewString(`CONTACT:PHONE:${number}`);
-            } else {
-                alert('Phone number not available.');
-            }
-        });
-        
-        // --- Ad Button (for testing Unity Ads via WebViewer String) ---
-        document.getElementById('adsButton').addEventListener('click', () => {
-            // This will tell App Inventor to show a rewarded ad.
-            // You can customize the 'coins' part to send different data.
-            window.AppInventor.setWebViewString('SHOW_AD:coins');
-            // This will trigger the UnityAds logic in App Inventor.
-        });
-
-        // --- Helpers ---
-        function escapeHTML(str) {
-            var div = document.createElement('div');
-            div.appendChild(document.createTextNode(str));
-            return div.innerHTML;
-        }
 
         // --- Initial Load & Auth State Handling ---
         document.addEventListener('DOMContentLoaded', () => {
-            // Initial splash screen animation
-            const splashScreen = document.getElementById('splash-screen');
+            // Hide splash screen after 2 seconds
             setTimeout(() => {
-                splashScreen.classList.add('fade-out');
-                splashScreen.addEventListener('transitionend', () => {
-                    splashScreen.classList.add('hidden');
-                    showPreloader(); // Show preloader after splash
-                }, { once: true });
-            }, SPLASH_SCREEN_DURATION);
+                document.getElementById('splash-screen').classList.add('hidden');
+                // Add a small delay for transition to finish before making preloader visible
+                setTimeout(() => {
+                     // Check auth state immediately after splash
+                     auth.onAuthStateChanged(async (user) => {
+                        hidePreloader(); // Hide preloader once user state is determined
 
-            // Firebase Auth State Listener
-            auth.onAuthStateChanged(async (user) => {
-                // hidePreloader will be called later, after profile check or initial signin screen
-                if (user) {
-                    currentUserId = user.uid;
-                    if (user.emailVerified) {
-                        const userDoc = await db.collection('users').doc(currentUserId).get();
-                        if (!userDoc.exists || !userDoc.data().username) {
-                            hidePreloader();
-                            showSection('setup-profile-section');
-                            if (user.displayName) {
-                                document.getElementById('newUsername').value = user.displayName;
+                        if (user) {
+                            currentUserId = user.uid;
+                            if (user.emailVerified) {
+                                await fetchUserProfile(currentUserId);
+                                showMainAppUI();
+                                cleanupOldPosts(); // Call cleanup when user logs in/app starts
+                                fetchPosts(); // Start fetching posts
+                            } else {
+                                showSection('email-verify');
+                                document.getElementById('verify-email-message').textContent = `Your email ${user.email} is not verified. Please check your inbox (and spam folder) for the verification link. After verifying, please sign in again.`;
                             }
                         } else {
-                            await fetchUserProfile(currentUserId);
-                            hidePreloader();
-                            showMainAppUI();
-                            cleanupOldPosts(); // Call cleanup when user logs in/app starts
+                            showSection('signin-auth');
                         }
-                    } else {
-                        hidePreloader();
-                        showSection('email-verify-section');
-                        document.getElementById('verify-email-message').textContent = `Your email ${user.email} is not verified. Please check your inbox (and spam folder) for the verification link. After verifying, please sign in again.`;
-                    }
-                } else {
-                    hidePreloader();
-                    showSection('signin-auth-section'); // Default to sign-in
-                }
-            });
+                    });
+                }, 500); // Allow 0.5s for splash screen to fade out
+            }, 2000); // Splash screen visible for 2 seconds
         });
+
+        // App Inventor specific functions (called from App Inventor blocks)
+        // These functions use window.AppInventor.setWebViewString to communicate with AI2
+        // They are placeholders; real implementation will be in AI2 blocks.
+
+        window.adRequested = function(status) {
+            console.log("Ad requested status from AI2:", status);
+            // This function would be called by App Inventor after an ad request
+            // You might add some client-side logic here based on status (e.g., enable/disable buttons)
+        };
+
+        window.adRequestedForExpiry = function(status) {
+            console.log("Ad requested for expiry status from AI2:", status);
+        };
+
+        window.updateCoins = function() {
+            console.log("Coins updated!");
+            // Update UI to show new coins, or show a message
+            displayMessage('main-app-status', '100 coins added!', 'success'); // Example
+        };
+
+        window.updateCredits = function() {
+            console.log("Credits updated!");
+            // Update UI to show new credits
+            displayMessage('main-app-status', '10 credits added!', 'success'); // Example
+        };
+
+        // Global status message for main app
+        // Add a div with id="main-app-status" in your main app UI to display these messages
+        // Example: <p id="main-app-status" class="message"></p>
+        // You can place it inside the content-area for general alerts.
+        // For now, I'll just log it.
+        function displayMainAppMessage(message, type = 'info') {
+            const statusDiv = document.getElementById('main-app-status');
+            if (statusDiv) {
+                statusDiv.textContent = message;
+                statusDiv.className = `message ${type}`;
+                setTimeout(() => { statusDiv.textContent = ''; statusDiv.className = 'message'; }, 5000);
+            } else {
+                console.log(`App Status (${type}): ${message}`);
+            }
+        }
+
     </script>
 </body>
 </html>
