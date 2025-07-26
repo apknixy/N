@@ -196,7 +196,7 @@
             animation: fadeInText 1s 1s forwards;
         }
 
-        /* Header */
+        /* Header (fixed at top) */
         header {
             background-color: var(--dark-fg);
             padding: 15px 20px;
@@ -205,8 +205,10 @@
             align-items: center;
             border-bottom: 1px solid var(--border-color);
             box-shadow: 0 3px 20px var(--shadow-color);
-            position: sticky;
+            position: fixed; /* Changed to fixed */
             top: 0;
+            left: 0;
+            right: 0;
             z-index: 99;
             animation: slideDown 0.5s ease-out;
         }
@@ -269,10 +271,10 @@
             filter: drop-shadow(0 0 5px rgba(255, 204, 0, 0.8));
         }
 
-        /* Main Content */
+        /* Main Content (with padding for header and footer) */
         main {
             flex-grow: 1;
-            padding: 20px;
+            padding: 80px 20px 80px 20px; /* Added padding for fixed header and footer */
             display: flex;
             flex-direction: column;
             gap: 30px;
@@ -453,7 +455,7 @@
             font-size: 1.5rem;
         }
 
-        /* Bottom Navigation */
+        /* Bottom Navigation (fixed at bottom) */
         footer {
             background-color: var(--dark-fg);
             padding: 15px 0;
@@ -461,8 +463,10 @@
             justify-content: space-around;
             border-top: 1px solid var(--border-color);
             box-shadow: 0 -3px 20px var(--shadow-color);
-            position: sticky;
+            position: fixed; /* Changed to fixed */
             bottom: 0;
+            left: 0;
+            right: 0;
             width: 100%;
             z-index: 99;
             animation: slideUp 0.5s ease-out;
@@ -488,13 +492,24 @@
             transition: transform 0.2s ease;
         }
         .nav-item:hover .icon { transform: scale(1.1); }
+        .nav-item .icon.create-plus {
+            font-size: 2.2rem;
+            transform: scale(1.2);
+            position: relative;
+            z-index: 1;
+            background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 10px rgba(0, 170, 255, 0.8), 0 0 20px rgba(255, 204, 0, 0.6);
+            animation: pulse 1.5s infinite;
+        }
 
         /* Desktop Adjustments */
         @media (min-width: 768px) {
             body { font-size: 17px; }
             .container { padding: 40px; max-width: 600px; }
             header { padding: 20px 40px; }
-            main { padding: 30px 40px; max-width: 1400px; }
+            main { padding: 90px 40px 90px 40px; max-width: 1400px; }
             footer { padding: 15px 40px; }
             .post-card.horizontal { grid-column: span 2; }
             .post-card.square { max-width: 350px; justify-self: center; }
@@ -751,7 +766,7 @@
                 <span>Home</span>
             </div>
             <div class="nav-item" data-section="create-post-section">
-                <span class="icon">&#x2795;</span>
+                <span class="icon create-plus">&#x2795;</span>
                 <span>Create</span>
             </div>
             <div class="nav-item" data-section="user-profile-section">
