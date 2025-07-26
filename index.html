@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -934,13 +934,7 @@
             signin: async (email, password) => {
                 App.UI.hideMessage('auth-status-message');
                 try {
-                    const userCredential = await App.auth.signInWithEmailAndPassword(email, password);
-                    if (!userCredential.user.emailVerified) {
-                        App.UI.showMessage('auth-status-message', 'Your email is not verified. Please check your inbox.', 'error');
-                        App.UI.showSection('email-verify');
-                        return;
-                    }
-                    App.UI.showMessage('auth-status-message', 'Signed in successfully!', 'success');
+                    await App.auth.signInWithEmailAndPassword(email, password);
                     // onAuthStateChanged will handle the rest
                 } catch (error) {
                     App.UI.showMessage('auth-status-message', `Error: ${error.message}`, 'error');
@@ -1019,6 +1013,11 @@
                 try {
                     const userDoc = await App.db.collection('users').doc(uid).get();
                     if (!userDoc.exists) {
+                        // This case handles when a user is logged in but hasn't set up a profile yet
+                        if (isCurrentUser) {
+                            App.UI.showSection('setup-profile');
+                            return;
+                        }
                         return null;
                     }
                     const data = userDoc.data();
@@ -1183,7 +1182,7 @@
             },
             fetch: async (targetDivId = 'posts-list', userId = null) => {
                 const container = document.getElementById(targetDivId);
-                container.innerHTML = '<p class="text-center" style="margin-top: 30px; font-style: italic; color: #aaa;">Fetching exciting posts...</p>';
+                container.innerHTML = '<p class="text-center" id="loading-posts-message" style="margin-top: 30px; font-style: italic; color: #aaa;">Fetching exciting posts...</p>';
                 App.postsCache = [];
 
                 let query = App.db.collection('posts').orderBy('timestamp', 'desc').limit(50);
@@ -1236,7 +1235,7 @@
                 
                 const postMeta = document.createElement('div');
                 postMeta.className = 'post-meta';
-                postMeta.innerHTML = `<span>Likes: <span id="likes-count-${post.id}">${post.likes}</span></span><span>${new Date(post.timestamp.toDate()).toLocaleString()}</span>`;
+                postMeta.innerHTML = `<span>Likes: <span id="likes-count-${post.id}">${post.likes}</span></span><span>${post.timestamp ? new Date(post.timestamp.toDate()).toLocaleString() : 'N/A'}</span>`;
                 
                 const postActions = document.createElement('div');
                 postActions.className = 'post-actions';
@@ -1462,6 +1461,7 @@
             });
         });
 
+        // --- THE CRITICAL FIX: onAuthStateChanged listener ---
         App.auth.onAuthStateChanged(async (user) => {
             setTimeout(() => {
                 App.UI.hidePreloader();
@@ -1470,11 +1470,13 @@
                     if (user.emailVerified) {
                         App.db.collection('users').doc(App.currentUserId).get().then(doc => {
                             if (doc.exists && doc.data().username) {
+                                // User is signed in and has a profile
                                 App.UI.showSection('home-posts');
                                 App.Profile.fetch(App.currentUserId, true);
                                 App.Posts.fetch();
                                 App.Monetization.checkDailyRewards();
                             } else {
+                                // User is signed in but needs to set up a profile
                                 App.UI.showSection('setup-profile');
                             }
                         }).catch(error => {
@@ -1482,9 +1484,11 @@
                             App.UI.showSection('setup-profile');
                         });
                     } else {
+                        // User is signed in but email is not verified
                         App.UI.showSection('email-verify');
                     }
                 } else {
+                    // No user is signed in
                     App.currentUserId = null;
                     App.UI.showSection('signin-auth');
                 }
