@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>AddMint Pro</title>
     <style>
-        /* CSS resets and global variables */
+        /* ========================================================= */
+        /* == Global Styles, Variables & Resets ==================== */
+        /* ========================================================= */
         :root {
             --dark-bg: #0d0d0d;
             --dark-fg: #1a1a1a;
@@ -23,13 +25,14 @@
             --border-radius-sm: 8px;
             --border-radius-md: 12px;
             --border-radius-lg: 18px;
+            --font-family: 'Poppins', 'Segoe UI', 'Roboto', sans-serif;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Poppins', 'Segoe UI', 'Roboto', sans-serif;
+            font-family: var(--font-family);
             -webkit-tap-highlight-color: transparent;
         }
 
@@ -43,7 +46,7 @@
             line-height: 1.6;
             display: flex;
             flex-direction: column;
-            overflow-x: hidden;
+            overflow: hidden; /* This is key for the fixed header/footer layout */
             font-size: 16px;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
@@ -66,6 +69,9 @@
             letter-spacing: 0.5px;
             position: relative;
             overflow: hidden;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
         button:hover, input[type="submit"]:hover {
             background-color: var(--primary-dark);
@@ -109,7 +115,7 @@
             outline: none;
             box-shadow: 0 0 0 3px rgba(0, 170, 255, 0.3), inset 0 1px 3px rgba(0, 0, 0, 0.6);
         }
-
+        
         .container {
             width: 90%;
             max-width: 500px;
@@ -137,7 +143,9 @@
 
         .hidden { display: none !important; }
 
-        /* Splash Screen */
+        /* ========================================================= */
+        /* == Splash Screen ======================================== */
+        /* ========================================================= */
         #splash-screen {
             position: fixed;
             top: 0; left: 0;
@@ -196,7 +204,18 @@
             animation: fadeInText 1s 1s forwards;
         }
 
-        /* Header (fixed at top) */
+        /* ========================================================= */
+        /* == App Layout & Structure =============================== */
+        /* ========================================================= */
+        #app-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            width: 100%;
+            transition: opacity 0.5s ease;
+        }
+
+        /* Fixed Header */
         header {
             background-color: var(--dark-fg);
             padding: 15px 20px;
@@ -205,7 +224,7 @@
             align-items: center;
             border-bottom: 1px solid var(--border-color);
             box-shadow: 0 3px 20px var(--shadow-color);
-            position: fixed; /* Changed to fixed */
+            position: fixed;
             top: 0;
             left: 0;
             right: 0;
@@ -253,35 +272,20 @@
             font-size: 1.2rem;
             margin-bottom: 3px;
         }
-        .header-stats .ad-logo-btn {
-            background: none;
-            border: none;
-            padding: 0;
-            margin: 0;
-            width: 40px; height: 40px;
-            transition: transform 0.2s ease;
-        }
-        .header-stats .ad-logo-btn:hover {
-            transform: scale(1.1) rotate(15deg);
-        }
-        .header-stats .ad-logo-btn svg {
-            width: 100%;
-            height: 100%;
-            color: var(--accent-color);
-            filter: drop-shadow(0 0 5px rgba(255, 204, 0, 0.8));
-        }
 
-        /* Main Content (with padding for header and footer) */
+        /* Scrollable Main Content */
         main {
             flex-grow: 1;
-            padding: 80px 20px 80px 20px; /* Added padding for fixed header and footer */
-            display: flex;
-            flex-direction: column;
-            gap: 30px;
+            padding: 20px;
+            padding-top: 80px; /* Space for the fixed header */
+            padding-bottom: 80px; /* Space for the fixed footer */
             overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
             width: 100%;
             max-width: 1400px;
             margin: 0 auto;
+            position: relative;
+            z-index: 1;
         }
 
         section {
@@ -292,6 +296,7 @@
             box-shadow: 0 8px 25px var(--shadow-color);
             animation: fadeIn 0.6s ease-out;
             border: 1px solid var(--border-color);
+            margin-bottom: 20px;
         }
         section.active { display: block; }
         h2 {
@@ -303,7 +308,50 @@
             text-shadow: 0 0 10px rgba(0, 170, 255, 0.5);
             letter-spacing: 1px;
         }
+        
+        /* Fixed Bottom Navigation */
+        footer {
+            background-color: var(--dark-fg);
+            padding: 15px 0;
+            display: flex;
+            justify-content: space-around;
+            border-top: 1px solid var(--border-color);
+            box-shadow: 0 -3px 20px var(--shadow-color);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            z-index: 99;
+            animation: slideUp 0.5s ease-out;
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #aaa;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: color var(--transition-speed), transform 0.2s ease;
+            padding: 8px 12px;
+            border-radius: var(--border-radius-sm);
+            flex: 1;
+            max-width: 100px;
+        }
+        .nav-item.active { color: var(--primary-color); transform: translateY(-3px); background-color: rgba(0, 170, 255, 0.1); }
+        .nav-item:hover { color: var(--primary-color); background-color: rgba(0, 170, 255, 0.05); }
+        .nav-item .icon {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+            transition: transform 0.2s ease;
+        }
+        .nav-item:hover .icon { transform: scale(1.1); }
 
+
+        /* ========================================================= */
+        /* == Section Specific Styles ============================== */
+        /* ========================================================= */
+        
         /* Password input with eye icon */
         .password-input-container { position: relative; margin-bottom: 15px; }
         .password-input-container input { padding-right: 50px; }
@@ -393,35 +441,55 @@
         .post-card.neon h3, .post-card.neon p, .post-card.neon .post-meta { text-shadow: 0 0 10px rgba(0, 170, 255, 0.8), 0 0 20px rgba(0, 170, 255, 0.6); }
 
         /* Profile Screen */
-        #user-profile-section .profile-header {
+        #user-profile-section .profile-header, #other-user-profile-section .profile-header {
             display: flex;
             flex-direction: column;
             align-items: center;
             text-align: center;
             margin-bottom: 25px;
         }
-        #user-profile-section .profile-image { width: 100px; height: 100px; background-color: #333; border-radius: 50%; border: 3px solid var(--primary-color); animation: profilePulse 2s infinite alternate; }
-        #user-profile-section .profile-username { font-size: 1.8rem; font-weight: 700; margin-top: 10px; }
-        #user-profile-section .profile-stats { display: flex; justify-content: space-around; width: 100%; max-width: 300px; margin-top: 20px; }
-        #user-profile-section .profile-stat-item { text-align: center; }
-        #user-profile-section .profile-stat-item strong { display: block; font-size: 1.2rem; }
-        #user-profile-section .profile-stat-item span { font-size: 0.9rem; color: #aaa; }
-        #user-profile-section .profile-buttons { display: flex; justify-content: center; gap: 15px; margin-top: 20px; }
-        #user-profile-section .profile-posts-grid {
+        .profile-image-container {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0, 170, 255, 0.5);
+            animation: profilePulse 2s infinite alternate;
+        }
+        .profile-image-container .profile-image {
+            width: 100%;
+            height: 100%;
+            background-color: #333;
+            background-size: cover;
+            background-position: center;
+            border: 3px solid var(--primary-color);
+            animation: profileImageGlow 2s infinite alternate ease-in-out;
+        }
+        #user-profile-section .profile-username, #other-user-profile-section .profile-username { font-size: 1.8rem; font-weight: 700; margin-top: 10px; }
+        #user-profile-section .profile-stats, #other-user-profile-section .profile-stats { display: flex; justify-content: space-around; width: 100%; max-width: 300px; margin-top: 20px; }
+        #user-profile-section .profile-stat-item, #other-user-profile-section .profile-stat-item { text-align: center; }
+        #user-profile-section .profile-stat-item strong, #other-user-profile-section .profile-stat-item strong { display: block; font-size: 1.2rem; }
+        #user-profile-section .profile-stat-item span, #other-user-profile-section .profile-stat-item span { font-size: 0.9rem; color: #aaa; }
+        .profile-buttons { display: flex; justify-content: center; gap: 15px; margin-top: 20px; }
+        .profile-posts-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             gap: 15px;
             margin-top: 25px;
         }
-        #user-profile-section .profile-post-card {
+        .profile-post-card {
             background-color: var(--dark-bg);
             border-radius: 10px;
             padding: 15px;
             box-shadow: 0 4px 10px var(--shadow-color);
             transition: transform 0.2s ease, box-shadow 0.2s ease;
             cursor: pointer;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
-        #user-profile-section .profile-post-card:hover { transform: scale(1.05); box-shadow: 0 6px 15px rgba(0, 0, 0, 0.9); }
+        .profile-post-card:hover { transform: scale(1.05); box-shadow: 0 6px 15px rgba(0, 0, 0, 0.9); }
         .follower-monetization-info {
             text-align: center;
             padding: 20px;
@@ -455,61 +523,14 @@
             font-size: 1.5rem;
         }
 
-        /* Bottom Navigation (fixed at bottom) */
-        footer {
-            background-color: var(--dark-fg);
-            padding: 15px 0;
-            display: flex;
-            justify-content: space-around;
-            border-top: 1px solid var(--border-color);
-            box-shadow: 0 -3px 20px var(--shadow-color);
-            position: fixed; /* Changed to fixed */
-            bottom: 0;
-            left: 0;
-            right: 0;
-            width: 100%;
-            z-index: 99;
-            animation: slideUp 0.5s ease-out;
-        }
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            color: #aaa;
-            font-size: 0.85rem;
-            cursor: pointer;
-            transition: color var(--transition-speed), transform 0.2s ease;
-            padding: 8px 12px;
-            border-radius: var(--border-radius-sm);
-            flex: 1;
-            max-width: 100px;
-        }
-        .nav-item.active { color: var(--primary-color); transform: translateY(-3px); background-color: rgba(0, 170, 255, 0.1); }
-        .nav-item:hover { color: var(--primary-color); background-color: rgba(0, 170, 255, 0.05); }
-        .nav-item .icon {
-            font-size: 1.8rem;
-            margin-bottom: 5px;
-            transition: transform 0.2s ease;
-        }
-        .nav-item:hover .icon { transform: scale(1.1); }
-        .nav-item .icon.create-plus {
-            font-size: 2.2rem;
-            transform: scale(1.2);
-            position: relative;
-            z-index: 1;
-            background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 10px rgba(0, 170, 255, 0.8), 0 0 20px rgba(255, 204, 0, 0.6);
-            animation: pulse 1.5s infinite;
-        }
-
-        /* Desktop Adjustments */
+        /* ========================================================= */
+        /* == Desktop Adjustments & Animations ===================== */
+        /* ========================================================= */
         @media (min-width: 768px) {
             body { font-size: 17px; }
             .container { padding: 40px; max-width: 600px; }
             header { padding: 20px 40px; }
-            main { padding: 90px 40px 90px 40px; max-width: 1400px; }
+            main { padding: 30px 40px; padding-top: 90px; padding-bottom: 90px; }
             footer { padding: 15px 40px; }
             .post-card.horizontal { grid-column: span 2; }
             .post-card.square { max-width: 350px; justify-self: center; }
@@ -517,7 +538,7 @@
             .profile-header .profile-stats { justify-content: flex-start; gap: 30px; }
         }
 
-        /* Animations */
+        /* Keyframe Animations */
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes fadeInText { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slideInUp { from { opacity: 0; transform: translateY(50px); } to { opacity: 1; transform: translateY(0); } }
@@ -534,7 +555,8 @@
         @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.8; } 100% { transform: scale(1); opacity: 1; } }
         @keyframes profilePulse { 0%, 100% { box-shadow: 0 0 0 0px rgba(0, 170, 255, 0.4); } 50% { box-shadow: 0 0 0 10px rgba(0, 170, 255, 0); } }
         @keyframes ripple { from { transform: scale(0); opacity: 1; } to { transform: scale(4); opacity: 0; } }
-
+        @keyframes profileImageGlow { from { filter: brightness(1) contrast(1); } to { filter: brightness(1.2) contrast(1.1); } }
+        
     </style>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
@@ -552,6 +574,7 @@
     </div>
 
     <div id="app-container" class="hidden">
+        
         <header>
             <div class="app-logo">
                 <span class="shape"></span> AddMint
@@ -667,7 +690,7 @@
             <section id="user-profile-section">
                 <div class="profile-header">
                     <div class="profile-image-container">
-                        <div class="profile-image"></div>
+                        <div class="profile-image" id="profile-image-own"></div>
                     </div>
                     <div class="profile-info">
                         <h3 class="profile-username" id="profile-display-name">Loading...</h3>
@@ -687,12 +710,11 @@
                         </div>
                         <div class="profile-buttons">
                             <button onclick="App.UI.showSection('edit-profile-section');">Edit Profile</button>
-                            <button id="follow-btn" onclick="App.Profile.toggleFollow()">Follow</button>
-                            <button id="message-btn" onclick="App.UI.openMessageApp()"><span class="icon">&#x1F4AC;</span> Message</button>
+                            <button onclick="App.Auth.logout()" style="background-color: var(--error-color);">Sign Out</button>
                         </div>
                     </div>
                 </div>
-                <div id="user-profile-details">
+                <div id="user-profile-details" class="container" style="background: none; box-shadow: none;">
                     <p><strong>Email:</strong> <span id="profile-email"></span></p>
                     <p><strong>Phone:</strong> <span id="profile-phone-number">N/A</span></p>
                     <p><strong>WhatsApp:</strong> <span id="profile-whatsapp-number">N/A</span></p>
@@ -701,7 +723,6 @@
                 <h4 style="margin-top: 30px; text-align: center;">Active Posts</h4>
                 <div id="profile-posts-grid" class="profile-posts-grid">
                     </div>
-                <button onclick="App.Auth.logout()" class="mt-4" style="background-color: var(--error-color);">Sign Out</button>
             </section>
 
             <section id="edit-profile-section" class="container">
@@ -724,7 +745,7 @@
             <section id="other-user-profile-section">
                 <div class="profile-header">
                     <div class="profile-image-container">
-                        <div class="profile-image"></div>
+                        <div class="profile-image" id="profile-image-other"></div>
                     </div>
                     <div class="profile-info">
                         <h3 class="profile-username" id="other-profile-display-name">Loading...</h3>
@@ -748,7 +769,7 @@
                         </div>
                     </div>
                 </div>
-                <div id="other-user-profile-details">
+                <div id="other-user-profile-details" class="container" style="background: none; box-shadow: none;">
                     <p><strong>Email:</strong> <span id="other-profile-email"></span></p>
                     <p><strong>WhatsApp:</strong> <span id="other-profile-whatsapp-number">N/A</span></p>
                     <p><strong>Instagram:</strong> <span id="other-profile-instagram-handle">N/A</span></p>
@@ -766,7 +787,7 @@
                 <span>Home</span>
             </div>
             <div class="nav-item" data-section="create-post-section">
-                <span class="icon create-plus">&#x2795;</span>
+                <span class="icon">&#x2795;</span>
                 <span>Create</span>
             </div>
             <div class="nav-item" data-section="user-profile-section">
@@ -846,6 +867,7 @@
                 document.getElementById('header-coins').textContent = coins;
                 document.getElementById('header-limit').textContent = limits;
                 document.getElementById('header-credits').textContent = credits;
+                document.getElementById('posts-limit-counter').textContent = limits;
             },
             hidePreloader: () => {
                 const splash = document.getElementById('splash-screen');
@@ -869,10 +891,11 @@
                 App.UI.runWebViewString(`TTS:${postContent}`);
             },
             openMessageApp: () => {
-                if (!App.profileToView) return;
                 const targetUserId = App.profileToView;
+                if (!targetUserId) return;
+                
                 const profile = targetUserId === App.currentUserId ? App.userProfileData : App.postsCache.find(p => p.userId === targetUserId);
-
+                
                 if (profile && profile.whatsapp) {
                     App.UI.runWebViewString(`WHATSAPP:${profile.whatsapp}`);
                 } else if (profile && profile.phone) {
@@ -888,6 +911,7 @@
         // ---------------------------------
         App.Auth = {
             signup: async (email, password, confirmPassword) => {
+                App.UI.hideMessage('signup-status-message');
                 if (password !== confirmPassword) {
                     App.UI.showMessage('signup-status-message', 'Passwords do not match.', 'error');
                     return;
@@ -908,6 +932,7 @@
                 }
             },
             signin: async (email, password) => {
+                App.UI.hideMessage('auth-status-message');
                 try {
                     const userCredential = await App.auth.signInWithEmailAndPassword(email, password);
                     if (!userCredential.user.emailVerified) {
@@ -950,6 +975,7 @@
         // ----------------------------------
         App.Profile = {
             setup: async (username, phone, whatsapp, instagram) => {
+                App.UI.hideMessage('profile-setup-message');
                 try {
                     await App.db.collection('users').doc(App.currentUserId).set({
                         username,
@@ -971,6 +997,7 @@
                 }
             },
             edit: async (username, phone, whatsapp, instagram) => {
+                App.UI.hideMessage('edit-profile-message');
                 try {
                     await App.db.collection('users').doc(App.currentUserId).update({
                         username,
@@ -1034,9 +1061,6 @@
                 document.getElementById('editPhone').value = profile.phone || '';
                 document.getElementById('editWhatsApp').value = profile.whatsapp || '';
                 document.getElementById('editInstagram').value = profile.instagram || '';
-
-                // Hide Follow button on own profile
-                document.getElementById('follow-btn').classList.add('hidden');
                 
                 // Render posts
                 App.Posts.renderAll(posts, 'profile-posts-grid', true);
@@ -1049,9 +1073,6 @@
                 document.getElementById('other-profile-email').textContent = profile.email;
                 document.getElementById('other-profile-whatsapp-number').textContent = profile.whatsapp || 'N/A';
                 document.getElementById('other-profile-instagram-handle').textContent = profile.instagram || 'N/A';
-                
-                // Show Follow/Message buttons
-                document.getElementById('other-follow-btn').classList.remove('hidden');
                 
                 // Check if already following
                 App.db.collection('users').doc(App.currentUserId).collection('following').doc(profile.uid).get().then(doc => {
@@ -1124,17 +1145,14 @@
                 // Show ad if using coins
                 if (postsLimit === 0 && coins >= 5) {
                     App.UI.runWebViewString('SHOW_REWARDED_AD:post');
-                    // The rest of the logic will be handled by the ad callback
                     return;
                 }
                 
-                // If we are here, it means we can post. Proceed.
                 await App.Posts.submitNewPost(content, userData, userRef, coins, postsLimit);
             },
             submitNewPost: async (content, userData, userRef, coins, postsLimit) => {
                 const batch = App.db.batch();
                 
-                // Create new post
                 const newPostRef = App.db.collection('posts').doc();
                 batch.set(newPostRef, {
                     content,
@@ -1142,11 +1160,10 @@
                     username: userData.username,
                     timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                     likes: 0,
-                    style: App.Posts.getRandomPostStyle(), // New function for unique styles
-                    expiryTime: Date.now() + (24 * 60 * 60 * 1000) // 24 hours expiry,
+                    style: App.Posts.getRandomPostStyle(),
+                    expiryTime: Date.now() + (24 * 60 * 60 * 1000)
                 });
                 
-                // Update user stats
                 if (postsLimit > 0) {
                     batch.update(userRef, { postLimit: firebase.firestore.FieldValue.increment(-1) });
                 } else {
@@ -1166,7 +1183,7 @@
             },
             fetch: async (targetDivId = 'posts-list', userId = null) => {
                 const container = document.getElementById(targetDivId);
-                container.innerHTML = '<p class="text-center" style="margin-top: 30px; font-style: italic; color: #aaa;">Fetching posts...</p>';
+                container.innerHTML = '<p class="text-center" style="margin-top: 30px; font-style: italic; color: #aaa;">Fetching exciting posts...</p>';
                 App.postsCache = [];
 
                 let query = App.db.collection('posts').orderBy('timestamp', 'desc').limit(50);
@@ -1180,49 +1197,27 @@
                         container.innerHTML = '<p class="text-center" style="margin-top: 30px; font-style: italic; color: #aaa;">No posts to display.</p>';
                         return;
                     }
-
-                    // Clear previous content
                     container.innerHTML = '';
-                    
                     const postDocs = snapshot.docs;
-                    const renderedUids = new Set(); // To store rendered user IDs for efficiency
                     
                     for (const doc of postDocs) {
                         const postData = doc.data();
                         postData.id = doc.id;
                         App.postsCache.push(postData);
                         
-                        // Add some duplicate posts for infinite scroll feel
-                        App.Posts.render(postData, container);
-                        if (Math.random() < 0.2) { // 20% chance to duplicate
-                           App.Posts.render(postData, container, null, true);
-                        }
+                        App.Posts.render(postData, container, userId !== null);
                     }
-                    
-                    // Add some more posts for different styles
-                    if (!userId) {
-                        const randomPosts = [...postDocs].sort(() => 0.5 - Math.random()).slice(0, 5);
-                        for (const doc of randomPosts) {
-                            const postData = doc.data();
-                            postData.id = doc.id;
-                            postData.style = ['horizontal', 'square', 'neon'][Math.floor(Math.random() * 3)];
-                            App.Posts.render(postData, container);
-                        }
-                    }
-
                 } catch (error) {
                     container.innerHTML = '<p class="text-center message error">Error loading posts. Please try again.</p>';
                     console.error("Error fetching posts:", error);
                 }
             },
-            render: (post, container, isProfilePost = false, isDuplicate = false) => {
-                // ... (existing render logic) ...
+            render: (post, container, isProfilePost = false) => {
                 const postElement = document.createElement('div');
                 postElement.className = `post-card ${post.style || ''}`;
                 postElement.dataset.postId = post.id;
                 postElement.dataset.userId = post.userId;
                 
-                const postId = isDuplicate ? post.id + '-dup-' + Math.random() : post.id;
                 const isOwner = post.userId === App.currentUserId;
                 
                 const postContentWrapper = document.createElement('div');
@@ -1241,7 +1236,7 @@
                 
                 const postMeta = document.createElement('div');
                 postMeta.className = 'post-meta';
-                postMeta.innerHTML = `<span>Likes: <span id="likes-count-${postId}">${post.likes}</span></span><span>${new Date(post.timestamp.toDate()).toLocaleString()}</span>`;
+                postMeta.innerHTML = `<span>Likes: <span id="likes-count-${post.id}">${post.likes}</span></span><span>${new Date(post.timestamp.toDate()).toLocaleString()}</span>`;
                 
                 const postActions = document.createElement('div');
                 postActions.className = 'post-actions';
@@ -1249,7 +1244,7 @@
                 const likeButton = document.createElement('button');
                 likeButton.textContent = 'Like';
                 likeButton.className = 'like-btn';
-                likeButton.onclick = () => App.Posts.like(post.id, postId);
+                likeButton.onclick = () => App.Posts.like(post.id);
 
                 const translateButton = document.createElement('button');
                 translateButton.textContent = 'Translate';
@@ -1266,10 +1261,9 @@
                     postActions.appendChild(deleteButton);
                 }
                 
-                // Add sound button
                 const soundButton = document.createElement('button');
                 soundButton.className = 'post-sound-btn';
-                soundButton.innerHTML = '&#128266;'; // Speaker icon
+                soundButton.innerHTML = '&#128266;';
                 soundButton.onclick = (e) => {
                     e.stopPropagation();
                     App.UI.playPostSound(post.content);
@@ -1285,11 +1279,24 @@
                 
                 container.appendChild(postElement);
             },
+            renderAll: (postDocs, containerId, isProfileView) => {
+                const container = document.getElementById(containerId);
+                container.innerHTML = '';
+                if (postDocs.length === 0) {
+                    container.innerHTML = `<p class="text-center" style="margin-top: 30px; font-style: italic; color: #aaa;">No posts to display.</p>`;
+                    return;
+                }
+                postDocs.forEach(doc => {
+                    const postData = doc.data();
+                    postData.id = doc.id;
+                    App.Posts.render(postData, container, isProfileView);
+                });
+            },
             getRandomPostStyle: () => {
-                const styles = ['horizontal', 'square', 'neon', 'normal', 'normal', 'normal'];
+                const styles = ['horizontal', 'square', 'neon', 'normal', 'normal', 'normal', 'normal'];
                 return styles[Math.floor(Math.random() * styles.length)];
             },
-            like: async (postId, likeCountId) => {
+            like: async (postId) => {
                 const likeRef = App.db.collection('posts').doc(postId).collection('likes').doc(App.currentUserId);
                 const postRef = App.db.collection('posts').doc(postId);
                 
@@ -1298,14 +1305,13 @@
                     if (doc.exists) {
                         await likeRef.delete();
                         await postRef.update({ likes: firebase.firestore.FieldValue.increment(-1) });
-                        document.getElementById(`likes-count-${likeCountId}`).textContent = parseInt(document.getElementById(`likes-count-${likeCountId}`).textContent) - 1;
                         alert('Un-liked post.');
                     } else {
                         await likeRef.set({ likedAt: new Date() });
                         await postRef.update({ likes: firebase.firestore.FieldValue.increment(1) });
-                        document.getElementById(`likes-count-${likeCountId}`).textContent = parseInt(document.getElementById(`likes-count-${likeCountId}`).textContent) + 1;
                         alert('Liked post!');
                     }
+                    App.Posts.fetch();
                 } catch (error) {
                     console.error("Error liking post:", error);
                     alert('Error liking post. Please try again.');
@@ -1317,7 +1323,7 @@
                         const postRef = App.db.collection('posts').doc(postId);
                         await postRef.delete();
                         alert('Post deleted.');
-                        App.Posts.fetch(); // Reload posts
+                        App.Posts.fetch();
                     } catch (error) {
                         console.error("Error deleting post:", error);
                         alert('Error deleting post. Please try again.');
@@ -1346,7 +1352,6 @@
                 
                 const oneDayInMs = 24 * 60 * 60 * 1000;
                 if (now.getTime() - lastRewardTime.getTime() > oneDayInMs) {
-                    // Give daily rewards
                     await userRef.update({
                         coins: firebase.firestore.FieldValue.increment(10),
                         postLimit: firebase.firestore.FieldValue.increment(2),
@@ -1356,7 +1361,7 @@
                     
                     const message = 'Daily rewards claimed! You got 10 Coins, 2 Post Limits, and 10 Credits.';
                     App.UI.showMessage('daily-free-rewards-message', message, 'info');
-                    App.Profile.fetch(App.currentUserId, true); // Refresh UI
+                    App.Profile.fetch(App.currentUserId, true);
                 }
             },
             requestAd: (rewardType) => {
@@ -1379,19 +1384,18 @@
                     } else if (rewardType === 'limits') {
                         updateData = { postLimit: firebase.firestore.FieldValue.increment(1) };
                     } else if (rewardType === 'post') {
-                         // This is for posting a paid post after watching an ad
                          const postContent = document.getElementById('post-content').value;
                          if (postContent.trim() !== '') {
                             const userDoc = await userRef.get();
                             const userData = userDoc.data();
                             await App.Posts.submitNewPost(postContent, userData, userRef, userData.coins, userData.postLimit);
                          }
-                         return; // Don't show a generic success message for this case
+                         return;
                     }
                     
                     await userRef.update(updateData);
                     App.UI.showMessage('ad-rewards-message', `Success! You received your reward.`, 'success');
-                    App.Profile.fetch(App.currentUserId, true); // Refresh UI
+                    App.Profile.fetch(App.currentUserId, true);
                 } catch (error) {
                     App.UI.showMessage('ad-rewards-message', `Error processing reward: ${error.message}`, 'error');
                     console.error("Reward processing error:", error);
@@ -1459,7 +1463,6 @@
         });
 
         App.auth.onAuthStateChanged(async (user) => {
-            // Wait for 1.5 seconds for the splash screen to show
             setTimeout(() => {
                 App.UI.hidePreloader();
                 if (user) {
@@ -1489,7 +1492,6 @@
         });
 
         // --- App Inventor Callback Functions (global scope) ---
-        // App Inventor calls these via RunJavaScript after an action
         window.adComplete = (rewardType) => {
             App.Monetization.handleAdCallback(rewardType);
         };
