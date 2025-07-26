@@ -26,6 +26,16 @@
             --border-radius-md: 12px;
             --border-radius-lg: 18px;
             --font-family: 'Poppins', 'Segoe UI', 'Roboto', sans-serif;
+            
+            /* NEON Colors */
+            --neon-blue: #00aaff;
+            --neon-blue-shadow: rgba(0, 170, 255, 0.8);
+            --neon-pink: #ff00ff;
+            --neon-pink-shadow: rgba(255, 0, 255, 0.8);
+            --neon-green: #00ff00;
+            --neon-green-shadow: rgba(0, 255, 0, 0.8);
+            --neon-yellow: #ffff00;
+            --neon-yellow-shadow: rgba(255, 255, 0, 0.8);
         }
 
         * {
@@ -46,7 +56,7 @@
             line-height: 1.6;
             display: flex;
             flex-direction: column;
-            overflow: hidden; /* This is key for the fixed header/footer layout */
+            overflow: hidden;
             font-size: 16px;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
@@ -82,22 +92,7 @@
             transform: translateY(0);
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.7);
         }
-        button::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 5px;
-            height: 5px;
-            background: rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            opacity: 0;
-            transform: translate(-50%, -50%);
-        }
-        button:focus::before {
-            animation: ripple 0.6s linear;
-        }
-
+        
         input[type="email"], input[type="password"], input[type="text"], textarea {
             width: 100%;
             padding: 12px 15px;
@@ -144,67 +139,6 @@
         .hidden { display: none !important; }
 
         /* ========================================================= */
-        /* == Splash Screen ======================================== */
-        /* ========================================================= */
-        #splash-screen {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: linear-gradient(135deg, var(--dark-bg), #080808);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            transition: opacity 1.5s ease-out;
-            opacity: 1;
-            backdrop-filter: blur(5px);
-            -webkit-backdrop-filter: blur(5px);
-        }
-        .splash-logo-container {
-            width: 150px; height: 150px;
-            position: relative;
-            animation: splashEntry 1s ease-out;
-        }
-        .splash-logo-diamond {
-            width: 120px; height: 120px;
-            background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
-            position: absolute;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%) rotate(45deg);
-            border-radius: 30px;
-            box-shadow: 0 0 40px rgba(0, 170, 255, 0.7);
-            animation: splashDiamondPulse 2s infinite alternate ease-in-out;
-        }
-        .splash-logo-text {
-            position: absolute;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 4rem;
-            font-weight: 800;
-            color: white;
-            text-shadow: 0 0 20px rgba(255, 255, 255, 0.8), 0 0 30px rgba(255, 255, 255, 0.6);
-            z-index: 1;
-            letter-spacing: 2px;
-        }
-        .splash-loader {
-            border: 5px solid var(--border-color);
-            border-top: 5px solid var(--primary-color);
-            border-radius: 50%;
-            width: 60px; height: 60px;
-            animation: spin 1s linear infinite, glow 1.5s infinite alternate;
-            margin-top: 50px;
-            box-shadow: 0 0 20px rgba(0, 170, 255, 0.5);
-        }
-        #loading-text {
-            margin-top: 20px;
-            font-size: 1.2rem;
-            color: #bbb;
-            opacity: 0;
-            animation: fadeInText 1s 1s forwards;
-        }
-
-        /* ========================================================= */
         /* == App Layout & Structure =============================== */
         /* ========================================================= */
         #app-container {
@@ -215,7 +149,6 @@
             transition: opacity 0.5s ease;
         }
 
-        /* Fixed Header */
         header {
             background-color: var(--dark-fg);
             padding: 15px 20px;
@@ -277,8 +210,8 @@
         main {
             flex-grow: 1;
             padding: 20px;
-            padding-top: 80px; /* Space for the fixed header */
-            padding-bottom: 80px; /* Space for the fixed footer */
+            padding-top: 80px;
+            padding-bottom: 80px;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
             width: 100%;
@@ -287,7 +220,7 @@
             position: relative;
             z-index: 1;
         }
-
+        
         section {
             display: none;
             padding: 30px;
@@ -309,7 +242,6 @@
             letter-spacing: 1px;
         }
         
-        /* Fixed Bottom Navigation */
         footer {
             background-color: var(--dark-fg);
             padding: 15px 0;
@@ -352,7 +284,6 @@
         /* == Section Specific Styles ============================== */
         /* ========================================================= */
         
-        /* Password input with eye icon */
         .password-input-container { position: relative; margin-bottom: 15px; }
         .password-input-container input { padding-right: 50px; }
         .toggle-password {
@@ -397,6 +328,8 @@
         .post-actions button.delete-btn { background-color: var(--error-color); }
         .post-actions button.delete-btn:hover { background-color: #b02a37; }
         .post-actions button.like-btn.liked { background-color: var(--accent-color); color: #222; }
+        .post-actions button.report-btn { background-color: #6c757d; }
+        .post-actions button.report-btn:hover { background-color: #5a6268; }
 
         /* Sound Button on Post */
         .post-sound-btn {
@@ -422,24 +355,36 @@
             color: var(--accent-color);
             animation: pulse 1s infinite;
         }
-
-        /* Unique Post Styles */
-        .post-card.horizontal { flex-direction: row; align-items: flex-start; gap: 20px; border-left: 5px solid var(--accent-color); animation: slideInRight 0.7s ease-out; }
-        .post-card.horizontal .post-content-wrapper { flex-grow: 1; }
-        .post-card.horizontal .post-meta { flex-direction: column; align-items: flex-end; text-align: right; min-width: 100px; border-top: none; padding-top: 0; margin-bottom: 0; }
-        .post-card.horizontal .post-actions { flex-direction: column; gap: 8px; }
-        .post-card.square { aspect-ratio: 1 / 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; border-radius: 50%; animation: zoomIn 0.8s ease-out; border: 2px solid var(--info-color); }
-        .post-card.square .post-content-wrapper { overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; margin-bottom: 10px; }
-        .post-card.square .post-meta, .post-card.square .post-actions { margin-top: 10px; justify-content: center; }
-        .post-card.neon {
-            box-shadow: 0 0 15px var(--primary-color), 0 0 25px var(--primary-color) inset;
-            border-color: var(--primary-color);
-            position: relative;
-            overflow: hidden;
-            animation: neonGlow 1.5s infinite alternate ease-in-out;
+        
+        /* Neon Post Styles with different colors */
+        .post-card.neon-blue {
+            box-shadow: 0 0 15px var(--neon-blue), 0 0 25px var(--neon-blue) inset;
+            border-color: var(--neon-blue);
+            animation: neonBlueGlow 1.5s infinite alternate ease-in-out;
         }
-        .post-card.neon h3, .post-card.neon p, .post-card.neon .post-meta { text-shadow: 0 0 10px rgba(0, 170, 255, 0.8), 0 0 20px rgba(0, 170, 255, 0.6); }
+        .post-card.neon-blue h3, .post-card.neon-blue p, .post-card.neon-blue .post-meta { text-shadow: 0 0 10px var(--neon-blue-shadow), 0 0 20px var(--neon-blue-shadow); }
 
+        .post-card.neon-pink {
+            box-shadow: 0 0 15px var(--neon-pink), 0 0 25px var(--neon-pink) inset;
+            border-color: var(--neon-pink);
+            animation: neonPinkGlow 1.5s infinite alternate ease-in-out;
+        }
+        .post-card.neon-pink h3, .post-card.neon-pink p, .post-card.neon-pink .post-meta { text-shadow: 0 0 10px var(--neon-pink-shadow), 0 0 20px var(--neon-pink-shadow); }
+
+        .post-card.neon-green {
+            box-shadow: 0 0 15px var(--neon-green), 0 0 25px var(--neon-green) inset;
+            border-color: var(--neon-green);
+            animation: neonGreenGlow 1.5s infinite alternate ease-in-out;
+        }
+        .post-card.neon-green h3, .post-card.neon-green p, .post-card.neon-green .post-meta { text-shadow: 0 0 10px var(--neon-green-shadow), 0 0 20px var(--neon-green-shadow); }
+
+        .post-card.neon-yellow {
+            box-shadow: 0 0 15px var(--neon-yellow), 0 0 25px var(--neon-yellow) inset;
+            border-color: var(--neon-yellow);
+            animation: neonYellowGlow 1.5s infinite alternate ease-in-out;
+        }
+        .post-card.neon-yellow h3, .post-card.neon-yellow p, .post-card.neon-yellow .post-meta { text-shadow: 0 0 10px var(--neon-yellow-shadow), 0 0 20px var(--neon-yellow-shadow); }
+        
         /* Profile Screen */
         #user-profile-section .profile-header, #other-user-profile-section .profile-header {
             display: flex;
@@ -532,31 +477,38 @@
             header { padding: 20px 40px; }
             main { padding: 30px 40px; padding-top: 90px; padding-bottom: 90px; }
             footer { padding: 15px 40px; }
-            .post-card.horizontal { grid-column: span 2; }
-            .post-card.square { max-width: 350px; justify-self: center; }
             .profile-header { flex-direction: row; gap: 30px; text-align: left; }
             .profile-header .profile-stats { justify-content: flex-start; gap: 30px; }
         }
 
         /* Keyframe Animations */
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes fadeInText { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slideInUp { from { opacity: 0; transform: translateY(50px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes slideInRight { from { opacity: 0; transform: translateX(50px); } to { opacity: 1; transform: translateX(0); } }
-        @keyframes zoomIn { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        @keyframes glow { 0% { box-shadow: 0 0 5px var(--primary-color); } 50% { box-shadow: 0 0 20px var(--primary-color), 0 0 30px var(--accent-color); } 100% { box-shadow: 0 0 5px var(--primary-color); } }
-        @keyframes splashDiamondPulse { 0%, 100% { transform: translate(-50%, -50%) rotate(45deg) scale(1); opacity: 1; } 50% { transform: translate(-50%, -50%) rotate(45deg) scale(1.08); opacity: 0.8; } }
-        @keyframes headerLogoSpin { 0% { transform: rotate(45deg) scale(1); } 25% { transform: rotate(135deg) scale(1.05); } 50% { transform: rotate(225deg) scale(1); } 75% { transform: rotate(315deg) scale(1.05); } 100% { transform: rotate(405deg) scale(1); } }
-        @keyframes headerLogoBounce { 0%, 100% { top: 0; } 50% { top: -5px; } }
         @keyframes slideDown { from { transform: translateY(-100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         @keyframes slideUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        @keyframes neonGlow { 0% { box-shadow: 0 0 10px var(--primary-color), 0 0 20px var(--primary-color) inset; } 50% { box-shadow: 0 0 25px var(--primary-color), 0 0 40px var(--primary-color) inset; } 100% { box-shadow: 0 0 10px var(--primary-color), 0 0 20px var(--primary-color) inset; } }
+        @keyframes neonBlueGlow { 0% { box-shadow: 0 0 10px var(--neon-blue), 0 0 20px var(--neon-blue) inset; } 50% { box-shadow: 0 0 25px var(--neon-blue), 0 0 40px var(--neon-blue) inset; } 100% { box-shadow: 0 0 10px var(--neon-blue), 0 0 20px var(--neon-blue) inset; } }
+        @keyframes neonPinkGlow { 0% { box-shadow: 0 0 10px var(--neon-pink), 0 0 20px var(--neon-pink) inset; } 50% { box-shadow: 0 0 25px var(--neon-pink), 0 0 40px var(--neon-pink) inset; } 100% { box-shadow: 0 0 10px var(--neon-pink), 0 0 20px var(--neon-pink) inset; } }
+        @keyframes neonGreenGlow { 0% { box-shadow: 0 0 10px var(--neon-green), 0 0 20px var(--neon-green) inset; } 50% { box-shadow: 0 0 25px var(--neon-green), 0 0 40px var(--neon-green) inset; } 100% { box-shadow: 0 0 10px var(--neon-green), 0 0 20px var(--neon-green) inset; } }
+        @keyframes neonYellowGlow { 0% { box-shadow: 0 0 10px var(--neon-yellow), 0 0 20px var(--neon-yellow) inset; } 50% { box-shadow: 0 0 25px var(--neon-yellow), 0 0 40px var(--neon-yellow) inset; } 100% { box-shadow: 0 0 10px var(--neon-yellow), 0 0 20px var(--neon-yellow) inset; } }
         @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.8; } 100% { transform: scale(1); opacity: 1; } }
         @keyframes profilePulse { 0%, 100% { box-shadow: 0 0 0 0px rgba(0, 170, 255, 0.4); } 50% { box-shadow: 0 0 0 10px rgba(0, 170, 255, 0); } }
-        @keyframes ripple { from { transform: scale(0); opacity: 1; } to { transform: scale(4); opacity: 0; } }
         @keyframes profileImageGlow { from { filter: brightness(1) contrast(1); } to { filter: brightness(1.2) contrast(1.1); } }
         
+        .post-card.neon h3, .post-card.neon p, .post-card.neon .post-meta { text-shadow: 0 0 10px rgba(0, 170, 255, 0.8), 0 0 20px rgba(0, 170, 255, 0.6); }
+
+        .splash-screen {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(135deg, #0d0d0d, #080808);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 0.5s ease-out;
+            color: white;
+            font-size: 2rem;
+        }
+
     </style>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
@@ -564,13 +516,8 @@
 </head>
 <body>
 
-    <div id="splash-screen">
-        <div class="splash-logo-container">
-            <div class="splash-logo-diamond"></div>
-            <div class="splash-logo-text">A</div>
-        </div>
-        <div class="splash-loader"></div>
-        <p id="loading-text">Optimizing App Experience...</p>
+    <div id="splash-screen" class="splash-screen">
+        Loading...
     </div>
 
     <div id="app-container" class="hidden">
@@ -765,7 +712,7 @@
                         </div>
                         <div class="profile-buttons">
                             <button id="other-follow-btn" onclick="App.Profile.toggleFollow()">Follow</button>
-                            <button id="other-message-btn" onclick="App.UI.openMessageApp()"><span class="icon">&#x1F4AC;</span> Message</button>
+                            <button id="other-message-btn" onclick="App.UI.openWhatsAppMessage()"><span class="icon">&#x1F4AC;</span> Message</button>
                         </div>
                     </div>
                 </div>
@@ -798,12 +745,8 @@
     </div>
     
     <script>
-        // Use a single global object to avoid polluting the global scope
         const App = {};
-
-        // -----------------------
-        // --- Firebase Config ---
-        // -----------------------
+        
         App.firebaseConfig = {
             apiKey: "AIzaSyDlZA4grzF3fx95-11E4s7ASXwkIij1k1w",
             authDomain: "addmint-7ab6b.firebaseapp.com",
@@ -820,13 +763,11 @@
 
         App.currentUserId = null;
         App.currentUsername = null;
-        App.userProfileData = {}; // Store current user's profile data
-        App.postsCache = []; // To store fetched posts and prevent re-fetching
-        App.profileToView = null; // Store the ID of the user whose profile is being viewed
+        App.userProfileData = {};
+        App.postsCache = [];
+        App.profileToView = null;
+        App.neonColors = ['neon-blue', 'neon-pink', 'neon-green', 'neon-yellow'];
 
-        // ------------------------------------
-        // --- UI & Helper Functions (UI.js) ---
-        // ------------------------------------
         App.UI = {
             showSection: (sectionId) => {
                 document.querySelectorAll('section').forEach(section => {
@@ -836,7 +777,6 @@
                 document.getElementById(sectionId).classList.remove('hidden');
                 document.getElementById(sectionId).classList.add('active');
                 
-                // Update navigation active state
                 document.querySelectorAll('.nav-item').forEach(item => {
                     item.classList.remove('active');
                     if (item.dataset.section === sectionId) {
@@ -857,10 +797,10 @@
                 const input = document.getElementById(inputId);
                 if (input.type === "password") {
                     input.type = "text";
-                    iconElement.innerHTML = '&#128064;'; // Open eye
+                    iconElement.innerHTML = '&#128064;';
                 } else {
                     input.type = "password";
-                    iconElement.innerHTML = '&#128065;'; // Closed eye
+                    iconElement.innerHTML = '&#128065;';
                 }
             },
             updateHeaderStats: (coins, limits, credits) => {
@@ -876,39 +816,35 @@
                     splash.classList.add('hidden');
                     document.body.style.overflow = 'auto';
                     document.getElementById('app-container').classList.remove('hidden');
-                }, 1500); // Wait for the fade out animation
-            },
-            runWebViewString: (command) => {
-                if (window.AppInventor && window.AppInventor.setWebViewString) {
-                    window.AppInventor.setWebViewString(command);
-                    console.log(`WebViewString Sent: ${command}`);
-                } else {
-                    console.warn(`AppInventor not found. Command: ${command}`);
-                    alert(`AppInventor not found. Command: ${command.split(':')[0]} with data: ${command.split(':')[1]}`);
-                }
+                }, 500);
             },
             playPostSound: (postContent) => {
-                App.UI.runWebViewString(`TTS:${postContent}`);
+                if ('speechSynthesis' in window) {
+                    const utterance = new SpeechSynthesisUtterance(postContent);
+                    utterance.lang = 'hi-IN'; // Set language to Hindi
+                    speechSynthesis.speak(utterance);
+                } else {
+                    alert("Your browser does not support Text-to-Speech.");
+                }
             },
-            openMessageApp: () => {
+            openWhatsAppMessage: () => {
                 const targetUserId = App.profileToView;
                 if (!targetUserId) return;
                 
-                const profile = targetUserId === App.currentUserId ? App.userProfileData : App.postsCache.find(p => p.userId === targetUserId);
-                
-                if (profile && profile.whatsapp) {
-                    App.UI.runWebViewString(`WHATSAPP:${profile.whatsapp}`);
-                } else if (profile && profile.phone) {
-                    App.UI.runWebViewString(`SMS:${profile.phone}`);
-                } else {
-                    alert('No contact information available for this user.');
-                }
+                App.db.collection('users').doc(targetUserId).get().then(doc => {
+                    const profile = doc.data();
+                    if (profile && profile.whatsapp) {
+                        window.open(`https://wa.me/${profile.whatsapp}`, '_blank');
+                    } else {
+                        alert('No WhatsApp number available for this user.');
+                    }
+                }).catch(error => {
+                    console.error("Error fetching WhatsApp number:", error);
+                    alert("Could not retrieve user's WhatsApp number.");
+                });
             }
         };
         
-        // ---------------------------------
-        // --- Core App Functions (Auth.js) ---
-        // ---------------------------------
         App.Auth = {
             signup: async (email, password, confirmPassword) => {
                 App.UI.hideMessage('signup-status-message');
@@ -935,7 +871,6 @@
                 App.UI.hideMessage('auth-status-message');
                 try {
                     await App.auth.signInWithEmailAndPassword(email, password);
-                    // onAuthStateChanged will handle the rest
                 } catch (error) {
                     App.UI.showMessage('auth-status-message', `Error: ${error.message}`, 'error');
                     console.error("Signin error:", error);
@@ -964,9 +899,6 @@
             }
         };
 
-        // ----------------------------------
-        // --- Profile Functions (Profile.js) ---
-        // ----------------------------------
         App.Profile = {
             setup: async (username, phone, whatsapp, instagram) => {
                 App.UI.hideMessage('profile-setup-message');
@@ -977,13 +909,12 @@
                         phone: phone || null,
                         whatsapp: whatsapp || null,
                         instagram: instagram || null,
-                        coins: 100, // Initial coins
-                        credits: 50, // Initial credits
-                        postLimit: 5, // Initial post limits
+                        coins: 100,
+                        credits: 50,
+                        postLimit: 5,
                         lastFreeRewardTime: new Date(0)
                     });
                     App.UI.showMessage('profile-setup-message', 'Profile saved successfully!', 'success');
-                    // Wait for a moment and then reload app state
                     setTimeout(() => window.location.reload(), 1000);
                 } catch (error) {
                     App.UI.showMessage('profile-setup-message', `Error saving profile: ${error.message}`, 'error');
@@ -1013,7 +944,6 @@
                 try {
                     const userDoc = await App.db.collection('users').doc(uid).get();
                     if (!userDoc.exists) {
-                        // This case handles when a user is logged in but hasn't set up a profile yet
                         if (isCurrentUser) {
                             App.UI.showSection('setup-profile');
                             return;
@@ -1029,7 +959,7 @@
                     data.postsCount = postsSnapshot.size;
                     data.followersCount = followersSnapshot.size;
                     data.followingCount = followingSnapshot.size;
-                    data.uid = uid; // Add UID to the data object
+                    data.uid = uid;
                     
                     if (isCurrentUser) {
                         App.userProfileData = data;
@@ -1055,13 +985,11 @@
                 document.getElementById('profile-whatsapp-number').textContent = profile.whatsapp || 'N/A';
                 document.getElementById('profile-instagram-handle').textContent = profile.instagram || 'N/A';
                 
-                // For Edit Profile form
                 document.getElementById('editUsername').value = profile.username || '';
                 document.getElementById('editPhone').value = profile.phone || '';
                 document.getElementById('editWhatsApp').value = profile.whatsapp || '';
                 document.getElementById('editInstagram').value = profile.instagram || '';
                 
-                // Render posts
                 App.Posts.renderAll(posts, 'profile-posts-grid', true);
             },
             renderOtherUserProfile: (profile, posts) => {
@@ -1073,16 +1001,15 @@
                 document.getElementById('other-profile-whatsapp-number').textContent = profile.whatsapp || 'N/A';
                 document.getElementById('other-profile-instagram-handle').textContent = profile.instagram || 'N/A';
                 
-                // Check if already following
                 App.db.collection('users').doc(App.currentUserId).collection('following').doc(profile.uid).get().then(doc => {
+                    const followBtn = document.getElementById('other-follow-btn');
                     if (doc.exists) {
-                        document.getElementById('other-follow-btn').textContent = 'Following';
+                        followBtn.textContent = 'Following';
                     } else {
-                        document.getElementById('other-follow-btn').textContent = 'Follow';
+                        followBtn.textContent = 'Follow';
                     }
                 });
 
-                // Render posts
                 App.Posts.renderAll(posts, 'other-profile-posts-grid', false);
             },
             toggleFollow: async (targetUserId = App.profileToView) => {
@@ -1094,17 +1021,14 @@
                 try {
                     const doc = await followRef.get();
                     if (doc.exists) {
-                        // Unfollow
                         await followRef.delete();
                         await followerRef.delete();
                         alert('Unfollowed user.');
                     } else {
-                        // Follow
                         await followRef.set({ followedAt: new Date() });
                         await followerRef.set({ followedAt: new Date() });
                         alert('Followed user!');
                     }
-                    // Refresh profile view
                     App.Profile.fetch(targetUserId, false);
                 } catch (error) {
                     console.error("Error toggling follow:", error);
@@ -1113,9 +1037,6 @@
             }
         };
 
-        // ---------------------------------
-        // --- Posts Functions (Posts.js) ---
-        // ---------------------------------
         App.Posts = {
             create: async (content) => {
                 const userRef = App.db.collection('users').doc(App.currentUserId);
@@ -1129,48 +1050,41 @@
                 const postsLimit = userData.postLimit || 0;
                 const coins = userData.coins || 0;
                 
-                let canPost = false;
-                if (postsLimit > 0) {
-                    canPost = true;
-                } else if (coins >= 5) {
-                    canPost = true;
-                }
-
-                if (!canPost) {
-                    App.UI.showMessage('create-post-message', 'You have no free posts left and not enough coins. Please watch an ad to get more.', 'error');
-                    return;
-                }
-
-                // Show ad if using coins
-                if (postsLimit === 0 && coins >= 5) {
-                    App.UI.runWebViewString('SHOW_REWARDED_AD:post');
+                if (postsLimit <= 0 && coins < 5) {
+                    App.UI.showMessage('create-post-message', 'You have no free posts left and not enough coins. Please get more to post.', 'error');
                     return;
                 }
                 
-                await App.Posts.submitNewPost(content, userData, userRef, coins, postsLimit);
+                await App.Posts.submitNewPost(content, userData, userRef);
             },
-            submitNewPost: async (content, userData, userRef, coins, postsLimit) => {
-                const batch = App.db.batch();
+            submitNewPost: async (content, userData, userRef) => {
+                const postsLimit = userData.postLimit || 0;
                 
                 const newPostRef = App.db.collection('posts').doc();
-                batch.set(newPostRef, {
-                    content,
-                    userId: App.currentUserId,
-                    username: userData.username,
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                    likes: 0,
-                    style: App.Posts.getRandomPostStyle(),
-                    expiryTime: Date.now() + (24 * 60 * 60 * 1000)
-                });
+                const updateData = {};
                 
                 if (postsLimit > 0) {
-                    batch.update(userRef, { postLimit: firebase.firestore.FieldValue.increment(-1) });
+                    updateData.postLimit = firebase.firestore.FieldValue.increment(-1);
                 } else {
-                    batch.update(userRef, { coins: firebase.firestore.FieldValue.increment(-5) });
+                    updateData.coins = firebase.firestore.FieldValue.increment(-5);
                 }
                 
+                const neonColor = App.Posts.getRandomPostStyle();
+
                 try {
-                    await batch.commit();
+                    await App.db.runTransaction(async (transaction) => {
+                        transaction.set(newPostRef, {
+                            content,
+                            userId: App.currentUserId,
+                            username: userData.username,
+                            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                            likes: 0,
+                            style: neonColor,
+                            expiryTime: Date.now() + (24 * 60 * 60 * 1000)
+                        });
+                        transaction.update(userRef, updateData);
+                    });
+
                     App.UI.showMessage('create-post-message', 'Post published successfully!', 'success');
                     document.getElementById('post-content').value = '';
                     await App.Profile.fetch(App.currentUserId, true);
@@ -1182,7 +1096,7 @@
             },
             fetch: async (targetDivId = 'posts-list', userId = null) => {
                 const container = document.getElementById(targetDivId);
-                container.innerHTML = '<p class="text-center" id="loading-posts-message" style="margin-top: 30px; font-style: italic; color: #aaa;">Fetching exciting posts...</p>';
+                container.innerHTML = '<p class="text-center" style="margin-top: 30px; font-style: italic; color: #aaa;">Fetching exciting posts...</p>';
                 App.postsCache = [];
 
                 let query = App.db.collection('posts').orderBy('timestamp', 'desc').limit(50);
@@ -1204,6 +1118,10 @@
                         postData.id = doc.id;
                         App.postsCache.push(postData);
                         
+                        // Check if the current user has liked this post
+                        const likedDoc = await App.db.collection('posts').doc(postData.id).collection('likes').doc(App.currentUserId).get();
+                        postData.hasLiked = likedDoc.exists;
+
                         App.Posts.render(postData, container, userId !== null);
                     }
                 } catch (error) {
@@ -1241,13 +1159,18 @@
                 postActions.className = 'post-actions';
 
                 const likeButton = document.createElement('button');
-                likeButton.textContent = 'Like';
-                likeButton.className = 'like-btn';
+                likeButton.textContent = post.hasLiked ? 'Liked' : 'Like';
+                likeButton.className = post.hasLiked ? 'like-btn liked' : 'like-btn';
                 likeButton.onclick = () => App.Posts.like(post.id);
 
                 const translateButton = document.createElement('button');
                 translateButton.textContent = 'Translate';
                 translateButton.onclick = () => App.Posts.translate(post.content);
+
+                const reportButton = document.createElement('button');
+                reportButton.textContent = 'Report';
+                reportButton.className = 'report-btn';
+                reportButton.onclick = () => App.Posts.report(post.id);
                 
                 const deleteButton = document.createElement('button');
                 deleteButton.textContent = 'Delete';
@@ -1256,6 +1179,7 @@
                 
                 postActions.appendChild(likeButton);
                 postActions.appendChild(translateButton);
+                postActions.appendChild(reportButton);
                 if (isOwner) {
                     postActions.appendChild(deleteButton);
                 }
@@ -1292,7 +1216,7 @@
                 });
             },
             getRandomPostStyle: () => {
-                const styles = ['horizontal', 'square', 'neon', 'normal', 'normal', 'normal', 'normal'];
+                const styles = App.neonColors;
                 return styles[Math.floor(Math.random() * styles.length)];
             },
             like: async (postId) => {
@@ -1330,25 +1254,36 @@
                 }
             },
             translate: (postContent) => {
-                App.UI.runWebViewString(`TRANSLATE:${postContent}`);
+                const encodedContent = encodeURIComponent(postContent);
+                const translateUrl = `https://translate.google.com/?sl=auto&tl=hi&text=${encodedContent}`;
+                window.open(translateUrl, '_blank');
+            },
+            report: async (postId) => {
+                if (confirm('Are you sure you want to report this post for inappropriate content?')) {
+                    try {
+                        const reportRef = App.db.collection('posts').doc(postId).collection('reports').doc(App.currentUserId);
+                        await reportRef.set({
+                            reportedBy: App.currentUserId,
+                            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                        alert('Post reported. Thank you for your feedback.');
+                    } catch (error) {
+                        console.error("Error reporting post:", error);
+                        alert('Error reporting post. Please try again.');
+                    }
+                }
             }
         };
 
-        // ------------------------------------
-        // --- Monetization Functions (Monetization.js) ---
-        // ------------------------------------
         App.Monetization = {
             checkDailyRewards: async () => {
                 if (!App.currentUserId) return;
-
                 const userRef = App.db.collection('users').doc(App.currentUserId);
                 const userDoc = await userRef.get();
                 if (!userDoc.exists) return;
-                
                 const userData = userDoc.data();
                 const lastRewardTime = userData.lastFreeRewardTime ? userData.lastFreeRewardTime.toDate() : new Date(0);
                 const now = new Date();
-                
                 const oneDayInMs = 24 * 60 * 60 * 1000;
                 if (now.getTime() - lastRewardTime.getTime() > oneDayInMs) {
                     await userRef.update({
@@ -1357,15 +1292,16 @@
                         credits: firebase.firestore.FieldValue.increment(10),
                         lastFreeRewardTime: new Date()
                     });
-                    
                     const message = 'Daily rewards claimed! You got 10 Coins, 2 Post Limits, and 10 Credits.';
                     App.UI.showMessage('daily-free-rewards-message', message, 'info');
                     App.Profile.fetch(App.currentUserId, true);
                 }
             },
             requestAd: (rewardType) => {
-                App.UI.runWebViewString(`SHOW_REWARDED_AD:${rewardType}`);
-                App.UI.showMessage('ad-rewards-message', 'Playing ad... Please do not close the app.', 'info');
+                // In a real app, this would trigger an ad.
+                // For now, we'll simulate the reward.
+                alert("Simulating Ad View. Reward will be given now.");
+                App.Monetization.handleAdCallback(rewardType);
             },
             handleAdCallback: async (rewardType) => {
                 if (!App.currentUserId) {
@@ -1382,14 +1318,6 @@
                         updateData = { credits: firebase.firestore.FieldValue.increment(10) };
                     } else if (rewardType === 'limits') {
                         updateData = { postLimit: firebase.firestore.FieldValue.increment(1) };
-                    } else if (rewardType === 'post') {
-                         const postContent = document.getElementById('post-content').value;
-                         if (postContent.trim() !== '') {
-                            const userDoc = await userRef.get();
-                            const userData = userDoc.data();
-                            await App.Posts.submitNewPost(postContent, userData, userRef, userData.coins, userData.postLimit);
-                         }
-                         return;
                     }
                     
                     await userRef.update(updateData);
@@ -1401,10 +1329,6 @@
                 }
             }
         };
-
-        // -------------------------
-        // --- Init & Events ---
-        // -------------------------
 
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('signup-form').addEventListener('submit', (e) => {
@@ -1461,54 +1385,32 @@
             });
         });
 
-        // --- THE CRITICAL FIX: onAuthStateChanged listener ---
         App.auth.onAuthStateChanged(async (user) => {
-            setTimeout(() => {
-                App.UI.hidePreloader();
-                if (user) {
-                    App.currentUserId = user.uid;
-                    if (user.emailVerified) {
-                        App.db.collection('users').doc(App.currentUserId).get().then(doc => {
-                            if (doc.exists && doc.data().username) {
-                                // User is signed in and has a profile
-                                App.UI.showSection('home-posts');
-                                App.Profile.fetch(App.currentUserId, true);
-                                App.Posts.fetch();
-                                App.Monetization.checkDailyRewards();
-                            } else {
-                                // User is signed in but needs to set up a profile
-                                App.UI.showSection('setup-profile');
-                            }
-                        }).catch(error => {
-                            console.error("Error fetching user profile:", error);
+            if (user) {
+                App.currentUserId = user.uid;
+                if (user.emailVerified) {
+                    App.db.collection('users').doc(App.currentUserId).get().then(doc => {
+                        if (doc.exists && doc.data().username) {
+                            App.UI.showSection('home-posts');
+                            App.Profile.fetch(App.currentUserId, true);
+                            App.Posts.fetch();
+                            App.Monetization.checkDailyRewards();
+                        } else {
                             App.UI.showSection('setup-profile');
-                        });
-                    } else {
-                        // User is signed in but email is not verified
-                        App.UI.showSection('email-verify');
-                    }
+                        }
+                    }).catch(error => {
+                        console.error("Error fetching user profile:", error);
+                        App.UI.showSection('setup-profile');
+                    });
                 } else {
-                    // No user is signed in
-                    App.currentUserId = null;
-                    App.UI.showSection('signin-auth');
+                    App.UI.showSection('email-verify');
                 }
-            }, 1500);
-        });
-
-        // --- App Inventor Callback Functions (global scope) ---
-        window.adComplete = (rewardType) => {
-            App.Monetization.handleAdCallback(rewardType);
-        };
-        window.onTranslateCallback = (translatedText) => {
-            alert(`Translated: ${translatedText}`);
-        };
-        window.onProfileOpen = (userId) => {
-            if (userId) {
-                App.profileToView = userId;
-                App.Profile.fetch(userId, userId === App.currentUserId);
-                App.UI.showSection(userId === App.currentUserId ? 'user-profile-section' : 'other-user-profile-section');
+            } else {
+                App.currentUserId = null;
+                App.UI.showSection('signin-auth');
             }
-        };
+            App.UI.hidePreloader();
+        });
 
     </script>
 </body>
