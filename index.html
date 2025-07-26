@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>AddMint Pro</title>
     <style>
-        /* Global Styles & Variables */
+        /* CSS resets and global variables */
         :root {
             --dark-bg: #0d0d0d;
             --dark-fg: #1a1a1a;
@@ -33,13 +33,16 @@
             -webkit-tap-highlight-color: transparent;
         }
 
+        html, body {
+            height: 100%;
+        }
+        
         body {
             background: linear-gradient(135deg, var(--dark-bg), #121212);
             color: var(--text-color);
             line-height: 1.6;
             display: flex;
             flex-direction: column;
-            min-height: 100vh;
             overflow-x: hidden;
             font-size: 16px;
             -webkit-font-smoothing: antialiased;
@@ -110,7 +113,7 @@
         .container {
             width: 90%;
             max-width: 500px;
-            margin: auto;
+            margin: 20px auto;
             padding: 30px;
             background-color: var(--dark-fg);
             border-radius: var(--border-radius-lg);
@@ -147,6 +150,8 @@
             z-index: 1000;
             transition: opacity 1.5s ease-out;
             opacity: 1;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
         }
         .splash-logo-container {
             width: 150px; height: 150px;
@@ -182,6 +187,13 @@
             animation: spin 1s linear infinite, glow 1.5s infinite alternate;
             margin-top: 50px;
             box-shadow: 0 0 20px rgba(0, 170, 255, 0.5);
+        }
+        #loading-text {
+            margin-top: 20px;
+            font-size: 1.2rem;
+            color: #bbb;
+            opacity: 0;
+            animation: fadeInText 1s 1s forwards;
         }
 
         /* Header */
@@ -343,7 +355,10 @@
             right: 25px;
             background: rgba(0, 0, 0, 0.5);
             border-radius: 50%;
-            padding: 10px;
+            width: 40px; height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             font-size: 1.5rem;
             color: white;
             cursor: pointer;
@@ -489,6 +504,7 @@
 
         /* Animations */
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeInText { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slideInUp { from { opacity: 0; transform: translateY(50px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes slideInRight { from { opacity: 0; transform: translateX(50px); } to { opacity: 1; transform: translateX(0); } }
         @keyframes zoomIn { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
@@ -508,7 +524,6 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
 </head>
 <body>
 
@@ -518,7 +533,7 @@
             <div class="splash-logo-text">A</div>
         </div>
         <div class="splash-loader"></div>
-        <p style="margin-top: 20px; font-size: 1.2rem; color: #bbb;">Loading AddMint Pro...</p>
+        <p id="loading-text">Optimizing App Experience...</p>
     </div>
 
     <div id="app-container" class="hidden">
@@ -527,14 +542,17 @@
                 <span class="shape"></span> AddMint
             </div>
             <div class="header-stats">
-                <div class="stat-item" onclick="showSection('ad-rewards-section');">
-                    <span class="icon">&#x1F4B0;</span> <span id="header-coins">0</span>
+                <div class="stat-item" onclick="App.UI.showSection('ad-rewards-section');">
+                    <span class="icon">&#x1F4B0;</span>
+                    <span id="header-coins">0</span>
                 </div>
-                <div class="stat-item" onclick="showSection('ad-rewards-section');">
-                    <span class="icon">&#x2756;</span> <span id="header-limit">0</span>
+                <div class="stat-item" onclick="App.UI.showSection('ad-rewards-section');">
+                    <span class="icon">&#x2756;</span>
+                    <span id="header-limit">0</span>
                 </div>
-                <div class="stat-item" onclick="showSection('ad-rewards-section');">
-                    <span class="icon">&#x1F4A1;</span> <span id="header-credits">0</span>
+                <div class="stat-item" onclick="App.UI.showSection('ad-rewards-section');">
+                    <span class="icon">&#x1F4A1;</span>
+                    <span id="header-credits">0</span>
                 </div>
             </div>
         </header>
@@ -547,10 +565,10 @@
                     <input type="email" id="signin-email" placeholder="Your Email" required>
                     <div class="password-input-container">
                         <input type="password" id="signin-password" placeholder="Password" required>
-                        <span class="toggle-password" onclick="togglePasswordVisibility('signin-password', this)">&#128065;</span>
+                        <span class="toggle-password" onclick="App.UI.togglePasswordVisibility('signin-password', this)">&#128065;</span>
                     </div>
                     <button type="submit">Sign In</button>
-                    <p class="text-center mt-4">Don't have an account? <a href="#" onclick="showSection('signup-auth'); return false;">Sign Up Here</a></p>
+                    <p class="text-center mt-4">Don't have an account? <a href="#" onclick="App.UI.showSection('signup-auth'); return false;">Sign Up Here</a></p>
                 </form>
             </section>
 
@@ -561,14 +579,14 @@
                     <input type="email" id="signup-email" placeholder="Your Email" required>
                     <div class="password-input-container">
                         <input type="password" id="signup-password" placeholder="Create Password (min 6 chars)" required>
-                        <span class="toggle-password" onclick="togglePasswordVisibility('signup-password', this)">&#128065;</span>
+                        <span class="toggle-password" onclick="App.UI.togglePasswordVisibility('signup-password', this)">&#128065;</span>
                     </div>
                     <div class="password-input-container">
                         <input type="password" id="signup-confirm-password" placeholder="Confirm Password" required>
-                        <span class="toggle-password" onclick="togglePasswordVisibility('signup-confirm-password', this)">&#128065;</span>
+                        <span class="toggle-password" onclick="App.UI.togglePasswordVisibility('signup-confirm-password', this)">&#128065;</span>
                     </div>
                     <button type="submit">Sign Up</button>
-                    <p class="text-center mt-4">Already have an account? <a href="#" onclick="showSection('signin-auth'); return false;">Sign In</a></p>
+                    <p class="text-center mt-4">Already have an account? <a href="#" onclick="App.UI.showSection('signin-auth'); return false;">Sign In</a></p>
                 </form>
             </section>
 
@@ -576,8 +594,8 @@
                 <h2>Verify Your Email</h2>
                 <div id="verify-email-message" class="message error"></div>
                 <p class="text-center mb-4">A verification link has been sent. Please check your inbox.</p>
-                <button onclick="sendVerificationEmail()">Resend Verification Email</button>
-                <button onclick="logout()" class="mt-4" style="background-color: var(--error-color);">Sign Out</button>
+                <button onclick="App.Auth.sendVerificationEmail()">Resend Verification Email</button>
+                <button onclick="App.Auth.logout()" class="mt-4" style="background-color: var(--error-color);">Sign Out</button>
             </section>
 
             <section id="setup-profile" class="container">
@@ -625,9 +643,9 @@
                 <div id="ad-rewards-message" class="message hidden"></div>
                 <p class="text-center mb-4">Watch an ad to get more coins, credits, or post limits. Full ad dekhna zaroori hai!</p>
                 <div class="reward-buttons">
-                    <button onclick="requestAd('coins');"><span class="icon">&#x1F4B0;</span> Get 10 Coins</button>
-                    <button onclick="requestAd('credits');"><span class="icon">&#x1F4A1;</span> Get 10 Credits</button>
-                    <button onclick="requestAd('limits');"><span class="icon">&#x2756;</span> Get 1 Post Limit</button>
+                    <button onclick="App.Monetization.requestAd('coins');"><span class="icon">&#x1F4B0;</span> Get 10 Coins</button>
+                    <button onclick="App.Monetization.requestAd('credits');"><span class="icon">&#x1F4A1;</span> Get 10 Credits</button>
+                    <button onclick="App.Monetization.requestAd('limits');"><span class="icon">&#x2756;</span> Get 1 Post Limit</button>
                 </div>
             </section>
 
@@ -653,8 +671,9 @@
                             </div>
                         </div>
                         <div class="profile-buttons">
-                            <button id="follow-btn" onclick="toggleFollow()">Follow</button>
-                            <button id="message-btn" onclick="sendMessage()"><span class="icon">&#x1F4AC;</span> Message</button>
+                            <button onclick="App.UI.showSection('edit-profile-section');">Edit Profile</button>
+                            <button id="follow-btn" onclick="App.Profile.toggleFollow()">Follow</button>
+                            <button id="message-btn" onclick="App.UI.openMessageApp()"><span class="icon">&#x1F4AC;</span> Message</button>
                         </div>
                     </div>
                 </div>
@@ -667,8 +686,7 @@
                 <h4 style="margin-top: 30px; text-align: center;">Active Posts</h4>
                 <div id="profile-posts-grid" class="profile-posts-grid">
                     </div>
-                <button onclick="showSection('edit-profile-section')" class="mt-4">Edit Profile</button>
-                <button onclick="logout()" class="mt-4" style="background-color: var(--error-color);">Sign Out</button>
+                <button onclick="App.Auth.logout()" class="mt-4" style="background-color: var(--error-color);">Sign Out</button>
             </section>
 
             <section id="edit-profile-section" class="container">
@@ -684,7 +702,7 @@
                     <label for="editInstagram" class="mt-4">Instagram Handle (Optional):</label>
                     <input type="text" id="editInstagram">
                     <button type="submit" class="mt-4">Save Changes</button>
-                    <button type="button" onclick="showSection('user-profile-section')" class="mt-4" style="background-color: #6c757d;">Cancel</button>
+                    <button type="button" onclick="App.UI.showSection('user-profile-section')" class="mt-4" style="background-color: #6c757d;">Cancel</button>
                 </form>
             </section>
 
@@ -710,8 +728,8 @@
                             </div>
                         </div>
                         <div class="profile-buttons">
-                            <button id="other-follow-btn" onclick="toggleFollow()">Follow</button>
-                            <button id="other-message-btn" onclick="sendMessage()"><span class="icon">&#x1F4AC;</span> Message</button>
+                            <button id="other-follow-btn" onclick="App.Profile.toggleFollow()">Follow</button>
+                            <button id="other-message-btn" onclick="App.UI.openMessageApp()"><span class="icon">&#x1F4AC;</span> Message</button>
                         </div>
                     </div>
                 </div>
@@ -770,10 +788,10 @@
         App.postsCache = []; // To store fetched posts and prevent re-fetching
         App.profileToView = null; // Store the ID of the user whose profile is being viewed
 
-        // ---------------------------
-        // --- UI & Helper Functions ---
-        // ---------------------------
-        const UI = {
+        // ------------------------------------
+        // --- UI & Helper Functions (UI.js) ---
+        // ------------------------------------
+        App.UI = {
             showSection: (sectionId) => {
                 document.querySelectorAll('section').forEach(section => {
                     section.classList.remove('active');
@@ -781,6 +799,8 @@
                 });
                 document.getElementById(sectionId).classList.remove('hidden');
                 document.getElementById(sectionId).classList.add('active');
+                
+                // Update navigation active state
                 document.querySelectorAll('.nav-item').forEach(item => {
                     item.classList.remove('active');
                     if (item.dataset.section === sectionId) {
@@ -801,10 +821,10 @@
                 const input = document.getElementById(inputId);
                 if (input.type === "password") {
                     input.type = "text";
-                    iconElement.innerHTML = '&#128064;';
+                    iconElement.innerHTML = '&#128064;'; // Open eye
                 } else {
                     input.type = "password";
-                    iconElement.innerHTML = '&#128065;';
+                    iconElement.innerHTML = '&#128065;'; // Closed eye
                 }
             },
             updateHeaderStats: (coins, limits, credits) => {
@@ -818,53 +838,140 @@
                 setTimeout(() => {
                     splash.classList.add('hidden');
                     document.body.style.overflow = 'auto';
-                }, 1500);
+                    document.getElementById('app-container').classList.remove('hidden');
+                }, 1500); // Wait for the fade out animation
             },
             runWebViewString: (command) => {
                 if (window.AppInventor && window.AppInventor.setWebViewString) {
                     window.AppInventor.setWebViewString(command);
+                    console.log(`WebViewString Sent: ${command}`);
                 } else {
                     console.warn(`AppInventor not found. Command: ${command}`);
                     alert(`AppInventor not found. Command: ${command.split(':')[0]} with data: ${command.split(':')[1]}`);
                 }
             },
             playPostSound: (postContent) => {
-                // Here we would implement the sound logic.
-                // Since there's no web-based text-to-speech without an API,
-                // we'll simulate the sound by calling a WebViewString.
-                // App Inventor will need a "TextToSpeech" component.
-                UI.runWebViewString(`TTS:${postContent}`);
+                App.UI.runWebViewString(`TTS:${postContent}`);
+            },
+            openMessageApp: () => {
+                if (!App.profileToView) return;
+                const targetUserId = App.profileToView;
+                const profile = targetUserId === App.currentUserId ? App.userProfileData : App.postsCache.find(p => p.userId === targetUserId);
+
+                if (profile && profile.whatsapp) {
+                    App.UI.runWebViewString(`WHATSAPP:${profile.whatsapp}`);
+                } else if (profile && profile.phone) {
+                    App.UI.runWebViewString(`SMS:${profile.phone}`);
+                } else {
+                    alert('No contact information available for this user.');
+                }
             }
         };
-
-        // -------------------------
-        // --- Core App Functions ---
-        // -------------------------
-
-        // --- AUTH.js (Simulated Module) ---
-        const Auth = {
+        
+        // ---------------------------------
+        // --- Core App Functions (Auth.js) ---
+        // ---------------------------------
+        App.Auth = {
             signup: async (email, password, confirmPassword) => {
-                // ... (existing signup logic) ...
+                if (password !== confirmPassword) {
+                    App.UI.showMessage('signup-status-message', 'Passwords do not match.', 'error');
+                    return;
+                }
+                if (password.length < 6) {
+                    App.UI.showMessage('signup-status-message', 'Password must be at least 6 characters long.', 'error');
+                    return;
+                }
+                
+                try {
+                    const userCredential = await App.auth.createUserWithEmailAndPassword(email, password);
+                    await App.Auth.sendVerificationEmail();
+                    App.UI.showMessage('signup-status-message', 'Successfully signed up! Please check your email for a verification link.', 'success');
+                    App.UI.showSection('email-verify');
+                } catch (error) {
+                    App.UI.showMessage('signup-status-message', `Error: ${error.message}`, 'error');
+                    console.error("Signup error:", error);
+                }
             },
             signin: async (email, password) => {
-                // ... (existing signin logic) ...
+                try {
+                    const userCredential = await App.auth.signInWithEmailAndPassword(email, password);
+                    if (!userCredential.user.emailVerified) {
+                        App.UI.showMessage('auth-status-message', 'Your email is not verified. Please check your inbox.', 'error');
+                        App.UI.showSection('email-verify');
+                        return;
+                    }
+                    App.UI.showMessage('auth-status-message', 'Signed in successfully!', 'success');
+                    // onAuthStateChanged will handle the rest
+                } catch (error) {
+                    App.UI.showMessage('auth-status-message', `Error: ${error.message}`, 'error');
+                    console.error("Signin error:", error);
+                }
             },
             logout: async () => {
-                await App.auth.signOut();
-                UI.showSection('signin-auth');
+                try {
+                    await App.auth.signOut();
+                    App.currentUserId = null;
+                    App.UI.showSection('signin-auth');
+                } catch (error) {
+                    console.error("Logout error:", error);
+                }
             },
             sendVerificationEmail: async () => {
-                // ... (existing sendVerificationEmail logic) ...
+                const user = App.auth.currentUser;
+                if (user) {
+                    try {
+                        await user.sendEmailVerification();
+                        App.UI.showMessage('verify-email-message', 'Verification link sent! Please check your inbox.', 'info');
+                    } catch (error) {
+                        App.UI.showMessage('verify-email-message', `Error sending verification email: ${error.message}`, 'error');
+                        console.error("Verification email error:", error);
+                    }
+                }
             }
         };
 
-        // --- PROFILE.js (Simulated Module) ---
-        const Profile = {
+        // ----------------------------------
+        // --- Profile Functions (Profile.js) ---
+        // ----------------------------------
+        App.Profile = {
             setup: async (username, phone, whatsapp, instagram) => {
-                // ... (existing profile setup logic) ...
+                try {
+                    await App.db.collection('users').doc(App.currentUserId).set({
+                        username,
+                        email: App.auth.currentUser.email,
+                        phone: phone || null,
+                        whatsapp: whatsapp || null,
+                        instagram: instagram || null,
+                        coins: 100, // Initial coins
+                        credits: 50, // Initial credits
+                        postLimit: 5, // Initial post limits
+                        lastFreeRewardTime: new Date(0)
+                    });
+                    App.UI.showMessage('profile-setup-message', 'Profile saved successfully!', 'success');
+                    // Wait for a moment and then reload app state
+                    setTimeout(() => window.location.reload(), 1000);
+                } catch (error) {
+                    App.UI.showMessage('profile-setup-message', `Error saving profile: ${error.message}`, 'error');
+                    console.error("Profile setup error:", error);
+                }
             },
             edit: async (username, phone, whatsapp, instagram) => {
-                // ... (existing profile edit logic) ...
+                try {
+                    await App.db.collection('users').doc(App.currentUserId).update({
+                        username,
+                        phone: phone || null,
+                        whatsapp: whatsapp || null,
+                        instagram: instagram || null,
+                    });
+                    App.UI.showMessage('edit-profile-message', 'Profile updated successfully!', 'success');
+                    setTimeout(() => {
+                        App.UI.showSection('user-profile-section');
+                        App.Profile.fetch(App.currentUserId, true);
+                    }, 1000);
+                } catch (error) {
+                    App.UI.showMessage('edit-profile-message', `Error updating profile: ${error.message}`, 'error');
+                    console.error("Profile edit error:", error);
+                }
             },
             fetch: async (uid, isCurrentUser = false) => {
                 try {
@@ -873,21 +980,23 @@
                         return null;
                     }
                     const data = userDoc.data();
+                    
                     const postsSnapshot = await App.db.collection('posts').where('userId', '==', uid).get();
                     const followersSnapshot = await App.db.collection('users').doc(uid).collection('followers').get();
                     const followingSnapshot = await App.db.collection('users').doc(uid).collection('following').get();
-
+                    
                     data.postsCount = postsSnapshot.size;
                     data.followersCount = followersSnapshot.size;
                     data.followingCount = followingSnapshot.size;
-
+                    data.uid = uid; // Add UID to the data object
+                    
                     if (isCurrentUser) {
                         App.userProfileData = data;
                         App.currentUsername = data.username;
-                        UI.updateHeaderStats(data.coins || 0, data.postLimit || 0, data.credits || 0);
-                        Profile.renderCurrentUserProfile(data, postsSnapshot.docs);
+                        App.UI.updateHeaderStats(data.coins || 0, data.postLimit || 0, data.credits || 0);
+                        App.Profile.renderCurrentUserProfile(data, postsSnapshot.docs);
                     } else {
-                        Profile.renderOtherUserProfile(data, postsSnapshot.docs);
+                        App.Profile.renderOtherUserProfile(data, postsSnapshot.docs);
                     }
                     return data;
                 } catch (error) {
@@ -896,83 +1005,470 @@
                 }
             },
             renderCurrentUserProfile: (profile, posts) => {
-                // ... (render logic for current user profile) ...
+                document.getElementById('profile-display-name').textContent = profile.username;
+                document.getElementById('profile-posts-count').textContent = profile.postsCount;
+                document.getElementById('profile-followers-count').textContent = profile.followersCount;
+                document.getElementById('profile-following-count').textContent = profile.followingCount;
+                document.getElementById('profile-email').textContent = profile.email;
+                document.getElementById('profile-phone-number').textContent = profile.phone || 'N/A';
+                document.getElementById('profile-whatsapp-number').textContent = profile.whatsapp || 'N/A';
+                document.getElementById('profile-instagram-handle').textContent = profile.instagram || 'N/A';
+                
+                // For Edit Profile form
+                document.getElementById('editUsername').value = profile.username || '';
+                document.getElementById('editPhone').value = profile.phone || '';
+                document.getElementById('editWhatsApp').value = profile.whatsapp || '';
+                document.getElementById('editInstagram').value = profile.instagram || '';
+
+                // Hide Follow button on own profile
+                document.getElementById('follow-btn').classList.add('hidden');
+                
+                // Render posts
+                App.Posts.renderAll(posts, 'profile-posts-grid', true);
             },
             renderOtherUserProfile: (profile, posts) => {
-                // ... (render logic for other user profile) ...
+                document.getElementById('other-profile-display-name').textContent = profile.username;
+                document.getElementById('other-profile-posts-count').textContent = profile.postsCount;
+                document.getElementById('other-profile-followers-count').textContent = profile.followersCount;
+                document.getElementById('other-profile-following-count').textContent = profile.followingCount;
+                document.getElementById('other-profile-email').textContent = profile.email;
+                document.getElementById('other-profile-whatsapp-number').textContent = profile.whatsapp || 'N/A';
+                document.getElementById('other-profile-instagram-handle').textContent = profile.instagram || 'N/A';
+                
+                // Show Follow/Message buttons
+                document.getElementById('other-follow-btn').classList.remove('hidden');
+                
+                // Check if already following
+                App.db.collection('users').doc(App.currentUserId).collection('following').doc(profile.uid).get().then(doc => {
+                    if (doc.exists) {
+                        document.getElementById('other-follow-btn').textContent = 'Following';
+                    } else {
+                        document.getElementById('other-follow-btn').textContent = 'Follow';
+                    }
+                });
+
+                // Render posts
+                App.Posts.renderAll(posts, 'other-profile-posts-grid', false);
             },
             toggleFollow: async (targetUserId = App.profileToView) => {
-                // ... (follow/unfollow logic) ...
+                if (!targetUserId || targetUserId === App.currentUserId) return;
+                
+                const followRef = App.db.collection('users').doc(App.currentUserId).collection('following').doc(targetUserId);
+                const followerRef = App.db.collection('users').doc(targetUserId).collection('followers').doc(App.currentUserId);
+                
+                try {
+                    const doc = await followRef.get();
+                    if (doc.exists) {
+                        // Unfollow
+                        await followRef.delete();
+                        await followerRef.delete();
+                        alert('Unfollowed user.');
+                    } else {
+                        // Follow
+                        await followRef.set({ followedAt: new Date() });
+                        await followerRef.set({ followedAt: new Date() });
+                        alert('Followed user!');
+                    }
+                    // Refresh profile view
+                    App.Profile.fetch(targetUserId, false);
+                } catch (error) {
+                    console.error("Error toggling follow:", error);
+                    alert("An error occurred. Please try again.");
+                }
             }
         };
 
-        // --- POSTS.js (Simulated Module) ---
-        const Posts = {
+        // ---------------------------------
+        // --- Posts Functions (Posts.js) ---
+        // ---------------------------------
+        App.Posts = {
             create: async (content) => {
-                // ... (create post logic with coin/limit check) ...
+                const userRef = App.db.collection('users').doc(App.currentUserId);
+                const userDoc = await userRef.get();
+                if (!userDoc.exists) {
+                    App.UI.showMessage('create-post-message', 'User profile not found.', 'error');
+                    return;
+                }
+                const userData = userDoc.data();
+                
+                const postsLimit = userData.postLimit || 0;
+                const coins = userData.coins || 0;
+                
+                let canPost = false;
+                if (postsLimit > 0) {
+                    canPost = true;
+                } else if (coins >= 5) {
+                    canPost = true;
+                }
+
+                if (!canPost) {
+                    App.UI.showMessage('create-post-message', 'You have no free posts left and not enough coins. Please watch an ad to get more.', 'error');
+                    return;
+                }
+
+                // Show ad if using coins
+                if (postsLimit === 0 && coins >= 5) {
+                    App.UI.runWebViewString('SHOW_REWARDED_AD:post');
+                    // The rest of the logic will be handled by the ad callback
+                    return;
+                }
+                
+                // If we are here, it means we can post. Proceed.
+                await App.Posts.submitNewPost(content, userData, userRef, coins, postsLimit);
+            },
+            submitNewPost: async (content, userData, userRef, coins, postsLimit) => {
+                const batch = App.db.batch();
+                
+                // Create new post
+                const newPostRef = App.db.collection('posts').doc();
+                batch.set(newPostRef, {
+                    content,
+                    userId: App.currentUserId,
+                    username: userData.username,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    likes: 0,
+                    style: App.Posts.getRandomPostStyle(), // New function for unique styles
+                    expiryTime: Date.now() + (24 * 60 * 60 * 1000) // 24 hours expiry,
+                });
+                
+                // Update user stats
+                if (postsLimit > 0) {
+                    batch.update(userRef, { postLimit: firebase.firestore.FieldValue.increment(-1) });
+                } else {
+                    batch.update(userRef, { coins: firebase.firestore.FieldValue.increment(-5) });
+                }
+                
+                try {
+                    await batch.commit();
+                    App.UI.showMessage('create-post-message', 'Post published successfully!', 'success');
+                    document.getElementById('post-content').value = '';
+                    await App.Profile.fetch(App.currentUserId, true);
+                    App.Posts.fetch();
+                } catch (error) {
+                    App.UI.showMessage('create-post-message', `Error publishing post: ${error.message}`, 'error');
+                    console.error("Post creation error:", error);
+                }
             },
             fetch: async (targetDivId = 'posts-list', userId = null) => {
-                // ... (fetch posts logic, including horizontal/vertical/neon styles) ...
+                const container = document.getElementById(targetDivId);
+                container.innerHTML = '<p class="text-center" style="margin-top: 30px; font-style: italic; color: #aaa;">Fetching posts...</p>';
+                App.postsCache = [];
+
+                let query = App.db.collection('posts').orderBy('timestamp', 'desc').limit(50);
+                if (userId) {
+                    query = query.where('userId', '==', userId);
+                }
+                
+                try {
+                    const snapshot = await query.get();
+                    if (snapshot.empty) {
+                        container.innerHTML = '<p class="text-center" style="margin-top: 30px; font-style: italic; color: #aaa;">No posts to display.</p>';
+                        return;
+                    }
+
+                    // Clear previous content
+                    container.innerHTML = '';
+                    
+                    const postDocs = snapshot.docs;
+                    const renderedUids = new Set(); // To store rendered user IDs for efficiency
+                    
+                    for (const doc of postDocs) {
+                        const postData = doc.data();
+                        postData.id = doc.id;
+                        App.postsCache.push(postData);
+                        
+                        // Add some duplicate posts for infinite scroll feel
+                        App.Posts.render(postData, container);
+                        if (Math.random() < 0.2) { // 20% chance to duplicate
+                           App.Posts.render(postData, container, null, true);
+                        }
+                    }
+                    
+                    // Add some more posts for different styles
+                    if (!userId) {
+                        const randomPosts = [...postDocs].sort(() => 0.5 - Math.random()).slice(0, 5);
+                        for (const doc of randomPosts) {
+                            const postData = doc.data();
+                            postData.id = doc.id;
+                            postData.style = ['horizontal', 'square', 'neon'][Math.floor(Math.random() * 3)];
+                            App.Posts.render(postData, container);
+                        }
+                    }
+
+                } catch (error) {
+                    container.innerHTML = '<p class="text-center message error">Error loading posts. Please try again.</p>';
+                    console.error("Error fetching posts:", error);
+                }
             },
-            render: (post, container, isProfilePost = false) => {
-                // ... (render logic for a single post, including sound, like, translate buttons) ...
+            render: (post, container, isProfilePost = false, isDuplicate = false) => {
+                // ... (existing render logic) ...
+                const postElement = document.createElement('div');
+                postElement.className = `post-card ${post.style || ''}`;
+                postElement.dataset.postId = post.id;
+                postElement.dataset.userId = post.userId;
+                
+                const postId = isDuplicate ? post.id + '-dup-' + Math.random() : post.id;
+                const isOwner = post.userId === App.currentUserId;
+                
+                const postContentWrapper = document.createElement('div');
+                postContentWrapper.className = 'post-content-wrapper';
+
+                const postTitle = document.createElement('h3');
+                postTitle.textContent = post.username;
+                postTitle.onclick = () => {
+                    App.profileToView = post.userId;
+                    App.Profile.fetch(post.userId, isOwner);
+                    App.UI.showSection(isOwner ? 'user-profile-section' : 'other-user-profile-section');
+                };
+                
+                const postBody = document.createElement('p');
+                postBody.textContent = post.content;
+                
+                const postMeta = document.createElement('div');
+                postMeta.className = 'post-meta';
+                postMeta.innerHTML = `<span>Likes: <span id="likes-count-${postId}">${post.likes}</span></span><span>${new Date(post.timestamp.toDate()).toLocaleString()}</span>`;
+                
+                const postActions = document.createElement('div');
+                postActions.className = 'post-actions';
+
+                const likeButton = document.createElement('button');
+                likeButton.textContent = 'Like';
+                likeButton.className = 'like-btn';
+                likeButton.onclick = () => App.Posts.like(post.id, postId);
+
+                const translateButton = document.createElement('button');
+                translateButton.textContent = 'Translate';
+                translateButton.onclick = () => App.Posts.translate(post.content);
+                
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'Delete';
+                deleteButton.className = 'delete-btn';
+                deleteButton.onclick = () => App.Posts.delete(post.id);
+                
+                postActions.appendChild(likeButton);
+                postActions.appendChild(translateButton);
+                if (isOwner) {
+                    postActions.appendChild(deleteButton);
+                }
+                
+                // Add sound button
+                const soundButton = document.createElement('button');
+                soundButton.className = 'post-sound-btn';
+                soundButton.innerHTML = '&#128266;'; // Speaker icon
+                soundButton.onclick = (e) => {
+                    e.stopPropagation();
+                    App.UI.playPostSound(post.content);
+                };
+                
+                postContentWrapper.appendChild(postTitle);
+                postContentWrapper.appendChild(postBody);
+
+                postElement.appendChild(postContentWrapper);
+                postElement.appendChild(postMeta);
+                postElement.appendChild(postActions);
+                postElement.appendChild(soundButton);
+                
+                container.appendChild(postElement);
             },
-            like: async (postId) => {
-                // ... (like post logic with Firestore transaction) ...
+            getRandomPostStyle: () => {
+                const styles = ['horizontal', 'square', 'neon', 'normal', 'normal', 'normal'];
+                return styles[Math.floor(Math.random() * styles.length)];
+            },
+            like: async (postId, likeCountId) => {
+                const likeRef = App.db.collection('posts').doc(postId).collection('likes').doc(App.currentUserId);
+                const postRef = App.db.collection('posts').doc(postId);
+                
+                try {
+                    const doc = await likeRef.get();
+                    if (doc.exists) {
+                        await likeRef.delete();
+                        await postRef.update({ likes: firebase.firestore.FieldValue.increment(-1) });
+                        document.getElementById(`likes-count-${likeCountId}`).textContent = parseInt(document.getElementById(`likes-count-${likeCountId}`).textContent) - 1;
+                        alert('Un-liked post.');
+                    } else {
+                        await likeRef.set({ likedAt: new Date() });
+                        await postRef.update({ likes: firebase.firestore.FieldValue.increment(1) });
+                        document.getElementById(`likes-count-${likeCountId}`).textContent = parseInt(document.getElementById(`likes-count-${likeCountId}`).textContent) + 1;
+                        alert('Liked post!');
+                    }
+                } catch (error) {
+                    console.error("Error liking post:", error);
+                    alert('Error liking post. Please try again.');
+                }
             },
             delete: async (postId) => {
-                // ... (delete post logic) ...
+                if (confirm('Are you sure you want to delete this post?')) {
+                    try {
+                        const postRef = App.db.collection('posts').doc(postId);
+                        await postRef.delete();
+                        alert('Post deleted.');
+                        App.Posts.fetch(); // Reload posts
+                    } catch (error) {
+                        console.error("Error deleting post:", error);
+                        alert('Error deleting post. Please try again.');
+                    }
+                }
             },
             translate: (postContent) => {
-                // Call WebViewString to trigger translation
-                UI.runWebViewString(`TRANSLATE:${postContent}`);
-            }
-        };
-        
-        // --- MONETIZATION.js (Simulated Module) ---
-        const Monetization = {
-            checkDailyRewards: async () => {
-                // ... (logic to check if daily rewards have been claimed) ...
-            },
-            requestAd: (rewardType) => {
-                // Send WebViewString to App Inventor to show ad
-                UI.runWebViewString(`SHOW_REWARDED_AD:${rewardType}`);
-            },
-            handleAdCallback: (rewardType) => {
-                // This function is called by App Inventor after a successful ad view
-                // ... (logic to update coins/credits/limits in Firestore) ...
+                App.UI.runWebViewString(`TRANSLATE:${postContent}`);
             }
         };
 
+        // ------------------------------------
+        // --- Monetization Functions (Monetization.js) ---
+        // ------------------------------------
+        App.Monetization = {
+            checkDailyRewards: async () => {
+                if (!App.currentUserId) return;
+
+                const userRef = App.db.collection('users').doc(App.currentUserId);
+                const userDoc = await userRef.get();
+                if (!userDoc.exists) return;
+                
+                const userData = userDoc.data();
+                const lastRewardTime = userData.lastFreeRewardTime ? userData.lastFreeRewardTime.toDate() : new Date(0);
+                const now = new Date();
+                
+                const oneDayInMs = 24 * 60 * 60 * 1000;
+                if (now.getTime() - lastRewardTime.getTime() > oneDayInMs) {
+                    // Give daily rewards
+                    await userRef.update({
+                        coins: firebase.firestore.FieldValue.increment(10),
+                        postLimit: firebase.firestore.FieldValue.increment(2),
+                        credits: firebase.firestore.FieldValue.increment(10),
+                        lastFreeRewardTime: new Date()
+                    });
+                    
+                    const message = 'Daily rewards claimed! You got 10 Coins, 2 Post Limits, and 10 Credits.';
+                    App.UI.showMessage('daily-free-rewards-message', message, 'info');
+                    App.Profile.fetch(App.currentUserId, true); // Refresh UI
+                }
+            },
+            requestAd: (rewardType) => {
+                App.UI.runWebViewString(`SHOW_REWARDED_AD:${rewardType}`);
+                App.UI.showMessage('ad-rewards-message', 'Playing ad... Please do not close the app.', 'info');
+            },
+            handleAdCallback: async (rewardType) => {
+                if (!App.currentUserId) {
+                    console.error("Ad callback received but user is not logged in.");
+                    return;
+                }
+                const userRef = App.db.collection('users').doc(App.currentUserId);
+                
+                try {
+                    let updateData = {};
+                    if (rewardType === 'coins') {
+                        updateData = { coins: firebase.firestore.FieldValue.increment(10) };
+                    } else if (rewardType === 'credits') {
+                        updateData = { credits: firebase.firestore.FieldValue.increment(10) };
+                    } else if (rewardType === 'limits') {
+                        updateData = { postLimit: firebase.firestore.FieldValue.increment(1) };
+                    } else if (rewardType === 'post') {
+                         // This is for posting a paid post after watching an ad
+                         const postContent = document.getElementById('post-content').value;
+                         if (postContent.trim() !== '') {
+                            const userDoc = await userRef.get();
+                            const userData = userDoc.data();
+                            await App.Posts.submitNewPost(postContent, userData, userRef, userData.coins, userData.postLimit);
+                         }
+                         return; // Don't show a generic success message for this case
+                    }
+                    
+                    await userRef.update(updateData);
+                    App.UI.showMessage('ad-rewards-message', `Success! You received your reward.`, 'success');
+                    App.Profile.fetch(App.currentUserId, true); // Refresh UI
+                } catch (error) {
+                    App.UI.showMessage('ad-rewards-message', `Error processing reward: ${error.message}`, 'error');
+                    console.error("Reward processing error:", error);
+                }
+            }
+        };
+
+        // -------------------------
         // --- Init & Events ---
+        // -------------------------
+
         document.addEventListener('DOMContentLoaded', () => {
-            // ... (existing DOMContentLoaded logic) ...
-            // Add event listeners for new buttons
-            document.getElementById('ad-logo-btn').addEventListener('click', () => UI.showSection('ad-rewards-section'));
+            document.getElementById('signup-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const email = document.getElementById('signup-email').value;
+                const password = document.getElementById('signup-password').value;
+                const confirmPassword = document.getElementById('signup-confirm-password').value;
+                App.Auth.signup(email, password, confirmPassword);
+            });
+
+            document.getElementById('signin-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const email = document.getElementById('signin-email').value;
+                const password = document.getElementById('signin-password').value;
+                App.Auth.signin(email, password);
+            });
+
+            document.getElementById('profile-setup-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const username = document.getElementById('profileUsername').value;
+                const phone = document.getElementById('profilePhone').value;
+                const whatsapp = document.getElementById('profileWhatsApp').value;
+                const instagram = document.getElementById('profileInstagram').value;
+                App.Profile.setup(username, phone, whatsapp, instagram);
+            });
+            
+            document.getElementById('edit-profile-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const username = document.getElementById('editUsername').value;
+                const phone = document.getElementById('editPhone').value;
+                const whatsapp = document.getElementById('editWhatsApp').value;
+                const instagram = document.getElementById('editInstagram').value;
+                App.Profile.edit(username, phone, whatsapp, instagram);
+            });
+            
+            document.getElementById('create-post-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const content = document.getElementById('post-content').value;
+                if (content.trim() !== '') {
+                    App.Posts.create(content);
+                }
+            });
+            
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const sectionId = item.dataset.section;
+                    App.UI.showSection(sectionId);
+                    if (sectionId === 'home-posts') {
+                        App.Posts.fetch();
+                    } else if (sectionId === 'user-profile-section') {
+                        App.Profile.fetch(App.currentUserId, true);
+                    }
+                });
+            });
         });
 
         App.auth.onAuthStateChanged(async (user) => {
+            // Wait for 1.5 seconds for the splash screen to show
             setTimeout(() => {
-                UI.hidePreloader();
+                App.UI.hidePreloader();
                 if (user) {
                     App.currentUserId = user.uid;
                     if (user.emailVerified) {
-                        Profile.fetch(App.currentUserId, true)
-                            .then(profile => {
-                                if (profile && profile.username) {
-                                    UI.showSection('home-posts');
-                                    Posts.fetch();
-                                    Monetization.checkDailyRewards();
-                                } else {
-                                    UI.showSection('setup-profile');
-                                }
-                            });
+                        App.db.collection('users').doc(App.currentUserId).get().then(doc => {
+                            if (doc.exists && doc.data().username) {
+                                App.UI.showSection('home-posts');
+                                App.Profile.fetch(App.currentUserId, true);
+                                App.Posts.fetch();
+                                App.Monetization.checkDailyRewards();
+                            } else {
+                                App.UI.showSection('setup-profile');
+                            }
+                        }).catch(error => {
+                            console.error("Error fetching user profile:", error);
+                            App.UI.showSection('setup-profile');
+                        });
                     } else {
-                        UI.showSection('email-verify');
+                        App.UI.showSection('email-verify');
                     }
                 } else {
                     App.currentUserId = null;
-                    UI.showSection('signin-auth');
+                    App.UI.showSection('signin-auth');
                 }
             }, 1500);
         });
@@ -980,11 +1476,17 @@
         // --- App Inventor Callback Functions (global scope) ---
         // App Inventor calls these via RunJavaScript after an action
         window.adComplete = (rewardType) => {
-            Monetization.handleAdCallback(rewardType);
+            App.Monetization.handleAdCallback(rewardType);
         };
         window.onTranslateCallback = (translatedText) => {
-            // Handle the translated text, e.g., show in a modal
             alert(`Translated: ${translatedText}`);
+        };
+        window.onProfileOpen = (userId) => {
+            if (userId) {
+                App.profileToView = userId;
+                App.Profile.fetch(userId, userId === App.currentUserId);
+                App.UI.showSection(userId === App.currentUserId ? 'user-profile-section' : 'other-user-profile-section');
+            }
         };
 
     </script>
