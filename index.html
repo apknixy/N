@@ -36,12 +36,6 @@
             --neon-green-shadow: rgba(0, 255, 0, 0.8);
             --neon-yellow: #ffff00;
             --neon-yellow-shadow: rgba(255, 255, 0, 0.8);
-            
-            /* Emojis */
-            --emoji-heart: '❤';
-            --emoji-laugh: '😂';
-            --emoji-thumbs-up: '👍';
-            --emoji-wow: '😮';
         }
 
         * {
@@ -350,7 +344,11 @@
         #posts-container > .post-card {
             margin-bottom: 0;
         }
-        .horizontal-posts-section {
+        .horizontal-scroll-container {
+            display: flex;
+            gap: 20px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
             padding: 10px;
             margin-bottom: 20px;
             border: 1px solid var(--border-color);
@@ -360,22 +358,11 @@
             box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
             max-width: 100%;
         }
-        .horizontal-posts-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            padding: 10px;
+        .horizontal-scroll-container .post-card {
+            min-width: 280px;
+            flex-shrink: 0;
+            padding: 20px;
         }
-        .horizontal-posts-grid .post-card {
-            min-width: unset;
-            padding: 15px;
-        }
-        @media (min-width: 600px) {
-            .horizontal-posts-grid {
-                grid-template-columns: repeat(4, 1fr);
-            }
-        }
-
 
         .post-card {
             background-color: var(--dark-bg);
@@ -390,11 +377,7 @@
             position: relative;
             animation: slideInUp 0.6s ease-out;
         }
-        .post-card.selected {
-            box-shadow: 0 0 15px var(--primary-color), 0 0 25px var(--primary-color) inset;
-            border-color: var(--primary-color);
-            animation: neonGlow 1.5s infinite alternate ease-in-out;
-        }
+        .post-card:hover { transform: translateY(-8px) scale(1.01); box-shadow: 0 15px 30px rgba(0, 0, 0, 0.9); border-color: var(--primary-color); }
         
         .post-header {
             display: flex;
@@ -463,71 +446,43 @@
         .post-card p { font-size: 1.05rem; margin-bottom: 20px; flex-grow: 1; word-wrap: break-word; color: var(--text-color); }
         .post-card p a { color: var(--primary-color); text-decoration: underline; }
         .post-meta { font-size: 0.88rem; color: #aaa; margin-top: auto; display: flex; justify-content: space-between; align-items: center; padding-top: 10px; border-top: 1px dashed rgba(255, 255, 255, 0.1); }
-        .post-stats { display: flex; align-items: center; gap: 10px; }
-        .post-stats span { display: flex; align-items: center; }
-        .post-stats .icon { margin-right: 3px; }
+        .post-likes-count { margin-left: 5px; }
 
-        .reactions-container {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-top: 15px;
-            padding-top: 10px;
-            border-top: 1px dashed rgba(255, 255, 255, 0.1);
+        /* Neon Post Styles with different colors */
+        .post-card.neon-blue {
+            box-shadow: 0 0 15px var(--neon-blue), 0 0 25px var(--neon-blue) inset;
+            border-color: var(--neon-blue);
+            animation: neonBlueGlow 1.5s infinite alternate ease-in-out;
         }
-        .reaction-emoji {
-            font-size: 1.5rem;
-            cursor: pointer;
-            position: relative;
-            transition: transform 0.2s ease;
-        }
-        .reaction-emoji:hover { transform: scale(1.2); }
-        .reaction-emoji.reacted {
-            animation: pulse 0.5s ease-in-out;
-        }
-        .reaction-count {
-            font-size: 0.8rem;
-            color: var(--text-color);
-            margin-left: 5px;
-        }
-        .reaction-selector {
-            position: absolute;
-            bottom: 100%;
-            left: 50%;
-            transform: translateX(-50%) translateY(10px);
-            background-color: var(--dark-fg);
-            border-radius: var(--border-radius-sm);
-            border: 1px solid var(--border-color);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-            display: flex;
-            gap: 5px;
-            padding: 8px;
-            z-index: 20;
-            visibility: hidden;
-            opacity: 0;
-            transition: transform 0.2s, opacity 0.2s, visibility 0.2s;
-        }
-        .reaction-selector.visible {
-            visibility: visible;
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
-        }
-        .reaction-selector span {
-            font-size: 1.5rem;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-        .reaction-selector span:hover {
-            transform: scale(1.2);
-        }
+        .post-card.neon-blue h3, .post-card.neon-blue p, .post-card.neon-blue .post-meta { text-shadow: 0 0 10px var(--neon-blue-shadow), 0 0 20px var(--neon-blue-shadow); }
 
+        .post-card.neon-pink {
+            box-shadow: 0 0 15px var(--neon-pink), 0 0 25px var(--neon-pink) inset;
+            border-color: var(--neon-pink);
+            animation: neonPinkGlow 1.5s infinite alternate ease-in-out;
+        }
+        .post-card.neon-pink h3, .post-card.neon-pink p, .post-card.neon-pink .post-meta { text-shadow: 0 0 10px var(--neon-pink-shadow), 0 0 20px var(--neon-pink-shadow); }
+
+        .post-card.neon-green {
+            box-shadow: 0 0 15px var(--neon-green), 0 0 25px var(--neon-green) inset;
+            border-color: var(--neon-green);
+            animation: neonGreenGlow 1.5s infinite alternate ease-in-out;
+        }
+        .post-card.neon-green h3, .post-card.neon-green p, .post-card.neon-green .post-meta { text-shadow: 0 0 10px var(--neon-green-shadow), 0 0 20px var(--neon-green-shadow); }
+
+        .post-card.neon-yellow {
+            box-shadow: 0 0 15px var(--neon-yellow), 0 0 25px var(--neon-yellow) inset;
+            border-color: var(--neon-yellow);
+            animation: neonYellowGlow 1.5s infinite alternate ease-in-out;
+        }
+        .post-card.neon-yellow h3, .post-card.neon-yellow p, .post-card.neon-yellow .post-meta { text-shadow: 0 0 10px var(--neon-yellow-shadow), 0 0 20px var(--neon-yellow-shadow); }
+        
+        .url-link { color: var(--primary-color); text-decoration: underline; }
 
         /* Profile Section */
         .profile-header {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
             text-align: center;
+            margin-bottom: 20px;
         }
         .profile-image-container {
             width: 100px;
@@ -537,29 +492,29 @@
             border: 3px solid var(--primary-color);
             position: relative;
             animation: profilePulse 2s infinite ease-out;
-            margin-bottom: 20px;
+            margin: 0 auto 15px;
+            background-color: var(--dark-bg);
         }
         .profile-image {
             width: 100%;
             height: 100%;
+            background: radial-gradient(circle, var(--neon-blue) 0%, var(--neon-pink) 100%);
+            animation: profileImageGlow 3s infinite alternate ease-in-out;
             border-radius: 50%;
-            background-size: cover;
-            background-position: center;
         }
-        .profile-info h3 {
-            font-size: 2rem;
-            color: var(--accent-color);
-            margin-bottom: 10px;
-        }
+        .profile-info { text-align: center; }
+        .profile-username { font-size: 1.8rem; font-weight: 700; color: var(--accent-color); margin-bottom: 10px; }
         .profile-stats {
             display: flex;
-            gap: 25px;
+            justify-content: center;
+            gap: 20px;
             margin-bottom: 20px;
         }
         .profile-stat-item {
             display: flex;
             flex-direction: column;
-            font-size: 1rem;
+            align-items: center;
+            font-size: 0.9rem;
             color: #ccc;
         }
         .profile-stat-item strong {
@@ -568,26 +523,14 @@
         }
         .profile-buttons {
             display: flex;
+            justify-content: center;
             gap: 15px;
             flex-wrap: wrap;
-            justify-content: center;
         }
         .profile-buttons button {
-            padding: 10px 20px;
+            min-width: 120px;
         }
-        .profile-posts-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
-        }
-        
-        .whatsapp-logo-svg { width: 24px; height: 24px; fill: white; }
-        .instagram-logo-svg { width: 24px; height: 24px; }
-        .youtube-logo-svg { width: 24px; height: 24px; fill: white; }
-        .yt-icon { background: url('https://upload.wikimedia.org/wikipedia/commons/4/42/YouTube_full-color_icon_%282017%29.svg') no-repeat center center / contain; }
-        .insta-icon { background: url('https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png') no-repeat center center / contain; }
-        
+
         /* Search Section */
         #search-results-list {
             display: flex;
@@ -603,11 +546,6 @@
             border: 1px solid var(--border-color);
             box-shadow: 0 4px 10px var(--shadow-color);
             animation: fadeIn 0.4s ease-out;
-            cursor: pointer;
-        }
-        .search-result-item:hover {
-            border-color: var(--primary-color);
-            box-shadow: 0 6px 15px rgba(0, 170, 255, 0.3);
         }
         .search-result-item .user-logo {
             width: 40px;
@@ -616,7 +554,6 @@
             margin-right: 15px;
             border: 2px solid var(--primary-color);
             background-size: cover;
-            background-position: center;
         }
         .search-result-item .user-info {
             flex-grow: 1;
@@ -625,7 +562,7 @@
             font-size: 1.1rem;
             color: var(--accent-color);
         }
-        .search-result-item .follow-btn {
+        .search-result-item button {
             padding: 8px 15px;
             font-size: 0.9rem;
         }
@@ -753,8 +690,8 @@
         }
         .menu-item .icon {
             margin-right: 15px;
-            font-size: 1.3rem;
-            color: var(--primary-color);
+            width: 24px;
+            height: 24px;
         }
         .toggle-switch {
             position: relative;
@@ -796,13 +733,62 @@
         input:checked + .slider:before {
             transform: translateX(22px);
         }
-        
-        .menu-logo {
-            width: 30px;
-            height: 30px;
-            margin-right: 15px;
+        .menu-item img {
+            width: 24px;
+            height: 24px;
         }
-
+        
+        .post-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 10px;
+            border-top: 1px dashed rgba(255, 255, 255, 0.1);
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        .post-stats {
+            display: flex;
+            gap: 15px;
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+        .post-reactions {
+            display: flex;
+            gap: 5px;
+            color: #aaa;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        .reaction-count {
+            font-size: 0.9rem;
+            margin-left: 5px;
+        }
+        .reaction-button {
+            position: relative;
+            font-size: 1.2rem;
+            padding: 5px;
+            border-radius: 50%;
+            transition: background-color 0.2s ease;
+        }
+        .reaction-button:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .reactions-popup {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%) translateY(-10px);
+            background-color: var(--dark-fg);
+            padding: 5px 10px;
+            border-radius: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            display: flex;
+            gap: 5px;
+            z-index: 10;
+        }
+        
         /* ========================================================= */
         /* == ANIMATIONS =========================================== */
         /* ========================================================= */
@@ -824,7 +810,10 @@
         @keyframes slideInUp { from { opacity: 0; transform: translateY(50px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes slideDown { from { transform: translateY(-100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         @keyframes slideUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        @keyframes neonGlow { 0% { box-shadow: 0 0 10px var(--primary-color), 0 0 20px var(--primary-color) inset; } 50% { box-shadow: 0 0 25px var(--primary-color), 0 0 40px var(--primary-color) inset; } 100% { box-shadow: 0 0 10px var(--primary-color), 0 0 20px var(--primary-color) inset; } }
+        @keyframes neonBlueGlow { 0% { box-shadow: 0 0 10px var(--neon-blue), 0 0 20px var(--neon-blue) inset; } 50% { box-shadow: 0 0 25px var(--neon-blue), 0 0 40px var(--neon-blue) inset; } 100% { box-shadow: 0 0 10px var(--neon-blue), 0 0 20px var(--neon-blue) inset; } }
+        @keyframes neonPinkGlow { 0% { box-shadow: 0 0 10px var(--neon-pink), 0 0 20px var(--neon-pink) inset; } 50% { box-shadow: 0 0 25px var(--neon-pink), 0 0 40px var(--neon-pink) inset; } 100% { box-shadow: 0 0 10px var(--neon-pink), 0 0 20px var(--neon-pink) inset; } }
+        @keyframes neonGreenGlow { 0% { box-shadow: 0 0 10px var(--neon-green), 0 0 20px var(--neon-green) inset; } 50% { box-shadow: 0 0 25px var(--neon-green), 0 0 40px var(--neon-green) inset; } 100% { box-shadow: 0 0 10px var(--neon-green), 0 0 20px var(--neon-green) inset; } }
+        @keyframes neonYellowGlow { 0% { box-shadow: 0 0 10px var(--neon-yellow), 0 0 20px var(--neon-yellow) inset; } 50% { box-shadow: 0 0 25px var(--neon-yellow), 0 0 40px var(--neon-yellow) inset; } 100% { box-shadow: 0 0 10px var(--neon-yellow), 0 0 20px var(--neon-yellow) inset; } }
         @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.8; } 100% { transform: scale(1); opacity: 1; } }
         @keyframes profilePulse { 0%, 100% { box-shadow: 0 0 0 0px rgba(0, 170, 255, 0.4); } 50% { box-shadow: 0 0 0 10px rgba(0, 170, 255, 0); } }
         @keyframes profileImageGlow { from { filter: brightness(1) contrast(1); } to { filter: brightness(1.2) contrast(1.1); } }
@@ -851,7 +840,9 @@
 <body>
 
     <div id="splash-screen" class="splash-screen">
-        Loading...
+        <div class="app-logo">
+            <img src="https://i.imgur.com/8Q3Q93K.png" alt="Addmint Logo" style="width: 80px; height: 80px;">
+        </div>
     </div>
 
     <div id="app-container" class="hidden">
@@ -860,7 +851,7 @@
             <div class="header-left">
                 <button class="header-menu-btn" onclick="App.UI.toggleSideMenu()">☰</button>
                 <div class="app-logo">
-                    <span class="shape"></span> AddMint
+                    <img src="https://i.imgur.com/8Q3Q93K.png" alt="Addmint Logo" style="width: 40px; height: 40px; margin-right: 10px;"> Addmint
                 </div>
             </div>
             <div class="header-right">
@@ -896,12 +887,12 @@
                 </label>
             </a>
             <a href="https://www.instagram.com/addmint__" target="_blank" class="menu-item">
-                <img class="menu-logo" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 448 512'%3E%3Cpath fill='url(%23g1)' d='M224.1 140.7c-35.3 0-64 28.7-64 64s28.7 64 64 64 64-28.7 64-64-28.7-64-64-64zm159.2 299.7C341.2 473.1 283.4 512 216 512c-67.4 0-125.2-38.9-158.4-90.1-23.7-36.2-36.5-79.3-37.6-123.7-1.1-44.5 9-88.7 30.6-126.7C88 107.5 142.1 64 216 64s128 43.5 163.4 107.5c21.6 38 31.7 82.2 30.6 126.7-1.1 44.4-13.9 87.5-37.6 123.7zM216 384c-79.5 0-144-64.5-144-144s64.5-144 144-144 144 64.5 144 144-64.5 144-144 144zM399.7 73.8c-11.7-11.7-30.8-11.7-42.4 0l-12.7 12.7c-11.7 11.7-11.7 30.8 0 42.4l12.7 12.7c11.7 11.7 30.8 11.7 42.4 0l12.7-12.7c11.7-11.7 11.7-30.8 0-42.4l-12.7-12.7zM216 96c-84.8 0-154.5 67.5-159.4 152.1-4.9 83.3 54.3 159.9 133.7 172.9 79.4 13 159.1-34.8 178.6-109.1C443.2 227.4 366.1 96 216 96zM416 160c0 144-112 256-256 256S-96 304-96 160C-96 16 16 0 16 0h400v160zM448 320c0 106-86 192-192 192S64 426 64 320V128h128c70.7 0 128 57.3 128 128s-57.3 128-128 128H64v64c0 35.3 28.7 64 64 64h192c35.3 0 64-28.7 64-64v-64h64c35.3 0 64-28.7 64-64v-64H64v64c0 35.3 28.7 64 64 64h128c70.7 0 128-57.3 128-128s-57.3-128-128-128H64V64c0-35.3 28.7-64 64-64h192c35.3 0 64 28.7 64 64v64h64c35.3 0 64 28.7 64 64v64H64v-64c0-35.3 28.7-64 64-64h128c70.7 0 128 57.3 128 128zM320 256c0 53-43 96-96 96s-96-43-96-96 43-96 96-96 96 43 96 96z'/%3E%3Cdefs%3E%3ClinearGradient id='g1' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' style='stop-color:%23405DE6' /%3E%3Cstop offset='0.1' style='stop-color:%235851DB' /%3E%3Cstop offset='0.25' style='stop-color:%23833AB4' /%3E%3Cstop offset='0.5' style='stop-color:%23C13584' /%3E%3Cstop offset='0.75' style='stop-color:%23E1306C' /%3E%3Cstop offset='0.9' style='stop-color:%23FD1D1D' /%3E%3Cstop offset='1' style='stop-color:%23FCAF45' /%3E%3C/linearGradient%3E%3C/defs%3E%3C/svg%3E" alt="Instagram Logo">
-                Instagram
+                <img src="https://i.imgur.com/7hW1f3S.png" class="icon" alt="Instagram Logo">
+                <span>Instagram</span>
             </a>
             <a href="https://www.youtube.com/@add_mint" target="_blank" class="menu-item">
-                <img class="menu-logo" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 576 512'%3E%3Cpath fill='red' d='M549.655 124.083c-6.277-23.655-24.787-42.275-48.442-48.541C434.731 43.111 288 43.111 288 43.111s-146.731 0-213.213 32.431c-23.655 6.266-42.165 24.886-48.442 48.541-32.431 104.72-32.431 200.822-32.431 200.822s0 96.101 32.431 200.823c6.277 23.656 24.787 41.5 48.442 47.785C141.269 468.891 288 468.891 288 468.891s146.731 0 213.213-32.432c23.655-6.285 41.5-24.129 47.785-47.785 32.432-104.72 32.432-200.823 32.432-200.823s0-96.102-32.432-200.823zM288 393.385V118.636l125.132 137.375-125.132 137.374z'/%3E%3C/svg%3E" alt="YouTube Logo">
-                YouTube
+                <img src="https://i.imgur.com/6D3e1kK.png" class="icon" alt="YouTube Logo">
+                <span>YouTube</span>
             </a>
             <a href="#" class="menu-item" onclick="App.UI.showSection('about-section'); App.UI.toggleSideMenu();">
                 <span class="icon">ℹ</span> About
@@ -1127,27 +1118,10 @@
                             </div>
                         </div>
                         <div class="profile-buttons">
-                            <button id="other-follow-btn" onclick="App.Profile.toggleFollow()"></button>
-                            <button id="other-whatsapp-btn" onclick="App.UI.openWhatsAppProfile()">
-                                <svg class="whatsapp-logo-svg" viewBox="0 0 448 512" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M380.9 97.1C339.9 50.1 283.9 22.1 224.1 22.1 127 22.1 48.9 101.4 48.9 198.5c0 31.9 8.6 63.8 24.2 92.5l-25.2 92.2 96.1-23.7c28 15.6 59.9 24.2 92.5 24.2 97.1 0 176.1-79.3 176.1-176.4 0-56.9-26.3-109.9-72.7-146.9zM224.1 391.8c-23.5 0-47-5.4-67.6-16.5l-4.8-2.8-50.5 12.4 12.7-46.3-3.1-4.8c-12-18.7-18.3-40.4-18.3-62.9 0-78.8 64.2-143.1 143.1-143.1 39.1 0 76.2 15.2 104.2 43.2 28 28 43.2 65.1 43.2 104.2 0 78.8-64.2 143.1-143.1 143.1-24.3 0-48.4-6-69.6-17.7zM224.1 346.5c-15.1 0-29.2-3.8-41.5-10.4l-3-1.6-32.9 8.1 8.2-29.8-1.5-2.9c-8-12.4-12.2-26.8-12.2-41.6 0-52.6 42.7-95.3 95.3-95.3s95.3 42.7 95.3 95.3-42.7 95.3-95.3 95.3z"/>
-                                </svg>
-                            </button>
-                            <button id="other-instagram-btn" onclick="App.UI.openInstagramProfile()">
-                                <svg class="instagram-logo-svg" viewBox="0 0 448 512" xmlns="http://www.w3.org/2000/svg">
-                                    <defs>
-                                        <linearGradient id="instagram-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                            <stop offset="0%" style="stop-color:#f8c54c;stop-opacity:1" />
-                                            <stop offset="15%" style="stop-color:#f1754f;stop-opacity:1" />
-                                            <stop offset="40%" style="stop-color:#e45172;stop-opacity:1" />
-                                            <stop offset="70%" style="stop-color:#c44199;stop-opacity:1" />
-                                            <stop offset="100%" style="stop-color:#833AB4;stop-opacity:1" />
-                                        </linearGradient>
-                                    </defs>
-                                    <path fill="url(#instagram-gradient)" d="M224.1 140.7c-35.3 0-64 28.7-64 64s28.7 64 64 64 64-28.7 64-64-28.7-64-64-64zm159.2 299.7c-4.4 12.9-18.4 25.2-34 26.6-42.5 3.9-85.1 3.9-127.6 0-15.6-1.4-29.6-13.7-34-26.6-4.5-13.2-5-26.9-5-40.4v-81.8c0-13.5 .5-27.2 5-40.4 4.4-12.9 18.4-25.2 34-26.6 42.5-3.9 85.1-3.9 127.6 0 15.6 1.4 29.6 13.7 34 26.6 4.5 13.2 5 26.9 5 40.4v81.8c0 13.5-.5 27.2-5 40.4zM224.1 384c-79.5 0-144-64.5-144-144s64.5-144 144-144 144 64.5 144 144-64.5 144-144 144zm147.2-224.1c-11.7-11.7-30.8-11.7-42.4 0l-12.7 12.7c-11.7 11.7-11.7 30.8 0 42.4l12.7 12.7c11.7 11.7 30.8 11.7 42.4 0l12.7-12.7c11.7-11.7 11.7-30.8 0-42.4l-12.7-12.7zM448 200c0-62.5-50.5-113-113-113h-192c-62.5 0-113 50.5-113 113v192c0 62.5 50.5 113 113 113h192c62.5 0 113-50.5 113-113v-192zM368 256c0 61.9-50.1 112-112 112-61.9 0-112-50.1-112-112s50.1-112 112-112c61.9 0 112 50.1 112 112z"/>
-                                </svg>
-                            </button>
-                            <button id="other-message-btn" onclick="App.Messages.startNewChat()">💬 Message</button>
+                            <button id="other-follow-btn" onclick="App.Profile.toggleFollow()">Follow</button>
+                            <button id="other-whatsapp-btn" onclick="App.UI.openWhatsAppProfile()">WhatsApp</button>
+                            <button id="other-instagram-btn" onclick="App.UI.openInstagramProfile()">Instagram</button>
+                            <button id="other-message-btn" onclick="App.Messages.startNewChat()"><span class="icon">💬</span> Message</button>
                         </div>
                     </div>
                 </div>
@@ -1221,17 +1195,7 @@
         App.isLoadingPosts = false;
         App.postsCache = [];
         App.isDataSaver = false;
-        App.currentNeonPost = null;
-
-        App.numberFormatter = (num) => {
-            if (num >= 1000000) {
-                return (num / 1000000).toFixed(1) + 'M';
-            } else if (num >= 1000) {
-                return (num / 1000).toFixed(1) + 'k';
-            }
-            return num;
-        };
-
+        
         App.UI = {
             showSection: (sectionId) => {
                 document.querySelectorAll('section').forEach(section => {
@@ -1272,9 +1236,9 @@
                 }
             },
             updateHeaderStats: (coins, limits, credits) => {
-                document.getElementById('header-coins').textContent = App.numberFormatter(coins);
-                document.getElementById('header-limit').textContent = App.numberFormatter(limits);
-                document.getElementById('header-credits').textContent = App.numberFormatter(credits);
+                document.getElementById('header-coins').textContent = App.Utils.formatNumber(coins);
+                document.getElementById('header-limit').textContent = App.Utils.formatNumber(limits);
+                document.getElementById('header-credits').textContent = App.Utils.formatNumber(credits);
             },
             hidePreloader: () => {
                 const splash = document.getElementById('splash-screen');
@@ -1330,6 +1294,18 @@
             hideAllDropdowns: () => {
                 document.querySelectorAll('.dropdown-menu').forEach(d => d.classList.remove('visible'));
             },
+            generateUserLogo: (uid) => {
+                const logoIndex = Array.from(uid).reduce((sum, char) => sum + char.charCodeAt(0), 0) % 50;
+                // For a simple example, we'll use a gradient.
+                // In a real app, you would have 50 different images/SVGs
+                const colors = [
+                    '#ff00ff', '#00ff00', '#00aaff', '#ffff00',
+                    '#ff5500', '#8800ff', '#ff0055', '#00ffaa'
+                ];
+                const color1 = colors[logoIndex % colors.length];
+                const color2 = colors[(logoIndex + 3) % colors.length];
+                return `linear-gradient(135deg, ${color1}, ${color2})`;
+            },
             toggleSideMenu: () => {
                 const menu = document.getElementById('side-menu');
                 const overlay = document.getElementById('side-menu-overlay');
@@ -1338,57 +1314,47 @@
             },
             toggleDataSaver: () => {
                 App.isDataSaver = document.getElementById('data-saver-toggle').checked;
-                // You can add more logic here, e.g., to load images only when a post is visible
                 alert(`Data Saver is now ${App.isDataSaver ? 'ON' : 'OFF'}.`);
             },
-            toggleReactionSelector: (postId, event) => {
-                const selector = document.getElementById(`reaction-selector-${postId}`);
-                if (selector) {
-                    // Hide other selectors
-                    document.querySelectorAll('.reaction-selector.visible').forEach(s => {
-                        if (s.id !== selector.id) {
-                            s.classList.remove('visible');
-                        }
-                    });
-                    // Toggle current selector
-                    selector.classList.toggle('visible');
-                    event.stopPropagation();
-                }
+            getEmojiPopup: (postId) => {
+                const emojis = ['👍', '❤️', '😂', '😮', '😢', '🔥', '🎉'];
+                const popup = document.createElement('div');
+                popup.className = 'reactions-popup';
+                emojis.forEach(emoji => {
+                    const btn = document.createElement('span');
+                    btn.textContent = emoji;
+                    btn.onclick = (e) => {
+                        e.stopPropagation();
+                        App.Posts.react(postId, emoji);
+                        popup.remove();
+                    };
+                    popup.appendChild(btn);
+                });
+                return popup;
             },
-            hideAllReactionSelectors: () => {
-                document.querySelectorAll('.reaction-selector.visible').forEach(s => s.classList.remove('visible'));
-            }
-        };
-        
-        const profileColors = [
-            '#ff00ff', '#00ff00', '#00aaff', '#ffff00',
-            '#ff5500', '#8800ff', '#ff0055', '#00ffaa',
-            '#1abc9c', '#2ecc71', '#3498db', '#9b59b6',
-            '#34495e', '#f1c40f', '#e67e22', '#e74c3c',
-            '#ecf0f1', '#95a5a6', '#7f8c8d', '#c0392b',
-            '#d35400', '#f39c12', '#2c3e50', '#8e44ad',
-            '#2980b9', '#16a085', '#27ae60', '#2d6d84',
-            '#e1762c', '#d64639', '#57a3e8', '#f3752e',
-            '#8f5c35', '#49372e', '#455a64', '#00838f',
-            '#006064', '#3e2723', '#bf360c', '#33691e',
-            '#1a237e', '#4a148c', '#880e4f', '#b71c1c',
-            '#e65100', '#f9a825', '#ffeb3b', '#cddc39',
-            '#8bc34a', '#4caf50', '#009688', '#00bcd4',
-            '#03a9f4', '#2196f3', '#3f51b5', '#673ab7'
-        ];
-        App.UI.generateUserLogo = (uid) => {
-            const hash = Array.from(uid).reduce((sum, char) => sum + char.charCodeAt(0), 0);
-            const color = profileColors[hash % profileColors.length];
-            return `radial-gradient(circle, ${color} 0%, rgba(255,255,255,0.2) 100%)`;
         };
 
         document.addEventListener('click', (event) => {
-            if (!event.target.closest('.post-actions-icons') && !event.target.closest('.reaction-selector')) {
+            if (!event.target.closest('.post-actions-icons')) {
                 App.UI.hideAllDropdowns();
-                App.UI.hideAllReactionSelectors();
+            }
+            if (!event.target.closest('.reaction-button')) {
+                document.querySelectorAll('.reactions-popup').forEach(p => p.remove());
             }
         });
         
+        App.Utils = {
+            formatNumber: (num) => {
+                if (num >= 1000000) {
+                    return (num / 1000000).toFixed(1) + 'M';
+                }
+                if (num >= 1000) {
+                    return (num / 1000).toFixed(1) + 'K';
+                }
+                return num;
+            }
+        };
+
         App.Auth = {
             signup: async (email, password, confirmPassword) => {
                 App.UI.hideMessage('signup-status-message');
@@ -1434,9 +1400,9 @@
                 if (user) {
                     try {
                         await user.sendEmailVerification();
-                        alert('Verification link sent! Please check your inbox.');
+                        App.UI.showMessage('verify-email-message', 'Verification link sent! Please check your inbox.', 'info');
                     } catch (error) {
-                        alert(`Error sending verification email: ${error.message}`);
+                        App.UI.showMessage('verify-email-message', `Error sending verification email: ${error.message}`, 'error');
                         console.error("Verification email error:", error);
                     }
                 }
@@ -1482,8 +1448,8 @@
                     App.UI.showMessage('profile-setup-message', 'This username is already taken. Please choose another.', 'error');
                     return;
                 }
-                if (!username) {
-                    App.UI.showMessage('profile-setup-message', 'Please provide a username.', 'error');
+                if (!username || (!whatsapp && !instagram)) {
+                    App.UI.showMessage('profile-setup-message', 'Please provide a username and at least one contact method.', 'error');
                     return;
                 }
                 
@@ -1566,9 +1532,9 @@
             },
             renderCurrentUserProfile: (profile, posts) => {
                 document.getElementById('profile-display-name').textContent = profile.username;
-                document.getElementById('profile-posts-count').textContent = App.numberFormatter(profile.postsCount);
-                document.getElementById('profile-followers-count').textContent = App.numberFormatter(profile.followersCount);
-                document.getElementById('profile-following-count').textContent = App.numberFormatter(profile.followingCount);
+                document.getElementById('profile-posts-count').textContent = App.Utils.formatNumber(profile.postsCount);
+                document.getElementById('profile-followers-count').textContent = App.Utils.formatNumber(profile.followersCount);
+                document.getElementById('profile-following-count').textContent = App.Utils.formatNumber(profile.followingCount);
                 document.getElementById('profile-email').textContent = profile.email;
                 document.getElementById('profile-whatsapp-number').textContent = profile.whatsapp || 'N/A';
                 document.getElementById('profile-instagram-handle').textContent = profile.instagram || 'N/A';
@@ -1580,31 +1546,28 @@
                 
                 App.Posts.renderAll(posts, 'profile-posts-grid', true);
             },
-            renderOtherUserProfile: async (profile, posts) => {
+            renderOtherUserProfile: (profile, posts) => {
                 document.getElementById('other-profile-display-name').textContent = profile.username;
-                document.getElementById('other-profile-posts-count').textContent = App.numberFormatter(profile.postsCount);
-                document.getElementById('other-profile-followers-count').textContent = App.numberFormatter(profile.followersCount);
-                document.getElementById('other-profile-following-count').textContent = App.numberFormatter(profile.followingCount);
+                document.getElementById('other-profile-posts-count').textContent = App.Utils.formatNumber(profile.postsCount);
+                document.getElementById('other-profile-followers-count').textContent = App.Utils.formatNumber(profile.followersCount);
+                document.getElementById('other-profile-following-count').textContent = App.Utils.formatNumber(profile.followingCount);
                 document.getElementById('other-profile-email').textContent = profile.email;
                 document.getElementById('other-profile-whatsapp-number').textContent = profile.whatsapp || 'N/A';
                 document.getElementById('other-profile-instagram-handle').textContent = profile.instagram || 'N/A';
                 document.getElementById('profile-image-other').style.background = App.UI.generateUserLogo(profile.uid);
                 
-                const followBtn = document.getElementById('other-follow-btn');
-                followBtn.style.display = 'inline-flex';
-                
-                const followDoc = await App.db.collection('users').doc(App.currentUserId).collection('following').doc(profile.uid).get();
-                if (followDoc.exists) {
-                    followBtn.textContent = 'Following';
-                    followBtn.style.backgroundColor = '#6c757d';
-                } else {
-                    followBtn.textContent = 'Follow';
-                    followBtn.style.backgroundColor = var(--primary-color);
-                }
+                App.db.collection('users').doc(App.currentUserId).collection('following').doc(profile.uid).get().then(doc => {
+                    const followBtn = document.getElementById('other-follow-btn');
+                    if (doc.exists) {
+                        followBtn.textContent = 'Following';
+                    } else {
+                        followBtn.textContent = 'Follow';
+                    }
+                });
                 
                 document.getElementById('other-whatsapp-btn').style.display = profile.whatsapp ? 'inline-flex' : 'none';
                 document.getElementById('other-instagram-btn').style.display = profile.instagram ? 'inline-flex' : 'none';
-                
+
                 App.Posts.renderAll(posts, 'other-profile-posts-grid', false);
             },
             toggleFollow: async (targetUserId = App.profileToView) => {
@@ -1639,7 +1602,7 @@
                 resultsContainer.innerHTML = '';
                 
                 if (searchTerm.length < 2) {
-                    App.UI.hideMessage('search-message');
+                    App.UI.showMessage('search-message', 'Please enter at least 2 characters to search.', 'info');
                     return;
                 }
 
@@ -1676,12 +1639,9 @@
                         
                         const followButton = document.createElement('button');
                         followButton.textContent = 'Follow';
-                        followButton.className = 'follow-btn';
                         followButton.onclick = (e) => {
                             e.stopPropagation();
                             App.Profile.toggleFollow(doc.id);
-                            followButton.textContent = 'Following';
-                            followButton.style.backgroundColor = '#6c757d';
                         };
 
                         resultItem.appendChild(userLogo);
@@ -1709,7 +1669,11 @@
                 const postsLimit = userData.postLimit || 0;
                 const coins = userData.coins || 0;
                 const boostDuration = document.getElementById('post-boost-option').value;
-                const requiredAds = (parseInt(boostDuration) / 6) - 2;
+
+                let requiredAds = 0;
+                if (boostDuration === '18') requiredAds = 1;
+                else if (boostDuration === '24') requiredAds = 2;
+                else if (boostDuration === '30') requiredAds = 3;
 
                 // New logic: must have both 1 limit AND 5 coins
                 if (postsLimit <= 0 || coins < 5) {
@@ -1794,7 +1758,6 @@
                         if (App.postsCache.length === 0) {
                             container.innerHTML = '<p class="text-center" style="margin-top: 30px; font-style: italic; color: #aaa;">No posts to display.</p>';
                         } else {
-                            // If we run out of posts, shuffle the cache and display again for an infinite feel
                             const shuffledCache = App.postsCache.sort(() => Math.random() - 0.5);
                             App.Posts.renderAll(shuffledCache, targetDivId, userId !== null, true);
                         }
@@ -1856,80 +1819,58 @@
                     const postId = isProfileView ? doc.id : doc.id;
                     const postElement = await App.Posts.createPostElement(postId, postData, isProfileView);
 
-                    if (!isProfileView && !App.isDataSaver && verticalPostsCount >= 5 && Math.random() > 0.5) {
-                        horizontalPosts.push(postElement);
-                        if (horizontalPosts.length >= 4) {
-                            const horizontalSection = document.createElement('div');
-                            horizontalSection.className = 'horizontal-posts-section';
-                            const horizontalGrid = document.createElement('div');
-                            horizontalGrid.className = 'horizontal-posts-grid';
-                            horizontalPosts.forEach(el => horizontalGrid.appendChild(el));
-                            horizontalSection.appendChild(horizontalGrid);
-                            container.appendChild(horizontalSection);
-                            horizontalPosts = [];
-                            verticalPostsCount = 0;
+                    if (!isProfileView && !App.isDataSaver) {
+                        verticalPostsCount++;
+                        if (verticalPostsCount % 5 === 0 && verticalPostsCount < 15 && Math.random() > 0.5) { // Random horizontal table after 5, 10 posts
+                            horizontalPosts.push(postElement);
+                            if (horizontalPosts.length >= 4) {
+                                const horizontalContainer = document.createElement('div');
+                                horizontalContainer.className = 'horizontal-scroll-container';
+                                horizontalPosts.forEach(el => horizontalContainer.appendChild(el));
+                                container.appendChild(horizontalContainer);
+                                horizontalPosts = [];
+                            }
+                        } else {
+                            postsListVertical.appendChild(postElement);
                         }
                     } else {
                         postsListVertical.appendChild(postElement);
-                        verticalPostsCount++;
                     }
                 }
                 
                 if (horizontalPosts.length > 0) {
-                     const horizontalSection = document.createElement('div');
-                     horizontalSection.className = 'horizontal-posts-section';
-                     const horizontalGrid = document.createElement('div');
-                     horizontalGrid.className = 'horizontal-posts-grid';
-                     horizontalPosts.forEach(el => horizontalGrid.appendChild(el));
-                     horizontalSection.appendChild(horizontalGrid);
-                     container.appendChild(horizontalSection);
+                     const horizontalContainer = document.createElement('div');
+                     horizontalContainer.className = 'horizontal-scroll-container';
+                     horizontalPosts.forEach(el => horizontalContainer.appendChild(el));
+                     container.appendChild(horizontalContainer);
                 }
                 
-                if (postsListVertical.children.length > 0) {
-                    container.appendChild(postsListVertical);
-                }
+                container.appendChild(postsListVertical);
             },
             createPostElement: async (postId, postData, isProfilePost = false) => {
                 const postElement = document.createElement('div');
-                postElement.className = `post-card`;
+                postElement.className = `post-card ${postData.style || ''}`;
                 postElement.dataset.postId = postId;
                 postElement.dataset.userId = postData.userId;
-                
-                postElement.onclick = (e) => {
-                    document.querySelectorAll('.post-card.selected').forEach(card => {
-                        card.classList.remove('selected');
-                    });
-                    postElement.classList.add('selected');
-                };
-
-                // Double-click to like
-                postElement.ondblclick = (e) => {
-                    e.preventDefault();
-                    App.Posts.like(postId, postElement.querySelector('.like-btn'));
-                };
                 
                 const isOwner = postData.userId === App.currentUserId;
                 const likedDoc = await App.db.collection('posts').doc(postId).collection('likes').doc(App.currentUserId).get();
                 postData.hasLiked = likedDoc.exists;
 
-                // Check if user has viewed this post before
-                const viewDocRef = App.db.collection('posts').doc(postId).collection('views').doc(App.currentUserId);
-                const viewDoc = await viewDocRef.get();
-                if (!viewDoc.exists) {
-                    await App.db.runTransaction(async (transaction) => {
-                        const postRef = App.db.collection('posts').doc(postId);
-                        transaction.set(viewDocRef, { viewedAt: new Date() });
-                        transaction.update(postRef, { views: firebase.firestore.FieldValue.increment(1) });
-                    });
+                // View count update
+                const viewRef = App.db.collection('posts').doc(postId).collection('views').doc(App.currentUserId);
+                const viewDoc = await viewRef.get();
+                if(!viewDoc.exists) {
+                    await viewRef.set({ timestamp: firebase.firestore.FieldValue.serverTimestamp() });
+                    await App.db.collection('posts').doc(postId).update({ views: firebase.firestore.FieldValue.increment(1) });
                 }
-                
+
                 const postHeader = document.createElement('div');
                 postHeader.className = 'post-header';
                 
                 const postTitle = document.createElement('h3');
                 postTitle.textContent = postData.username;
-                postTitle.onclick = (e) => {
-                    e.stopPropagation();
+                postTitle.onclick = () => {
                     App.profileToView = postData.userId;
                     App.Profile.fetch(postData.userId, isOwner);
                     App.UI.showSection(isOwner ? 'user-profile-section' : 'other-user-profile-section');
@@ -1939,7 +1880,7 @@
                 actionIcons.className = 'post-actions-icons';
                 
                 const likeButton = document.createElement('span');
-                likeButton.innerHTML = postData.hasLiked ? '❤️' : '♡'; // Heart icon
+                likeButton.innerHTML = postData.hasLiked ? '❤' : '♡'; // Heart icon
                 likeButton.className = `like-btn action-icon-btn ${postData.hasLiked ? 'liked' : ''}`;
                 likeButton.onclick = (e) => {
                     e.stopPropagation();
@@ -2007,58 +1948,47 @@
                 const postBody = document.createElement('p');
                 postBody.innerHTML = App.Posts.formatTextWithLinks(postData.content);
                 
-                const postMeta = document.createElement('div');
-                postMeta.className = 'post-meta';
-                
+                const postFooter = document.createElement('div');
+                postFooter.className = 'post-footer';
+
                 const postStats = document.createElement('div');
                 postStats.className = 'post-stats';
-                
-                const likesSpan = document.createElement('span');
-                likesSpan.innerHTML = `<span class="icon">❤️</span><span id="likes-count-${postId}">${App.numberFormatter(postData.likes)}</span>`;
+                postStats.innerHTML = `<span>Likes: <span id="likes-count-${postId}">${App.Utils.formatNumber(postData.likes || 0)}</span></span>
+                                        <span>Views: <span id="views-count-${postId}">${App.Utils.formatNumber(postData.views || 0)}</span></span>`;
 
-                const viewsSpan = document.createElement('span');
-                viewsSpan.innerHTML = `<span class="icon">👀</span><span id="views-count-${postId}">${App.numberFormatter(postData.views)}</span>`;
-                
-                postStats.appendChild(likesSpan);
-                postStats.appendChild(viewsSpan);
-                
-                postMeta.appendChild(postStats);
-                postMeta.innerHTML += `<span>${postData.timestamp ? new Date(postData.timestamp.toDate()).toLocaleString() : 'N/A'}</span>`;
+                const postReactionsContainer = document.createElement('div');
+                postReactionsContainer.className = 'post-reactions-container';
+                postReactionsContainer.onclick = (e) => {
+                    e.stopPropagation();
+                    document.querySelectorAll('.reactions-popup').forEach(p => p.remove());
+                    const popup = App.UI.getEmojiPopup(postId);
+                    postReactionsContainer.appendChild(popup);
+                };
 
-                const reactionsContainer = document.createElement('div');
-                reactionsContainer.className = 'reactions-container';
+                const reactionsButton = document.createElement('span');
+                reactionsButton.className = 'reaction-button';
+                reactionsButton.innerHTML = '🙂';
 
-                const reactions = ['👍', '😂', '😮', '❤️'];
-                reactions.forEach(emoji => {
-                    const reactionBtn = document.createElement('span');
-                    reactionBtn.className = `reaction-emoji`;
-                    reactionBtn.textContent = emoji;
-                    
-                    const myReaction = (await App.db.collection('posts').doc(postId).collection('reactions').doc(App.currentUserId).get()).data();
-                    if (myReaction && myReaction.emoji === emoji) {
-                        reactionBtn.classList.add('reacted');
-                    }
-                    
-                    reactionBtn.onclick = (e) => {
-                        e.stopPropagation();
-                        App.Posts.react(postId, emoji, reactionBtn);
-                    };
-                    
-                    reactionsContainer.appendChild(reactionBtn);
-                });
-
-                const totalReactions = Object.values(postData.reactions || {}).reduce((sum, count) => sum + count, 0);
-                const reactionCountSpan = document.createElement('span');
-                reactionCountSpan.id = `total-reactions-${postId}`;
-                reactionCountSpan.className = 'reaction-count';
-                reactionCountSpan.textContent = `(${App.numberFormatter(totalReactions)})`;
-                reactionsContainer.appendChild(reactionCountSpan);
+                const reactionsCount = document.createElement('span');
+                reactionsCount.className = 'reaction-count';
+                let totalReactions = 0;
+                for (const key in postData.reactions) {
+                    totalReactions += postData.reactions[key];
+                }
+                reactionsCount.textContent = App.Utils.formatNumber(totalReactions);
                 
+                postReactionsContainer.appendChild(reactionsButton);
+                postReactionsContainer.appendChild(reactionsCount);
+
+                postFooter.appendChild(postStats);
+                postFooter.appendChild(postReactionsContainer);
+
                 postElement.appendChild(postHeader);
                 postElement.appendChild(postBody);
-                postElement.appendChild(postMeta);
-                postElement.appendChild(reactionsContainer);
+                postElement.appendChild(postFooter);
                 
+                postElement.ondblclick = () => App.Posts.like(postId, likeButton);
+
                 return postElement;
             },
             getRandomPostStyle: () => {
@@ -2086,14 +2016,14 @@
                     if (doc.exists) {
                         await likeRef.delete();
                         await postRef.update({ likes: firebase.firestore.FieldValue.increment(-1) });
-                        if (likesCountElement) likesCountElement.textContent = App.numberFormatter(parseInt(likesCountElement.textContent) - 1);
+                        if (likesCountElement) likesCountElement.textContent = App.Utils.formatNumber(parseInt(likesCountElement.textContent) - 1);
                         likeButton.innerHTML = '♡'; // White heart
                         likeButton.classList.remove('liked');
                     } else {
                         await likeRef.set({ likedAt: new Date() });
                         await postRef.update({ likes: firebase.firestore.FieldValue.increment(1) });
-                        if (likesCountElement) likesCountElement.textContent = App.numberFormatter(parseInt(likesCountElement.textContent) + 1);
-                        likeButton.innerHTML = '❤️'; // Red heart
+                        if (likesCountElement) likesCountElement.textContent = App.Utils.formatNumber(parseInt(likesCountElement.textContent) + 1);
+                        likeButton.innerHTML = '❤'; // Red heart
                         likeButton.classList.add('liked');
                     }
                 } catch (error) {
@@ -2101,63 +2031,43 @@
                     alert('Error liking post. Please try again.');
                 }
             },
-            react: async (postId, emoji, reactionButton) => {
-                const reactionRef = App.db.collection('posts').doc(postId).collection('reactions').doc(App.currentUserId);
+            react: async (postId, emoji) => {
                 const postRef = App.db.collection('posts').doc(postId);
-
+                const reactionRef = postRef.collection('reactions').doc(App.currentUserId);
+                
                 try {
-                    const doc = await reactionRef.get();
-                    const postDoc = await postRef.get();
-                    if (!postDoc.exists) return;
-                    const postData = postDoc.data();
-                    const currentReaction = doc.exists ? doc.data().emoji : null;
+                    const reactionDoc = await reactionRef.get();
+                    let currentEmoji = reactionDoc.exists ? reactionDoc.data().emoji : null;
 
-                    const newReactions = postData.reactions || {};
-                    let updatePostData = {};
-
-                    if (currentReaction === emoji) {
-                        // User is un-reacting
-                        await reactionRef.delete();
-                        newReactions[emoji] = (newReactions[emoji] || 1) - 1;
-                        if (newReactions[emoji] <= 0) delete newReactions[emoji];
-                        updatePostData = { reactions: newReactions };
-                    } else {
-                        // User is adding a new reaction or changing it
-                        await reactionRef.set({ emoji, timestamp: new Date() });
-                        if (currentReaction) {
-                            newReactions[currentReaction] = (newReactions[currentReaction] || 1) - 1;
-                            if (newReactions[currentReaction] <= 0) delete newReactions[currentReaction];
+                    await App.db.runTransaction(async (transaction) => {
+                        const postDoc = await transaction.get(postRef);
+                        const reactions = postDoc.data().reactions || {};
+                        
+                        // Decrement old reaction count if it exists
+                        if (currentEmoji && reactions[currentEmoji]) {
+                            reactions[currentEmoji]--;
                         }
-                        newReactions[emoji] = (newReactions[emoji] || 0) + 1;
-                        updatePostData = { reactions: newReactions };
-                    }
-
-                    await postRef.update(updatePostData);
-                    App.Posts.updatePostReactionsUI(postId, newReactions);
+                        
+                        // Increment new reaction count
+                        if (currentEmoji === emoji) {
+                            // User un-reacted
+                            delete reactions[emoji];
+                            transaction.delete(reactionRef);
+                        } else {
+                            reactions[emoji] = (reactions[emoji] || 0) + 1;
+                            transaction.set(reactionRef, { emoji: emoji });
+                        }
+                        
+                        transaction.update(postRef, { reactions: reactions });
+                    });
+                    
+                    // Re-render the post to show updated reaction counts
+                    // This is a simple approach; for performance, you could update a specific element
+                    App.Posts.fetch(true);
                 } catch (error) {
                     console.error("Error reacting to post:", error);
                     alert('Error reacting to post. Please try again.');
                 }
-            },
-            updatePostReactionsUI: (postId, reactionsData) => {
-                const postElement = document.querySelector(`[data-post-id="${postId}"]`);
-                if (!postElement) return;
-
-                const reactionButtons = postElement.querySelectorAll('.reaction-emoji');
-                reactionButtons.forEach(btn => btn.classList.remove('reacted'));
-                
-                const totalCountElement = postElement.querySelector(`#total-reactions-${postId}`);
-                const totalCount = Object.values(reactionsData).reduce((sum, count) => sum + count, 0);
-                if (totalCountElement) totalCountElement.textContent = `(${App.numberFormatter(totalCount)})`;
-
-                const myReactionRef = App.db.collection('posts').doc(postId).collection('reactions').doc(App.currentUserId);
-                myReactionRef.get().then(doc => {
-                    if (doc.exists) {
-                        const myEmoji = doc.data().emoji;
-                        const myBtn = postElement.querySelector(`.reaction-emoji[data-emoji="${myEmoji}"]`);
-                        if (myBtn) myBtn.classList.add('reacted');
-                    }
-                });
             },
             delete: async (postId) => {
                 if (confirm('Are you sure you want to delete this post?')) {
@@ -2429,7 +2339,10 @@
                 App.currentUserId = null;
                 App.UI.showSection('signin-auth');
             }
-            App.UI.hidePreloader();
+            // Add a slight delay for the splash screen to be visible
+            setTimeout(() => {
+                 App.UI.hidePreloader();
+            }, 1000); // 1 second delay
         });
         
         window.handleAdCompletion = (rewardType) => {
