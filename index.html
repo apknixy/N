@@ -93,7 +93,7 @@
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.7);
         }
         
-        input[type="email"], input[type="password"], input[type="text"], textarea {
+        input[type="email"], input[type="password"], input[type="text"], textarea, select {
             width: 100%;
             padding: 12px 15px;
             margin-bottom: 15px;
@@ -104,8 +104,9 @@
             font-size: 1rem;
             transition: all 0.3s ease;
             box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.6);
+            appearance: none;
         }
-        input:focus, textarea:focus {
+        input:focus, textarea:focus, select:focus {
             border-color: var(--primary-color);
             outline: none;
             box-shadow: 0 0 0 3px rgba(0, 170, 255, 0.3), inset 0 1px 3px rgba(0, 0, 0, 0.6);
@@ -164,6 +165,11 @@
             z-index: 99;
             animation: slideDown 0.5s ease-out;
         }
+        .header-left, .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
         .app-logo {
             display: flex;
             align-items: center;
@@ -205,6 +211,20 @@
             font-size: 1.2rem;
             margin-bottom: 3px;
         }
+        .header-menu-btn, .header-refresh-btn {
+            font-size: 1.5rem;
+            color: #fff;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+            transition: color 0.2s ease, transform 0.2s ease;
+        }
+        .header-menu-btn:hover, .header-refresh-btn:hover {
+            color: var(--primary-color);
+            transform: scale(1.1);
+        }
+
 
         /* Scrollable Main Content */
         main {
@@ -572,6 +592,113 @@
             padding: 10px 25px;
         }
 
+        /* Side Menu */
+        .side-menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 100;
+            display: none;
+        }
+        .side-menu {
+            position: fixed;
+            top: 0;
+            right: -300px;
+            width: 280px;
+            height: 100%;
+            background-color: var(--dark-fg);
+            box-shadow: -5px 0 20px rgba(0, 0, 0, 0.8);
+            z-index: 101;
+            transition: right 0.3s ease-out;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            border-left: 1px solid var(--border-color);
+        }
+        .side-menu.visible {
+            right: 0;
+        }
+        .menu-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        .menu-header h3 {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+        }
+        .menu-close-btn {
+            font-size: 2rem;
+            color: #fff;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+        }
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 10px;
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 1rem;
+            border-radius: var(--border-radius-sm);
+            transition: background-color 0.2s ease;
+            cursor: pointer;
+        }
+        .menu-item:hover {
+            background-color: rgba(0, 170, 255, 0.1);
+        }
+        .menu-item .icon {
+            margin-right: 15px;
+            font-size: 1.3rem;
+            color: var(--primary-color);
+        }
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 28px;
+            margin-left: auto;
+        }
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 28px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: var(--success-color);
+        }
+        input:checked + .slider:before {
+            transform: translateX(22px);
+        }
+
         /* ========================================================= */
         /* == ANIMATIONS =========================================== */
         /* ========================================================= */
@@ -629,24 +756,58 @@
     <div id="app-container" class="hidden">
         
         <header>
-            <div class="app-logo">
-                <span class="shape"></span> AddMint
+            <div class="header-left">
+                <button class="header-menu-btn" onclick="App.UI.toggleSideMenu()">&#9776;</button>
+                <div class="app-logo">
+                    <span class="shape"></span> AddMint
+                </div>
             </div>
-            <div class="header-stats">
-                <div class="stat-item" onclick="App.UI.showSection('ad-rewards-section');">
-                    <span class="icon">&#x1F4B0;</span>
-                    <span id="header-coins">0</span>
-                </div>
-                <div class="stat-item" onclick="App.UI.showSection('ad-rewards-section');">
-                    <span class="icon">&#x2756;</span>
-                    <span id="header-limit">0</span>
-                </div>
-                <div class="stat-item" onclick="App.UI.showSection('ad-rewards-section');">
-                    <span class="icon">&#x1F4A1;</span>
-                    <span id="header-credits">0</span>
+            <div class="header-right">
+                <button class="header-refresh-btn" onclick="App.Posts.fetch(true)">&#x21BB;</button>
+                <div class="header-stats">
+                    <div class="stat-item" onclick="App.UI.showSection('ad-rewards-section');">
+                        <span class="icon">&#x1F4B0;</span>
+                        <span id="header-coins">0</span>
+                    </div>
+                    <div class="stat-item" onclick="App.UI.showSection('ad-rewards-section');">
+                        <span class="icon">&#x2756;</span>
+                        <span id="header-limit">0</span>
+                    </div>
+                    <div class="stat-item" onclick="App.UI.showSection('ad-rewards-section');">
+                        <span class="icon">&#x1F4A1;</span>
+                        <span id="header-credits">0</span>
+                    </div>
                 </div>
             </div>
         </header>
+        
+        <div id="side-menu-overlay" class="side-menu-overlay" onclick="App.UI.toggleSideMenu()"></div>
+        <div id="side-menu" class="side-menu">
+            <div class="menu-header">
+                <h3>Menu</h3>
+                <button class="menu-close-btn" onclick="App.UI.toggleSideMenu()">&times;</button>
+            </div>
+            <a href="#" class="menu-item" onclick="App.UI.toggleDataSaver()">
+                <span class="icon">&#x2600;</span> Data Saver
+                <label class="toggle-switch">
+                    <input type="checkbox" id="data-saver-toggle">
+                    <span class="slider"></span>
+                </label>
+            </a>
+            <a href="https://www.instagram.com/addmint__" target="_blank" class="menu-item">
+                <span class="icon">&#x1F4F8;</span> Instagram
+            </a>
+            <a href="https://www.youtube.com/@add_mintmint" target="_blank" class="menu-item">
+                <span class="icon">&#x25B6;</span> YouTube
+            </a>
+            <a href="#" class="menu-item" onclick="App.UI.showSection('about-section'); App.UI.toggleSideMenu();">
+                <span class="icon">&#x2139;</span> About
+            </a>
+            <a href="#" class="menu-item" onclick="App.UI.showSection('privacy-policy-section'); App.UI.toggleSideMenu();">
+                <span class="icon">&#x1F512;</span> Privacy Policy
+            </a>
+        </div>
+
 
         <main id="main-content">
             <section id="signin-auth" class="container active">
@@ -699,10 +860,8 @@
                         <input type="text" id="profileUsername" placeholder="e.g., AddMintUser" required>
                         <span id="username-status-icon" class="username-status-icon hidden"></span>
                     </div>
-                    <label for="profilePhone">Phone Number (Optional):</label>
-                    <input type="text" id="profilePhone" placeholder="e.g., +919876543210">
                     <label for="profileWhatsApp">WhatsApp Number (Optional):</label>
-                    <input type="text" id="profileWhatsApp" placeholder="e.g., +919876543210">
+                    <input type="text" id="profileWhatsApp" placeholder="e.g., 919876543210 (without +)">
                     <label for="profileInstagram">Instagram Handle (Optional):</label>
                     <input type="text" id="profileInstagram" placeholder="e.g., yourhandle">
                     <button type="submit" class="mt-4">Save Profile & Continue</button>
@@ -732,10 +891,6 @@
             <section id="create-post-section">
                 <h2>Share Your Thoughts</h2>
                 <div id="create-post-message" class="message hidden"></div>
-                <div class="follower-monetization-info">
-                    <h4>Monetization Coming Soon!</h4>
-                    <p>Earn real money after reaching 100 followers! You can earn ₹10-₹100 for every 150 posts. Share the app and grow your audience to get started!</p>
-                </div>
                 <form id="create-post-form" class="mt-4">
                     <label for="post-content">What's on your mind today?</label>
                     <textarea id="post-content" placeholder="Type your message here..." required></textarea>
@@ -751,15 +906,14 @@
                     </div>
 
                     <button type="submit" class="mt-4">Publish Post</button>
-                    <p class="text-center mt-2">Free posts remaining today: <strong id="posts-limit-counter">0</strong></p>
-                    <p class="text-center">Or use coins: <strong id="post-cost-info">5 Coins / Post</strong></p>
+                    <p class="text-center mt-2">Cost: 1 Limit & 5 Coins</p>
                 </form>
             </section>
             
             <section id="ad-rewards-section" class="container">
                 <h2>Get More!</h2>
                 <div id="ad-rewards-message" class="message hidden"></div>
-                <p class="text-center mb-4">Watch a full ad to get more coins, credits, or post limits.</p>
+                <p class="text-center mb-4">Watch an ad to get more coins, credits, or post limits.</p>
                 <div class="reward-buttons">
                     <button onclick="App.Monetization.requestAd('coins');"><span class="icon">&#x1F4B0;</span> Get 10 Coins</button>
                     <button onclick="App.Monetization.requestAd('credits');"><span class="icon">&#x1F4A1;</span> Get 10 Credits</button>
@@ -779,6 +933,19 @@
                     <button onclick="App.Monetization.hideDailyRewardPopup()">Claim</button>
                 </div>
             </div>
+            
+            <section id="about-section" class="container">
+                <h2>About AddMint</h2>
+                <p>Welcome to AddMint! Our goal is to create a fun and engaging social platform where you can share your thoughts and connect with others. We believe in providing a seamless user experience while giving creators the tools they need to grow. Join our community and start sharing today!</p>
+            </section>
+
+            <section id="privacy-policy-section" class="container">
+                <h2>Privacy Policy</h2>
+                <p>Your privacy is important to us. This policy explains how we collect, use, and protect your information. By using our app, you agree to the collection and use of information in accordance with this policy.</p>
+                <p>We may collect information such as your name, email, and social media handles to provide and improve our service. We do not share your personal information with third parties without your consent.</p>
+                <p>We take reasonable measures to protect your information from unauthorized access or disclosure. However, no method of transmission over the internet or electronic storage is 100% secure.</p>
+                <p>If you have any questions about this Privacy Policy, please contact us through the app.</p>
+            </section>
 
             <section id="user-profile-section">
                 <div class="profile-header">
@@ -809,7 +976,6 @@
                 </div>
                 <div id="user-profile-details" class="container" style="background: none; box-shadow: none;">
                     <p><strong>Email:</strong> <span id="profile-email"></span></p>
-                    <p><strong>Phone:</strong> <span id="profile-phone-number">N/A</span></p>
                     <p><strong>WhatsApp:</strong> <span id="profile-whatsapp-number">N/A</span></p>
                     <p><strong>Instagram:</strong> <span id="profile-instagram-handle">N/A</span></p>
                 </div>
@@ -823,9 +989,10 @@
                 <div id="edit-profile-message" class="message hidden"></div>
                 <form id="edit-profile-form">
                     <label for="editUsername">Username:</label>
-                    <input type="text" id="editUsername" required>
-                    <label for="editPhone" class="mt-4">Phone Number (Optional):</label>
-                    <input type="text" id="editPhone">
+                    <div class="username-input-group mb-4">
+                        <input type="text" id="editUsername" required>
+                        <span id="edit-username-status-icon" class="username-status-icon hidden"></span>
+                    </div>
                     <label for="editWhatsApp" class="mt-4">WhatsApp Number (Optional):</label>
                     <input type="text" id="editWhatsApp">
                     <label for="editInstagram" class="mt-4">Instagram Handle (Optional):</label>
@@ -889,11 +1056,11 @@
 
         <footer>
             <div class="nav-item active" data-section="home-posts">
-                <span class="icon">&#x2302;</span>
+                <span class="icon">&#8962;</span>
                 <span>Home</span>
             </div>
             <div class="nav-item" data-section="search-section">
-                <span class="icon">&#x1F50D;</span>
+                <span class="icon">&#x2315;</span>
                 <span>Search</span>
             </div>
             <div class="nav-item" data-section="create-post-section">
@@ -901,7 +1068,7 @@
                 <span>Create</span>
             </div>
             <div class="nav-item" data-section="user-profile-section">
-                <span class="icon">&#x1F464;</span>
+                <span class="icon">&#x25C9;</span>
                 <span>Profile</span>
             </div>
         </footer>
@@ -933,6 +1100,7 @@
         App.lastPost = null;
         App.isLoadingPosts = false;
         App.postsCache = [];
+        App.isDataSaver = false;
         
         App.UI = {
             showSection: (sectionId) => {
@@ -977,7 +1145,6 @@
                 document.getElementById('header-coins').textContent = coins;
                 document.getElementById('header-limit').textContent = limits;
                 document.getElementById('header-credits').textContent = credits;
-                document.getElementById('posts-limit-counter').textContent = limits;
             },
             hidePreloader: () => {
                 const splash = document.getElementById('splash-screen');
@@ -1044,6 +1211,17 @@
                 const gradient = `linear-gradient(135deg, ${color1}, ${color2})`;
                 return gradient;
             },
+            toggleSideMenu: () => {
+                const menu = document.getElementById('side-menu');
+                const overlay = document.getElementById('side-menu-overlay');
+                menu.classList.toggle('visible');
+                overlay.style.display = menu.classList.contains('visible') ? 'block' : 'none';
+            },
+            toggleDataSaver: () => {
+                App.isDataSaver = document.getElementById('data-saver-toggle').checked;
+                // You can add more logic here, e.g., to load images only when a post is visible
+                alert(`Data Saver is now ${App.isDataSaver ? 'ON' : 'OFF'}.`);
+            }
         };
 
         document.addEventListener('click', (event) => {
@@ -1107,16 +1285,26 @@
         };
 
         App.Profile = {
-            checkUsernameAvailability: async (username) => {
-                const icon = document.getElementById('username-status-icon');
+            checkUsernameAvailability: async (username, isEdit = false) => {
+                const icon = document.getElementById(isEdit ? 'edit-username-status-icon' : 'username-status-icon');
                 if (!username || username.length < 3) {
                     icon.classList.add('hidden');
                     return false;
                 }
                 
-                const usersRef = App.db.collection('users').where('username', '==', username);
+                const usersRef = App.db.collection('users').where('username', '==', username.toLowerCase());
                 const snapshot = await usersRef.get();
-                if (snapshot.empty) {
+                
+                let isAvailable = true;
+                if (!snapshot.empty) {
+                    if (isEdit && snapshot.docs[0].id === App.currentUserId) {
+                        isAvailable = true;
+                    } else {
+                        isAvailable = false;
+                    }
+                }
+                
+                if (isAvailable) {
                     icon.classList.remove('hidden', 'unavailable');
                     icon.classList.add('available');
                     icon.innerHTML = '&#x2714;'; // Green tick
@@ -1128,23 +1316,22 @@
                     return false;
                 }
             },
-            setup: async (username, phone, whatsapp, instagram) => {
+            setup: async (username, whatsapp, instagram) => {
                 App.UI.hideMessage('profile-setup-message');
                 const isUsernameAvailable = await App.Profile.checkUsernameAvailability(username);
                 if (!isUsernameAvailable) {
                     App.UI.showMessage('profile-setup-message', 'This username is already taken. Please choose another.', 'error');
                     return;
                 }
-                if (!username || (!phone && !whatsapp && !instagram)) {
+                if (!username || (!whatsapp && !instagram)) {
                     App.UI.showMessage('profile-setup-message', 'Please provide a username and at least one contact method.', 'error');
                     return;
                 }
                 
                 try {
                     await App.db.collection('users').doc(App.currentUserId).set({
-                        username,
+                        username: username.toLowerCase(),
                         email: App.auth.currentUser.email,
-                        phone: phone || null,
                         whatsapp: whatsapp || null,
                         instagram: instagram || null,
                         coins: 10,
@@ -1159,12 +1346,17 @@
                     console.error("Profile setup error:", error);
                 }
             },
-            edit: async (username, phone, whatsapp, instagram) => {
+            edit: async (username, whatsapp, instagram) => {
                 App.UI.hideMessage('edit-profile-message');
+                const isUsernameAvailable = await App.Profile.checkUsernameAvailability(username, true);
+                if (!isUsernameAvailable) {
+                    App.UI.showMessage('edit-profile-message', 'This username is already taken. Please choose another.', 'error');
+                    return;
+                }
+                
                 try {
                     await App.db.collection('users').doc(App.currentUserId).update({
-                        username,
-                        phone: phone || null,
+                        username: username.toLowerCase(),
                         whatsapp: whatsapp || null,
                         instagram: instagram || null,
                     });
@@ -1219,13 +1411,11 @@
                 document.getElementById('profile-followers-count').textContent = profile.followersCount;
                 document.getElementById('profile-following-count').textContent = profile.followingCount;
                 document.getElementById('profile-email').textContent = profile.email;
-                document.getElementById('profile-phone-number').textContent = profile.phone || 'N/A';
                 document.getElementById('profile-whatsapp-number').textContent = profile.whatsapp || 'N/A';
                 document.getElementById('profile-instagram-handle').textContent = profile.instagram || 'N/A';
                 document.getElementById('profile-image-own').style.background = App.UI.generateUserLogo(profile.uid);
                 
                 document.getElementById('editUsername').value = profile.username || '';
-                document.getElementById('editPhone').value = profile.phone || '';
                 document.getElementById('editWhatsApp').value = profile.whatsapp || '';
                 document.getElementById('editInstagram').value = profile.instagram || '';
                 
@@ -1250,7 +1440,6 @@
                     }
                 });
                 
-                // Hide or show contact buttons if details are missing
                 document.getElementById('other-whatsapp-btn').style.display = profile.whatsapp ? 'inline-flex' : 'none';
                 document.getElementById('other-instagram-btn').style.display = profile.instagram ? 'inline-flex' : 'none';
 
@@ -1295,7 +1484,7 @@
                 App.UI.hideMessage('search-message');
 
                 try {
-                    const usersRef = App.db.collection('users').orderBy('username').startAt(searchTerm).endAt(searchTerm + '\uf8ff');
+                    const usersRef = App.db.collection('users').where('username', '>=', searchTerm).where('username', '<=', searchTerm + '\uf8ff').limit(20);
                     const snapshot = await usersRef.get();
                     
                     if (snapshot.empty) {
@@ -1316,12 +1505,11 @@
                         
                         const userInfo = document.createElement('div');
                         userInfo.className = 'user-info';
-                        userInfo.innerHTML = `<h4>${user.username}</h4><p style="color:#aaa;">@${user.username}</p>`;
+                        userInfo.innerHTML = `<h4>${user.username}</h4>`;
                         
                         const followButton = document.createElement('button');
                         followButton.textContent = 'Follow';
                         followButton.onclick = () => {
-                             // Simplified follow logic for search results
                             App.Profile.toggleFollow(doc.id);
                         };
 
@@ -1356,31 +1544,29 @@
                 else if (boostDuration === '24') requiredAds = 2;
                 else if (boostDuration === '30') requiredAds = 3;
 
-                if (postsLimit <= 0 && coins < 5) {
-                    App.UI.showMessage('create-post-message', 'You have no free posts left and not enough coins. Please get more to post.', 'error');
+                // New logic: must have both 1 limit AND 5 coins
+                if (postsLimit <= 0 || coins < 5) {
+                    App.UI.showMessage('create-post-message', 'You need at least 1 post limit and 5 coins to post. Please get more to post.', 'error');
                     return;
                 }
                 
                 if (requiredAds > 0) {
                      App.UI.showMessage('create-post-message', `You need to watch ${requiredAds} ad(s) for this boost option.`, 'info');
-                     // Placeholder for starting ad
-                     App.Monetization.requestAd(`boost_${boostDuration}`);
+                     // This is where you would trigger the ad from your App Inventor app
+                     // window.AppInventor.requestAd(`boost_${boostDuration}`);
+                     // For now, we simulate it
+                     // App.Monetization.handleAdCompletion(`boost_${boostDuration}`);
                      return;
                 }
 
                 await App.Posts.submitNewPost(content, userData, userRef, boostDuration);
             },
             submitNewPost: async (content, userData, userRef, boostDuration = '12') => {
-                const postsLimit = userData.postLimit || 0;
-                
                 const newPostRef = App.db.collection('posts').doc();
-                const updateData = {};
-                
-                if (postsLimit > 0) {
-                    updateData.postLimit = firebase.firestore.FieldValue.increment(-1);
-                } else {
-                    updateData.coins = firebase.firestore.FieldValue.increment(-5);
-                }
+                const updateData = {
+                    postLimit: firebase.firestore.FieldValue.increment(-1),
+                    coins: firebase.firestore.FieldValue.increment(-5)
+                };
                 
                 const neonColor = App.Posts.getRandomPostStyle();
                 const expiryTime = new Date(Date.now() + (parseInt(boostDuration) * 60 * 60 * 1000));
@@ -1402,23 +1588,27 @@
                     App.UI.showMessage('create-post-message', 'Post published successfully!', 'success');
                     document.getElementById('post-content').value = '';
                     await App.Profile.fetch(App.currentUserId, true);
-                    App.Posts.fetch();
+                    App.Posts.fetch(true); // Refresh posts after upload
                 } catch (error) {
                     App.UI.showMessage('create-post-message', `Error publishing post: ${error.message}`, 'error');
                     console.error("Post creation error:", error);
                 }
             },
-            fetch: async (targetDivId = 'posts-container', userId = null) => {
+            fetch: async (forceRefresh = false, targetDivId = 'posts-container', userId = null) => {
                 const container = document.getElementById(targetDivId);
                 const spinner = document.getElementById('loading-spinner');
 
                 if (App.isLoadingPosts) return;
                 App.isLoadingPosts = true;
 
-                if (App.lastPost === null) {
+                if (forceRefresh) {
+                    App.lastPost = null;
                     container.innerHTML = '';
-                    spinner.classList.remove('hidden');
                     App.postsCache = [];
+                }
+
+                if (App.lastPost === null) {
+                    spinner.classList.remove('hidden');
                 }
 
                 let query = App.db.collection('posts').orderBy('timestamp', 'desc').limit(25);
@@ -1432,34 +1622,40 @@
                 try {
                     const snapshot = await query.get();
                     if (snapshot.empty) {
-                        if (!App.lastPost) {
+                        if (App.postsCache.length === 0) {
                             container.innerHTML = '<p class="text-center" style="margin-top: 30px; font-style: italic; color: #aaa;">No posts to display.</p>';
                         } else {
-                            // If we run out of posts, shuffle the cache and display again for infinite feel
+                            // If we run out of posts, shuffle the cache and display again for an infinite feel
                             const shuffledCache = App.postsCache.sort(() => Math.random() - 0.5);
-                            App.Posts.renderAll(shuffledCache, targetDivId, userId !== null);
+                            App.Posts.renderAll(shuffledCache, targetDivId, userId !== null, true);
                         }
+                        spinner.classList.add('hidden');
                         return;
                     }
 
                     App.lastPost = snapshot.docs[snapshot.docs.length - 1];
                     const postDocs = snapshot.docs;
 
-                    // Filter out expired posts and delete them
-                    const validPosts = postDocs.filter(doc => {
-                        const expiry = doc.data().expiryTime;
+                    const validPosts = [];
+                    for (const doc of postDocs) {
+                        const postData = doc.data();
+                        const expiry = postData.expiryTime;
                         const isExpired = expiry && expiry < Date.now();
+                        
                         if (isExpired) {
-                            doc.ref.delete().catch(e => console.error("Error deleting expired post:", e));
+                            await doc.ref.delete().catch(e => console.error("Error deleting expired post:", e));
+                        } else {
+                            validPosts.push(doc);
                         }
-                        return !isExpired;
-                    });
+                    }
+
+                    if (forceRefresh) {
+                         App.postsCache = validPosts.map(doc => ({ id: doc.id, ...doc.data() }));
+                    } else {
+                         App.postsCache.push(...validPosts.map(doc => ({ id: doc.id, ...doc.data() })));
+                    }
                     
-                    // Add valid posts to cache
-                    App.postsCache.push(...validPosts.map(doc => ({ id: doc.id, ...doc.data() })));
-                    
-                    // Render the new posts
-                    App.Posts.renderAll(validPosts, targetDivId, userId !== null, true);
+                    App.Posts.renderAll(validPosts, targetDivId, userId !== null, !forceRefresh);
 
                 } catch (error) {
                     container.innerHTML = '<p class="text-center message error">Error loading posts. Please try again.</p>';
@@ -1471,35 +1667,35 @@
             },
             renderAll: async (postDocs, containerId, isProfileView, append = false) => {
                 const container = document.getElementById(containerId);
-                if (!append) container.innerHTML = '';
-                if (postDocs.length === 0 && !append) {
-                    container.innerHTML = `<p class="text-center" style="margin-top: 30px; font-style: italic; color: #aaa;">No posts to display.</p>`;
-                    return;
-                }
-
-                let verticalPostsCount = 0;
-                let horizontalPosts = [];
                 const postsListVertical = document.createElement('div');
                 postsListVertical.id = 'posts-list-vertical';
                 postsListVertical.style.display = 'grid';
                 postsListVertical.style.gap = '20px';
 
+                if (!append) container.innerHTML = '';
+                if (postDocs.length === 0 && !append) {
+                    container.innerHTML = `<p class="text-center" style="margin-top: 30px; font-style: italic; color: #aaa;">No posts to display.</p>`;
+                    return;
+                }
+                
+                let verticalPostsCount = 0;
+                let horizontalPosts = [];
+
                 for (const doc of postDocs) {
-                    const postData = isProfileView ? doc.data() : doc;
+                    const postData = isProfileView ? doc.data() : { id: doc.id, ...doc.data() };
                     const postId = isProfileView ? doc.id : doc.id;
                     const postElement = await App.Posts.createPostElement(postId, postData, isProfileView);
 
-                    if (!isProfileView) {
-                        // Logic for alternating horizontal and vertical
+                    if (!isProfileView && !App.isDataSaver) { // Only mix horizontal posts if not in profile view and data saver is off
                         if (verticalPostsCount >= 5 && Math.random() > 0.5) {
                             horizontalPosts.push(postElement);
-                            verticalPostsCount = 0;
                             if (horizontalPosts.length >= 4) {
                                 const horizontalContainer = document.createElement('div');
                                 horizontalContainer.className = 'horizontal-scroll-container';
                                 horizontalPosts.forEach(el => horizontalContainer.appendChild(el));
                                 container.appendChild(horizontalContainer);
                                 horizontalPosts = [];
+                                verticalPostsCount = 0;
                             }
                         } else {
                             postsListVertical.appendChild(postElement);
@@ -1509,7 +1705,7 @@
                         postsListVertical.appendChild(postElement);
                     }
                 }
-
+                
                 if (horizontalPosts.length > 0) {
                      const horizontalContainer = document.createElement('div');
                      horizontalContainer.className = 'horizontal-scroll-container';
@@ -1748,7 +1944,8 @@
                     if (rewardType.startsWith('boost_')) {
                          const duration = rewardType.split('_')[1];
                          alert(`Your post has been boosted for ${duration} hours!`);
-                         // In a real implementation, you would need to store this state to apply the boost to the last pending post
+                         // This is where you would update the post's expiry time if a post was pending for boost
+                         // For now, it's a message only
                     } else if (rewardType === 'coins') {
                         updateData = { coins: firebase.firestore.FieldValue.increment(10) };
                         rewardMessage = '10 Coins';
@@ -1844,23 +2041,27 @@
                     App.Profile.checkUsernameAvailability(e.target.value);
                 }, 500);
             });
+            document.getElementById('editUsername').addEventListener('input', (e) => {
+                clearTimeout(this.checkTimer);
+                this.checkTimer = setTimeout(() => {
+                    App.Profile.checkUsernameAvailability(e.target.value, true);
+                }, 500);
+            });
 
             document.getElementById('profile-setup-form').addEventListener('submit', (e) => {
                 e.preventDefault();
                 const username = document.getElementById('profileUsername').value;
-                const phone = document.getElementById('profilePhone').value;
                 const whatsapp = document.getElementById('profileWhatsApp').value;
                 const instagram = document.getElementById('profileInstagram').value;
-                App.Profile.setup(username, phone, whatsapp, instagram);
+                App.Profile.setup(username, whatsapp, instagram);
             });
             
             document.getElementById('edit-profile-form').addEventListener('submit', (e) => {
                 e.preventDefault();
                 const username = document.getElementById('editUsername').value;
-                const phone = document.getElementById('editPhone').value;
                 const whatsapp = document.getElementById('editWhatsApp').value;
                 const instagram = document.getElementById('editInstagram').value;
-                App.Profile.edit(username, phone, whatsapp, instagram);
+                App.Profile.edit(username, whatsapp, instagram);
             });
             
             document.getElementById('create-post-form').addEventListener('submit', (e) => {
@@ -1884,8 +2085,7 @@
                     const sectionId = item.dataset.section;
                     App.UI.showSection(sectionId);
                     if (sectionId === 'home-posts') {
-                        App.lastPost = null;
-                        App.Posts.fetch();
+                        App.Posts.fetch(true);
                     } else if (sectionId === 'user-profile-section') {
                         App.Profile.fetch(App.currentUserId, true);
                     } else if (sectionId === 'search-section') {
