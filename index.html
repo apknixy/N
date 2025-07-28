@@ -337,8 +337,8 @@
 
         /* Post Display Section */
         #posts-container {
-            display: grid;
-            grid-template-columns: 1fr;
+            display: flex;
+            flex-direction: column;
             gap: 20px;
         }
         #posts-container > .post-card {
@@ -452,34 +452,91 @@
         .post-card.neon-blue {
             box-shadow: 0 0 15px var(--neon-blue), 0 0 25px var(--neon-blue) inset;
             border-color: var(--neon-blue);
-            animation: neonBlueGlow 1.5s infinite alternate ease-in-out;
         }
+        .post-card.neon-blue.glowing { animation: neonBlueGlow 0.4s forwards, fadeOutGlow 3s 0.4s forwards; }
         .post-card.neon-blue h3, .post-card.neon-blue p, .post-card.neon-blue .post-meta { text-shadow: 0 0 10px var(--neon-blue-shadow), 0 0 20px var(--neon-blue-shadow); }
 
         .post-card.neon-pink {
             box-shadow: 0 0 15px var(--neon-pink), 0 0 25px var(--neon-pink) inset;
             border-color: var(--neon-pink);
-            animation: neonPinkGlow 1.5s infinite alternate ease-in-out;
         }
+        .post-card.neon-pink.glowing { animation: neonPinkGlow 0.4s forwards, fadeOutGlow 3s 0.4s forwards; }
         .post-card.neon-pink h3, .post-card.neon-pink p, .post-card.neon-pink .post-meta { text-shadow: 0 0 10px var(--neon-pink-shadow), 0 0 20px var(--neon-pink-shadow); }
 
         .post-card.neon-green {
             box-shadow: 0 0 15px var(--neon-green), 0 0 25px var(--neon-green) inset;
             border-color: var(--neon-green);
-            animation: neonGreenGlow 1.5s infinite alternate ease-in-out;
         }
+        .post-card.neon-green.glowing { animation: neonGreenGlow 0.4s forwards, fadeOutGlow 3s 0.4s forwards; }
         .post-card.neon-green h3, .post-card.neon-green p, .post-card.neon-green .post-meta { text-shadow: 0 0 10px var(--neon-green-shadow), 0 0 20px var(--neon-green-shadow); }
 
         .post-card.neon-yellow {
             box-shadow: 0 0 15px var(--neon-yellow), 0 0 25px var(--neon-yellow) inset;
             border-color: var(--neon-yellow);
-            animation: neonYellowGlow 1.5s infinite alternate ease-in-out;
         }
+        .post-card.neon-yellow.glowing { animation: neonYellowGlow 0.4s forwards, fadeOutGlow 3s 0.4s forwards; }
         .post-card.neon-yellow h3, .post-card.neon-yellow p, .post-card.neon-yellow .post-meta { text-shadow: 0 0 10px var(--neon-yellow-shadow), 0 0 20px var(--neon-yellow-shadow); }
         
         .url-link { color: var(--primary-color); text-decoration: underline; }
 
+        /* Emoji reaction picker */
+        .reaction-picker {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 50px;
+            padding: 8px 15px;
+            position: absolute;
+            bottom: -50px; /* Position below the post card */
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s ease-out;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+            z-index: 5;
+        }
+        .reaction-picker.visible {
+            bottom: -60px; /* Nudge it down slightly when visible */
+            opacity: 1;
+            visibility: visible;
+        }
+        .reaction-picker span {
+            font-size: 1.8rem;
+            cursor: pointer;
+            transform: scale(1);
+            transition: transform 0.2s ease;
+        }
+        .reaction-picker span:hover {
+            transform: scale(1.3);
+        }
+        .post-reactions {
+            font-size: 0.9rem;
+            color: #aaa;
+            margin-top: 10px;
+            text-align: right;
+            border-top: 1px dashed rgba(255, 255, 255, 0.1);
+            padding-top: 5px;
+        }
+        .reaction-count {
+            margin-right: 10px;
+            display: inline-block;
+        }
+
         /* Profile Section */
+        .profile-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: var(--dark-fg);
+            border-radius: var(--border-radius-lg);
+            padding: 30px;
+            box-shadow: 0 8px 25px var(--shadow-color);
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+        }
         .profile-image-container {
             width: 100px;
             height: 100px;
@@ -488,6 +545,8 @@
             border: 3px solid var(--primary-color);
             position: relative;
             animation: profilePulse 2s infinite ease-out;
+            margin-bottom: 20px;
+            cursor: pointer; /* To suggest it's clickable for logo change */
         }
         .profile-image {
             width: 100%;
@@ -495,6 +554,65 @@
             background: radial-gradient(circle, var(--neon-blue) 0%, var(--neon-pink) 100%);
             animation: profileImageGlow 3s infinite alternate ease-in-out;
             border-radius: 50%;
+        }
+        .profile-info {
+            text-align: center;
+            width: 100%;
+        }
+        .profile-info h3 {
+            color: var(--accent-color);
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        .profile-stats {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        .profile-stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 0.9rem;
+            color: #ccc;
+        }
+        .profile-stat-item strong {
+            font-size: 1.4rem;
+            color: var(--primary-color);
+        }
+        .profile-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+        .profile-buttons button {
+            padding: 10px 20px;
+            font-size: 0.95rem;
+        }
+        #user-profile-details, #other-user-profile-details {
+            background-color: var(--dark-fg);
+            padding: 20px;
+            border-radius: var(--border-radius-lg);
+            border: 1px solid var(--border-color);
+            margin-bottom: 20px;
+        }
+        #user-profile-details p, #other-user-profile-details p {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #ccc;
+        }
+        #user-profile-details p strong, #other-user-profile-details p strong {
+            color: var(--primary-color);
+        }
+        .profile-posts-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
         }
 
         /* Search Section */
@@ -519,6 +637,7 @@
             border-radius: 50%;
             margin-right: 15px;
             border: 2px solid var(--primary-color);
+            flex-shrink: 0;
         }
         .search-result-item .user-info {
             flex-grow: 1;
@@ -698,78 +817,55 @@
         input:checked + .slider:before {
             transform: translateX(22px);
         }
-        
-        .chat-container {
+
+        /* Chat Window Styling */
+        #chat-window {
+            height: 300px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px;
+            overflow-y: auto;
             display: flex;
             flex-direction: column;
             gap: 10px;
-            height: 300px;
-            overflow-y: auto;
-            padding: 15px;
-            border-radius: var(--border-radius-sm);
-            border: 1px solid var(--border-color);
-            margin-bottom: 20px;
+            margin-bottom: 15px;
+            background-color: var(--dark-bg);
         }
         .chat-message {
             max-width: 80%;
             padding: 10px 15px;
-            border-radius: 20px;
+            border-radius: 15px;
             word-wrap: break-word;
-            animation: fadeIn 0.3s ease;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            position: relative;
+            animation: fadeIn 0.3s ease-out;
         }
         .chat-message.sent {
+            align-self: flex-end;
             background-color: var(--primary-color);
             color: white;
-            align-self: flex-end;
-            border-bottom-right-radius: 5px;
+            border-bottom-right-radius: 3px;
         }
         .chat-message.received {
-            background-color: var(--border-color);
-            color: var(--text-color);
             align-self: flex-start;
-            border-bottom-left-radius: 5px;
+            background-color: var(--dark-fg);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            border-bottom-left-radius: 3px;
         }
-        .chat-timestamp {
+        .chat-message .timestamp {
             font-size: 0.75rem;
-            color: #888;
+            color: rgba(255, 255, 255, 0.6);
             margin-top: 5px;
             text-align: right;
+            display: block;
         }
-        
-        /* Reaction popover */
-        .reaction-popover {
-            position: absolute;
-            bottom: 60px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: var(--dark-fg);
-            border: 1px solid var(--border-color);
-            border-radius: 50px;
-            padding: 5px;
-            display: flex;
-            gap: 5px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s ease, transform 0.3s ease;
-            z-index: 100;
+        .chat-message.received .timestamp {
+             text-align: left;
         }
-        .reaction-popover.visible {
-            opacity: 1;
-            visibility: visible;
-            transform: translateX(-50%) translateY(-10px);
-        }
-        .reaction-btn {
-            font-size: 1.5rem;
-            background: none;
-            border: none;
-            padding: 5px;
-            cursor: pointer;
-            transition: transform 0.2s ease;
-        }
-        .reaction-btn:hover {
-            transform: scale(1.2);
-        }
+
 
         /* ========================================================= */
         /* == ANIMATIONS =========================================== */
@@ -792,10 +888,26 @@
         @keyframes slideInUp { from { opacity: 0; transform: translateY(50px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes slideDown { from { transform: translateY(-100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         @keyframes slideUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        @keyframes neonBlueGlow { 0% { box-shadow: 0 0 10px var(--neon-blue), 0 0 20px var(--neon-blue) inset; } 50% { box-shadow: 0 0 25px var(--neon-blue), 0 0 40px var(--neon-blue) inset; } 100% { box-shadow: 0 0 10px var(--neon-blue), 0 0 20px var(--neon-blue) inset; } }
-        @keyframes neonPinkGlow { 0% { box-shadow: 0 0 10px var(--neon-pink), 0 0 20px var(--neon-pink) inset; } 50% { box-shadow: 0 0 25px var(--neon-pink), 0 0 40px var(--neon-pink) inset; } 100% { box-shadow: 0 0 10px var(--neon-pink), 0 0 20px var(--neon-pink) inset; } }
-        @keyframes neonGreenGlow { 0% { box-shadow: 0 0 10px var(--neon-green), 0 0 20px var(--neon-green) inset; } 50% { box-shadow: 0 0 25px var(--neon-green), 0 0 40px var(--neon-green) inset; } 100% { box-shadow: 0 0 10px var(--neon-green), 0 0 20px var(--neon-green) inset; } }
-        @keyframes neonYellowGlow { 0% { box-shadow: 0 0 10px var(--neon-yellow), 0 0 20px var(--neon-yellow) inset; } 50% { box-shadow: 0 0 25px var(--neon-yellow), 0 0 40px var(--neon-yellow) inset; } 100% { box-shadow: 0 0 10px var(--neon-yellow), 0 0 20px var(--neon-yellow) inset; } }
+        @keyframes neonBlueGlow {
+            from { box-shadow: 0 0 10px rgba(0, 170, 255, 0.4), 0 0 20px rgba(0, 170, 255, 0.4) inset; }
+            to { box-shadow: 0 0 25px var(--neon-blue), 0 0 40px var(--neon-blue) inset; }
+        }
+        @keyframes neonPinkGlow {
+            from { box-shadow: 0 0 10px rgba(255, 0, 255, 0.4), 0 0 20px rgba(255, 0, 255, 0.4) inset; }
+            to { box-shadow: 0 0 25px var(--neon-pink), 0 0 40px var(--neon-pink) inset; }
+        }
+        @keyframes neonGreenGlow {
+            from { box-shadow: 0 0 10px rgba(0, 255, 0, 0.4), 0 0 20px rgba(0, 255, 0, 0.4) inset; }
+            to { box-shadow: 0 0 25px var(--neon-green), 0 0 40px var(--neon-green) inset; }
+        }
+        @keyframes neonYellowGlow {
+            from { box-shadow: 0 0 10px rgba(255, 255, 0, 0.4), 0 0 20px rgba(255, 255, 0, 0.4) inset; }
+            to { box-shadow: 0 0 25px var(--neon-yellow), 0 0 40px var(--neon-yellow) inset; }
+        }
+        @keyframes fadeOutGlow {
+            0% { box-shadow: var(--current-shadow); }
+            100% { box-shadow: 0 8px 20px var(--shadow-color); border-color: var(--border-color); }
+        }
         @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.8; } 100% { transform: scale(1); opacity: 1; } }
         @keyframes profilePulse { 0%, 100% { box-shadow: 0 0 0 0px rgba(0, 170, 255, 0.4); } 50% { box-shadow: 0 0 0 10px rgba(0, 170, 255, 0); } }
         @keyframes profileImageGlow { from { filter: brightness(1) contrast(1); } to { filter: brightness(1.2) contrast(1.1); } }
@@ -866,11 +978,30 @@
                     <span class="slider"></span>
                 </label>
             </a>
-            <a href="https://www.instagram.com/add_mint" target="_blank" class="menu-item">
-                <span class="icon">📸</span> Instagram
+            <a href="https://www.instagram.com/addmint__" target="_blank" class="menu-item">
+                <span class="icon">
+                    <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:1em;height:1em;vertical-align:middle;">
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M30 0H70C86.5685 0 100 13.4315 100 30V70C100 86.5685 86.5685 100 70 100H30C13.4315 100 0 86.5685 0 70V30C0 13.4315 13.4315 0 30 0ZM50 25C36.1929 25 25 36.1929 25 50C25 63.8071 36.1929 75 50 75C63.8071 75 75 63.8071 75 50C75 36.1929 63.8071 25 50 25ZM75 20C78.3137 20 81 17.3137 81 14C81 10.6863 78.3137 8 75 8C71.6863 8 69 10.6863 69 14C69 17.3137 71.6863 20 75 20ZM50 35C44.4772 35 40 39.4772 40 45C40 50.5228 44.4772 55 50 55C55.5228 55 60 50.5228 60 45C60 39.4772 55.5228 35 50 35Z" fill="url(#instagramGradient)"/>
+                        <defs>
+                            <linearGradient id="instagramGradient" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#fd5c4d"/>
+                                <stop offset="0.2" stop-color="#fc8621"/>
+                                <stop offset="0.4" stop-color="#ffb737"/>
+                                <stop offset="0.6" stop-color="#f8dc74"/>
+                                <stop offset="0.8" stop-color="#a23ccf"/>
+                                <stop offset="1" stop-color="#5522c0"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </span> Instagram
             </a>
-            <a href="https://www.youtube.com/channel/UCG0hM5Y9tE2HqN2fK0g3-5g" target="_blank" class="menu-item">
-                <span class="icon">▶</span> YouTube
+            <a href="https://www.youtube.com/@add_mint" target="_blank" class="menu-item">
+                <span class="icon">
+                    <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:1em;height:1em;vertical-align:middle;">
+                        <rect width="100" height="100" rx="20" fill="#FF0000"/>
+                        <path d="M68 49.9997L40 30L40 69.9997L68 49.9997Z" fill="white"/>
+                    </svg>
+                </span> YouTube
             </a>
             <a href="#" class="menu-item" onclick="App.UI.showSection('about-section'); App.UI.toggleSideMenu();">
                 <span class="icon">ℹ</span> About
@@ -951,13 +1082,19 @@
             </section>
             
             <section id="search-section" class="container">
-                <h2>Find Users</h2>
+                <h2>Find Users & Posts</h2>
                 <div id="search-message" class="message hidden"></div>
                 <div class="username-input-group mb-4">
-                    <input type="text" id="search-username-input" placeholder="Search by username..." oninput="App.Search.searchUsers()">
+                    <input type="text" id="search-input" placeholder="Search users, posts..." oninput="App.Search.performSearch()">
                 </div>
-                <div id="search-results-list">
-                    </div>
+                <h3>Users:</h3>
+                <div id="search-results-list-users">
+                    <p class="text-center" style="color: #aaa;">No user results.</p>
+                </div>
+                <h3 style="margin-top: 30px;">Posts:</h3>
+                <div id="search-results-list-posts">
+                     <p class="text-center" style="color: #aaa;">No post results.</p>
+                </div>
             </section>
 
             <section id="create-post-section">
@@ -1021,7 +1158,7 @@
 
             <section id="user-profile-section">
                 <div class="profile-header">
-                    <div class="profile-image-container">
+                    <div class="profile-image-container" onclick="App.Profile.openLogoPicker()">
                         <div class="profile-image" id="profile-image-own"></div>
                     </div>
                     <div class="profile-info">
@@ -1051,7 +1188,7 @@
                     <p><strong>WhatsApp:</strong> <span id="profile-whatsapp-number">N/A</span></p>
                     <p><strong>Instagram:</strong> <span id="profile-instagram-handle">N/A</span></p>
                 </div>
-                <h4 style="margin-top: 30px; text-align: center;">Active Posts</h4>
+                <h4 style="margin-top: 30px; text-align: center; color: var(--primary-color);">Your Posts</h4>
                 <div id="profile-posts-grid" class="profile-posts-grid">
                     </div>
             </section>
@@ -1097,18 +1234,31 @@
                         </div>
                         <div class="profile-buttons">
                             <button id="other-follow-btn" onclick="App.Profile.toggleFollow()">Follow</button>
-                            <button id="other-whatsapp-btn" onclick="App.UI.openWhatsAppProfile()">WhatsApp</button>
-                            <button id="other-instagram-btn" onclick="App.UI.openInstagramProfile()">Instagram</button>
+                            <button id="other-whatsapp-btn" onclick="App.UI.openWhatsAppProfile()">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" style="vertical-align: middle; margin-right: 5px;">
+                                    <path d="M12.04 2C7.38 2 3.53 5.86 3.53 10.53C3.53 12.07 3.93 13.52 4.67 14.81L3.06 20.12L8.51 18.57C9.72 19.23 11.09 19.58 12.5 19.58L12.04 19.59V19.59C16.69 19.59 20.55 15.73 20.55 11.07C20.55 6.42 16.69 2.56 12.04 2.56V2ZM16.69 14.51C16.4 14.98 13.91 16.27 13.41 16.38C12.91 16.48 12.52 16.53 12.13 16.43C11.73 16.32 11.16 16.14 10.59 15.93C9.44 15.48 8.44 14.39 7.68 13.23C7.05 12.27 6.64 11.16 6.37 10.88C6.1 10.6 5.82 9.9 6.51 9.77C7.19 9.64 7.63 9.47 7.72 9.3C7.82 9.13 7.88 8.95 7.97 8.76C8.06 8.57 8.16 8.38 8.24 8.23C8.42 7.89 8.61 7.42 8.76 7.07C8.91 6.72 9.07 6.55 9.24 6.52C9.41 6.49 9.61 6.5 9.77 6.5C9.93 6.5 10.11 6.5 10.28 6.5C10.45 6.5 10.62 6.52 10.74 6.64C10.87 6.76 11.04 6.94 11.16 7.08C11.3 7.22 11.38 7.33 11.47 7.46C11.66 7.73 11.87 8.01 12.02 8.22C12.18 8.44 12.33 8.65 12.45 8.87C12.57 9.09 12.69 9.3 12.79 9.42C12.92 9.57 13.06 9.67 13.21 9.8C13.62 10.15 14.07 10.5 14.49 10.87C15.01 11.34 15.44 11.75 15.79 12.13C16.15 12.52 16.42 12.87 16.61 13.26C16.8 13.65 16.89 14.08 16.69 14.51Z" fill="#25D366"/>
+                                </svg> WhatsApp
+                            </button>
+                            <button id="other-instagram-btn" onclick="App.UI.openInstagramProfile()">
+                                <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:1em;height:1em;vertical-align:middle;margin-right: 5px;">
+                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M30 0H70C86.5685 0 100 13.4315 100 30V70C100 86.5685 86.5685 100 70 100H30C13.4315 100 0 86.5685 0 70V30C0 13.4315 13.4315 0 30 0ZM50 25C36.1929 25 25 36.1929 25 50C25 63.8071 36.1929 75 50 75C63.8071 75 75 63.8071 75 50C75 36.1929 63.8071 25 50 25ZM75 20C78.3137 20 81 17.3137 81 14C81 10.6863 78.3137 8 75 8C71.6863 8 69 10.6863 69 14C69 17.3137 71.6863 20 75 20ZM50 35C44.4772 35 40 39.4772 40 45C40 50.5228 44.4772 55 50 55C55.5228 55 60 50.5228 60 45C60 39.4772 55.5228 35 50 35Z" fill="url(#instagramGradientSmall)"/>
+                                    <defs>
+                                        <linearGradient id="instagramGradientSmall" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
+                                            <stop stop-color="#fd5c4d"/>
+                                            <stop offset="0.2" stop-color="#fc8621"/>
+                                            <stop offset="0.4" stop-color="#ffb737"/>
+                                            <stop offset="0.6" stop-color="#f8dc74"/>
+                                            <stop offset="0.8" stop-color="#a23ccf"/>
+                                            <stop offset="1" stop-color="#5522c0"/>
+                                        </linearGradient>
+                                    </defs>
+                                </svg>Instagram
+                            </button>
                             <button id="other-message-btn" onclick="App.Messages.startNewChat()"><span class="icon">💬</span> Message</button>
                         </div>
                     </div>
                 </div>
-                <div id="other-user-profile-details" class="container" style="background: none; box-shadow: none;">
-                    <p><strong>Email:</strong> <span id="other-profile-email"></span></p>
-                    <p><strong>WhatsApp:</strong> <span id="other-profile-whatsapp-number">N/A</span></p>
-                    <p><strong>Instagram:</strong> <span id="other-profile-instagram-handle">N/A</span></p>
-                </div>
-                <h4 style="margin-top: 30px; text-align: center;">Posts</h4>
+                <h4 style="margin-top: 30px; text-align: center; color: var(--primary-color);">Posts</h4>
                 <div id="other-profile-posts-grid" class="profile-posts-grid">
                     </div>
             </section>
@@ -1116,8 +1266,9 @@
             <section id="message-section" class="container">
                 <h2 id="message-recipient-name">Message User</h2>
                 <div id="message-status-message" class="message hidden"></div>
-                <div id="chat-window" class="chat-container">
-                    </div>
+                <div id="chat-window">
+                    <p style="color: #aaa; text-align: center;">Start chatting! (Messages delete after 12 hours)</p>
+                </div>
                 <form id="send-message-form" class="mt-4">
                     <textarea id="message-content" placeholder="Type your message here..." required></textarea>
                     <button type="submit" class="mt-4">Send Message (1 Credit)</button>
@@ -1167,11 +1318,24 @@
         App.userProfileData = {};
         App.profileToView = null;
         App.neonColors = ['neon-blue', 'neon-pink', 'neon-green', 'neon-yellow'];
+        App.profileLogos = [
+            '&#128100;', '&#128101;', '&#128102;', '&#128103;', '&#128104;', // People
+            '&#128054;', '&#128049;', '&#128057;', '&#128038;', '&#128062;', // Animals
+            '&#127760;', '&#127765;', '&#127757;', '&#127797;', '&#127802;', // Nature
+            '&#128640;', '&#128761;', '&#128737;', '&#128663;', '&#128670;', // Transport
+            '&#127918;', '&#127912;', '&#127925;', '&#127931;', '&#127940;', // Sports/Music
+            '&#128214;', '&#128220;', '&#128161;', '&#128187;', '&#128269;', // Objects/Symbols
+            '&#128512;', '&#128522;', '&#128525;', '&#128531;', '&#128540;', // Faces
+            '&#128077;', '&#128079;', '&#128076;', '&#128080;', '&#128170;', // Hand gestures
+            '&#127775;', '&#127774;', '&#127807;', '&#127808;', '&#127810;', // Food/Weather
+            '&#127916;', '&#127926;', '&#127941;', '&#127942;', '&#127943;'  // Activities
+        ];
         
         App.lastPost = null;
         App.isLoadingPosts = false;
         App.postsCache = [];
         App.isDataSaver = false;
+        App.currentGlowingPost = null;
         
         App.UI = {
             showSection: (sectionId) => {
@@ -1213,9 +1377,9 @@
                 }
             },
             updateHeaderStats: (coins, limits, credits) => {
-                document.getElementById('header-coins').textContent = App.Utils.formatNumber(coins);
-                document.getElementById('header-limit').textContent = App.Utils.formatNumber(limits);
-                document.getElementById('header-credits').textContent = App.Utils.formatNumber(credits);
+                document.getElementById('header-coins').textContent = App.UI.formatNumber(coins);
+                document.getElementById('header-limit').textContent = App.UI.formatNumber(limits);
+                document.getElementById('header-credits').textContent = App.UI.formatNumber(credits);
             },
             hidePreloader: () => {
                 const splash = document.getElementById('splash-screen');
@@ -1240,22 +1404,22 @@
                 App.db.collection('users').doc(App.profileToView).get().then(doc => {
                     const profile = doc.data();
                     if (profile && profile.whatsapp) {
-                        window.open(`https://wa.me/${profile.whatsapp}`, '_blank');
+                        window.open(`https://wa.me/${profile.whatsapp}`, '_system'); // Use _system to open in external app
                     } else {
                         alert('No WhatsApp number available for this user.');
                     }
-                });
+                }).catch(e => console.error("WhatsApp error:", e));
             },
             openInstagramProfile: () => {
                 if (!App.profileToView) return;
                 App.db.collection('users').doc(App.profileToView).get().then(doc => {
                     const profile = doc.data();
                     if (profile && profile.instagram) {
-                        window.open(`https://www.instagram.com/${profile.instagram}`, '_blank');
+                        window.open(`https://www.instagram.com/${profile.instagram}`, '_system'); // Use _system
                     } else {
                         alert('No Instagram handle available for this user.');
                     }
-                });
+                }).catch(e => console.error("Instagram error:", e));
             },
             toggleDropdown: (postId) => {
                 const dropdown = document.getElementById(`dropdown-${postId}`);
@@ -1272,20 +1436,15 @@
                 document.querySelectorAll('.dropdown-menu').forEach(d => d.classList.remove('visible'));
             },
             generateUserLogo: (uid) => {
-                const colors = [
-                    '#ff00ff', '#00ff00', '#00aaff', '#ffff00', '#ff5500', '#8800ff', '#ff0055', '#00ffaa'
+                const colorPalette = [
+                    '#ff00ff', '#00ff00', '#00aaff', '#ffff00',
+                    '#ff5500', '#8800ff', '#ff0055', '#00ffaa'
                 ];
                 const hash = Array.from(uid).reduce((sum, char) => sum + char.charCodeAt(0), 0);
-                const colorIndex = hash % colors.length;
-                const color = colors[colorIndex];
-                
-                const logo = document.createElement('div');
-                logo.style.width = '100%';
-                logo.style.height = '100%';
-                logo.style.borderRadius = '50%';
-                logo.style.background = color;
-                
-                return logo;
+                const color1 = colorPalette[hash % colorPalette.length];
+                const color2 = colorPalette[(hash + 3) % colorPalette.length];
+                const gradient = `linear-gradient(135deg, ${color1}, ${color2})`;
+                return gradient;
             },
             toggleSideMenu: () => {
                 const menu = document.getElementById('side-menu');
@@ -1295,8 +1454,40 @@
             },
             toggleDataSaver: () => {
                 App.isDataSaver = document.getElementById('data-saver-toggle').checked;
-                // You can add more logic here, e.g., to load images only when a post is visible
+                // Add more logic here to handle image loading based on data saver status
                 alert(`Data Saver is now ${App.isDataSaver ? 'ON' : 'OFF'}.`);
+            },
+            formatNumber: (num) => {
+                if (num >= 1000000) {
+                    return (num / 1000000).toFixed(1) + 'M';
+                }
+                if (num >= 1000) {
+                    return (num / 1000).toFixed(1) + 'K';
+                }
+                return num;
+            },
+            applyNeonGlow: (postId) => {
+                const postElement = document.querySelector(`[data-post-id="${postId}"]`);
+                if (postElement) {
+                    if (App.currentGlowingPost && App.currentGlowingPost !== postElement) {
+                        App.currentGlowingPost.classList.remove('glowing');
+                    }
+                    postElement.style.setProperty('--current-shadow', postElement.style.boxShadow);
+                    postElement.classList.add('glowing');
+                    App.currentGlowingPost = postElement;
+                    setTimeout(() => {
+                        postElement.classList.remove('glowing');
+                        App.currentGlowingPost = null;
+                    }, 3000); // Glow for 3 seconds
+                }
+            },
+            openLogoPicker: () => {
+                const selectedLogo = prompt("Choose a profile logo (enter an emoji or keyword):\n" +
+                                        "Examples: 🧑, 🐶, 🌳, 🚀, 💡, 😄\n" +
+                                        "You can also choose a random one by typing 'random'.");
+                if (selectedLogo) {
+                    App.Profile.updateLogo(selectedLogo);
+                }
             }
         };
 
@@ -1324,7 +1515,7 @@
                     App.UI.showMessage('signup-status-message', 'Successfully signed up! Please check your email for a verification link.', 'success');
                     App.UI.showSection('email-verify');
                 } catch (error) {
-                    App.UI.showMessage('signup-status-message', `Error: ${error.message}`, 'error');
+                    App.UI.showMessage('signup-status-message', `Error: ${error.message.replace('Firebase: Error ', '')}`, 'error');
                     console.error("Signup error:", error);
                 }
             },
@@ -1333,7 +1524,7 @@
                 try {
                     await App.auth.signInWithEmailAndPassword(email, password);
                 } catch (error) {
-                    App.UI.showMessage('auth-status-message', `Error: ${error.message}`, 'error');
+                    App.UI.showMessage('auth-status-message', `Error: ${error.message.replace('Firebase: Error ', '')}`, 'error');
                     console.error("Signin error:", error);
                 }
             },
@@ -1353,7 +1544,7 @@
                         await user.sendEmailVerification();
                         App.UI.showMessage('verify-email-message', 'Verification link sent! Please check your inbox.', 'info');
                     } catch (error) {
-                        App.UI.showMessage('verify-email-message', `Error sending verification email: ${error.message}`, 'error');
+                        App.UI.showMessage('verify-email-message', `Error sending verification email: ${error.message.replace('Firebase: Error ', '')}`, 'error');
                         console.error("Verification email error:", error);
                     }
                 }
@@ -1409,16 +1600,17 @@
                         username: username.toLowerCase(),
                         email: App.auth.currentUser.email,
                         whatsapp: whatsapp || null,
-                        instagram: instagram || null,
+                        instagram: instagram ? instagram.replace(/^@/, '') : null, // Remove @ if present
                         coins: 10,
                         credits: 10,
                         postLimit: 1,
-                        lastRewardDate: new Date().toDateString()
+                        lastRewardDate: new Date().toDateString(),
+                        profileLogo: App.UI.generateUserLogo(App.currentUserId) // Default generated logo
                     });
                     App.UI.showMessage('profile-setup-message', 'Profile saved successfully!', 'success');
                     setTimeout(() => window.location.reload(), 1000);
                 } catch (error) {
-                    App.UI.showMessage('profile-setup-message', `Error saving profile: ${error.message}`, 'error');
+                    App.UI.showMessage('profile-setup-message', `Error saving profile: ${error.message.replace('Firebase: Error ', '')}`, 'error');
                     console.error("Profile setup error:", error);
                 }
             },
@@ -1434,7 +1626,7 @@
                     await App.db.collection('users').doc(App.currentUserId).update({
                         username: username.toLowerCase(),
                         whatsapp: whatsapp || null,
-                        instagram: instagram || null,
+                        instagram: instagram ? instagram.replace(/^@/, '') : null,
                     });
                     App.UI.showMessage('edit-profile-message', 'Profile updated successfully!', 'success');
                     setTimeout(() => {
@@ -1442,7 +1634,7 @@
                         App.Profile.fetch(App.currentUserId, true);
                     }, 1000);
                 } catch (error) {
-                    App.UI.showMessage('edit-profile-message', `Error updating profile: ${error.message}`, 'error');
+                    App.UI.showMessage('edit-profile-message', `Error updating profile: ${error.message.replace('Firebase: Error ', '')}`, 'error');
                     console.error("Profile edit error:", error);
                 }
             },
@@ -1483,14 +1675,13 @@
             },
             renderCurrentUserProfile: (profile, posts) => {
                 document.getElementById('profile-display-name').textContent = profile.username;
-                document.getElementById('profile-posts-count').textContent = App.Utils.formatNumber(profile.postsCount);
-                document.getElementById('profile-followers-count').textContent = App.Utils.formatNumber(profile.followersCount);
-                document.getElementById('profile-following-count').textContent = App.Utils.formatNumber(profile.followingCount);
+                document.getElementById('profile-posts-count').textContent = App.UI.formatNumber(profile.postsCount);
+                document.getElementById('profile-followers-count').textContent = App.UI.formatNumber(profile.followersCount);
+                document.getElementById('profile-following-count').textContent = App.UI.formatNumber(profile.followingCount);
                 document.getElementById('profile-email').textContent = profile.email;
                 document.getElementById('profile-whatsapp-number').textContent = profile.whatsapp || 'N/A';
                 document.getElementById('profile-instagram-handle').textContent = profile.instagram || 'N/A';
-                document.getElementById('profile-image-own').innerHTML = '';
-                document.getElementById('profile-image-own').appendChild(App.UI.generateUserLogo(profile.uid));
+                document.getElementById('profile-image-own').style.background = profile.profileLogo || App.UI.generateUserLogo(profile.uid);
                 
                 document.getElementById('editUsername').value = profile.username || '';
                 document.getElementById('editWhatsApp').value = profile.whatsapp || '';
@@ -1500,14 +1691,13 @@
             },
             renderOtherUserProfile: (profile, posts) => {
                 document.getElementById('other-profile-display-name').textContent = profile.username;
-                document.getElementById('other-profile-posts-count').textContent = App.Utils.formatNumber(profile.postsCount);
-                document.getElementById('other-profile-followers-count').textContent = App.Utils.formatNumber(profile.followersCount);
-                document.getElementById('other-profile-following-count').textContent = App.Utils.formatNumber(profile.followingCount);
+                document.getElementById('other-profile-posts-count').textContent = App.UI.formatNumber(profile.postsCount);
+                document.getElementById('other-profile-followers-count').textContent = App.UI.formatNumber(profile.followersCount);
+                document.getElementById('other-profile-following-count').textContent = App.UI.formatNumber(profile.followingCount);
                 document.getElementById('other-profile-email').textContent = profile.email;
                 document.getElementById('other-profile-whatsapp-number').textContent = profile.whatsapp || 'N/A';
                 document.getElementById('other-profile-instagram-handle').textContent = profile.instagram || 'N/A';
-                document.getElementById('profile-image-other').innerHTML = '';
-                document.getElementById('profile-image-other').appendChild(App.UI.generateUserLogo(profile.uid));
+                document.getElementById('profile-image-other').style.background = profile.profileLogo || App.UI.generateUserLogo(profile.uid);
                 
                 App.db.collection('users').doc(App.currentUserId).collection('following').doc(profile.uid).get().then(doc => {
                     const followBtn = document.getElementById('other-follow-btn');
@@ -1540,64 +1730,108 @@
                         await followerRef.set({ followedAt: new Date() });
                         alert('Followed user!');
                     }
-                    App.Profile.fetch(targetUserId, false);
+                    App.Profile.fetch(targetUserId, false); // Refresh to update counts
                 } catch (error) {
                     console.error("Error toggling follow:", error);
-                    alert("An error occurred. Please try again.");
+                    alert("An error occurred. Please try again: " + error.message);
+                }
+            },
+            updateLogo: async (selectedLogo) => {
+                try {
+                    let logoValue = '';
+                    if (selectedLogo === 'random') {
+                        logoValue = App.UI.generateUserLogo(App.currentUserId + Math.random()); // new random gradient
+                    } else if (selectedLogo.length <= 2) { // Assume single emoji
+                        logoValue = `center center / 50% no-repeat url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text x="50%" y="50%" font-size="80" text-anchor="middle" dominant-baseline="central">${selectedLogo}</text></svg>')`;
+                    } else {
+                        // For keywords, we can generate a simple initial or use a fixed background
+                        logoValue = `linear-gradient(45deg, ${App.UI.generateUserLogo(selectedLogo)})`; // Use keyword to generate gradient
+                    }
+
+                    await App.db.collection('users').doc(App.currentUserId).update({
+                        profileLogo: logoValue
+                    });
+                    document.getElementById('profile-image-own').style.background = logoValue;
+                    alert('Profile logo updated!');
+                } catch (error) {
+                    console.error("Error updating logo:", error);
+                    alert('Failed to update logo. ' + error.message);
                 }
             }
         };
 
         App.Search = {
-            searchUsers: async () => {
-                const searchTerm = document.getElementById('search-username-input').value.toLowerCase().trim();
-                const resultsContainer = document.getElementById('search-results-list');
-                resultsContainer.innerHTML = '';
+            performSearch: async () => {
+                const searchTerm = document.getElementById('search-input').value.toLowerCase().trim();
+                const usersResultsContainer = document.getElementById('search-results-list-users');
+                const postsResultsContainer = document.getElementById('search-results-list-posts');
+                usersResultsContainer.innerHTML = '';
+                postsResultsContainer.innerHTML = '';
                 
                 if (searchTerm.length < 2) {
-                    App.UI.showMessage('search-message', 'Please enter at least 2 characters to search.', 'info');
+                    usersResultsContainer.innerHTML = '<p class="text-center" style="color: #aaa;">No user results.</p>';
+                    postsResultsContainer.innerHTML = '<p class="text-center" style="color: #aaa;">No post results.</p>';
+                    App.UI.hideMessage('search-message');
                     return;
                 }
 
                 App.UI.hideMessage('search-message');
 
                 try {
-                    const usersRef = App.db.collection('users').orderBy('username').startAt(searchTerm).endAt(searchTerm + '\uf8ff').limit(20);
-                    const snapshot = await usersRef.get();
+                    // Search Users
+                    const usersRef = App.db.collection('users').where('username', '>=', searchTerm).where('username', '<=', searchTerm + '\uf8ff').limit(10);
+                    const usersSnapshot = await usersRef.get();
                     
-                    if (snapshot.empty) {
-                        App.UI.showMessage('search-message', 'No users found.', 'info');
-                        return;
+                    if (usersSnapshot.empty) {
+                        usersResultsContainer.innerHTML = '<p class="text-center" style="color: #aaa;">No users found matching your search.</p>';
+                    } else {
+                        usersSnapshot.docs.forEach(doc => {
+                            const user = doc.data();
+                            if (doc.id === App.currentUserId) return; // Don't show current user in search results
+                            
+                            const resultItem = document.createElement('div');
+                            resultItem.className = 'search-result-item';
+                            resultItem.onclick = () => {
+                                App.profileToView = doc.id;
+                                App.Profile.fetch(doc.id, false);
+                                App.UI.showSection('other-user-profile-section');
+                            };
+                            
+                            const userLogo = document.createElement('div');
+                            userLogo.className = 'user-logo';
+                            userLogo.style.background = user.profileLogo || App.UI.generateUserLogo(doc.id);
+                            
+                            const userInfo = document.createElement('div');
+                            userInfo.className = 'user-info';
+                            userInfo.innerHTML = `<h4>${user.username}</h4>`;
+                            
+                            const followButton = document.createElement('button');
+                            followButton.textContent = 'Follow';
+                            followButton.onclick = (e) => {
+                                e.stopPropagation(); // Prevent opening profile when clicking follow
+                                App.Profile.toggleFollow(doc.id);
+                            };
+
+                            resultItem.appendChild(userLogo);
+                            resultItem.appendChild(userInfo);
+                            resultItem.appendChild(followButton);
+                            usersResultsContainer.appendChild(resultItem);
+                        });
                     }
 
-                    snapshot.docs.forEach(doc => {
-                        const user = doc.data();
-                        if (doc.id === App.currentUserId) return;
-                        
-                        const resultItem = document.createElement('div');
-                        resultItem.className = 'search-result-item';
-                        
-                        const userLogo = document.createElement('div');
-                        userLogo.className = 'user-logo';
-                        userLogo.appendChild(App.UI.generateUserLogo(doc.id));
-                        
-                        const userInfo = document.createElement('div');
-                        userInfo.className = 'user-info';
-                        userInfo.innerHTML = `<h4>${user.username}</h4>`;
-                        
-                        const followButton = document.createElement('button');
-                        followButton.textContent = 'Follow';
-                        followButton.onclick = () => {
-                            App.Profile.toggleFollow(doc.id);
-                        };
+                    // Search Posts (very basic - by content. For more, need proper indexing/full-text search)
+                    const postsRef = App.db.collection('posts').orderBy('timestamp', 'desc').limit(10); // Limit results for performance
+                    const postsSnapshot = await postsRef.get();
+                    const matchingPosts = postsSnapshot.docs.filter(doc => doc.data().content.toLowerCase().includes(searchTerm));
 
-                        resultItem.appendChild(userLogo);
-                        resultItem.appendChild(userInfo);
-                        resultItem.appendChild(followButton);
-                        resultsContainer.appendChild(resultItem);
-                    });
+                    if (matchingPosts.length === 0) {
+                        postsResultsContainer.innerHTML = '<p class="text-center" style="color: #aaa;">No posts found matching your search.</p>';
+                    } else {
+                        App.Posts.renderAll(matchingPosts, 'search-results-list-posts', false, false);
+                    }
+
                 } catch (error) {
-                    App.UI.showMessage('search-message', `Error searching: ${error.message}`, 'error');
+                    App.UI.showMessage('search-message', `Error searching: ${error.message.replace('Firebase: Error ', '')}`, 'error');
                     console.error("Search error:", error);
                 }
             }
@@ -1615,31 +1849,31 @@
                 
                 const postsLimit = userData.postLimit || 0;
                 const coins = userData.coins || 0;
-                const boostDuration = document.getElementById('post-boost-option').value;
+                const boostOption = document.getElementById('post-boost-option').value;
+                const boostDuration = parseInt(boostOption); // in hours
 
                 let requiredAds = 0;
-                if (boostDuration === '18') requiredAds = 1;
-                else if (boostDuration === '24') requiredAds = 2;
-                else if (boostDuration === '30') requiredAds = 3;
+                if (boostOption === '18') requiredAds = 1;
+                else if (boostOption === '24') requiredAds = 2;
+                else if (boostOption === '30') requiredAds = 3;
 
                 // New logic: must have both 1 limit AND 5 coins
-                if (postsLimit <= 0 || coins < 5) {
+                if (postsLimit < 1 || coins < 5) {
                     App.UI.showMessage('create-post-message', 'You need at least 1 post limit and 5 coins to post. Please get more to post.', 'error');
                     return;
                 }
                 
                 if (requiredAds > 0) {
-                     App.UI.showMessage('create-post-message', `You need to watch ${requiredAds} ad(s) for this boost option.`, 'info');
+                     App.UI.showMessage('create-post-message', `You need to watch ${requiredAds} ad(s) for this boost option. After watching the ad, click 'Publish Post' again.`, 'info');
                      // This is where you would trigger the ad from your App Inventor app
-                     // window.AppInventor.requestAd(`boost_${boostDuration}`);
-                     // For now, we simulate it
-                     // App.Monetization.handleAdCompletion(`boost_${boostDuration}`);
+                     // window.AppInventor.requestAd(`boost_post_${boostDuration}`);
+                     // For now, we return, expecting user to click again after ad
                      return;
                 }
 
                 await App.Posts.submitNewPost(content, userData, userRef, boostDuration);
             },
-            submitNewPost: async (content, userData, userRef, boostDuration = '12') => {
+            submitNewPost: async (content, userData, userRef, boostDuration = 12) => {
                 const newPostRef = App.db.collection('posts').doc();
                 const updateData = {
                     postLimit: firebase.firestore.FieldValue.increment(-1),
@@ -1647,7 +1881,7 @@
                 };
                 
                 const neonColor = App.Posts.getRandomPostStyle();
-                const expiryTime = new Date(Date.now() + (parseInt(boostDuration) * 60 * 60 * 1000));
+                const expiryTime = new Date(Date.now() + (boostDuration * 60 * 60 * 1000));
 
                 try {
                     await App.db.runTransaction(async (transaction) => {
@@ -1657,10 +1891,10 @@
                             username: userData.username,
                             timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                             likes: 0,
-                            views: {},
-                            reactions: {},
+                            views: 0, // Initialize views
                             style: neonColor,
-                            expiryTime: expiryTime.getTime()
+                            expiryTime: expiryTime.getTime(),
+                            reactions: {} // New field for emoji reactions
                         });
                         transaction.update(userRef, updateData);
                     });
@@ -1670,7 +1904,7 @@
                     await App.Profile.fetch(App.currentUserId, true);
                     App.Posts.fetch(true); // Refresh posts after upload
                 } catch (error) {
-                    App.UI.showMessage('create-post-message', `Error publishing post: ${error.message}`, 'error');
+                    App.UI.showMessage('create-post-message', `Error publishing post: ${error.message.replace('Firebase: Error ', '')}`, 'error');
                     console.error("Post creation error:", error);
                 }
             },
@@ -1678,7 +1912,7 @@
                 const container = document.getElementById(targetDivId);
                 const spinner = document.getElementById('loading-spinner');
 
-                if (App.isLoadingPosts) return;
+                if (App.isLoadingPosts && !forceRefresh) return;
                 App.isLoadingPosts = true;
 
                 if (forceRefresh) {
@@ -1687,12 +1921,12 @@
                     App.postsCache = [];
                 }
 
-                if (App.lastPost === null) {
+                if (App.lastPost === null && targetDivId === 'posts-container') {
                     spinner.classList.remove('hidden');
                 }
 
                 let query = App.db.collection('posts').orderBy('timestamp', 'desc').limit(25);
-                if (App.lastPost) {
+                if (App.lastPost && targetDivId === 'posts-container') { // Only paginate home feed
                     query = query.startAfter(App.lastPost);
                 }
                 if (userId) {
@@ -1701,26 +1935,13 @@
 
                 try {
                     const snapshot = await query.get();
-                    if (snapshot.empty) {
-                        if (App.postsCache.length === 0) {
-                            container.innerHTML = '<p class="text-center" style="margin-top: 30px; font-style: italic; color: #aaa;">No posts to display.</p>';
-                        } else {
-                            // If we run out of posts, shuffle the cache and display again for an infinite feel
-                            const shuffledCache = App.postsCache.sort(() => Math.random() - 0.5);
-                            App.Posts.renderAll(shuffledCache, targetDivId, userId !== null, true);
-                        }
-                        spinner.classList.add('hidden');
-                        return;
-                    }
-
-                    App.lastPost = snapshot.docs[snapshot.docs.length - 1];
-                    const postDocs = snapshot.docs;
-
                     const validPosts = [];
-                    for (const doc of postDocs) {
+                    const now = Date.now();
+
+                    for (const doc of snapshot.docs) {
                         const postData = doc.data();
                         const expiry = postData.expiryTime;
-                        const isExpired = expiry && expiry < Date.now();
+                        const isExpired = expiry && expiry < now;
                         
                         if (isExpired) {
                             await doc.ref.delete().catch(e => console.error("Error deleting expired post:", e));
@@ -1729,7 +1950,26 @@
                         }
                     }
 
-                    if (forceRefresh) {
+                    if (validPosts.length === 0) {
+                        if (App.postsCache.length === 0 && targetDivId === 'posts-container') {
+                            container.innerHTML = '<p class="text-center" style="margin-top: 30px; font-style: italic; color: #aaa;">No posts to display.</p>';
+                        } else if (targetDivId === 'posts-container') {
+                            // If we run out of posts for home feed, shuffle the cache and display again for an infinite feel
+                            const shuffledCache = App.postsCache.sort(() => Math.random() - 0.5);
+                            App.Posts.renderAll(shuffledCache.slice(0, 25), targetDivId, userId !== null, true); // Render a chunk from cache
+                            spinner.classList.add('hidden');
+                            App.isLoadingPosts = false;
+                            return; // Stop here if using cache
+                        } else { // For profile or search, if no posts, just show message
+                            container.innerHTML = '<p class="text-center" style="margin-top: 30px; font-style: italic; color: #aaa;">No posts to display.</p>';
+                        }
+                    }
+
+                    if (targetDivId === 'posts-container') {
+                        App.lastPost = snapshot.docs.length > 0 ? snapshot.docs[snapshot.docs.length - 1] : null;
+                    }
+                    
+                    if (forceRefresh || targetDivId !== 'posts-container') {
                          App.postsCache = validPosts.map(doc => ({ id: doc.id, ...doc.data() }));
                     } else {
                          App.postsCache.push(...validPosts.map(doc => ({ id: doc.id, ...doc.data() })));
@@ -1738,7 +1978,7 @@
                     App.Posts.renderAll(validPosts, targetDivId, userId !== null, !forceRefresh);
 
                 } catch (error) {
-                    container.innerHTML = '<p class="text-center message error">Error loading posts. Please try again.</p>';
+                    container.innerHTML = '<p class="text-center message error">Error loading posts. Please try again: ' + error.message.replace('Firebase: Error ', '') + '</p>';
                     console.error("Error fetching posts:", error);
                 } finally {
                     spinner.classList.add('hidden');
@@ -1747,57 +1987,88 @@
             },
             renderAll: async (postDocs, containerId, isProfileView, append = false) => {
                 const container = document.getElementById(containerId);
-                const postsListVertical = document.createElement('div');
-                postsListVertical.id = 'posts-list-vertical';
-                postsListVertical.style.display = 'grid';
-                postsListVertical.style.gap = '20px';
+                let currentPostsHTML = append ? container.innerHTML : '';
 
-                if (!append) container.innerHTML = '';
                 if (postDocs.length === 0 && !append) {
                     container.innerHTML = `<p class="text-center" style="margin-top: 30px; font-style: italic; color: #aaa;">No posts to display.</p>`;
                     return;
                 }
                 
                 let verticalPostsCount = 0;
-                let horizontalPosts = [];
-
+                let horizontalPostsBatch = [];
+                
+                const postElements = [];
                 for (const doc of postDocs) {
                     const postData = isProfileView ? doc.data() : { id: doc.id, ...doc.data() };
                     const postId = isProfileView ? doc.id : doc.id;
-                    const postElement = await App.Posts.createPostElement(postId, postData, isProfileView);
+                    postElements.push(await App.Posts.createPostElement(postId, postData, isProfileView));
+                }
 
-                    if (!isProfileView && !App.isDataSaver) { // Only mix horizontal posts if not in profile view and data saver is off
-                        if (verticalPostsCount >= 5 && Math.random() > 0.5) {
-                            horizontalPosts.push(postElement);
-                            if (horizontalPosts.length >= 4) {
-                                const horizontalContainer = document.createElement('div');
-                                horizontalContainer.className = 'horizontal-scroll-container';
-                                horizontalPosts.forEach(el => horizontalContainer.appendChild(el));
-                                container.appendChild(horizontalContainer);
-                                horizontalPosts = [];
-                                verticalPostsCount = 0;
-                            }
-                        } else {
-                            postsListVertical.appendChild(postElement);
-                            verticalPostsCount++;
+                for (let i = 0; i < postElements.length; i++) {
+                    const postElement = postElements[i];
+                    if (containerId === 'posts-container' && !App.isDataSaver && Math.random() < 0.3 && verticalPostsCount >= 5) { // Randomly insert horizontal block
+                        horizontalPostsBatch.push(postElement);
+                        if (horizontalPostsBatch.length >= 4 || i === postElements.length - 1) { // Render batch if enough or last posts
+                            const horizontalContainer = document.createElement('div');
+                            horizontalContainer.className = 'horizontal-scroll-container';
+                            horizontalPostsBatch.forEach(el => horizontalContainer.appendChild(el));
+                            currentPostsHTML += horizontalContainer.outerHTML;
+                            horizontalPostsBatch = [];
+                            verticalPostsCount = 0;
                         }
                     } else {
-                        postsListVertical.appendChild(postElement);
+                        currentPostsHTML += postElement.outerHTML;
+                        verticalPostsCount++;
                     }
                 }
-                
-                if (horizontalPosts.length > 0) {
-                     const horizontalContainer = document.createElement('div');
-                     horizontalContainer.className = 'horizontal-scroll-container';
-                     horizontalPosts.forEach(el => horizontalContainer.appendChild(el));
-                     container.appendChild(horizontalContainer);
-                }
-                
-                container.appendChild(postsListVertical);
+                container.innerHTML = currentPostsHTML;
+
+                // Re-attach event listeners as innerHTML overwrites them
+                postElements.forEach(postElement => {
+                    const postId = postElement.dataset.postId;
+                    const likeButton = document.querySelector(`[data-post-id="${postId}"] .like-btn`);
+                    const soundButton = document.querySelector(`[data-post-id="${postId}"] .action-icon-btn:nth-child(2)`);
+                    const translateButton = document.querySelector(`[data-post-id="${postId}"] .action-icon-btn:nth-child(1)`);
+                    const optionsButton = document.querySelector(`[data-post-id="${postId}"] .action-icon-btn:nth-child(3)`);
+                    const postCard = document.querySelector(`[data-post-id="${postId}"]`);
+                    
+                    if (likeButton) {
+                        likeButton.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            App.Posts.like(postId, likeButton);
+                        });
+                        postCard.addEventListener('dblclick', (e) => {
+                            e.stopPropagation();
+                            App.Posts.like(postId, likeButton);
+                        });
+                    }
+                    if (soundButton) soundButton.addEventListener('click', (e) => { e.stopPropagation(); App.UI.playPostSound(postElement.querySelector('p').textContent); });
+                    if (translateButton) translateButton.addEventListener('click', (e) => { e.stopPropagation(); App.Posts.translate(postElement.querySelector('p').textContent); });
+                    if (optionsButton) optionsButton.addEventListener('click', (e) => { e.stopPropagation(); App.UI.toggleDropdown(postId); });
+                    
+                    // Long press for emoji reaction
+                    let pressTimer;
+                    postCard.addEventListener('touchstart', (e) => {
+                        pressTimer = setTimeout(() => {
+                            App.Posts.showReactionPicker(postId, postCard);
+                        }, 500); // 500ms for long press
+                    });
+                    postCard.addEventListener('touchend', () => clearTimeout(pressTimer));
+                    postCard.addEventListener('touchmove', () => clearTimeout(pressTimer));
+
+                    // Add click to glow
+                    postCard.addEventListener('click', () => {
+                        App.UI.applyNeonGlow(postId);
+                    });
+
+                    // Update views for each post being rendered
+                    App.Posts.updateViews(postId);
+                });
+
             },
             createPostElement: async (postId, postData, isProfilePost = false) => {
                 const postElement = document.createElement('div');
-                postElement.className = `post-card`;
+                postElement.className = `post-card ${postData.style || ''}`;
                 postElement.dataset.postId = postId;
                 postElement.dataset.userId = postData.userId;
                 
@@ -1822,34 +2093,18 @@
                 const likeButton = document.createElement('span');
                 likeButton.innerHTML = postData.hasLiked ? '❤' : '♡'; // Heart icon
                 likeButton.className = `like-btn action-icon-btn ${postData.hasLiked ? 'liked' : ''}`;
-                likeButton.onclick = (e) => {
-                    e.stopPropagation();
-                    App.Posts.like(postId, likeButton);
-                };
+                
+                const translateButton = document.createElement('span');
+                translateButton.innerHTML = '🌐'; // Earth icon
+                translateButton.className = 'action-icon-btn';
                 
                 const soundButton = document.createElement('span');
                 soundButton.innerHTML = '🔊';
                 soundButton.className = 'action-icon-btn';
-                soundButton.onclick = (e) => {
-                    e.stopPropagation();
-                    App.UI.playPostSound(postData.content);
-                };
-
-                const translateButton = document.createElement('span');
-                translateButton.innerHTML = '🌐'; // Earth icon
-                translateButton.className = 'action-icon-btn';
-                translateButton.onclick = (e) => {
-                    e.stopPropagation();
-                    App.Posts.translate(postData.content);
-                };
-
+                
                 const optionsButton = document.createElement('span');
                 optionsButton.innerHTML = '⋮'; // Three dots
                 optionsButton.className = 'action-icon-btn';
-                optionsButton.onclick = (e) => {
-                    e.stopPropagation();
-                    App.UI.toggleDropdown(postId);
-                };
 
                 const dropdownMenu = document.createElement('div');
                 dropdownMenu.id = `dropdown-${postId}`;
@@ -1890,22 +2145,33 @@
                 
                 const postMeta = document.createElement('div');
                 postMeta.className = 'post-meta';
-                postMeta.innerHTML = `<span>Likes: <span id="likes-count-${postId}">${App.Utils.formatNumber(postData.likes)}</span></span><span>Views: <span id="views-count-${postId}">${App.Utils.formatNumber(Object.keys(postData.views || {}).length)}</span></span><span>${postData.timestamp ? new Date(postData.timestamp.toDate()).toLocaleString() : 'N/A'}</span>`;
+                postMeta.innerHTML = `<span>Likes: <span id="likes-count-${postId}">${App.UI.formatNumber(postData.likes || 0)}</span> | Views: <span id="views-count-${postId}">${App.UI.formatNumber(postData.views || 0)}</span></span><span>${postData.timestamp ? new Date(postData.timestamp.toDate()).toLocaleString() : 'N/A'}</span>`;
                 
+                const reactionContainer = document.createElement('div');
+                reactionContainer.className = 'post-reactions';
+                reactionContainer.id = `reactions-container-${postId}`;
+                App.Posts.renderReactions(postData.reactions || {}, reactionContainer);
+
+                // Add Reaction Picker placeholder
+                const reactionPicker = document.createElement('div');
+                reactionPicker.className = 'reaction-picker';
+                reactionPicker.id = `reaction-picker-${postId}`;
+                ['👍', '😂', '😡', '❤️', '🤔', '🎉'].forEach(emoji => {
+                    const span = document.createElement('span');
+                    span.textContent = emoji;
+                    span.onclick = (e) => {
+                        e.stopPropagation();
+                        App.Posts.addReaction(postId, emoji);
+                        reactionPicker.classList.remove('visible');
+                    };
+                    reactionPicker.appendChild(span);
+                });
+
                 postElement.appendChild(postHeader);
                 postElement.appendChild(postBody);
                 postElement.appendChild(postMeta);
-                
-                // Double click like functionality
-                let lastClick = 0;
-                postElement.addEventListener('click', (e) => {
-                    const now = new Date().getTime();
-                    const delta = now - lastClick;
-                    if (delta < 300 && delta > 0) { // Double click
-                        App.Posts.like(postId, likeButton);
-                    }
-                    lastClick = now;
-                });
+                postElement.appendChild(reactionContainer);
+                postElement.appendChild(reactionPicker); // Add picker to post
 
                 return postElement;
             },
@@ -1934,19 +2200,19 @@
                     if (doc.exists) {
                         await likeRef.delete();
                         await postRef.update({ likes: firebase.firestore.FieldValue.increment(-1) });
-                        if (likesCountElement) likesCountElement.textContent = App.Utils.formatNumber(parseInt(likesCountElement.textContent) - 1);
+                        if (likesCountElement) likesCountElement.textContent = App.UI.formatNumber(parseInt(likesCountElement.textContent) - 1);
                         likeButton.innerHTML = '♡'; // White heart
                         likeButton.classList.remove('liked');
                     } else {
                         await likeRef.set({ likedAt: new Date() });
                         await postRef.update({ likes: firebase.firestore.FieldValue.increment(1) });
-                        if (likesCountElement) likesCountElement.textContent = App.Utils.formatNumber(parseInt(likesCountElement.textContent) + 1);
+                        if (likesCountElement) likesCountElement.textContent = App.UI.formatNumber(parseInt(likesCountElement.textContent) + 1);
                         likeButton.innerHTML = '❤'; // Red heart
                         likeButton.classList.add('liked');
                     }
                 } catch (error) {
                     console.error("Error liking post:", error);
-                    alert('Error liking post. Please try again.');
+                    alert('Error liking post. Please try again: ' + error.message.replace('Firebase: Error ', ''));
                 }
             },
             delete: async (postId) => {
@@ -1959,7 +2225,7 @@
                         if (postElement) postElement.remove();
                     } catch (error) {
                         console.error("Error deleting post:", error);
-                        alert('Error deleting post. Please try again.');
+                        alert('Error deleting post. Please try again: ' + error.message.replace('Firebase: Error ', ''));
                     }
                 }
             },
@@ -1979,8 +2245,91 @@
                         alert('Post reported. Thank you for your feedback.');
                     } catch (error) {
                         console.error("Error reporting post:", error);
-                        alert('Error reporting post. Please try again.');
+                        alert('Error reporting post. Please try again: ' + error.message.replace('Firebase: Error ', ''));
                     }
+                }
+            },
+            updateViews: async (postId) => {
+                // To prevent excessive writes, you might implement a client-side throttle
+                // or a Cloud Function that aggregates views. For now, a simple increment.
+                const viewTrackingRef = App.db.collection('posts').doc(postId).collection('views').doc(App.currentUserId);
+                try {
+                    const doc = await viewTrackingRef.get();
+                    let incrementBy = 0;
+                    if (!doc.exists) {
+                        incrementBy = 1;
+                    } else {
+                        const viewData = doc.data();
+                        const viewsToday = viewData.count || 0;
+                        if (viewsToday < 3) { // Limit 3 views per user per post
+                            incrementBy = 1;
+                        }
+                    }
+
+                    if (incrementBy > 0) {
+                        await App.db.runTransaction(async (transaction) => {
+                            const postDoc = await transaction.get(App.db.collection('posts').doc(postId));
+                            if (postDoc.exists) {
+                                transaction.update(App.db.collection('posts').doc(postId), {
+                                    views: firebase.firestore.FieldValue.increment(incrementBy)
+                                });
+                            }
+                            transaction.set(viewTrackingRef, {
+                                count: firebase.firestore.FieldValue.increment(incrementBy),
+                                lastViewed: new Date().getTime()
+                            }, { merge: true }); // Use merge to update count
+                        });
+                        const viewsCountElement = document.getElementById(`views-count-${postId}`);
+                        if (viewsCountElement) {
+                            viewsCountElement.textContent = App.UI.formatNumber(parseInt(viewsCountElement.textContent) + incrementBy);
+                        }
+                    }
+                } catch (error) {
+                    console.error("Error updating views:", error);
+                }
+            },
+            showReactionPicker: (postId, postElement) => {
+                const picker = document.getElementById(`reaction-picker-${postId}`);
+                if (picker) {
+                    // Hide any other visible pickers
+                    document.querySelectorAll('.reaction-picker.visible').forEach(p => p.classList.remove('visible'));
+                    picker.classList.add('visible');
+                    // Automatically hide after some time if no interaction
+                    setTimeout(() => {
+                        picker.classList.remove('visible');
+                    }, 5000); // Hide after 5 seconds
+                }
+            },
+            addReaction: async (postId, emoji) => {
+                const postRef = App.db.collection('posts').doc(postId);
+                try {
+                    await postRef.update({
+                        [`reactions.${emoji}`]: firebase.firestore.FieldValue.increment(1)
+                    });
+                    // Immediately update UI for better responsiveness
+                    const reactionsContainer = document.getElementById(`reactions-container-${postId}`);
+                    if (reactionsContainer) {
+                        const postDoc = await postRef.get();
+                        App.Posts.renderReactions(postDoc.data().reactions || {}, reactionsContainer);
+                    }
+                } catch (error) {
+                    console.error("Error adding reaction:", error);
+                    alert("Could not add reaction. " + error.message.replace('Firebase: Error ', ''));
+                }
+            },
+            renderReactions: (reactions, containerElement) => {
+                containerElement.innerHTML = ''; // Clear previous reactions
+                let totalReactions = 0;
+                let reactionHTML = '';
+                for (const emoji in reactions) {
+                    const count = reactions[emoji];
+                    if (count > 0) {
+                        reactionHTML += `<span class="reaction-count">${emoji} ${App.UI.formatNumber(count)}</span>`;
+                        totalReactions += count;
+                    }
+                }
+                if (totalReactions > 0) {
+                    containerElement.innerHTML = reactionHTML;
                 }
             }
         };
@@ -2055,13 +2404,17 @@
                     
                     App.Profile.fetch(App.currentUserId, true);
                 } catch (error) {
-                    App.UI.showMessage('ad-rewards-message', `Error processing reward: ${error.message}`, 'error');
+                    App.UI.showMessage('ad-rewards-message', `Error processing reward: ${error.message.replace('Firebase: Error ', '')}`, 'error');
                     console.error("Reward processing error:", error);
                 }
             }
         };
 
         App.Messages = {
+            currentChatRecipientId: null,
+            currentChatRecipientName: null,
+            chatListener: null, // To manage real-time listener
+
             startNewChat: async () => {
                 const credits = App.userProfileData.credits || 0;
                 if (credits < 1) {
@@ -2069,12 +2422,93 @@
                     return;
                 }
                 
-                const recipientName = document.getElementById('other-profile-display-name').textContent;
-                document.getElementById('message-recipient-name').textContent = `Message to ${recipientName}`;
+                App.Messages.currentChatRecipientId = App.profileToView;
+                App.Messages.currentChatRecipientName = document.getElementById('other-profile-display-name').textContent;
+                document.getElementById('message-recipient-name').textContent = `Chat with ${App.Messages.currentChatRecipientName}`;
                 App.UI.showSection('message-section');
+                
+                // Clear existing messages and start new listener
+                document.getElementById('chat-window').innerHTML = '<p style="color: #aaa; text-align: center;">Loading messages...</p>';
+                App.Messages.listenForMessages();
+            },
+            listenForMessages: () => {
+                if (App.Messages.chatListener) {
+                    App.Messages.chatListener(); // Unsubscribe previous listener
+                }
+
+                const chatWindow = document.getElementById('chat-window');
+                const now = Date.now();
+                const twelveHoursAgo = now - (12 * 60 * 60 * 1000); // 12 hours in milliseconds
+
+                // Query messages where current user is sender AND recipient is target user
+                // OR current user is recipient AND sender is target user
+                const query1 = App.db.collection('messages')
+                    .where('senderId', '==', App.currentUserId)
+                    .where('recipientId', '==', App.Messages.currentChatRecipientId)
+                    .where('timestamp', '>', new Date(twelveHoursAgo));
+
+                const query2 = App.db.collection('messages')
+                    .where('senderId', '==', App.Messages.currentChatRecipientId)
+                    .where('recipientId', '==', App.currentUserId)
+                    .where('timestamp', '>', new Date(twelveHoursAgo));
+
+                // Combine results from both queries and order by timestamp
+                // Note: Firestore doesn't allow OR queries across different fields or ranges easily.
+                // A better approach for complex chat queries is to use a dedicated 'chats' collection
+                // or combine client-side (less efficient for many messages).
+                // For this example, we'll fetch two separate queries and merge.
+                // For proper real-time chat, a combined ordered stream would require a Cloud Function to orchestrate.
+
+                // Using onSnapshot for real-time updates
+                App.Messages.chatListener = App.db.collection('messages')
+                    .where('participants', 'array-contains', App.currentUserId) // Assuming a 'participants' array [user1_id, user2_id]
+                    .orderBy('timestamp', 'asc')
+                    .onSnapshot(async (snapshot) => {
+                        let allMessages = [];
+                        snapshot.forEach(doc => {
+                            const msg = doc.data();
+                            const msgTimestamp = msg.timestamp ? msg.timestamp.toDate().getTime() : 0;
+                            // Filter for messages relevant to THIS chat and within 12 hours
+                            if (
+                                (msgTimestamp > twelveHoursAgo) &&
+                                (
+                                    (msg.senderId === App.currentUserId && msg.recipientId === App.Messages.currentChatRecipientId) ||
+                                    (msg.senderId === App.Messages.currentChatRecipientId && msg.recipientId === App.currentUserId)
+                                )
+                            ) {
+                                allMessages.push(msg);
+                            } else if (msgTimestamp <= twelveHoursAgo && doc.exists) {
+                                // Delete expired messages from Firebase
+                                doc.ref.delete().catch(e => console.error("Error deleting old message:", e));
+                            }
+                        });
+
+                        // Sort messages by timestamp
+                        allMessages.sort((a, b) => (a.timestamp ? a.timestamp.toDate().getTime() : 0) - (b.timestamp ? b.timestamp.toDate().getTime() : 0));
+                        
+                        chatWindow.innerHTML = ''; // Clear chat window
+                        if (allMessages.length === 0) {
+                             chatWindow.innerHTML = '<p style="color: #aaa; text-align: center;">No messages yet. Start a conversation!</p>';
+                        } else {
+                            allMessages.forEach(msg => {
+                                const messageElement = document.createElement('div');
+                                messageElement.className = `chat-message ${msg.senderId === App.currentUserId ? 'sent' : 'received'}`;
+                                messageElement.textContent = msg.content;
+                                const timestampSpan = document.createElement('span');
+                                timestampSpan.className = 'timestamp';
+                                timestampSpan.textContent = msg.timestamp ? new Date(msg.timestamp.toDate()).toLocaleTimeString() : '';
+                                messageElement.appendChild(timestampSpan);
+                                chatWindow.appendChild(messageElement);
+                            });
+                        }
+                        chatWindow.scrollTop = chatWindow.scrollHeight; // Scroll to bottom
+                    }, (error) => {
+                        console.error("Error listening to messages:", error);
+                        App.UI.showMessage('message-status-message', `Error loading chat: ${error.message.replace('Firebase: Error ', '')}`, 'error');
+                    });
             },
             send: async (message) => {
-                if (!App.profileToView) return;
+                if (!App.Messages.currentChatRecipientId) return;
                 
                 const userRef = App.db.collection('users').doc(App.currentUserId);
                 const userData = (await userRef.get()).data();
@@ -2090,9 +2524,11 @@
                         transaction.set(newMsgRef, {
                             senderId: App.currentUserId,
                             senderName: App.currentUsername,
-                            recipientId: App.profileToView,
+                            recipientId: App.Messages.currentChatRecipientId,
                             content: message,
-                            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                            expiryTime: new Date(Date.now() + (12 * 60 * 60 * 1000)).getTime(), // 12 hours from now
+                            participants: [App.currentUserId, App.Messages.currentChatRecipientId].sort() // For easier querying
                         });
                         transaction.update(userRef, {
                             credits: firebase.firestore.FieldValue.increment(-1)
@@ -2103,19 +2539,11 @@
                     document.getElementById('message-content').value = '';
                     App.Profile.fetch(App.currentUserId, true); // Update credits
                 } catch (error) {
-                    App.UI.showMessage('message-status-message', `Error sending message: ${error.message}`, 'error');
+                    App.UI.showMessage('message-status-message', `Error sending message: ${error.message.replace('Firebase: Error ', '')}`, 'error');
                     console.error("Message send error:", error);
                 }
             }
         };
-        
-        App.Utils = {
-            formatNumber: (num) => {
-                if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
-                if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
-                return num;
-            }
-        }
 
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -2188,16 +2616,17 @@
                     } else if (sectionId === 'user-profile-section') {
                         App.Profile.fetch(App.currentUserId, true);
                     } else if (sectionId === 'search-section') {
-                        document.getElementById('search-username-input').value = '';
-                        document.getElementById('search-results-list').innerHTML = '';
+                        document.getElementById('search-input').value = '';
+                        document.getElementById('search-results-list-users').innerHTML = '<p class="text-center" style="color: #aaa;">No user results.</p>';
+                        document.getElementById('search-results-list-posts').innerHTML = '<p class="text-center" style="color: #aaa;">No post results.</p>';
                     }
                 });
             });
 
             const mainContent = document.getElementById('main-content');
             mainContent.addEventListener('scroll', () => {
-                const sectionId = document.querySelector('section.active').id;
-                if (sectionId === 'home-posts' && mainContent.scrollTop + mainContent.clientHeight >= mainContent.scrollHeight - 100 && !App.isLoadingPosts) {
+                const activeSection = document.querySelector('section.active');
+                if (activeSection && activeSection.id === 'home-posts' && mainContent.scrollTop + mainContent.clientHeight >= mainContent.scrollHeight - 100 && !App.isLoadingPosts) {
                     App.Posts.fetch();
                 }
             });
