@@ -2827,6 +2827,24 @@
                 App.Monetization.handleAdCompletion(rewardType);
             }
         };
+        document.addEventListener('DOMContentLoaded', (event) => {
+    const splashScreen = document.getElementById('splash-screen');
+    const mainContent = document.getElementById('main-content');
+
+    setTimeout(() => {
+        if (splashScreen) {
+            splashScreen.classList.add('hidden'); // Add the hidden class to fade out
+
+            // After the transition, completely remove it or set display: none
+            splashScreen.addEventListener('transitionend', () => {
+                splashScreen.style.display = 'none';
+                if (mainContent) {
+                    mainContent.style.display = 'block'; // Show main content
+                }
+            }, { once: true }); // Ensure the event listener runs only once
+        }
+    }, 3000); // 3000 milliseconds = 3 seconds
+});
 
     </script>
 </body>
