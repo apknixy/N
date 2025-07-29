@@ -1,12 +1,1448 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AddMint - Ultra Professional</title>
-    <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* General Body and Container Styles */
+        body {
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #1a1a2e; /* Dark background for neon effect */
+            color: #e0e0e0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 420px; /* Typical mobile width */
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background-color: #16213e; /* Slightly lighter dark blue */
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.2); /* Subtle glow */
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative; /* For sidebar positioning */
+            border: 1px solid #0f3460;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Splash Screen */
+        .splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0f3460, #16213e); /* Gradient background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 1000;
+            color: white;
+            text-align: center;
+        }
+
+        .splash-content {
+            animation: fadeIn 1s ease-out forwards;
+        }
+
+        .app-logo-splash {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(45deg, #00ffff, #ff00ff); /* Neon gradient */
+            border-radius: 50%;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.6), 0 0 40px rgba(255, 0, 255, 0.4);
+            animation: pulse 2s infinite alternate;
+        }
+        .app-logo-splash::before {
+            content: 'A'; /* Simple 'A' for AddMint */
+            font-family: 'Montserrat', sans-serif;
+            font-size: 60px;
+            font-weight: bold;
+            color: #1a1a2e;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .splash-screen h1 {
+            font-size: 2.8em;
+            margin-bottom: 10px;
+            color: #00ffff;
+            text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff;
+        }
+
+        .splash-screen p {
+            font-size: 1.2em;
+            color: #88d4d4;
+        }
+
+        .loader {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid #00ffff;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin-top: 20px;
+        }
+
+        /* Header */
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background-color: #0f3460;
+            color: white;
+            border-bottom: 1px solid #0d2a4a;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            z-index: 10;
+        }
+
+        .header-left, .header-right {
+            display: flex;
+            align-items: center;
+        }
+
+        .app-title {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-left: 15px;
+            color: #00ffff;
+            text-shadow: 0 0 5px #00ffff;
+        }
+
+        .status-display {
+            font-size: 0.9em;
+            background-color: #1a1a2e;
+            padding: 5px 10px;
+            border-radius: 5px;
+            border: 1px solid #00ffff;
+            box-shadow: 0 0 5px rgba(0, 255, 255, 0.4);
+        }
+
+        .status-display span {
+            margin: 0 5px;
+            font-weight: bold;
+            cursor: pointer; /* Make resource spans clickable */
+            transition: color 0.2s ease, transform 0.2s ease;
+        }
+        .status-display span:hover {
+            color: #ff00ff; /* Pink hover effect */
+            transform: scale(1.05);
+        }
+
+
+        .icon-button {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.2em;
+            cursor: pointer;
+            margin-left: 15px;
+            transition: color 0.3s ease, transform 0.2s ease;
+        }
+
+        .icon-button:hover {
+            color: #00ffff;
+            transform: scale(1.1);
+        }
+
+        .menu-icon {
+            width: 30px;
+            height: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            cursor: pointer;
+        }
+
+        .menu-icon .bar {
+            width: 100%;
+            height: 3px;
+            background-color: white;
+            border-radius: 2px;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -300px; /* Hidden by default */
+            width: 280px;
+            height: 100%;
+            background-color: #0f3460;
+            box-shadow: 5px 0 15px rgba(0, 0, 0, 0.5);
+            z-index: 20;
+            transition: left 0.3s ease-in-out;
+            padding-top: 20px;
+        }
+
+        .sidebar.open {
+            left: 0;
+        }
+
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid #0d2a4a;
+            margin-bottom: 20px;
+        }
+
+        .sidebar-header h3 {
+            margin: 0;
+            color: #00ffff;
+            font-size: 1.4em;
+        }
+
+        .close-sidebar {
+            font-size: 2em;
+            color: white;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar ul li {
+            margin-bottom: 10px;
+        }
+
+        .sidebar ul li a {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: #e0e0e0;
+            text-decoration: none;
+            font-size: 1.1em;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .sidebar ul li a i {
+            margin-right: 15px;
+            font-size: 1.3em;
+        }
+
+        .sidebar ul li a:hover {
+            background-color: #1a1a2e;
+            color: #00ffff;
+        }
+
+        /* Data Saver Toggle */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 20px;
+            margin-left: auto; /* Push to the right */
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-switch label {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            -webkit-transition: .4s;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .toggle-switch label:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            -webkit-transition: .4s;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        .toggle-switch input:checked + label {
+            background-color: #00ffff;
+        }
+
+        .toggle-switch input:checked + label:before {
+            -webkit-transform: translateX(20px);
+            -ms-transform: translateX(20px);
+            transform: translateX(20px);
+        }
+
+
+        /* Main Content */
+        .main-content {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 20px;
+            padding-bottom: 80px; /* Space for bottom nav */
+        }
+
+        .app-screen {
+            display: none;
+        }
+
+        .app-screen.active {
+            display: block;
+        }
+
+        section {
+            background-color: #1a1a2e;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.1);
+            border: 1px solid #0f3460;
+        }
+
+        h2 {
+            color: #00ffff;
+            text-shadow: 0 0 5px #00ffff;
+            border-bottom: 2px solid #0f3460;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        /* Post Feed Styles */
+        .posts-feed {
+            display: flex;
+            flex-direction: column;
+            gap: 20px; /* Space between posts */
+        }
+
+        .post-card {
+            background-color: #0f3460;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.08);
+            border: 1px solid #0d2a4a;
+            transition: box-shadow 0.3s ease-in-out;
+            position: relative; /* For neon effect */
+        }
+
+        .post-card.neon-glow {
+            box-shadow: 0 0 5px #00ffff, 0 0 15px #00ffff, 0 0 25px #00ffff, 0 0 35px #00ffff;
+            border-color: #00ffff;
+        }
+
+        .post-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .profile-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #00ffff; /* Default for coded avatars */
+            margin-right: 10px;
+            overflow: hidden;
+            position: relative;
+            border: 2px solid #00ffff;
+            flex-shrink: 0;
+            cursor: pointer; /* Make avatar clickable */
+        }
+
+        /* Styles for coded avatars - All 50 logos */
+        .profile-avatar.user-logo-1 { background-color: #ff6347; } .profile-avatar.user-logo-1::before { content: '🧑'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .profile-avatar.user-logo-2 { background-color: #6a5acd; } .profile-avatar.user-logo-2::before { content: '👩'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .profile-avatar.user-logo-3 { background-color: #32cd32; } .profile-avatar.user-logo-3::before { content: '🚀'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .profile-avatar.user-logo-4 { background-color: #ff8c00; } .profile-avatar.user-logo-4::before { content: '💡'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .profile-avatar.user-logo-5 { background-color: #ffd700; } .profile-avatar.user-logo-5::before { content: '🌟'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .profile-avatar.user-logo-6 { background-color: #9932cc; } .profile-avatar.user-logo-6::before { content: '🌈'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .profile-avatar.user-logo-7 { background-color: #d2691e; } .profile-avatar.user-logo-7::before { content: '🦊'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .profile-avatar.user-logo-8 { background-color: #6495ed; } .profile-avatar.user-logo-8::before { content: '🐼'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .profile-avatar.user-logo-9 { background-color: #dda0dd; } .profile-avatar.user-logo-9::before { content: '🦋'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .profile-avatar.user-logo-10 { background-color: #20b2aa; } .profile-avatar.user-logo-10::before { content: '🐢'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .profile-avatar.user-logo-11 { background-color: #87ceeb; } .profile-avatar.user-logo-11::before { content: '🤖'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .profile-avatar.user-logo-12 { background-color: #7cfc00; } .profile-avatar.user-logo-12::before { content: '👽'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .profile-avatar.user-logo-13 { background-color: #ee82ee; } .profile-avatar.user-logo-13::before { content: '🦄'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .profile-avatar.user-logo-14 { background-color: #48d1cc; } .profile-avatar.user-logo-14::before { content: '🐉'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .profile-avatar.user-logo-15 { background-color: #4682b4; } .profile-avatar.user-logo-15::before { content: '🌊'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .profile-avatar.user-logo-16 { background-color: #dc143c; } .profile-avatar.user-logo-16::before { content: '🔥'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .profile-avatar.user-logo-17 { background-color: #f0e68c; } .profile-avatar.user-logo-17::before { content: '👑'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .profile-avatar.user-logo-18 { background-color: #00ced1; } .profile-avatar.user-logo-18::before { content: '💎'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .profile-avatar.user-logo-19 { background-color: #b0e0e6; } .profile-avatar.user-logo-19::before { content: '🔑'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .profile-avatar.user-logo-20 { background-color: #ffff00; } .profile-avatar.user-logo-20::before { content: '⚡'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .profile-avatar.user-logo-21 { background-color: #ff69b4; } .profile-avatar.user-logo-21::before { content: '🎵'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .profile-avatar.user-logo-22 { background-color: #7b68ee; } .profile-avatar.user-logo-22::before { content: '🎨'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .profile-avatar.user-logo-23 { background-color: #ffa07a; } .profile-avatar.user-logo-23::before { content: '🧩'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .profile-avatar.user-logo-24 { background-color: #cd853f; } .profile-avatar.user-logo-24::before { content: '🍔'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .profile-avatar.user-logo-25 { background-color: #f08080; } .profile-avatar.user-logo-25::before { content: '🍕'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .profile-avatar.user-logo-26 { background-color: #c0c0c0; } .profile-avatar.user-logo-26::before { content: '🎮'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .profile-avatar.user-logo-27 { background-color: #afeeee; } .profile-avatar.user-logo-27::before { content: '✈️'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .profile-avatar.user-logo-28 { background-color: #228b22; } .profile-avatar.user-logo-28::before { content: '🌳'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .profile-avatar.user-logo-29 { background-color: #ffb6c1; } .profile-avatar.user-logo-29::before { content: '🌸'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .profile-avatar.user-logo-30 { background-color: #b0c4de; } .profile-avatar.user-logo-30::before { content: '⚽'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .profile-avatar.user-logo-31 { background-color: #8b4513; } .profile-avatar.user-logo-31::before { content: '🎸'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .profile-avatar.user-logo-32 { background-color: #00fa9a; } .profile-avatar.user-logo-32::before { content: '🚲'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .profile-avatar.user-logo-33 { background-color: #deb887; } .profile-avatar.user-logo-33::before { content: '📚'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .profile-avatar.user-logo-34 { background-color: #d2b48c; } .profile-avatar.user-logo-34::before { content: '☕'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .profile-avatar.user-logo-35 { background-color: #f4a460; } .profile-avatar.user-logo-35::before { content: '🎁'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .profile-avatar.user-logo-36 { background-color: #ba55d3; } .profile-avatar.user-logo-36::before { content: '🎉'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .profile-avatar.user-logo-37 { background-color: #87cefa; } .profile-avatar.user-logo-37::before { content: '🌍'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .profile-avatar.user-logo-38 { background-color: #778899; } .profile-avatar.user-logo-38::before { content: '🔬'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .profile-avatar.user-logo-39 { background-color: #696969; } .profile-avatar.user-logo-39::before { content: '🔭'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .profile-avatar.user-logo-40 { background-color: #d3d3d3; } .profile-avatar.user-logo-40::before { content: '🛠️'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .profile-avatar.user-logo-41 { background-color: #add8e6; } .profile-avatar.user-logo-41::before { content: '⚖️'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .profile-avatar.user-logo-42 { background-color: #b8860b; } .profile-avatar.user-logo-42::before { content: '💰'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .profile-avatar.user-logo-43 { background-color: #5f9ea0; } .profile-avatar.user-logo-43::before { content: '🛡️'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .profile-avatar.user-logo-44 { background-color: #f0f8ff; } .profile-avatar.user-logo-44::before { content: '🔔'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .profile-avatar.user-logo-45 { background-color: #fa8072; } .profile-avatar.user-logo-45::before { content: '⏳'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .profile-avatar.user-logo-46 { background-color: #3cb371; } .profile-avatar.user-logo-46::before { content: '💾'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .profile-avatar.user-logo-47 { background-color: #4682b4; } .profile-avatar.user-logo-47::before { content: '⚙️'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .profile-avatar.user-logo-48 { background-color: #2e8b57; } .profile-avatar.user-logo-48::before { content: '📡'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .profile-avatar.user-logo-49 { background-color: #a52a2a; } .profile-avatar.user-logo-49::before { content: '🌐'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .profile-avatar.user-logo-50 { background-color: #c71585; } .profile-avatar.user-logo-50::before { content: '📈'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+
+
+        .profile-avatar.small {
+            width: 30px;
+            height: 30px;
+            border-width: 1px;
+        }
+
+        .username {
+            font-weight: bold;
+            color: #fff;
+            flex-grow: 1;
+            cursor: pointer; /* Make username clickable */
+        }
+
+        .post-options {
+            position: relative;
+        }
+
+        .post-options .fa-ellipsis-v {
+            cursor: pointer;
+            font-size: 1.2em;
+            color: #888;
+        }
+
+        .options-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background-color: #1a1a2e;
+            border: 1px solid #0f3460;
+            border-radius: 5px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+            z-index: 5;
+            min-width: 120px;
+            overflow: hidden;
+        }
+
+        .options-dropdown span {
+            display: block;
+            padding: 10px 15px;
+            cursor: pointer;
+            color: #e0e0e0;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+
+        .options-dropdown span:hover {
+            background-color: #0f3460;
+            color: #00ffff;
+        }
+
+        .post-content {
+            margin-bottom: 10px;
+        }
+
+        .post-content p {
+            margin: 0 0 10px 0;
+        }
+
+        .post-content img {
+            max-width: 100%;
+            border-radius: 8px;
+            margin-top: 10px;
+            border: 1px solid #0d2a4a;
+        }
+
+        .post-content a {
+            color: #00ffff;
+            text-decoration: underline;
+            word-break: break-all;
+        }
+
+        .post-footer {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .post-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .like-button, .views-count, .translate-button {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            color: #bbb;
+            transition: color 0.2s ease;
+        }
+
+        .like-button i, .views-count i, .translate-button i {
+            margin-right: 5px;
+        }
+
+        .like-button .fas.fa-heart {
+            color: #ff007f; /* Red for liked */
+            animation: bounceIn 0.3s ease-out;
+        }
+
+        .post-reactions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9em;
+            color: #aaa;
+        }
+
+        .emoji-reaction-display {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap; /* Allow wrapping if many emojis */
+        }
+
+        .emoji-reaction-display .emoji {
+            font-size: 1.2em;
+            display: flex; /* To align count */
+            align-items: center;
+        }
+
+        .emoji-reaction-display .count {
+            font-size: 0.8em;
+            margin-left: 2px;
+            color: #e0e0e0;
+        }
+
+        .total-reactions {
+            margin-left: 10px;
+            font-weight: bold;
+            color: #00ffff;
+        }
+
+        .emoji-picker, .emoji-picker-chat {
+            position: absolute;
+            bottom: 10px; /* Adjust based on footer position */
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #1a1a2e;
+            border: 1px solid #0f3460;
+            border-radius: 8px;
+            padding: 8px;
+            display: flex;
+            gap: 10px;
+            box-shadow: 0 5px 20px rgba(0, 255, 255, 0.2);
+            z-index: 10;
+        }
+
+        .emoji-option {
+            font-size: 1.5em;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .emoji-option:hover {
+            transform: scale(1.2);
+        }
+
+        /* Horizontal Post Layout (for mixed feed) */
+        .horizontal-post-container {
+            display: flex;
+            overflow-x: auto;
+            gap: 15px;
+            padding: 10px 0;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch; /* For smoother scrolling on iOS */
+            margin: 10px 0;
+            background-color: #0d2a4a;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: inset 0 0 10px rgba(0, 255, 255, 0.1);
+            border: 1px solid #0f3460;
+        }
+
+        .horizontal-post-container .post-card {
+            min-width: 250px; /* Fixed width for horizontal items */
+            scroll-snap-align: start;
+            flex-shrink: 0;
+            margin-bottom: 0; /* Override default margin */
+        }
+
+        .horizontal-post-container .post-card .post-content img {
+            height: 150px; /* Fixed height for horizontal images */
+            object-fit: cover;
+        }
+
+        /* Table Post Layout */
+        .table-post-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* Responsive grid */
+            gap: 15px;
+            padding: 15px;
+            background-color: #0d2a4a;
+            border-radius: 10px;
+            box-shadow: inset 0 0 10px rgba(0, 255, 255, 0.1);
+            border: 1px solid #0f3460;
+            margin: 10px 0;
+        }
+
+        .table-post-container .post-card {
+            margin-bottom: 0; /* Override default margin */
+            padding: 10px;
+        }
+
+        .table-post-container .post-card .post-content img {
+            height: 100px; /* Smaller images for table layout */
+            object-fit: cover;
+        }
+        .table-post-container .post-card .post-content p {
+            font-size: 0.85em; /* Smaller text for table layout */
+            display: -webkit-box;
+            -webkit-line-clamp: 3; /* Limit text to 3 lines */
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+
+        /* Form & Button Styles */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #e0e0e0;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        input[type="file"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #00ffff; /* Neon border */
+            border-radius: 6px;
+            background-color: #1a1a2e;
+            color: #e0e0e0;
+            box-sizing: border-box;
+            font-size: 1em;
+            box-shadow: 0 0 8px rgba(0, 255, 255, 0.2);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="password"]:focus,
+        textarea:focus,
+        select:focus {
+            border-color: #ff00ff; /* Pink focus */
+            box-shadow: 0 0 15px rgba(255, 0, 255, 0.4);
+            outline: none;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        input[type="file"] {
+            padding: 8px; /* Less padding for file input */
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: bold;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            text-align: center;
+            text-decoration: none; /* For link buttons */
+        }
+
+        .btn.primary-btn {
+            background-color: #00ffff;
+            color: #1a1a2e;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.4);
+        }
+
+        .btn.primary-btn:hover {
+            background-color: #00e0e0;
+            transform: translateY(-2px);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.6);
+        }
+
+        .btn.secondary-btn {
+            background-color: #334e68;
+            color: #e0e0e0;
+            border: 1px solid #00ffff;
+        }
+
+        .btn.secondary-btn:hover {
+            background-color: #4a6684;
+            transform: translateY(-2px);
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.4);
+        }
+
+        .btn.danger-btn {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .btn.danger-btn:hover {
+            background-color: #c0392b;
+            transform: translateY(-2px);
+        }
+
+        .btn.social-btn {
+            background-color: #2e8b57; /* WhatsApp Green */
+            color: white;
+            margin-right: 10px;
+        }
+
+        .btn.social-btn i {
+            margin-right: 8px;
+        }
+
+        .btn.social-btn:hover {
+            background-color: #226b41;
+        }
+
+        .profile-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+
+        /* Modals */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .modal-content {
+            background-color: #1a1a2e;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 0 25px rgba(0, 255, 255, 0.3);
+            border: 1px solid #00ffff;
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+            animation: fadeInScale 0.3s ease-out;
+        }
+
+        .modal-content h3 {
+            color: #00ffff;
+            margin-top: 0;
+            margin-bottom: 20px;
+            text-align: center;
+            border-bottom: 1px solid #0f3460;
+            padding-bottom: 10px;
+        }
+
+        .modal-content .btn {
+            margin-top: 15px;
+            width: 100%;
+        }
+
+        .logo-options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+            gap: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 10px;
+            border: 1px solid #0f3460;
+            border-radius: 8px;
+            background-color: #0d2a4a;
+        }
+
+        .logo-option-item {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: #333; /* Base color for logo previews */
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 2px solid transparent;
+            transition: border-color 0.2s ease, transform 0.2s ease;
+        }
+
+        .logo-option-item.selected {
+            border-color: #00ffff;
+            box-shadow: 0 0 10px #00ffff;
+        }
+
+        .logo-option-item:hover {
+            transform: scale(1.1);
+        }
+
+        /* Specific profile avatar styles for edit profile */
+        .profile-avatar-large.user-logo-1 { background-color: #ff6347; } .profile-avatar-large.user-logo-1::before { content: '🧑'; font-size: 60px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #1a1a2e; }
+        .profile-avatar-large.user-logo-2 { background-color: #6a5acd; } .profile-avatar-large.user-logo-2::before { content: '👩'; font-size: 60px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #1a1a2e; }
+        .profile-avatar-large.user-logo-3 { background-color: #32cd32; } .profile-avatar-large.user-logo-3::before { content: '🚀'; font-size: 60px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #1a1a2e; }
+        .profile-avatar-large.user-logo-4 { background-color: #ff8c00; } .profile-avatar-large.user-logo-4::before { content: '💡'; font-size: 60px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #1a1a2e; }
+        .profile-avatar-large.user-logo-5 { background-color: #ffd700; } .profile-avatar-large.user-logo-5::before { content: '🌟'; font-size: 60px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #1a1a2e; }
+        .profile-avatar-large.user-logo-6 { background-color: #9932cc; } .profile-avatar-large.user-logo-6::before { content: '🌈'; font-size: 60px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #1a1a2e; }
+        .profile-avatar-large.user-logo-7 { background-color: #d2691e; } .profile-avatar-large.user-logo-7::before { content: '🦊'; font-size: 60px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #1a1a2e; }
+        .profile-avatar-large.user-logo-8 { background-color: #6495ed; } .profile-avatar-large.user-logo-8::before { content: '🐼'; font-size: 60px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #1a1a2e; }
+        .profile-avatar-large.user-logo-9 { background-color: #dda0dd; } .profile-avatar-large.user-logo-9::before { content: '🦋'; font-size: 60px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #1a1a2e; }
+        .profile-avatar-large.user-logo-10 { background-color: #20b2aa; } .profile-avatar-large.user-logo-10::before { content: '🐢'; font-size: 60px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #1a1a2e; }
+        .profile-avatar-large.user-logo-11 { background-color: #87ceeb; } .profile-avatar-large.user-logo-11::before { content: '🤖'; font-size: 60px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #1a1a2e; }
+        .profile-avatar-large.user-logo-12 { background-color: #7cfc00; } .profile-avatar-large.user-logo-12::before { content: '👽'; font-size: 60px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #1a1a2e; }
+        .profile-avatar-large.user-logo-13 { background-color: #ee82ee; } .profile-avatar-large.user-logo-13::before { content: '🦄'; font-size: 60px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #1a1a2e; }
+        .profile-avatar-large.user-logo-14 { background-color: #48d1cc; } .profile-avatar-large.user-logo-14::before { content: '🐉'; font-size: 60px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #1a1a2e; }
+        .profile-avatar-large.user-logo-15 { background-color: #4682b4; } .profile-avatar-large.user-logo-15::before { content: '🌊'; font-size: 60px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #1a1a2e; }
+        .profile-avatar-large.user-logo-16 { background-color: #dc143c; } .profile-avatar-large.user-logo-16::before { content: '🔥'; font-size: 60px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #1a1a2e; }
+        .profile-avatar-large.user-logo-17 { background-color: #f0e68c; } .profile-avatar-large.user-logo-17::before { content: '👑'; font-size: 60px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #1a1a2e; }
+        .profile-avatar-large.user-logo-18 { background-color: #00ced1; } .profile-avatar-large.user-logo-18::before { content: '💎'; font-size: 60px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #1a1a2e; }
+        .profile-avatar-large.user-logo-19 { background-color: #b0e0e6; } .profile-avatar-large.user-logo-19::before { content: '🔑'; font-size: 60px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #1a1a2e; }
+        .profile-avatar-large.user-logo-20 { background-color: #ffff00; } .profile-avatar-large.user-logo-20::before { content: '⚡'; font-size: 60px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #1a1a2e; }
+        .profile-avatar-large.user-logo-21 { background-color: #ff69b4; } .profile-avatar-large.user-logo-21::before { content: '🎵'; font-size: 60px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #1a1a2e; }
+        .profile-avatar-large.user-logo-22 { background-color: #7b68ee; } .profile-avatar-large.user-logo-22::before { content: '🎨'; font-size: 60px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #1a1a2e; }
+        .profile-avatar-large.user-logo-23 { background-color: #ffa07a; } .profile-avatar-large.user-logo-23::before { content: '🧩'; font-size: 60px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #1a1a2e; }
+        .profile-avatar-large.user-logo-24 { background-color: #cd853f; } .profile-avatar-large.user-logo-24::before { content: '🍔'; font-size: 60px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #1a1a2e; }
+        .profile-avatar-large.user-logo-25 { background-color: #f08080; } .profile-avatar-large.user-logo-25::before { content: '🍕'; font-size: 60px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #1a1a2e; }
+        .profile-avatar-large.user-logo-26 { background-color: #c0c0c0; } .profile-avatar-large.user-logo-26::before { content: '🎮'; font-size: 60px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #1a1a2e; }
+        .profile-avatar-large.user-logo-27 { background-color: #afeeee; } .profile-avatar-large.user-logo-27::before { content: '✈️'; font-size: 60px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #1a1a2e; }
+        .profile-avatar-large.user-logo-28 { background-color: #228b22; } .profile-avatar-large.user-logo-28::before { content: '🌳'; font-size: 60px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #1a1a2e; }
+        .profile-avatar-large.user-logo-29 { background-color: #ffb6c1; } .profile-avatar-large.user-logo-29::before { content: '🌸'; font-size: 60px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #1a1a2e; }
+        .profile-avatar-large.user-logo-30 { background-color: #b0c4de; } .profile-avatar-large.user-logo-30::before { content: '⚽'; font-size: 60px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #1a1a2e; }
+        .profile-avatar-large.user-logo-31 { background-color: #8b4513; } .profile-avatar-large.user-logo-31::before { content: '🎸'; font-size: 60px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #1a1a2e; }
+        .profile-avatar-large.user-logo-32 { background-color: #00fa9a; } .profile-avatar-large.user-logo-32::before { content: '🚲'; font-size: 60px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #1a1a2e; }
+        .profile-avatar-large.user-logo-33 { background-color: #deb887; } .profile-avatar-large.user-logo-33::before { content: '📚'; font-size: 60px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #1a1a2e; }
+        .profile-avatar-large.user-logo-34 { background-color: #d2b48c; } .profile-avatar-large.user-logo-34::before { content: '☕'; font-size: 60px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #1a1a2e; }
+        .profile-avatar-large.user-logo-35 { background-color: #f4a460; } .profile-avatar-large.user-logo-35::before { content: '🎁'; font-size: 60px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #1a1a2e; }
+        .profile-avatar-large.user-logo-36 { background-color: #ba55d3; } .profile-avatar-large.user-logo-36::before { content: '🎉'; font-size: 60px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #1a1a2e; }
+        .profile-avatar-large.user-logo-37 { background-color: #87cefa; } .profile-avatar-large.user-logo-37::before { content: '🌍'; font-size: 60px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #1a1a2e; }
+        .profile-avatar-large.user-logo-38 { background-color: #778899; } .profile-avatar-large.user-logo-38::before { content: '🔬'; font-size: 60px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #1a1a2e; }
+        .profile-avatar-large.user-logo-39 { background-color: #696969; } .profile-avatar-large.user-logo-39::before { content: '🔭'; font-size: 60px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #1a1a2e; }
+        .profile-avatar-large.user-logo-40 { background-color: #d3d3d3; } .profile-avatar-large.user-logo-40::before { content: '🛠️'; font-size: 60px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #1a1a2e; }
+        .profile-avatar-large.user-logo-41 { background-color: #add8e6; } .profile-avatar-large.user-logo-41::before { content: '⚖️'; font-size: 60px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #1a1a2e; }
+        .profile-avatar-large.user-logo-42 { background-color: #b8860b; } .profile-avatar-large.user-logo-42::before { content: '💰'; font-size: 60px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #1a1a2e; }
+        .profile-avatar-large.user-logo-43 { background-color: #5f9ea0; } .profile-avatar-large.user-logo-43::before { content: '🛡️'; font-size: 60px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #1a1a2e; }
+        .profile-avatar-large.user-logo-44 { background-color: #f0f8ff; } .profile-avatar-large.user-logo-44::before { content: '🔔'; font-size: 60px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #1a1a2e; }
+        .profile-avatar-large.user-logo-45 { background-color: #fa8072; } .profile-avatar-large.user-logo-45::before { content: '⏳'; font-size: 60px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #1a1a2e; }
+        .profile-avatar-large.user-logo-46 { background-color: #3cb371; } .profile-avatar-large.user-logo-46::before { content: '💾'; font-size: 60px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #1a1a2e; }
+        .profile-avatar-large.user-logo-47 { background-color: #4682b4; } .profile-avatar-large.user-logo-47::before { content: '⚙️'; font-size: 60px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #1a1a2e; }
+        .profile-avatar-large.user-logo-48 { background-color: #2e8b57; } .profile-avatar-large.user-logo-48::before { content: '📡'; font-size: 60px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #1a1a2e; }
+        .profile-avatar-large.user-logo-49 { background-color: #a52a2a; } .profile-avatar-large.user-logo-49::before { content: '🌐'; font-size: 60px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #1a1a2e; }
+        .profile-avatar-large.user-logo-50 { background-color: #c71585; } .profile-avatar-large.user-logo-50::before { content: '📈'; font-size: 60px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #1a1a2e; }
+
+
+        /* Profile Screen Specifics */
+        .profile-header-area {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: #0f3460;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.1);
+            border: 1px solid #0d2a4a;
+        }
+
+        .profile-avatar-large {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background-color: #00ffff; /* Default for coded avatars */
+            margin: 0 auto 20px auto;
+            overflow: hidden;
+            position: relative;
+            border: 4px solid #00ffff;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
+        }
+
+        .profile-avatar-large::before {
+            content: '👤'; /* Default large avatar */
+            font-size: 60px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #1a1a2e;
+        }
+
+        .profile-stats {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            margin-top: 15px;
+            font-size: 1.1em;
+        }
+
+        .profile-stats div {
+            text-align: center;
+            padding: 8px 12px;
+            background-color: #1a1a2e;
+            border-radius: 8px;
+            border: 1px solid #00ffff;
+            box-shadow: 0 0 8px rgba(0, 255, 255, 0.2);
+        }
+
+        .profile-stats span {
+            display: block;
+            font-weight: bold;
+            font-size: 1.2em;
+            color: #00ffff;
+        }
+
+        .clickable-stat {
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.2s ease;
+        }
+
+        .clickable-stat:hover {
+            background-color: #0d2a4a;
+            transform: translateY(-2px);
+        }
+
+        /* Chat Styles */
+        .message-list-container, .chat-window-container {
+            background-color: #0f3460;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.1);
+            border: 1px solid #0d2a4a;
+            height: calc(100% - 40px); /* Adjust based on parent padding */
+            display: flex;
+            flex-direction: column;
+        }
+
+        .recent-chats-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+
+        .chat-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 10px;
+            border-bottom: 1px solid #1a1a2e;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .chat-item:hover {
+            background-color: #1a1a2e;
+        }
+
+        .chat-info {
+            margin-left: 10px;
+            flex-grow: 1;
+        }
+
+        .chat-username {
+            font-weight: bold;
+            color: #00ffff;
+            display: block;
+        }
+
+        .last-message {
+            font-size: 0.9em;
+            color: #bbb;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .chat-window-container {
+            height: calc(100vh - 160px); /* Adjust for header/footer */
+            padding: 0;
+        }
+
+        .chat-header {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background-color: #0f3460;
+            border-bottom: 1px solid #0d2a4a;
+            color: white;
+        }
+
+        .chat-header .icon-button {
+            margin-right: 10px;
+        }
+
+        #chat-partner-username {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #00ffff;
+        }
+
+        .chat-messages {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background-color: #1a1a2e;
+        }
+
+        .message-bubble {
+            padding: 10px 15px;
+            border-radius: 18px;
+            max-width: 80%;
+            word-wrap: break-word;
+            font-size: 0.95em;
+            line-height: 1.4;
+            position: relative; /* For emoji reaction */
+        }
+
+        .message-bubble.right {
+            align-self: flex-end;
+            background-color: #00ffff;
+            color: #1a1a2e;
+            border-bottom-right-radius: 4px; /* Tail effect */
+        }
+
+        .message-bubble.left {
+            align-self: flex-start;
+            background-color: #334e68;
+            color: #e0e0e0;
+            border-bottom-left-radius: 4px; /* Tail effect */
+        }
+
+        .chat-input-area {
+            display: flex;
+            padding: 10px 15px;
+            border-top: 1px solid #0d2a4a;
+            background-color: #0f3460;
+        }
+
+        #message-input {
+            flex-grow: 1;
+            margin-right: 10px;
+            min-height: 40px; /* Adjust as needed */
+            max-height: 100px; /* Limit expansion */
+            resize: none;
+            align-self: center;
+        }
+
+        #send-message-btn {
+            padding: 10px 15px;
+            font-size: 1.2em;
+        }
+
+        /* Search Screen */
+        .search-input-group {
+            display: flex;
+            margin-bottom: 20px;
+        }
+
+        #search-query {
+            flex-grow: 1;
+            margin-right: 10px;
+        }
+
+        .search-results-container h3 {
+            margin-top: 25px;
+            color: #00ffff;
+            border-bottom: 1px solid #0f3460;
+            padding-bottom: 5px;
+        }
+
+        .search-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            background-color: #0d2a4a;
+            border-radius: 8px;
+            border: 1px solid #0f3460;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .search-user-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            border-bottom: 1px solid #1a1a2e;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .search-user-item:last-child {
+            border-bottom: none;
+        }
+
+        .search-user-item:hover {
+            background-color: #1a1a2e;
+        }
+
+        .search-username {
+            flex-grow: 1;
+            margin-left: 10px;
+            font-weight: bold;
+            color: #e0e0e0;
+        }
+
+        .search-user-item .follow-btn {
+            padding: 5px 10px;
+            font-size: 0.9em;
+        }
+
+        /* NEW: Monetization Screen Styles */
+        #monetization-screen .info-card {
+            background-color: #0f3460;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #0d2a4a;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.08);
+        }
+        #monetization-screen .info-card h4 {
+            color: #00ffff;
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+        #monetization-screen .info-card i {
+            margin-right: 8px;
+            color: #ff00ff;
+        }
+        #monetization-screen .info-card .btn {
+            margin-top: 10px;
+            width: auto;
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+
+        /* Bottom Navigation */
+        .app-bottom-nav {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            background-color: #0f3460;
+            border-top: 1px solid #0d2a4a;
+            padding: 10px 0;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+            position: sticky;
+            bottom: 0;
+            width: 100%;
+            z-index: 10;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: #888;
+            font-size: 0.8em;
+            transition: color 0.3s ease, transform 0.2s ease;
+        }
+
+        .nav-item .icon-wrapper {
+            width: 30px;
+            height: 30px;
+            margin-bottom: 5px;
+            position: relative;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid transparent; /* For active state glow */
+            transition: border-color 0.3s ease;
+        }
+
+        /* Custom Coded Icons for Bottom Nav */
+        .home-icon::before { content: '\f015'; font-family: 'Font Awesome 6 Free'; font-weight: 900; font-size: 1.4em; color: #e0e0e0; }
+        .search-icon::before { content: '\f002'; font-family: 'Font Awesome 6 Free'; font-weight: 900; font-size: 1.4em; color: #e0e0e0; }
+        .upload-icon::before { content: '\f067'; font-family: 'Font Awesome 6 Free'; font-weight: 900; font-size: 1.4em; color: #e0e0e0; } /* Plus Circle */
+        .messages-icon::before { content: '\f075'; font-family: 'Font Awesome 6 Free'; font-weight: 900; font-size: 1.4em; color: #e0e0e0; } /* Comment Dots */
+        .profile-icon::before { content: '\f406'; font-family: 'Font Awesome 6 Free'; font-weight: 900; font-size: 1.4em; color: #e0e0e0; } /* User Circle Solid */
+
+        .nav-item.active {
+            color: #00ffff;
+            transform: translateY(-3px);
+        }
+
+        .nav-item.active .icon-wrapper {
+            border-color: #00ffff;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+        }
+
+        .nav-item.active .icon-wrapper::before {
+            color: #00ffff;
+        }
+
+
+        /* Ad Modal */
+        #ad-modal .modal-content {
+            text-align: center;
+        }
+        #ad-placeholder {
+            background-color: #0d2a4a;
+            height: 150px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+            border-radius: 8px;
+            font-style: italic;
+            color: #bbb;
+            border: 1px dashed #00ffff;
+        }
+        #close-ad-modal {
+            margin-top: 20px;
+        }
+
+        /* Reward Popup */
+        .reward-content {
+            text-align: center;
+        }
+        .reward-content h3 {
+            color: #33ff57; /* Green for success */
+            text-shadow: 0 0 8px rgba(51, 255, 87, 0.6);
+            margin-bottom: 15px;
+        }
+        .reward-content i.fas.fa-trophy {
+            font-size: 1.5em;
+            margin-left: 10px;
+            vertical-align: middle;
+        }
+        #reward-message {
+            font-size: 1.1em;
+            color: #e0e0e0;
+            margin-bottom: 20px;
+        }
+
+
+        /* Toast Notification */
+        .toast-notification {
+            position: fixed;
+            bottom: 80px; /* Above bottom nav */
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            z-index: 200;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            font-size: 0.95em;
+            min-width: 200px;
+            text-align: center;
+        }
+
+        .toast-notification.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 10px rgba(0, 255, 255, 0.6), 0 0 20px rgba(255, 0, 255, 0.4); }
+            100% { transform: scale(1.05); box-shadow: 0 0 20px rgba(0, 255, 255, 0.8), 0 0 30px rgba(255, 0, 255, 0.6); }
+        }
+
+        @keyframes fadeInScale {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.1); opacity: 1; }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+            .app-container {
+                border-radius: 0;
+                box-shadow: none;
+                max-width: 100%;
+                height: 100vh; /* Ensure it takes full height on small screens */
+            }
+
+            body {
+                align-items: flex-start; /* Align to top on small screens */
+            }
+
+            .main-content {
+                padding: 10px;
+            }
+
+            .app-header {
+                padding: 10px;
+            }
+
+            .app-title {
+                font-size: 1.3em;
+                margin-left: 10px;
+            }
+
+            .status-display {
+                font-size: 0.8em;
+                padding: 3px 8px;
+            }
+
+            .icon-button {
+                font-size: 1em;
+                margin-left: 10px;
+            }
+
+            .app-bottom-nav {
+                padding: 8px 0;
+            }
+
+            .nav-item {
+                font-size: 0.7em;
+            }
+
+            .nav-item .icon-wrapper {
+                width: 25px;
+                height: 25px;
+            }
+
+            .home-icon::before, .search-icon::before, .upload-icon::before, .messages-icon::before, .profile-icon::before {
+                font-size: 1.2em;
+            }
+
+            .modal-content {
+                width: 95%;
+                padding: 20px;
+            }
+
+            .profile-avatar-large {
+                width: 80px;
+                height: 80px;
+            }
+
+            .profile-avatar-large::before {
+                font-size: 45px;
+            }
+
+            .profile-stats {
+                gap: 15px;
+                font-size: 1em;
+            }
+
+            .profile-stats span {
+                font-size: 1.1em;
+            }
+
+            .btn {
+                padding: 10px 15px;
+                font-size: 1em;
+            }
+
+            .profile-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+            .profile-actions .btn {
+                width: 80%;
+            }
+
+            .emoji-picker, .emoji-picker-chat {
+                padding: 6px;
+                gap: 8px;
+            }
+
+            .emoji-option {
+                font-size: 1.3em;
+            }
+
+            .message-bubble {
+                max-width: 90%;
+            }
+
+            .toast-notification {
+                bottom: 70px;
+                font-size: 0.8em;
+                min-width: unset;
+                width: auto;
+                padding: 10px 15px;
+            }
+        }
+    </style>
 </head>
 <body>
 
@@ -49,7 +1485,7 @@
         <nav id="sidebar" class="sidebar">
             <div class="sidebar-header">
                 <h3>AddMint Menu</h3>
-                <div class="close-sidebar" id="close-sidebar">×</div>
+                <div class="close-sidebar" id="close-sidebar">&times;</div>
             </div>
             <ul>
                 <li><a href="#" data-screen="home"><i class="fas fa-home"></i> Home Feed</a></li>
@@ -57,7 +1493,7 @@
                 <li><a href="#" data-screen="upload"><i class="fas fa-plus-circle"></i> Upload Post</a></li>
                 <li><a href="#" data-screen="messages"><i class="fas fa-comments"></i> Messages</a></li>
                 <li><a href="#" data-screen="search"><i class="fas fa-search"></i> Search Users</a></li>
-                <li><a href="#" data-screen="monetization"><i class="fas fa-dollar-sign"></i> Earn & Boost</a></li> <!-- NEW -->
+                <li><a href="#" data-screen="monetization"><i class="fas fa-dollar-sign"></i> Earn & Boost</a></li>
                 <li><a href="#" id="data-saver-toggle"><i class="fas fa-wifi"></i> Data Saver <span class="toggle-switch"><input type="checkbox" id="data-saver-checkbox"><label for="data-saver-checkbox"></label></span></a></li>
                 <li><a href="https://www.instagram.com/addmint__" target="_blank"><i class="fab fa-instagram"></i> Our Instagram</a></li>
                 <li><a href="https://www.youtube.com/@add_mintmint" target="_blank"><i class="fab fa-youtube"></i> Our YouTube</a></li>
@@ -328,6 +1764,2068 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
-    <script src="script.js"></script>
+    <script>
+        // Firebase Configuration (from your input)
+        const firebaseConfig = {
+            apiKey: "AIzaSyDlZA4grzF3fx95-11E4s7ASXwkIij1k1w",
+            authDomain: "addmint-7ab6b.firebaseapp.com",
+            databaseURL: "https://addmint-7ab6b-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "addmint-7ab6b",
+            storageBucket: "addmint-7ab6b.firebasestorage.app",
+            messagingSenderId: "504015450137",
+            appId: "1:504015450137:web:694b176313582cce1e7a88",
+            measurementId: "G-H7J7M23Z82"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const storage = firebase.storage();
+
+        // --- DOM Elements ---
+        const splashScreen = document.getElementById('splash-screen');
+        const appContainer = document.getElementById('app-container');
+        const menuToggle = document.getElementById('menu-toggle');
+        const sidebar = document.getElementById('sidebar');
+        const closeSidebarBtn = document.getElementById('close-sidebar');
+        const mainContent = document.querySelector('.main-content');
+        const bottomNavItems = document.querySelectorAll('.app-bottom-nav .nav-item');
+        const screenSections = document.querySelectorAll('.app-screen');
+        const headerCoins = document.getElementById('header-coins');
+        const headerCredits = document.getElementById('header-credits');
+        const headerLimit = document.getElementById('header-limit');
+        const giftClaimBtn = document.getElementById('gift-claim-btn');
+        const adModal = document.getElementById('ad-modal');
+        const closeAdModalBtn = document.getElementById('close-ad-modal');
+        const rewardPopup = document.getElementById('reward-popup');
+        const rewardMessage = document.getElementById('reward-message');
+        const closeRewardPopupBtn = document.getElementById('close-reward-popup');
+        const toastNotification = document.getElementById('toast-notification');
+        const refreshPostsBtn = document.getElementById('refresh-posts-btn');
+        const postsFeed = document.getElementById('posts-feed');
+        const loadingSpinner = document.getElementById('loading-spinner');
+
+        // Post Upload Screen
+        const uploadScreen = document.getElementById('upload-screen');
+        const postContentInput = document.getElementById('post-content');
+        const postImageInput = document.getElementById('post-image');
+        const postBoostSelect = document.getElementById('post-boost');
+        const publishPostBtn = document.getElementById('publish-post-btn');
+        const uploadStatus = document.getElementById('upload-status');
+
+        // Profile Screen
+        const profileScreen = document.getElementById('profile-screen');
+        const myProfileAvatar = document.getElementById('my-profile-avatar');
+        const myProfileUsername = document.getElementById('my-profile-username');
+        const myPostsCount = document.getElementById('my-posts-count');
+        const myFollowersCount = document.getElementById('my-followers-count');
+        const myFollowingCount = document.getElementById('my-following-count');
+        const editProfileBtn = document.getElementById('edit-profile-btn');
+        const followUserBtn = document.getElementById('follow-user-btn');
+        const unfollowUserBtn = document.getElementById('unfollow-user-btn');
+        const messageUserBtn = document.getElementById('message-user-btn');
+        const profileWhatsappLink = document.getElementById('profile-whatsapp-link');
+        const profileInstagramLink = document.getElementById('profile-instagram-link');
+        const currentProfileUsernamePosts = document.getElementById('current-profile-username-posts');
+        const profilePostsFeed = document.getElementById('profile-posts-feed');
+
+        const editProfileModal = document.getElementById('edit-profile-modal');
+        const editUsernameInput = document.getElementById('edit-username');
+        const usernameAvailability = document.getElementById('username-availability');
+        const editWhatsappInput = document.getElementById('edit-whatsapp');
+        const editInstagramInput = document.getElementById('edit-instagram');
+        const profileLogoOptions = document.getElementById('profile-logo-options');
+        const saveProfileBtn = document.getElementById('save-profile-btn');
+        const cancelEditProfileBtn = document.getElementById('cancel-edit-profile-btn');
+
+        const followListModal = document.getElementById('follow-list-modal');
+        const followListTitle = document.getElementById('follow-list-title');
+        const followListContent = document.getElementById('follow-list-content');
+        const closeFollowListModalBtn = document.getElementById('close-follow-list-modal');
+
+        // Messaging Screen
+        const messagesScreen = document.getElementById('messages-screen');
+        const messageListContainer = document.getElementById('message-list-container');
+        const recentChatsList = document.getElementById('recent-chats-list');
+        const chatWindowContainer = document.getElementById('chat-window-container');
+        const chatPartnerUsername = document.getElementById('chat-partner-username');
+        const chatMessages = document.getElementById('chat-messages');
+        const messageInput = document.getElementById('message-input');
+        const sendMessageBtn = document.getElementById('send-message-btn');
+        const backToChatsBtn = document.getElementById('back-to-chats-btn');
+
+        // Search Screen
+        const searchScreen = document.getElementById('search-screen');
+        const searchQueryInput = document.getElementById('search-query');
+        const searchBtn = document.getElementById('search-btn');
+        const searchUserList = document.getElementById('search-user-list');
+        const searchPostList = document.getElementById('search-post-list');
+        const noSearchResults = document.getElementById('no-search-results');
+
+        // --- Global Variables ---
+        let currentUser = null;
+        let currentProfileViewingId = null; // To differentiate between viewing own profile vs. other's
+        let currentChatPartnerId = null;
+        let lastVisiblePost = null; // For infinite scrolling pagination
+        let fetchingPosts = false;
+        let postsToLoadPerScroll = 10;
+        let postsLoadedCount = 0; // Track total posts loaded to implement loop
+        let dataSaverEnabled = false; // For data saver feature
+
+        const PROFILE_LOGOS = [
+            { class: 'logo-1', emoji: '🧑', color: '#ff6347' }, // Tomato
+            { class: 'logo-2', emoji: '👩', color: '#6a5acd' }, // SlateBlue
+            { class: 'logo-3', emoji: '🚀', color: '#32cd32' }, // LimeGreen
+            { class: 'logo-4', emoji: '💡', color: '#ff8c00' }, // DarkOrange
+            { class: 'logo-5', emoji: '🌟', color: '#ffd700' }, // Gold
+            { class: 'logo-6', emoji: '🌈', color: '#9932cc' }, // DarkOrchid
+            { class: 'logo-7', emoji: '🦊', color: '#d2691e' }, // Chocolate
+            { class: 'logo-8', emoji: '🐼', color: '#6495ed' }, // CornflowerBlue
+            { class: 'logo-9', emoji: '🦋', color: '#dda0dd' }, // Plum
+            { class: 'logo-10', emoji: '🐢', color: '#20b2aa' }, // LightSeaGreen
+            { class: 'logo-11', emoji: '🤖', color: '#87ceeb' }, // SkyBlue
+            { class: 'logo-12', emoji: '👽', color: '#7cfc00' }, // LawnGreen
+            { class: 'logo-13', emoji: '🦄', color: '#ee82ee' }, // Violet
+            { class: 'logo-14', emoji: '🐉', color: '#48d1cc' }, // MediumTurquoise
+            { class: 'logo-15', emoji: '🌊', color: '#4682b4' }, // SteelBlue
+            { class: 'logo-16', emoji: '🔥', color: '#dc143c' }, // Crimson
+            { class: 'logo-17', emoji: '👑', color: '#f0e68c' }, // Khaki
+            { class: 'logo-18', emoji: '💎', color: '#00ced1' }, // DarkTurquoise
+            { class: 'logo-19', emoji: '🔑', color: '#b0e0e6' }, // PowderBlue
+            { class: 'logo-20', emoji: '⚡', color: '#ffff00' }, // Yellow
+            { class: 'logo-21', emoji: '🎵', color: '#ff69b4' }, // HotPink
+            { class: 'logo-22', emoji: '🎨', color: '#7b68ee' }, // MediumSlateBlue
+            { class: 'logo-23', emoji: '🧩', color: '#ffa07a' }, // LightSalmon
+            { class: 'logo-24', emoji: '🍔', color: '#cd853f' }, // Peru
+            { class: 'logo-25', emoji: '🍕', color: '#f08080' }, // LightCoral
+            { class: 'logo-26', emoji: '🎮', color: '#c0c0c0' }, // Silver
+            { class: 'logo-27', emoji: '✈️', color: '#afeeee' }, // PaleTurquoise
+            { class: 'logo-28', emoji: '🌳', color: '#228b22' }, // ForestGreen
+            { class: 'logo-29', emoji: '🌸', color: '#ffb6c1' }, // LightPink
+            { class: 'logo-30', emoji: '⚽', color: '#b0c4de' }, // LightSteelBlue
+            { class: 'logo-31', emoji: '🎸', color: '#8b4513' }, // SaddleBrown
+            { class: 'logo-32', emoji: '🚲', color: '#00fa9a' }, // MediumSpringGreen
+            { class: 'logo-33', emoji: '📚', color: '#deb887' }, // BurlyWood
+            { class: 'logo-34', emoji: '☕', color: '#d2b48c' }, // Tan
+            { class: 'logo-35', emoji: '🎁', color: '#f4a460' }, // SandyBrown
+            { class: 'logo-36', emoji: '🎉', color: '#ba55d3' }, // MediumOrchid
+            { class: 'logo-37', emoji: '🌍', color: '#87cefa' }, // LightSkyBlue
+            { class: 'logo-38', emoji: '🔬', color: '#778899' }, // LightSlateGray
+            { class: 'logo-39', emoji: '🔭', color: '#696969' }, // DimGray
+            { class: 'logo-40', emoji: '🛠️', color: '#d3d3d3' }, // LightGray
+            { class: 'logo-41', emoji: '⚖️', color: '#add8e6' }, // LightBlue
+            { class: 'logo-42', emoji: '💰', color: '#b8860b' }, // DarkGoldenRod
+            { class: 'logo-43', emoji: '🛡️', color: '#5f9ea0' }, // CadetBlue
+            { class: 'logo-44', emoji: '🔔', color: '#f0f8ff' }, // AliceBlue
+            { class: 'logo-45', emoji: '⏳', color: '#fa8072' }, // Salmon
+            { class: 'logo-46', emoji: '💾', color: '#3cb371' }, // MediumSeaGreen
+            { class: 'logo-47', emoji: '⚙️', color: '#4682b4' }, // SteelBlue
+            { class: 'logo-48', emoji: '📡', color: '#2e8b57' }, // SeaGreen
+            { class: 'logo-49', emoji: '🌐', color: '#a52a2a' }, // Brown
+            { class: 'logo-50', emoji: '📈', color: '#c71585' }  // MediumVioletRed
+        ];
+
+
+        // --- Utility Functions ---
+
+        function showToast(message, type = 'info', duration = 3000) {
+            toastNotification.textContent = message;
+            toastNotification.className = `toast-notification show ${type}`; // Add type for styling (e.g., 'error', 'success')
+            setTimeout(() => {
+                toastNotification.className = 'toast-notification';
+            }, duration);
+        }
+
+        function formatNumber(num) {
+            if (num >= 1000000) return (num / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
+            if (num >= 1000) return (num / 1000).toFixed(1).replace(/\.0$/, '') + 'k';
+            return num;
+        }
+
+        function showScreen(screenId) {
+            screenSections.forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById(screenId).classList.add('active');
+
+            // Update bottom nav active state
+            bottomNavItems.forEach(item => {
+                if (item.dataset.screen === screenId.replace('-screen', '')) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+
+            // Close sidebar if open
+            sidebar.classList.remove('open');
+        }
+
+        // Function to generate a random logo class (e.g., for new users, search results)
+        function getRandomLogoClass() {
+            const randomIndex = Math.floor(Math.random() * PROFILE_LOGOS.length);
+            return PROFILE_LOGOS[randomIndex].class;
+        }
+
+        function getLogoCssClass(logoName) {
+            const logo = PROFILE_LOGOS.find(l => l.class === logoName);
+            return logo ? `user-${logo.class}` : 'user-logo-1'; // Default to logo-1 if not found
+        }
+
+        // --- Firebase Authentication ---
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                currentUser = user;
+                // Check if user's profile exists in Firestore
+                const userDoc = await db.collection('users').doc(currentUser.uid).get();
+                if (!userDoc.exists || !userDoc.data().username) {
+                    // New user or incomplete profile, redirect to profile setup
+                    showScreen('profile-screen'); // Show profile setup on first login/incomplete
+                    editProfileModal.classList.remove('hidden'); // Automatically open edit profile
+                    showToast("Welcome! Please complete your profile.", 'info', 5000);
+                    myProfileUsername.textContent = "@NewUser"; // Placeholder
+                } else {
+                    // Existing user, load profile and show home feed
+                    loadUserProfile(currentUser.uid);
+                    loadUserCoinsCreditsLimits(currentUser.uid);
+                    showScreen('home-screen');
+                    postsFeed.innerHTML = ''; // Clear existing posts before loading fresh
+                    lastVisiblePost = null; // Reset pagination
+                    postsLoadedCount = 0;
+                    loadPosts(); // Start loading posts for existing users
+                }
+                hideSplashScreen();
+            } else {
+                currentUser = null;
+                // Redirect to login/signup page (You need to implement this)
+                // For now, let's assume a dummy login for demonstration
+                showDummyLogin();
+            }
+        });
+
+        // --- Dummy Login/Signup (Replace with actual Firebase Auth UI) ---
+        function showDummyLogin() {
+            // This is a placeholder. In a real app, you'd show a login/signup form.
+            // For now, let's auto-sign in anonymously or with a fixed user for testing.
+            auth.signInAnonymously().catch((error) => {
+                console.error("Error signing in anonymously:", error);
+                showToast("Error logging in. Please try again.", 'error');
+            });
+            // Or, prompt for email/password and call auth.createUserWithEmailAndPassword / signInWithEmailAndPassword
+        }
+
+        // --- Splash Screen Transition ---
+        function hideSplashScreen() {
+            setTimeout(() => {
+                splashScreen.style.opacity = '0';
+                setTimeout(() => {
+                    splashScreen.classList.add('hidden');
+                    appContainer.classList.remove('hidden');
+                }, 500); // Wait for fade out to complete
+            }, 1000); // Show splash for at least 1-3 seconds
+        }
+
+        // --- Header Coins/Credits/Limits Display ---
+        async function loadUserCoinsCreditsLimits(userId) {
+            if (!userId) return;
+            try {
+                const userDocRef = db.collection('users').doc(userId);
+                userDocRef.onSnapshot(doc => {
+                    if (doc.exists) {
+                        const data = doc.data();
+                        headerCoins.textContent = `${formatNumber(data.coins || 0)} C`;
+                        headerCredits.textContent = `${formatNumber(data.credits || 0)} Cr`;
+                        headerLimit.textContent = `${formatNumber(data.postLimit || 0)} L`;
+                        checkDailyRewardStatus(data.lastRewardClaim || 0); // Check for reward
+                        // Note: Post expiry is better handled with Cloud Functions
+                    }
+                });
+            } catch (error) {
+                console.error("Error fetching user stats:", error);
+                showToast("Error loading user stats.", 'error');
+            }
+        }
+
+        // Click listeners for header stats to trigger ads
+        document.querySelectorAll('.status-display .clickable-stat').forEach(statSpan => {
+            statSpan.addEventListener('click', (e) => {
+                const resourceType = e.currentTarget.dataset.resourceType;
+                if (!currentUser) {
+                    showToast("Please log in to earn resources.", 'info');
+                    return;
+                }
+                let adDetails = {};
+                if (resourceType === 'coins') adDetails = { coins: 10 };
+                else if (resourceType === 'credits') adDetails = { credits: 5 };
+                else if (resourceType === 'limit') adDetails = { limit: 1 };
+                showAdModal(resourceType, adDetails);
+            });
+        });
+
+
+        // --- Daily Reward Logic ---
+        const DAILY_REWARD_INTERVAL = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+        const DAILY_REWARD = { limit: 2, coins: 10, credits: 10 };
+
+        async function checkDailyRewardStatus(lastClaimTimestamp) {
+            if (!currentUser) return;
+            const now = Date.now();
+            const lastClaimTime = lastClaimTimestamp; // Firestore timestamp to milliseconds
+
+            if (now - lastClaimTime >= DAILY_REWARD_INTERVAL) {
+                giftClaimBtn.classList.add('neon-glow'); // Visually indicate available reward
+            } else {
+                giftClaimBtn.classList.remove('neon-glow');
+                const timeRemaining = DAILY_REWARD_INTERVAL - (now - lastClaimTime);
+                console.log(`Next reward in: ${new Date(timeRemaining).toISOString().substr(11, 8)}`);
+            }
+        }
+
+        giftClaimBtn.addEventListener('click', async () => {
+            if (!currentUser) {
+                showToast("Please log in to claim rewards.", 'info');
+                return;
+            }
+
+            try {
+                const userDocRef = db.collection('users').doc(currentUser.uid);
+                const userDoc = await userDocRef.get();
+                const userData = userDoc.data();
+                const lastClaimTime = userData.lastRewardClaim || 0;
+                const now = Date.now();
+
+                if (now - lastClaimTime >= DAILY_REWARD_INTERVAL) {
+                    // Claim reward
+                    await userDocRef.update({
+                        coins: firebase.firestore.FieldValue.increment(DAILY_REWARD.coins),
+                        credits: firebase.firestore.FieldValue.increment(DAILY_REWARD.credits),
+                        postLimit: firebase.firestore.FieldValue.increment(DAILY_REWARD.limit),
+                        lastRewardClaim: now // Update last claim time
+                    });
+                    showRewardPopup(`You claimed your daily reward!\n+${DAILY_REWARD.coins} Coins, +${DAILY_REWARD.credits} Credits, +${DAILY_REWARD.limit} Limits.`);
+                    showToast("Daily reward claimed!", 'success');
+                } else {
+                    const timeRemaining = DAILY_REWARD_INTERVAL - (now - lastClaimTime);
+                    showToast(`Next reward available in: ${new Date(timeRemaining).toISOString().substr(11, 8)}`, 'info', 5000);
+                }
+            } catch (error) {
+                console.error("Error claiming daily reward:", error);
+                showToast("Failed to claim reward. Please try again.", 'error');
+            }
+        });
+
+        function showRewardPopup(message) {
+            rewardMessage.textContent = message;
+            rewardPopup.classList.remove('hidden');
+        }
+
+        closeRewardPopupBtn.addEventListener('click', () => {
+            rewardPopup.classList.add('hidden');
+        });
+
+
+        // --- Data Saver Toggle ---
+        document.getElementById('data-saver-checkbox').addEventListener('change', (e) => {
+            dataSaverEnabled = e.target.checked;
+            showToast(`Data Saver ${dataSaverEnabled ? 'Enabled' : 'Disabled'}`, 'info');
+            // Implement logic to reduce image quality or lazy load more aggressively
+            // when dataSaverEnabled is true during post loading.
+        });
+
+
+        // --- Sidebar Navigation ---
+        menuToggle.addEventListener('click', () => {
+            sidebar.classList.add('open');
+        });
+
+        closeSidebarBtn.addEventListener('click', () => {
+            sidebar.classList.remove('open');
+        });
+
+        sidebar.querySelectorAll('ul li a').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const screenId = e.currentTarget.dataset.screen;
+                if (screenId) {
+                    showScreen(`${screenId}-screen`);
+                    // Specific actions for screens
+                    if (screenId === 'profile') {
+                        loadUserProfile(currentUser.uid); // Load own profile
+                        currentProfileViewingId = currentUser.uid;
+                        updateProfileDisplay(currentUser.uid);
+                    } else if (screenId === 'messages') {
+                        loadRecentChats();
+                        messageListContainer.classList.remove('hidden');
+                        chatWindowContainer.classList.add('hidden');
+                    } else if (screenId === 'home') {
+                        // Reset feed if navigating back to home
+                        postsFeed.innerHTML = '';
+                        lastVisiblePost = null;
+                        postsLoadedCount = 0; // Reset count for loop
+                        loadPosts();
+                    } else if (screenId === 'monetization') {
+                        // No specific action needed for monetization screen yet, just show it
+                    }
+                }
+                sidebar.classList.remove('open');
+            });
+        });
+
+        // Logout Button
+        document.getElementById('logout-btn').addEventListener('click', async () => {
+            try {
+                await auth.signOut();
+                showToast("Logged out successfully.", 'info');
+                // Redirect to login page or show login UI
+                showDummyLogin(); // Back to dummy login for this demo
+            } catch (error) {
+                console.error("Error logging out:", error);
+                showToast("Failed to log out.", 'error');
+            }
+        });
+
+        // --- Bottom Navigation ---
+        bottomNavItems.forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                const screenId = e.currentTarget.dataset.screen;
+                showScreen(`${screenId}-screen`);
+                // Specific actions for screens
+                if (screenId === 'profile') {
+                    loadUserProfile(currentUser.uid); // Load own profile
+                    currentProfileViewingId = currentUser.uid;
+                    updateProfileDisplay(currentUser.uid);
+                } else if (screenId === 'messages') {
+                    loadRecentChats();
+                    messageListContainer.classList.remove('hidden');
+                    chatWindowContainer.classList.add('hidden');
+                } else if (screenId === 'home') {
+                    postsFeed.innerHTML = ''; // Clear existing posts
+                    lastVisiblePost = null; // Reset pagination
+                    postsLoadedCount = 0; // Reset count for loop
+                    loadPosts(); // Reload posts
+                } else if (screenId === 'search') {
+                    searchUserList.innerHTML = '';
+                    searchPostList.innerHTML = '';
+                    noSearchResults.classList.add('hidden');
+                    searchQueryInput.value = '';
+                }
+            });
+        });
+
+
+        // --- Post Loading and Infinite Scrolling ---
+        async function loadPosts() {
+            if (fetchingPosts || !currentUser) return;
+
+            fetchingPosts = true;
+            loadingSpinner.classList.remove('hidden');
+
+            try {
+                let postsRef = db.collection('posts')
+                                .orderBy('timestamp', 'desc')
+                                .limit(postsToLoadPerScroll);
+
+                if (lastVisiblePost) {
+                    postsRef = postsRef.startAfter(lastVisiblePost);
+                }
+
+                const snapshot = await postsRef.get();
+                if (snapshot.empty) {
+                    // If no more new posts, reset lastVisiblePost to null to start from beginning for "never-ending" effect
+                    // To prevent immediate endless loop if only a few posts exist, add a condition
+                    if (postsLoadedCount > 0 && postsLoadedCount % (postsToLoadPerScroll * 3) === 0) { // Example: Reset after 3 full batches
+                        showToast("Looping older posts.", 'info');
+                        lastVisiblePost = null;
+                        postsLoadedCount = 0;
+                        // Recursive call to fetch from beginning
+                        loadPosts();
+                        return;
+                    } else if (postsLoadedCount < postsToLoadPerScroll && postsFeed.children.length > 0) {
+                        // If very few posts initially and still no new ones, just show message for now
+                        // or implement more complex logic to pick random older posts.
+                        showToast("No more new posts to load, you're seeing the feed as it is.", 'info');
+                        loadingSpinner.classList.add('hidden');
+                        fetchingPosts = false;
+                        return;
+                    } else if (postsFeed.children.length === 0) { // If absolutely no posts at all
+                        postsFeed.innerHTML = '<p style="text-align: center; color: #ccc;">No posts available. Be the first to post!</p>';
+                        loadingSpinner.classList.add('hidden');
+                        fetchingPosts = false;
+                        return;
+                    }
+                }
+
+                lastVisiblePost = snapshot.docs[snapshot.docs.length - 1];
+                postsLoadedCount += snapshot.docs.length;
+
+                // Group posts for mixed layout
+                let currentBatch = [];
+                snapshot.docs.forEach(doc => {
+                    currentBatch.push({ id: doc.id, ...doc.data() });
+                });
+
+                // Apply random layout logic
+                let tempPosts = [...currentBatch];
+                while (tempPosts.length > 0) {
+                    const randomLayout = Math.floor(Math.random() * 3); // 0: vertical, 1: horizontal, 2: table
+
+                    if (randomLayout === 0 || tempPosts.length < 4) { // Vertical or not enough for other layouts
+                        const post = tempPosts.shift();
+                        renderPost(post, 'vertical-post');
+                    } else if (randomLayout === 1 && tempPosts.length >= 2) { // Horizontal (2-3 posts)
+                        const numHorizontal = Math.min(tempPosts.length, Math.floor(Math.random() * 2) + 2); // 2 or 3
+                        const horizontalContainer = document.createElement('div');
+                        horizontalContainer.className = 'horizontal-post-container';
+                        for (let i = 0; i < numHorizontal; i++) {
+                            const post = tempPosts.shift();
+                            horizontalContainer.appendChild(createPostElement(post, 'horizontal-post'));
+                        }
+                        postsFeed.appendChild(horizontalContainer);
+                    } else if (randomLayout === 2 && tempPosts.length >= 4) { // Table (4-6 posts)
+                        const numTable = Math.min(tempPosts.length, Math.floor(Math.random() * 3) + 4); // 4, 5, or 6
+                        const tableContainer = document.createElement('div');
+                        tableContainer.className = 'table-post-container';
+                        for (let i = 0; i < numTable; i++) {
+                            const post = tempPosts.shift();
+                            tableContainer.appendChild(createPostElement(post, 'table-post'));
+                        }
+                        postsFeed.appendChild(tableContainer);
+                    } else { // Fallback to vertical if conditions not met
+                        const post = tempPosts.shift();
+                        renderPost(post, 'vertical-post');
+                    }
+                }
+            } catch (error) {
+                console.error("Error loading posts:", error);
+                showToast("Error loading posts. Please refresh.", 'error');
+            } finally {
+                loadingSpinner.classList.add('hidden');
+                fetchingPosts = false;
+            }
+        }
+
+        function createPostElement(postData, layoutClass = 'vertical-post') {
+            const postCard = document.createElement('div');
+            postCard.className = `post-card ${layoutClass}`;
+            postCard.dataset.postId = postData.id;
+
+            // Determine if the current user has liked this post
+            const hasLiked = postData.likedBy && postData.likedBy.includes(currentUser.uid);
+            const likeIconClass = hasLiked ? 'fas fa-heart' : 'far fa-heart';
+
+            const userProfileClass = getLogoCssClass(postData.userProfileLogo || getRandomLogoClass());
+
+            postCard.innerHTML = `
+                <div class="post-header">
+                    <div class="profile-avatar ${userProfileClass}" data-user-id="${postData.userId}"></div>
+                    <span class="username" data-user-id="${postData.userId}">@${postData.username}</span>
+                    <div class="post-options">
+                        <i class="fas fa-ellipsis-v"></i>
+                        <div class="options-dropdown hidden">
+                            <span class="report-btn">Report</span>
+                            ${postData.userId === currentUser.uid ? `<span class="delete-btn">Delete</span>` : ''}
+                        </div>
+                    </div>
+                </div>
+                <div class="post-content">
+                    <p>${formatPostContent(postData.content)}</p>
+                    ${dataSaverEnabled && postData.imageUrl ? `<img src="${postData.imageUrl}" alt="Post Image" style="filter: blur(5px);">` : postData.imageUrl ? `<img src="${postData.imageUrl}" alt="Post Image">` : ''}
+                </div>
+                <div class="post-footer">
+                    <div class="post-actions">
+                        <span class="like-button"><i class="${likeIconClass}"></i> <span class="like-count">${formatNumber(postData.likes || 0)}</span></span>
+                        <span class="views-count"><i class="fas fa-eye"></i> <span class="view-count-num">${formatNumber(postData.views || 0)}</span></span>
+                        <span class="translate-button"><i class="fas fa-language"></i></span>
+                    </div>
+                    <div class="post-reactions" data-post-id="${postData.id}">
+                        ${renderEmojiReactions(postData.reactions)}
+                        <span class="total-reactions">${formatNumber(Object.values(postData.reactions || {}).reduce((a, b) => a + b, 0))} reactions</span>
+                    </div>
+                </div>
+                <div class="emoji-picker hidden">
+                    <span class="emoji-option" data-emoji="👍">👍</span>
+                    <span class="emoji-option" data-emoji="❤️">❤️</span>
+                    <span class="emoji-option" data-emoji="😂">😂</span>
+                    <span class="emoji-option" data-emoji="😢">😢</span>
+                    <span class="emoji-option" data-emoji="🔥">🔥</span>
+                </div>
+            `;
+
+            addPostEventListeners(postCard, postData);
+            return postCard;
+        }
+
+        function renderPost(postData, layoutClass = 'vertical-post') {
+            const postElement = createPostElement(postData, layoutClass);
+            postsFeed.appendChild(postElement);
+        }
+
+        function formatPostContent(content) {
+            // Convert URLs to clickable links
+            const urlRegex = /(https?:\/\/[^\s]+)/g;
+            return content.replace(urlRegex, (url) => `<a href="${url}" target="_blank" style="color: #00ffff; text-decoration: underline;">${url}</a>`);
+        }
+
+        function renderEmojiReactions(reactions) {
+            if (!reactions) return '';
+            const topEmojis = Object.entries(reactions)
+                .filter(([, count]) => count > 0) // Only show emojis with counts > 0
+                .sort(([, a], [, b]) => b - a)
+                .slice(0, 3); // Get top 3
+            
+            let html = '<span class="emoji-reaction-display">';
+            topEmojis.forEach(([emoji, count]) => {
+                html += `<span class="emoji">${emoji}</span><span class="count">${formatNumber(count)}</span>`;
+            });
+            html += '</span>';
+            return html;
+        }
+
+        // Add event listeners for post elements
+        let lastClickTime = 0;
+        let clickTimer;
+        let longPressTimer;
+        let currentNeonPost = null;
+
+        function addPostEventListeners(postElement, postData) {
+            const postId = postData.id;
+            const likeButton = postElement.querySelector('.like-button');
+            const likeButtonIcon = likeButton.querySelector('i');
+            const likeCountSpan = likeButton.querySelector('.like-count');
+            const postOptionsBtn = postElement.querySelector('.post-options .fa-ellipsis-v');
+            const optionsDropdown = postElement.querySelector('.options-dropdown');
+            const reportBtn = postElement.querySelector('.report-btn');
+            const deleteBtn = postElement.querySelector('.delete-btn');
+            const translateBtn = postElement.querySelector('.translate-button');
+            const profileAvatar = postElement.querySelector('.profile-avatar');
+            const usernameSpan = postElement.querySelector('.username');
+            const emojiPicker = postElement.querySelector('.emoji-picker');
+            const postReactionsDisplay = postElement.querySelector('.post-reactions'); // The container for reaction emojis
+
+            // Profile Click
+            if (profileAvatar) {
+                profileAvatar.addEventListener('click', (e) => {
+                    e.stopPropagation(); // Prevent triggering post's click/long-press
+                    openUserProfile(postData.userId);
+                });
+            }
+            if (usernameSpan) {
+                usernameSpan.addEventListener('click', (e) => {
+                    e.stopPropagation(); // Prevent triggering post's click/long-press
+                    openUserProfile(postData.userId);
+                });
+            }
+
+            // Double-click for Like & Single click for Neon
+            postElement.addEventListener('click', (e) => {
+                // Exclude clicks on specific interactive elements inside the post
+                if (e.target.closest('.like-button') || e.target.closest('.post-options') || e.target.closest('.translate-button') || e.target.closest('.emoji-picker') || e.target.closest('.profile-avatar') || e.target.closest('.username')) {
+                    return; // Don't trigger post's click/double-click if these are clicked
+                }
+
+                const currentTime = new Date().getTime();
+                const timeDiff = currentTime - lastClickTime;
+
+                if (timeDiff < 300 && timeDiff > 0) { // Double click detected (within 300ms)
+                    clearTimeout(clickTimer);
+                    handleLike(postId, postElement);
+                    lastClickTime = 0; // Reset for next double click
+                } else {
+                    // Single click for neon effect
+                    clearTimeout(clickTimer);
+                    clickTimer = setTimeout(() => {
+                        handleNeonEffect(postElement);
+                    }, 300); // Wait to see if it's a double click
+                }
+                lastClickTime = currentTime;
+            });
+
+            // Long press for emoji reactions
+            // Use touch events for mobile, mouse events for desktop for long press simulation
+            postElement.addEventListener('touchstart', (e) => {
+                if (e.target.closest('.like-button') || e.target.closest('.post-options') || e.target.closest('.translate-button') || e.target.closest('.emoji-picker') || e.target.closest('.profile-avatar') || e.target.closest('.username')) {
+                    return; // Don't trigger long press if these are clicked
+                }
+                e.preventDefault(); // Prevent default touch behavior like scrolling for better long press detection
+                clearTimeout(clickTimer); // Clear potential single/double click
+                longPressTimer = setTimeout(() => {
+                    emojiPicker.classList.remove('hidden');
+                }, 800); // 800ms for long press (adjust as needed)
+            }, { passive: false }); // Use passive: false to allow preventDefault
+
+            postElement.addEventListener('touchend', () => {
+                clearTimeout(longPressTimer);
+            });
+
+            // For desktop long press (optional, usually right-click is enough)
+            // You could also detect mousedown/mouseup for a longer press
+            postElement.addEventListener('contextmenu', (e) => {
+                e.preventDefault(); // Prevent default right-click context menu
+                emojiPicker.classList.remove('hidden');
+            });
+
+            // Hide emoji picker if clicking outside
+            document.addEventListener('click', (e) => {
+                if (emojiPicker && !emojiPicker.contains(e.target) && !postElement.contains(e.target)) {
+                    emojiPicker.classList.add('hidden');
+                }
+            });
+
+
+            // Emoji selection
+            emojiPicker.querySelectorAll('.emoji-option').forEach(emojiOption => {
+                emojiOption.addEventListener('click', async (e) => {
+                    const selectedEmoji = e.target.dataset.emoji;
+                    await handleEmojiReaction(postId, selectedEmoji, postElement);
+                    emojiPicker.classList.add('hidden');
+                });
+            });
+
+            // Like button explicit click (for consistency, even with double-click)
+            if (likeButton) {
+                likeButton.addEventListener('click', (e) => {
+                    e.stopPropagation(); // Prevent post's double click/neon effect
+                    handleLike(postId, postElement);
+                });
+            }
+
+            // Post Options (Report/Delete)
+            if (postOptionsBtn) {
+                postOptionsBtn.addEventListener('click', (e) => {
+                    e.stopPropagation(); // Prevent post click/neon effect
+                    optionsDropdown.classList.toggle('hidden');
+                });
+
+                // Close dropdown if clicking outside
+                document.addEventListener('click', (e) => {
+                    if (optionsDropdown && !postOptionsBtn.contains(e.target) && !optionsDropdown.contains(e.target)) {
+                        optionsDropdown.classList.add('hidden');
+                    }
+                });
+            }
+
+            if (reportBtn) {
+                reportBtn.addEventListener('click', () => {
+                    handleReportPost(postId);
+                    optionsDropdown.classList.add('hidden');
+                });
+            }
+
+            if (deleteBtn) {
+                deleteBtn.addEventListener('click', () => {
+                    handleDeletePost(postId, postElement);
+                    optionsDropdown.classList.add('hidden');
+                });
+            }
+
+            if (translateBtn) {
+                translateBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    showToast("Translate feature coming soon!", 'info');
+                    // Implement translation API integration here
+                });
+            }
+
+            // Views count - increment on first unique view per user (simplified client-side)
+            incrementViewCount(postId);
+        }
+
+        // Function to handle the neon effect
+        function handleNeonEffect(postElement) {
+            // Remove neon from previously highlighted post
+            if (currentNeonPost && currentNeonPost !== postElement) {
+                currentNeonPost.classList.remove('neon-glow');
+            }
+            // Add neon to current post
+            postElement.classList.add('neon-glow');
+            currentNeonPost = postElement;
+
+            // Remove neon after 3-4 seconds
+            setTimeout(() => {
+                if (postElement) { // Check if element still exists (e.g., if deleted)
+                    postElement.classList.remove('neon-glow');
+                    if (currentNeonPost === postElement) {
+                        currentNeonPost = null;
+                    }
+                }
+            }, 3500); // 3.5 seconds
+        }
+
+        // Like functionality
+        async function handleLike(postId, postElement) {
+            if (!currentUser) {
+                showToast("Please log in to like posts.", 'info');
+                return;
+            }
+
+            const likeButtonIcon = postElement.querySelector('.like-button i');
+            const likeCountSpan = postElement.querySelector('.like-button .like-count');
+
+            try {
+                const postRef = db.collection('posts').doc(postId);
+                const userRef = db.collection('users').doc(currentUser.uid); // For potential future tracking of user's liked posts
+
+                const postDoc = await postRef.get();
+                if (!postDoc.exists) {
+                    showToast("Post not found.", 'error');
+                    return;
+                }
+
+                const postData = postDoc.data();
+                const likedBy = postData.likedBy || [];
+
+                let newLikes = postData.likes || 0;
+                let action = '';
+
+                if (likedBy.includes(currentUser.uid)) {
+                    // Unlike
+                    newLikes = Math.max(0, newLikes - 1); // Ensure likes don't go negative
+                    likeButtonIcon.classList.remove('fas');
+                    likeButtonIcon.classList.add('far');
+                    action = 'remove';
+                } else {
+                    // Like
+                    newLikes++;
+                    likeButtonIcon.classList.remove('far');
+                    likeButtonIcon.classList.add('fas');
+                    action = 'add';
+                }
+
+                await db.runTransaction(async (transaction) => {
+                    const updatedLikedBy = action === 'add'
+                        ? firebase.firestore.FieldValue.arrayUnion(currentUser.uid)
+                        : firebase.firestore.FieldValue.arrayRemove(currentUser.uid);
+
+                    transaction.update(postRef, {
+                        likes: newLikes,
+                        likedBy: updatedLikedBy
+                    });
+                });
+
+                likeCountSpan.textContent = formatNumber(newLikes);
+                showToast(action === 'add' ? "Post liked!" : "Post unliked.", 'success');
+
+            } catch (error) {
+                console.error("Error liking post:", error);
+                showToast("Failed to like/unlike post. Try again.", 'error');
+            }
+        }
+
+        // Emoji Reaction functionality
+        async function handleEmojiReaction(postId, emoji, postElement) {
+            if (!currentUser) {
+                showToast("Please log in to react to posts.", 'info');
+                return;
+            }
+
+            try {
+                const postRef = db.collection('posts').doc(postId);
+
+                const postDoc = await postRef.get();
+                if (!postDoc.exists) {
+                    showToast("Post not found.", 'error');
+                    return;
+                }
+
+                const postData = postDoc.data();
+                const currentReactions = postData.reactions || {};
+                const userReactions = postData.userReactions || {}; // Tracks what each user reacted with
+
+                const existingReaction = userReactions[currentUser.uid];
+
+                await db.runTransaction(async (transaction) => {
+                    let updatedUserReactions = { ...userReactions };
+                    let updatedReactionsCount = { ...currentReactions };
+
+                    if (existingReaction) {
+                        // If user already reacted, decrement count of old emoji
+                        updatedReactionsCount[existingReaction] = (updatedReactionsCount[existingReaction] || 1) - 1;
+                        if (updatedReactionsCount[existingReaction] <= 0) {
+                            delete updatedReactionsCount[existingReaction];
+                        }
+                    }
+
+                    if (existingReaction === emoji) {
+                        // User clicked the same emoji again, un-react
+                        delete updatedUserReactions[currentUser.uid];
+                    } else {
+                        // New reaction, or changing reaction
+                        updatedReactionsCount[emoji] = (updatedReactionsCount[emoji] || 0) + 1;
+                        updatedUserReactions[currentUser.uid] = emoji;
+                    }
+
+                    transaction.update(postRef, {
+                        reactions: updatedReactionsCount,
+                        userReactions: updatedUserReactions // Store user specific reaction
+                    });
+                });
+
+                // Update UI immediately (optimistic update)
+                const updatedPostDoc = await postRef.get(); // Re-fetch to get latest counts for rendering
+                const updatedPostData = updatedPostDoc.data();
+
+                const emojiReactionDisplayElement = postElement.querySelector('.emoji-reaction-display');
+                const totalReactionsElement = postElement.querySelector('.total-reactions');
+                
+                emojiReactionDisplayElement.innerHTML = renderEmojiReactions(updatedPostData.reactions);
+                totalReactionsElement.textContent = `${formatNumber(Object.values(updatedPostData.reactions || {}).reduce((a, b) => a + b, 0))} reactions`;
+
+                showToast("Emoji reaction sent!", 'success');
+
+            } catch (error) {
+                console.error("Error sending emoji reaction:", error);
+                showToast("Failed to send reaction. Try again.", 'error');
+            }
+        }
+
+
+        // View Count functionality
+        async function incrementViewCount(postId) {
+            if (!currentUser) return; // Only count views from logged-in users
+
+            const viewsRef = db.collection('postViews').doc(postId);
+            const postRef = db.collection('posts').doc(postId);
+            const viewCountSpan = document.querySelector(`.post-card[data-post-id="${postId}"] .view-count-num`);
+
+            try {
+                await db.runTransaction(async (transaction) => {
+                    const viewsDoc = await transaction.get(viewsRef);
+                    let viewsData = viewsDoc.exists ? viewsDoc.data() : { totalViews: 0, viewedBy: {} };
+                    const viewedBy = viewsData.viewedBy || {};
+
+                    let userViewCount = viewedBy[currentUser.uid] || 0;
+
+                    if (userViewCount < 1) { // Count as 1 unique view per user (simplified)
+                        viewsData.totalViews = (viewsData.totalViews || 0) + 1;
+                        viewedBy[currentUser.uid] = (viewedBy[currentUser.uid] || 0) + 1; // Mark user as having viewed
+
+                        transaction.set(viewsRef, {
+                            totalViews: viewsData.totalViews,
+                            viewedBy: viewedBy
+                        }, { merge: true });
+
+                        // Atomically update the post's main view count
+                        transaction.update(postRef, {
+                            views: firebase.firestore.FieldValue.increment(1)
+                        });
+
+                        if (viewCountSpan) {
+                            viewCountSpan.textContent = formatNumber(viewsData.totalViews); // Optimistic update
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error("Error incrementing view count:", error);
+            }
+        }
+
+        // Refresh Posts Button
+        refreshPostsBtn.addEventListener('click', () => {
+            postsFeed.innerHTML = ''; // Clear current posts
+            lastVisiblePost = null; // Reset pagination
+            postsLoadedCount = 0; // Reset count for loop
+            loadPosts(); // Reload posts from the beginning
+            showToast("Posts feed refreshed!", 'info');
+        });
+
+        // Infinite Scroll Listener
+        mainContent.addEventListener('scroll', () => {
+            if (mainContent.scrollTop + mainContent.clientHeight >= mainContent.scrollHeight - 100 &&
+                document.getElementById('home-screen').classList.contains('active')) {
+                loadPosts();
+            }
+        });
+
+
+        // --- Post Upload Functionality ---
+        publishPostBtn.addEventListener('click', async () => {
+            if (!currentUser) {
+                showToast("Please log in to upload posts.", 'error');
+                return;
+            }
+
+            const content = postContentInput.value.trim();
+            const imageFile = postImageInput.files[0];
+            const boostHours = parseInt(postBoostSelect.value);
+
+            if (!content && !imageFile) {
+                showToast("Please enter some content or upload an image.", 'error');
+                return;
+            }
+
+            // Check coins and limits
+            const userDocRef = db.collection('users').doc(currentUser.uid);
+            const userDoc = await userDocRef.get();
+            const userData = userDoc.data();
+
+            const currentCoins = userData.coins || 0;
+            const currentLimit = userData.postLimit || 0;
+
+            const requiredCoins = 0; // Free posts
+            const requiredLimit = 1; // Always costs 1 limit
+            let adsRequiredForBoost = 0;
+
+            if (boostHours === 18) adsRequiredForBoost = 1;
+            else if (boostHours === 24) adsRequiredForBoost = 2;
+            else if (boostHours === 30) adsRequiredForBoost = 3;
+
+            // A more complex check for boost if it required coins later:
+            // const boostCost = (boostHours === 18) ? 10 : (boostHours === 24) ? 20 : (boostHours === 30) ? 30 : 0;
+            // if (currentCoins < boostCost || currentLimit < requiredLimit) { ... }
+
+            if (currentLimit < requiredLimit) {
+                showToast("You need 1 post limit to upload. Watch an ad to earn.", 'error', 5000);
+                showAdModal('limit', { requiredLimit: requiredLimit - currentLimit });
+                return;
+            }
+
+            // Deduct limit
+            try {
+                await userDocRef.update({
+                    postLimit: firebase.firestore.FieldValue.increment(-requiredLimit)
+                });
+            } catch (error) {
+                console.error("Error deducting limit for post:", error);
+                showToast("Failed to deduct post limit. Please try again.", 'error');
+                return;
+            }
+
+            uploadStatus.textContent = "Uploading post...";
+            publishPostBtn.disabled = true;
+
+            try {
+                let imageUrl = '';
+                if (imageFile) {
+                    const storageRef = storage.ref(`post_images/${currentUser.uid}/${Date.now()}_${imageFile.name}`);
+                    const uploadTask = await storageRef.put(imageFile);
+                    imageUrl = await uploadTask.ref.getDownloadURL();
+                }
+
+                const newPostRef = db.collection('posts').doc(); // Auto-generated ID
+                await newPostRef.set({
+                    userId: currentUser.uid,
+                    username: userData.username, // Use user's current username
+                    userProfileLogo: userData.profileLogo || getRandomLogoClass(), // User's chosen logo
+                    content: content,
+                    imageUrl: imageUrl,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    likes: 0,
+                    views: 0,
+                    reactions: {},
+                    userReactions: {},
+                    boostHours: boostHours,
+                    expiryTime: firebase.firestore.Timestamp.fromMillis(Date.now() + (boostHours * 60 * 60 * 1000))
+                });
+
+                // Increment user's post count
+                await userDocRef.update({
+                    postCount: firebase.firestore.FieldValue.increment(1)
+                });
+
+                uploadStatus.textContent = "Post uploaded successfully!";
+                showToast("Post uploaded successfully!", 'success');
+                postContentInput.value = '';
+                postImageInput.value = '';
+                postBoostSelect.value = '12';
+                showScreen('home-screen'); // Navigate back to home feed
+                postsFeed.innerHTML = ''; // Clear and reload posts
+                lastVisiblePost = null;
+                postsLoadedCount = 0; // Reset for home feed to reload from start
+                loadPosts();
+
+            } catch (error) {
+                console.error("Error publishing post:", error);
+                if (error.code === 'permission-denied' || error.message.includes('Missing or insufficient permissions')) {
+                    uploadStatus.textContent = "Error: Permission denied. Check Firebase rules.";
+                    showToast("Error publishing post: Missing or insufficient permissions. Contact admin.", 'error', 5000);
+                } else {
+                    uploadStatus.textContent = `Error: ${error.message}`;
+                    showToast("Failed to upload post. Try again.", 'error');
+                }
+                // Revert limit if upload failed after deduction
+                await userDocRef.update({
+                    postLimit: firebase.firestore.FieldValue.increment(requiredLimit)
+                });
+            } finally {
+                publishPostBtn.disabled = false;
+            }
+        });
+
+        // Ad Modal Logic
+        let currentAdPurpose = ''; // 'post-upload', 'message-credit', 'limit', 'coins'
+        let adRewardDetails = {};
+
+        function showAdModal(purpose, details = {}) {
+            currentAdPurpose = purpose;
+            adRewardDetails = details;
+            adModal.classList.remove('hidden');
+            closeAdModalBtn.disabled = true; // Disable close until ad "finishes"
+
+            // Simulate ad playback
+            const adPlaceholder = document.getElementById('ad-placeholder');
+            adPlaceholder.innerHTML = '<p>Simulating Ad (5 seconds)...</p><div class="loader"></div>';
+            
+            setTimeout(() => {
+                adPlaceholder.innerHTML = '<p>Ad Complete!</p>';
+                closeAdModalBtn.disabled = false;
+                showToast("Ad completed! You can now claim your reward.", 'success');
+            }, 5000); // Simulate 5-second ad
+        }
+
+        closeAdModalBtn.addEventListener('click', async () => {
+            adModal.classList.add('hidden');
+            // Reward logic based on currentAdPurpose and adRewardDetails
+            await processAdReward();
+        });
+
+        async function processAdReward() {
+            if (!currentUser) return;
+
+            try {
+                const userDocRef = db.collection('users').doc(currentUser.uid);
+                let rewardMessageText = "Reward Claimed: ";
+                let updateData = {};
+
+                if (currentAdPurpose === 'coins') {
+                    const coinsToAward = adRewardDetails.coins || 10;
+                    updateData.coins = firebase.firestore.FieldValue.increment(coinsToAward);
+                    rewardMessageText += `+${coinsToAward} Coins`;
+                } else if (currentAdPurpose === 'credits') {
+                    const creditsToAward = adRewardDetails.credits || 5;
+                    updateData.credits = firebase.firestore.FieldValue.increment(creditsToAward);
+                    rewardMessageText += `+${creditsToAward} Credits`;
+                } else if (currentAdPurpose === 'limit') {
+                    const limitsToAward = adRewardDetails.limit || 1;
+                    updateData.postLimit = firebase.firestore.FieldValue.increment(limitsToAward);
+                    rewardMessageText += `+${limitsToAward} Post Limit`;
+                } else if (currentAdPurpose === 'message-credit') { // From messaging screen
+                    const creditsToAward = adRewardDetails.requiredCredits || 1;
+                    updateData.credits = firebase.firestore.FieldValue.increment(creditsToAward);
+                    rewardMessageText += `+${creditsToAward} Credits for Messaging`;
+                } else if (currentAdPurpose === 'post-upload') { // From upload screen (for general resources)
+                    const coinsToAward = adRewardDetails.coins || 10;
+                    const limitsToAward = adRewardDetails.limit || 1;
+                    updateData.coins = firebase.firestore.FieldValue.increment(coinsToAward);
+                    updateData.postLimit = firebase.firestore.FieldValue.increment(limitsToAward);
+                    rewardMessageText += `+${coinsToAward} Coins, +${limitsToAward} Post Limit`;
+                }
+
+                if (Object.keys(updateData).length > 0) {
+                    await userDocRef.update(updateData);
+                    showRewardPopup(rewardMessageText);
+                    showToast("Reward processed!", 'success');
+                } else {
+                    showToast("No specific reward defined for this ad purpose.", 'info');
+                }
+
+
+            } catch (error) {
+                console.error("Error processing ad reward:", error);
+                showToast("Failed to process ad reward. Try again.", 'error');
+            } finally {
+                currentAdPurpose = ''; // Reset
+                adRewardDetails = {}; // Reset
+            }
+        }
+
+
+        // --- Profile Management ---
+        async function loadUserProfile(userId) {
+            if (!userId) return;
+            currentProfileViewingId = userId; // Set the ID of the profile currently being viewed
+
+            try {
+                const userDoc = await db.collection('users').doc(userId).get();
+                if (userDoc.exists) {
+                    const userData = userDoc.data();
+                    updateProfileDisplay(userData);
+                    loadProfilePosts(userId);
+
+                    // Show/hide follow/message buttons based on whose profile it is
+                    if (userId === currentUser.uid) {
+                        editProfileBtn.classList.remove('hidden');
+                        followUserBtn.classList.add('hidden');
+                        unfollowUserBtn.classList.add('hidden');
+                        messageUserBtn.classList.add('hidden');
+                        profileWhatsappLink.classList.add('hidden');
+                        profileInstagramLink.classList.add('hidden');
+                    } else {
+                        editProfileBtn.classList.add('hidden');
+                        messageUserBtn.classList.remove('hidden'); // Always allow messaging
+                        // Check follow status
+                        const currentUserDoc = await db.collection('users').doc(currentUser.uid).get();
+                        const currentUserData = currentUserDoc.data();
+                        if (currentUserData.following && currentUserData.following.includes(userId)) {
+                            followUserBtn.classList.add('hidden');
+                            unfollowUserBtn.classList.remove('hidden');
+                        } else {
+                            followUserBtn.classList.remove('hidden');
+                            unfollowUserBtn.classList.add('hidden');
+                        }
+
+                        // Show social links if available
+                        if (userData.whatsapp) {
+                            profileWhatsappLink.classList.remove('hidden');
+                            profileWhatsappLink.href = `https://wa.me/${userData.whatsapp.replace(/\D/g, '')}`;
+                        } else {
+                            profileWhatsappLink.classList.add('hidden');
+                            profileWhatsappLink.removeAttribute('href');
+                        }
+                        if (userData.instagram) {
+                            profileInstagramLink.classList.remove('hidden');
+                            profileInstagramLink.href = `https://www.instagram.com/${userData.instagram}`;
+                        } else {
+                            profileInstagramLink.classList.add('hidden');
+                            profileInstagramLink.removeAttribute('href');
+                        }
+                    }
+                } else {
+                    showToast("User profile not found.", 'error');
+                    // If user not found and it's not the current user trying to set up profile, revert to home
+                    if (userId !== currentUser.uid) {
+                        showScreen('home-screen');
+                    }
+                }
+            } catch (error) {
+                console.error("Error loading user profile:", error);
+                showToast("Error loading profile. Try again.", 'error');
+            }
+        }
+
+        function updateProfileDisplay(userData) {
+            // Determine which user's profile is being displayed
+            const isCurrentUserProfile = userData.uid === currentUser.uid;
+
+            myProfileUsername.textContent = `@${userData.username || 'NewUser'}`;
+            currentProfileUsernamePosts.textContent = userData.username || 'Me';
+
+            // Set dynamic profile logo
+            const profileLogoClass = getLogoCssClass(userData.profileLogo || getRandomLogoClass());
+            myProfileAvatar.className = `profile-avatar-large ${profileLogoClass}`; // Correctly apply class
+
+            myPostsCount.textContent = formatNumber(userData.postCount || 0);
+            myFollowersCount.textContent = formatNumber(userData.followersCount || 0);
+            myFollowingCount.textContent = formatNumber(userData.followingCount || 0);
+
+            // Set social links (already handled in loadUserProfile based on currentProfileViewingId)
+
+            // Set edit profile modal inputs if it's the current user's profile
+            if (isCurrentUserProfile) {
+                editUsernameInput.value = userData.username || '';
+                editWhatsappInput.value = userData.whatsapp || '';
+                editInstagramInput.value = userData.instagram || '';
+                populateProfileLogoOptions(userData.profileLogo);
+            }
+        }
+
+        async function loadProfilePosts(userId) {
+            profilePostsFeed.innerHTML = ''; // Clear existing posts
+            try {
+                const querySnapshot = await db.collection('posts')
+                    .where('userId', '==', userId)
+                    .orderBy('timestamp', 'desc')
+                    .limit(10) // Initial load limit for profile posts
+                    .get();
+
+                if (querySnapshot.empty) {
+                    profilePostsFeed.innerHTML = '<p style="text-align: center; color: #ccc;">No posts yet.</p>';
+                    return;
+                }
+
+                querySnapshot.docs.forEach(doc => {
+                    profilePostsFeed.appendChild(createPostElement({ id: doc.id, ...doc.data() }));
+                });
+                // Implement infinite scroll for profile posts similarly if needed
+            } catch (error) {
+                console.error("Error loading profile posts:", error);
+                profilePostsFeed.innerHTML = '<p style="text-align: center; color: red;">Error loading posts.</p>';
+            }
+        }
+
+        // Edit Profile Modal
+        editProfileBtn.addEventListener('click', () => {
+            editProfileModal.classList.remove('hidden');
+            // Pre-populate fields from current user data (already done by updateProfileDisplay)
+        });
+
+        cancelEditProfileBtn.addEventListener('click', () => {
+            editProfileModal.classList.add('hidden');
+        });
+
+        // Username Availability Check
+        let usernameCheckTimeout;
+        editUsernameInput.addEventListener('input', async () => {
+            clearTimeout(usernameCheckTimeout);
+            usernameAvailability.textContent = ''; // Clear previous status
+            usernameAvailability.className = '';
+
+            const newUsername = editUsernameInput.value.trim();
+            if (newUsername === '') return;
+
+            const userDoc = await db.collection('users').doc(currentUser.uid).get();
+            const currentUsername = userDoc.data().username;
+
+            if (newUsername === currentUsername) { // If username hasn't changed
+                usernameAvailability.textContent = 'Username is available.';
+                usernameAvailability.classList.add('success-text');
+                return;
+            }
+
+            usernameCheckTimeout = setTimeout(async () => {
+                try {
+                    const usersRef = db.collection('users');
+                    const snapshot = await usersRef.where('username', '==', newUsername).get();
+
+                    if (snapshot.empty) {
+                        usernameAvailability.textContent = 'Username is available.';
+                        usernameAvailability.classList.add('success-text');
+                    } else {
+                        usernameAvailability.textContent = 'Username already taken.';
+                        usernameAvailability.classList.add('error-text');
+                    }
+                } catch (error) {
+                    console.error("Error checking username availability:", error);
+                    usernameAvailability.textContent = 'Error checking username.';
+                    usernameAvailability.classList.add('error-text');
+                }
+            }, 500); // Debounce
+        });
+
+        // Populate Profile Logo Options
+        function populateProfileLogoOptions(currentLogoClass) {
+            profileLogoOptions.innerHTML = '';
+            PROFILE_LOGOS.forEach(logo => {
+                const logoItem = document.createElement('div');
+                logoItem.className = `logo-option-item profile-avatar user-${logo.class}`; // Apply correct class
+                logoItem.dataset.logoClass = logo.class;
+                
+                // No need to dynamically append <style> tags here. The CSS should already define
+                // .profile-avatar.user-logo-X rules based on PROFILE_LOGOS data.
+                // We only need to ensure the correct class is applied to the element.
+
+                if (currentLogoClass === logo.class) {
+                    logoItem.classList.add('selected');
+                }
+
+                logoItem.addEventListener('click', () => {
+                    profileLogoOptions.querySelectorAll('.logo-option-item').forEach(item => item.classList.remove('selected'));
+                    logoItem.classList.add('selected');
+                });
+                profileLogoOptions.appendChild(logoItem);
+            });
+        }
+
+        // Save Profile Changes
+        saveProfileBtn.addEventListener('click', async () => {
+            if (!currentUser) return;
+
+            const newUsername = editUsernameInput.value.trim();
+            const newWhatsapp = editWhatsappInput.value.trim();
+            const newInstagram = editInstagramInput.value.trim();
+            const selectedLogoElement = profileLogoOptions.querySelector('.logo-option-item.selected');
+            const newProfileLogo = selectedLogoElement ? selectedLogoElement.dataset.logoClass : null;
+
+            if (newUsername === '') {
+                showToast("Username cannot be empty.", 'error');
+                return;
+            }
+
+            // Ensure at least one contact method is provided (optional, but good for robust app)
+            // if (newWhatsapp === '' && newInstagram === '') {
+            //     showToast("Please provide at least a WhatsApp number or Instagram ID.", 'error');
+            //     return;
+            // }
+
+            try {
+                const userDocRef = db.collection('users').doc(currentUser.uid);
+                const userDoc = await userDocRef.get();
+                const currentData = userDoc.data();
+
+                // Check username uniqueness again before saving
+                if (newUsername !== currentData.username) {
+                    const usernameSnapshot = await db.collection('users').where('username', '==', newUsername).get();
+                    if (!usernameSnapshot.empty) {
+                        showToast("Username already taken. Please choose another.", 'error');
+                        return;
+                    }
+                }
+
+                await userDocRef.update({
+                    username: newUsername,
+                    whatsapp: newWhatsapp,
+                    instagram: newInstagram,
+                    profileLogo: newProfileLogo,
+                    // Initialize follower/following counts if they don't exist
+                    followersCount: currentData.followersCount || 0,
+                    followingCount: currentData.followingCount || 0,
+                    postCount: currentData.postCount || 0,
+                    // Initialize coins, credits, limit if new user
+                    coins: currentData.coins !== undefined ? currentData.coins : 100, // Starting bonus if undefined
+                    credits: currentData.credits !== undefined ? currentData.credits : 50,
+                    postLimit: currentData.postLimit !== undefined ? currentData.postLimit : 5,
+                    lastRewardClaim: currentData.lastRewardClaim !== undefined ? currentData.lastRewardClaim : 0
+                });
+
+                // Update username in existing posts if it changed
+                if (newUsername !== currentData.username) {
+                    const postsSnapshot = await db.collection('posts').where('userId', '==', currentUser.uid).get();
+                    const batch = db.batch();
+                    postsSnapshot.docs.forEach(doc => {
+                        const postRef = db.collection('posts').doc(doc.id);
+                        batch.update(postRef, { username: newUsername });
+                    });
+                    await batch.commit();
+                }
+
+                editProfileModal.classList.add('hidden');
+                showToast("Profile updated successfully!", 'success');
+                loadUserProfile(currentUser.uid); // Reload profile display
+            } catch (error) {
+                console.error("Error saving profile:", error);
+                showToast("Failed to save profile. Please try again.", 'error');
+            }
+        });
+
+        // Follow/Unfollow Logic
+        followUserBtn.addEventListener('click', () => handleFollow(currentProfileViewingId));
+        unfollowUserBtn.addEventListener('click', () => handleUnfollow(currentProfileViewingId));
+
+        async function handleFollow(targetUserId) {
+            if (!currentUser || currentUser.uid === targetUserId) {
+                showToast("Cannot follow yourself or not logged in.", 'info');
+                return;
+            }
+
+            try {
+                const currentUserRef = db.collection('users').doc(currentUser.uid);
+                const targetUserRef = db.collection('users').doc(targetUserId);
+
+                await db.runTransaction(async (transaction) => {
+                    const currentUserDoc = await transaction.get(currentUserRef);
+                    const targetUserDoc = await transaction.get(targetUserRef);
+
+                    if (!currentUserDoc.exists || !targetUserDoc.exists) {
+                        throw "User not found.";
+                    }
+
+                    const currentUserData = currentUserDoc.data();
+                    // Check if already following inside transaction for atomicity
+                    if (currentUserData.following && currentUserData.following.includes(targetUserId)) {
+                        return; // Already following, no action needed in transaction
+                    }
+
+                    // Update current user's following list and count
+                    transaction.update(currentUserRef, {
+                        following: firebase.firestore.FieldValue.arrayUnion(targetUserId),
+                        followingCount: firebase.firestore.FieldValue.increment(1)
+                    });
+
+                    // Update target user's followers list and count
+                    transaction.update(targetUserRef, {
+                        followers: firebase.firestore.FieldValue.arrayUnion(currentUser.uid),
+                        followersCount: firebase.firestore.FieldValue.increment(1)
+                    });
+                });
+
+                // Only show toast and update UI if transaction completed successfully (i.e., actually followed)
+                const updatedCurrentUserDoc = await db.collection('users').doc(currentUser.uid).get();
+                if (updatedCurrentUserDoc.data().following.includes(targetUserId)) {
+                    showToast("Followed user!", 'success');
+                    followUserBtn.classList.add('hidden');
+                    unfollowUserBtn.classList.remove('hidden');
+                    loadUserProfile(currentProfileViewingId); // Refresh counts
+                } else {
+                    showToast("Already following.", 'info'); // This case means the transaction found they were already following
+                }
+
+            } catch (error) {
+                console.error("Error following user:", error);
+                showToast(`Failed to follow: ${error.message || error}`, 'error');
+            }
+        }
+
+        async function handleUnfollow(targetUserId) {
+            if (!currentUser || currentUser.uid === targetUserId) {
+                showToast("Cannot unfollow yourself or not logged in.", 'info');
+                return;
+            }
+
+            try {
+                const currentUserRef = db.collection('users').doc(currentUser.uid);
+                const targetUserRef = db.collection('users').doc(targetUserId);
+
+                await db.runTransaction(async (transaction) => {
+                    const currentUserDoc = await transaction.get(currentUserRef);
+                    const targetUserDoc = await transaction.get(targetUserRef);
+
+                    if (!currentUserDoc.exists || !targetUserDoc.exists) {
+                        throw "User not found.";
+                    }
+
+                    const currentUserData = currentUserDoc.data();
+                    // Check if currently following inside transaction for atomicity
+                    if (!currentUserData.following || !currentUserData.following.includes(targetUserId)) {
+                        return; // Not following, no action needed in transaction
+                    }
+
+                    // Update current user's following list and count
+                    transaction.update(currentUserRef, {
+                        following: firebase.firestore.FieldValue.arrayRemove(targetUserId),
+                        followingCount: firebase.firestore.FieldValue.increment(-1)
+                    });
+
+                    // Update target user's followers list and count
+                    transaction.update(targetUserRef, {
+                        followers: firebase.firestore.FieldValue.arrayRemove(currentUser.uid),
+                        followersCount: firebase.firestore.FieldValue.increment(-1)
+                    });
+                });
+
+                // Only show toast and update UI if transaction completed successfully (i.e., actually unfollowed)
+                const updatedCurrentUserDoc = await db.collection('users').doc(currentUser.uid).get();
+                if (!(updatedCurrentUserDoc.data().following && updatedCurrentUserDoc.data().following.includes(targetUserId))) {
+                    showToast("Unfollowed user.", 'info');
+                    followUserBtn.classList.remove('hidden');
+                    unfollowUserBtn.classList.add('hidden');
+                    loadUserProfile(currentProfileViewingId); // Refresh counts
+                } else {
+                    showToast("Not currently following.", 'info'); // This case means the transaction found they were not following
+                }
+
+            } catch (error) {
+                console.error("Error unfollowing user:", error);
+                showToast(`Failed to unfollow: ${error.message || error}`, 'error');
+            }
+        }
+
+        // View Followers/Following Lists
+        document.querySelectorAll('.clickable-stat').forEach(stat => {
+            stat.addEventListener('click', (e) => {
+                const statType = e.currentTarget.dataset.stat; // 'followers' or 'following'
+                const userId = currentProfileViewingId; // The user whose profile is currently open
+                if (userId) {
+                    showFollowList(userId, statType);
+                }
+            });
+        });
+
+        async function showFollowList(userId, type) {
+            followListContent.innerHTML = '<div class="loader" style="margin: 20px auto;"></div>';
+            followListTitle.textContent = type === 'followers' ? 'Followers' : 'Following';
+            followListModal.classList.remove('hidden');
+
+            try {
+                const userDoc = await db.collection('users').doc(userId).get();
+                if (!userDoc.exists) {
+                    followListContent.innerHTML = '<p style="text-align: center;">User not found.</p>';
+                    return;
+                }
+
+                const userRefs = userDoc.data()[type] || []; // Array of UIDs
+                if (userRefs.length === 0) {
+                    followListContent.innerHTML = `<p style="text-align: center;">No ${type} found.</p>`;
+                    return;
+                }
+
+                const usersData = [];
+                // Fetch details for each user in the list (can be slow for many users)
+                for (const uid of userRefs) {
+                    const refDoc = await db.collection('users').doc(uid).get();
+                    if (refDoc.exists) {
+                        usersData.push({ id: refDoc.id, ...refDoc.data() });
+                    }
+                }
+
+                followListContent.innerHTML = '';
+                for (const user of usersData) { // Use for...of for async operations
+                    const userItem = document.createElement('li');
+                    userItem.className = 'search-user-item';
+                    userItem.dataset.userId = user.id; // Store user ID
+
+                    const userLogoClass = getLogoCssClass(user.profileLogo || getRandomLogoClass());
+
+                    let followBtnHtml = '';
+                    if (currentUser.uid !== user.id) { // Don't show follow button for self
+                        const currentUserDoc = await db.collection('users').doc(currentUser.uid).get();
+                        const followingList = currentUserDoc.data().following || [];
+                        const isFollowing = followingList.includes(user.id);
+                        const btnClass = isFollowing ? 'secondary-btn' : 'primary-btn';
+                        const btnText = isFollowing ? 'Following' : 'Follow';
+                        followBtnHtml = `<button class="btn small ${btnClass} follow-btn" data-target-id="${user.id}">${btnText}</button>`;
+                    }
+
+                    userItem.innerHTML = `
+                        <div class="profile-avatar small ${userLogoClass}"></div>
+                        <span class="search-username">@${user.username}</span>
+                        ${followBtnHtml}
+                    `;
+                    followListContent.appendChild(userItem);
+
+                    const followBtn = userItem.querySelector('.follow-btn');
+                    if (followBtn) {
+                        followBtn.addEventListener('click', async (e) => {
+                            e.stopPropagation(); // Prevent opening profile
+                            const targetId = e.target.dataset.targetId;
+                            if (e.target.textContent === 'Follow') {
+                                await handleFollow(targetId);
+                                e.target.textContent = 'Following';
+                                e.target.classList.add('secondary-btn');
+                                e.target.classList.remove('primary-btn');
+                            } else {
+                                await handleUnfollow(targetId);
+                                e.target.textContent = 'Follow';
+                                e.target.classList.add('primary-btn');
+                                e.target.classList.remove('secondary-btn');
+                            }
+                        });
+                    }
+
+                    // Make the entire list item clickable to open profile
+                    userItem.addEventListener('click', () => {
+                        followListModal.classList.add('hidden'); // Close modal
+                        openUserProfile(user.id); // Open clicked user's profile
+                    });
+                }
+            } catch (error) {
+                console.error("Error loading follow list:", error);
+                followListContent.innerHTML = '<p style="text-align: center; color: red;">Error loading list.</p>';
+                showToast("Error loading follow list.", 'error');
+            }
+        }
+
+        closeFollowListModalBtn.addEventListener('click', () => {
+            followListModal.classList.add('hidden');
+        });
+
+        // Navigate to another user's profile
+        function openUserProfile(userId) {
+            if (userId === currentUser.uid) {
+                showScreen('profile-screen'); // If clicking on own profile, just navigate
+                loadUserProfile(currentUser.uid);
+            } else {
+                showScreen('profile-screen');
+                loadUserProfile(userId); // Load specific user's profile
+            }
+        }
+
+        // --- Messaging ---
+        messageUserBtn.addEventListener('click', () => {
+            if (!currentProfileViewingId) return;
+            openChatWindow(currentProfileViewingId);
+        });
+
+        async function loadRecentChats() {
+            if (!currentUser) return;
+            recentChatsList.innerHTML = '<div class="loader" style="margin: 20px auto;"></div>';
+
+            try {
+                const chats = {};
+
+                // Listen to messages where current user is sender OR receiver
+                // This query fetches all messages involving the current user,
+                // which might be inefficient for very large message counts.
+                // A better approach for scaling would be to have a 'chats' collection
+                // with chat document IDs like `chat_USER1ID_USER2ID` to easily retrieve messages.
+
+                const querySnapshot = await db.collection('messages')
+                    .where('participants', 'array-contains', currentUser.uid)
+                    .orderBy('timestamp', 'desc')
+                    .limit(50) // Limit the number of messages to process for recent chats
+                    .get();
+
+                querySnapshot.docs.forEach(doc => {
+                    const data = doc.data();
+                    // Determine the other participant in the chat
+                    const otherParticipantId = data.senderId === currentUser.uid ? data.receiverId : data.senderId;
+
+                    // Only consider messages from within the last 7 days for recent chats
+                    const sevenDaysAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
+                    if (data.timestamp.toMillis() < sevenDaysAgo) return;
+
+
+                    // Keep track of the latest message for each chat partner
+                    if (!chats[otherParticipantId] || data.timestamp.toMillis() > chats[otherParticipantId].timestamp) {
+                        chats[otherParticipantId] = {
+                            partnerId: otherParticipantId,
+                            lastMessage: data.content,
+                            timestamp: data.timestamp.toMillis(),
+                            isSender: data.senderId === currentUser.uid
+                        };
+                    }
+                });
+
+                const chatPartners = Object.values(chats).sort((a, b) => b.timestamp - a.timestamp);
+
+                if (chatPartners.length === 0) {
+                    recentChatsList.innerHTML = '<p style="text-align: center; color: #ccc;">No recent chats.</p>';
+                    return;
+                }
+
+                recentChatsList.innerHTML = '';
+                for (const chat of chatPartners) { // Use for...of for async operations
+                    const partnerDoc = await db.collection('users').doc(chat.partnerId).get();
+                    if (partnerDoc.exists) {
+                        const partnerData = partnerDoc.data();
+                        const chatItem = document.createElement('li');
+                        chatItem.className = 'chat-item';
+                        chatItem.dataset.userId = partnerData.uid;
+
+                        const partnerLogoClass = getLogoCssClass(partnerData.profileLogo || getRandomLogoClass());
+
+                        chatItem.innerHTML = `
+                            <div class="profile-avatar small ${partnerLogoClass}"></div>
+                            <div class="chat-info">
+                                <span class="chat-username">@${partnerData.username}</span>
+                                <span class="last-message">${chat.isSender ? 'You: ' : ''}${chat.lastMessage}</span>
+                            </div>
+                        `;
+                        chatItem.addEventListener('click', () => openChatWindow(partnerData.uid));
+                        recentChatsList.appendChild(chatItem);
+                    }
+                }
+            } catch (error) {
+                console.error("Error loading recent chats:", error);
+                showToast("Error loading chats.", 'error');
+                recentChatsList.innerHTML = '<p style="text-align: center; color: red;">Error loading chats.</p>';
+            }
+        }
+
+        async function openChatWindow(partnerId) {
+            if (!currentUser) return;
+            currentChatPartnerId = partnerId;
+            messageListContainer.classList.add('hidden');
+            chatWindowContainer.classList.remove('hidden');
+            chatMessages.innerHTML = '<div class="loader" style="margin: 20px auto;"></div>';
+
+            try {
+                const partnerDoc = await db.collection('users').doc(partnerId).get();
+                if (partnerDoc.exists) {
+                    chatPartnerUsername.textContent = `@${partnerDoc.data().username}`;
+                    // Set partner avatar
+                    const partnerAvatar = chatWindowContainer.querySelector('.profile-avatar.small');
+                    const partnerLogoClass = getLogoCssClass(partnerDoc.data().profileLogo || getRandomLogoClass());
+                    partnerAvatar.className = `profile-avatar small ${partnerLogoClass}`;
+                } else {
+                    chatPartnerUsername.textContent = "@UnknownUser";
+                }
+
+                // Real-time listener for messages in the specific chat
+                // Create a composite query for direct messages between two users
+                const chatQuery1 = db.collection('messages')
+                    .where('senderId', '==', currentUser.uid)
+                    .where('receiverId', '==', partnerId);
+                
+                const chatQuery2 = db.collection('messages')
+                    .where('senderId', '==', partnerId)
+                    .where('receiverId', '==', currentUser.uid);
+
+                // Combine results using a snapshot listener, sorting by timestamp
+                // Firestore does not directly support OR queries on different fields,
+                // so you'd typically query for `participants` array or use two queries and merge results,
+                // or a Cloud Function to handle complex chat queries.
+                // For simplicity and to fit client-side, we'll listen to a common `participants` array
+                // as structured in the send message function.
+
+                db.collection('messages')
+                    .where('participants', 'array-contains', currentUser.uid)
+                    .orderBy('timestamp', 'asc')
+                    .limit(100) // Limit chat history
+                    .onSnapshot(snapshot => {
+                        chatMessages.innerHTML = ''; // Clear existing messages
+                        snapshot.docs.forEach(doc => {
+                            const message = doc.data();
+                            // Filter messages relevant to the current chat partner
+                            const isRelevant = (message.senderId === currentUser.uid && message.receiverId === partnerId) ||
+                                            (message.senderId === partnerId && message.receiverId === currentUser.uid);
+                            
+                            if (isRelevant) {
+                                const messageBubble = document.createElement('div');
+                                messageBubble.className = `message-bubble ${message.senderId === currentUser.uid ? 'right' : 'left'}`;
+                                messageBubble.textContent = message.content;
+                                chatMessages.appendChild(messageBubble);
+                            }
+                        });
+                        chatMessages.scrollTop = chatMessages.scrollHeight; // Scroll to bottom
+                    }, error => {
+                        console.error("Error getting messages:", error);
+                        chatMessages.innerHTML = '<p style="text-align: center; color: red;">Error loading messages.</p>';
+                        showToast("Error loading messages.", 'error');
+                    });
+
+                // Long press emoji picker for chat messages (similar to posts)
+                const emojiPickerChat = chatWindowContainer.querySelector('.emoji-picker-chat');
+                if (emojiPickerChat) { // Ensure element exists
+                    messageInput.addEventListener('touchstart', (e) => {
+                        clearTimeout(longPressTimer);
+                        longPressTimer = setTimeout(() => {
+                            emojiPickerChat.classList.remove('hidden');
+                        }, 800);
+                    }, { passive: false });
+
+                    messageInput.addEventListener('touchend', () => {
+                        clearTimeout(longPressTimer);
+                    });
+
+                    // For desktop, right-click to open emoji picker in chat
+                    messageInput.addEventListener('contextmenu', (e) => {
+                        e.preventDefault();
+                        emojiPickerChat.classList.remove('hidden');
+                    });
+
+                    document.addEventListener('click', (e) => {
+                        if (emojiPickerChat && !emojiPickerChat.contains(e.target) && !messageInput.contains(e.target)) {
+                            emojiPickerChat.classList.add('hidden');
+                        }
+                    });
+
+                    emojiPickerChat.querySelectorAll('.emoji-option').forEach(emojiOption => {
+                        emojiOption.addEventListener('click', (e) => {
+                            const selectedEmoji = e.target.dataset.emoji;
+                            messageInput.value += ` ${selectedEmoji} `; // Append emoji to input
+                            emojiPickerChat.classList.add('hidden');
+                        });
+                    });
+                }
+
+
+            } catch (error) {
+                console.error("Error opening chat window:", error);
+                showToast("Failed to open chat. Try again.", 'error');
+            }
+        }
+
+        backToChatsBtn.addEventListener('click', () => {
+            messageListContainer.classList.remove('hidden');
+            chatWindowContainer.classList.add('hidden');
+            currentChatPartnerId = null;
+            // Note: Detaching Firestore listeners for chat is important in a production app to avoid memory leaks.
+            // This example doesn't include explicit detach logic for simplicity, but it's good practice.
+        });
+
+        sendMessageBtn.addEventListener('click', async () => {
+            if (!currentUser || !currentChatPartnerId) return;
+
+            const messageContent = messageInput.value.trim();
+            if (messageContent === '') return;
+
+            // Check credits
+            const userDocRef = db.collection('users').doc(currentUser.uid);
+            const userDoc = await userDocRef.get();
+            const userData = userDoc.data();
+            const currentCredits = userData.credits || 0;
+
+            if (currentCredits < 1) {
+                showToast("You need 1 credit to send a message. Watch an ad to earn.", 'error', 5000);
+                showAdModal('message-credit', { requiredCredits: 1 });
+                return;
+            }
+
+            try {
+                await userDocRef.update({
+                    credits: firebase.firestore.FieldValue.increment(-1)
+                });
+
+                await db.collection('messages').add({
+                    senderId: currentUser.uid,
+                    receiverId: currentChatPartnerId,
+                    content: messageContent,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    participants: [currentUser.uid, currentChatPartnerId], // For easier querying (needs composite index)
+                    read: false // Can be used for read receipts
+                });
+
+                messageInput.value = ''; // Clear input
+                chatMessages.scrollTop = chatMessages.scrollHeight; // Scroll to bottom
+                showToast("Message sent!", 'success');
+
+            } catch (error) {
+                console.error("Error sending message:", error);
+                if (error.code === 'permission-denied' || error.message.includes('Missing or insufficient permissions')) {
+                    showToast("Error sending message: Missing or insufficient permissions. Check Firebase rules.", 'error', 5000);
+                } else {
+                    showToast("Failed to send message. Try again.", 'error');
+                }
+                // Revert credit if failed
+                await userDocRef.update({
+                    credits: firebase.firestore.FieldValue.increment(1)
+                });
+            }
+        });
+
+
+        // --- Search Functionality ---
+        searchBtn.addEventListener('click', () => performSearch());
+        searchQueryInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                performSearch();
+            }
+        });
+
+        async function performSearch() {
+            const query = searchQueryInput.value.trim().toLowerCase();
+            searchUserList.innerHTML = '';
+            searchPostList.innerHTML = '';
+            noSearchResults.classList.add('hidden');
+
+            if (query === '') {
+                showToast("Please enter a search query.", 'info');
+                return;
+            }
+
+            let foundResults = false;
+
+            // Search Users
+            try {
+                const userSnapshot = await db.collection('users')
+                    .where('username', '>=', query)
+                    .where('username', '<=', query + '\uf8ff')
+                    .limit(10) // Limit search results
+                    .get();
+
+                if (!userSnapshot.empty) {
+                    foundResults = true;
+                    for (const doc of userSnapshot.docs) { // Use for...of for async inside loop
+                        const userData = { id: doc.id, ...doc.data() };
+                        const userItem = document.createElement('li');
+                        userItem.className = 'search-user-item';
+                        userItem.dataset.userId = userData.id;
+
+                        const userLogoClass = getLogoCssClass(userData.profileLogo || getRandomLogoClass());
+
+                        let followBtnHtml = '';
+                        if (currentUser.uid !== userData.id) { // Don't show follow button for self
+                            const currentUserDoc = await db.collection('users').doc(currentUser.uid).get();
+                            const followingList = currentUserDoc.data().following || [];
+                            const isFollowing = followingList.includes(userData.id);
+                            const btnClass = isFollowing ? 'secondary-btn' : 'primary-btn';
+                            const btnText = isFollowing ? 'Following' : 'Follow';
+                            followBtnHtml = `<button class="btn small ${btnClass} follow-btn" data-target-id="${userData.id}">${btnText}</button>`;
+                        }
+
+                        userItem.innerHTML = `
+                            <div class="profile-avatar small ${userLogoClass}"></div>
+                            <span class="search-username">@${userData.username}</span>
+                            ${followBtnHtml}
+                        `;
+                        searchUserList.appendChild(userItem);
+
+                        const followBtn = userItem.querySelector('.follow-btn');
+                        if (followBtn) {
+                            followBtn.addEventListener('click', async (e) => {
+                                e.stopPropagation(); // Prevent opening profile
+                                const targetId = e.target.dataset.targetId;
+                                if (e.target.textContent === 'Follow') {
+                                    await handleFollow(targetId);
+                                    e.target.textContent = 'Following';
+                                    e.target.classList.add('secondary-btn');
+                                    e.target.classList.remove('primary-btn');
+                                } else {
+                                    await handleUnfollow(targetId);
+                                    e.target.textContent = 'Follow';
+                                    e.target.classList.add('primary-btn');
+                                    e.target.classList.remove('secondary-btn');
+                                }
+                            });
+                        }
+                        userItem.addEventListener('click', () => openUserProfile(userData.id));
+                    }
+                }
+            } catch (error) {
+                console.error("Error searching users:", error);
+                showToast("Error searching users.", 'error');
+            }
+
+            // Search Posts (by content, basic matching)
+            try {
+                // This is highly inefficient for large datasets for full-text search.
+                // For production, use Algolia or client-side indexing.
+                const postSnapshot = await db.collection('posts')
+                    .orderBy('timestamp', 'desc')
+                    .limit(20) // Search more posts to find matches
+                    .get();
+
+                postSnapshot.docs.forEach(doc => {
+                    const postData = { id: doc.id, ...doc.data() };
+                    // Simple client-side check if content includes query (case-insensitive)
+                    if (postData.content && postData.content.toLowerCase().includes(query)) {
+                        foundResults = true;
+                        searchPostList.appendChild(createPostElement(postData));
+                    }
+                });
+            } catch (error) {
+                console.error("Error searching posts:", error);
+                showToast("Error searching posts.", 'error');
+            }
+
+            if (!foundResults) {
+                noSearchResults.classList.remove('hidden');
+            }
+        }
+
+        // --- Post Options (Report/Delete) ---
+        async function handleReportPost(postId) {
+            if (!currentUser) {
+                showToast("Please log in to report posts.", 'info');
+                return;
+            }
+            // Implement reporting logic (e.g., add to a 'reports' collection)
+            try {
+                await db.collection('reports').add({
+                    postId: postId,
+                    reportedBy: currentUser.uid,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    status: 'pending'
+                });
+                showToast("Post reported successfully. We will review it.", 'info');
+            } catch (error) {
+                console.error("Error reporting post:", error);
+                showToast("Failed to report post.", 'error');
+            }
+        }
+
+        async function handleDeletePost(postId, postElement) {
+            if (!currentUser) return;
+
+            // Verify ownership before deleting
+            try {
+                const postRef = db.collection('posts').doc(postId);
+                const postDoc = await postRef.get();
+
+                if (postDoc.exists && postDoc.data().userId === currentUser.uid) {
+                    if (confirm("Are you sure you want to delete this post? This action cannot be undone.")) {
+                        await postRef.delete();
+                        // Also delete related likes, reactions, views (requires more complex logic, e.g., cloud functions)
+                        // For simplicity, we only delete the post document here.
+                        postElement.remove(); // Remove from UI
+                        showToast("Post deleted successfully.", 'success');
+
+                        // Decrement user's post count
+                        await db.collection('users').doc(currentUser.uid).update({
+                            postCount: firebase.firestore.FieldValue.increment(-1)
+                        });
+                    }
+                } else {
+                    showToast("You can only delete your own posts.", 'error');
+                }
+            } catch (error) {
+                console.error("Error deleting post:", error);
+                showToast("Failed to delete post. Try again.", 'error');
+            }
+        }
+
+
+        // --- Initial Loads ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initial screen setup if user is already authenticated (handled by onAuthStateChanged)
+            // If not authenticated, login/signup flow will handle initial screen.
+            // Ensure the splash screen is visible initially
+            splashScreen.classList.remove('hidden');
+            appContainer.classList.add('hidden'); // Hide app container initially
+        });
+
+        // Initial call to load posts or handle login is done in auth.onAuthStateChanged
+    </script>
 </body>
 </html>
