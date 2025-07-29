@@ -2035,23 +2035,47 @@
 
 
         // --- Splash Screen & Initial Load ---
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                splashScreen.style.opacity = '0';
-                setTimeout(() => {
-                    splashScreen.classList.add('hidden');
-                    // Check auth state and show correct screen after splash fades
-                    auth.onAuthStateChanged(user => {
-                        if (user) {
-                            appContainer.classList.remove('hidden');
-                            showScreen('feed-screen'); // Show feed after login
-                        } else {
-                            authScreen.classList.remove('hidden');
-                        }
-                    });
-                }, 1000); // Wait for splash fade-out animation
-            }, 2000); // Splash screen visible for 2 seconds
-        });
+        // Get references to your elements
+const splashScreen = document.getElementById('splash-screen');
+const appContainer = document.getElementById('app-container');
+const authScreen = document.getElementById('auth-screen');
+
+// Function to show a specific screen
+function showScreen(screenId) {
+    // Hide all main screens first (if you have multiple)
+    // For simplicity, we'll just show the target and hide the other main one.
+    if (screenId === 'feed-screen') {
+        appContainer.classList.remove('hidden');
+        authScreen.classList.add('hidden'); // Ensure auth screen is hidden
+        // Potentially show the specific feed-screen div within appContainer if needed
+        document.getElementById('feed-screen').classList.remove('hidden'); // If feed-screen is also hidden initially
+    } else if (screenId === 'auth-screen') {
+        authScreen.classList.remove('hidden');
+        appContainer.classList.add('hidden'); // Ensure app container is hidden
+    }
+}
+
+
+window.addEventListener('load', () => {
+    // Splash screen visible for 2 seconds (initial delay)
+    setTimeout(() => {
+        splashScreen.style.opacity = '0'; // Start fading out the splash screen
+
+        // Wait for splash fade-out animation (1 second)
+        setTimeout(() => {
+            splashScreen.classList.add('hidden'); // Fully remove splash screen from layout
+
+            // Check auth state and show correct screen after splash fades
+            auth.onAuthStateChanged(user => {
+                if (user) {
+                    showScreen('feed-screen'); // User logged in, show feed
+                } else {
+                    showScreen('auth-screen'); // User not logged in, show auth screen
+                }
+            });
+        }, 1000); // This should match the CSS transition duration for opacity
+    }, 2000); // Splash screen remains fully opaque for 2 seconds
+});
 
         // --- Authentication Logic ---
         auth.onAuthStateChanged(user => {
