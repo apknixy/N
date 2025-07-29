@@ -1,124 +1,183 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your App</title>
-    <link rel="stylesheet" href="style.css"> <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> </head>
+    <title>Add Mint</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-storage-compat.js"></script>
+    </head>
 <body>
-
     <div id="splash-screen" class="splash-screen">
-        <img src="your_app_logo.png" alt="App Logo" class="splash-logo">
-        <p>Loading...</p>
+        <div class="splash-logo"></div>
+        <p class="splash-text">Add Mint</p>
     </div>
 
-    <div id="main-content" class="app-container" style="display: none;">
+    <div id="app-container" class="app-container hidden">
         <header class="app-header">
             <div class="header-left">
-                <div class="app-logo">Your App Name</div>
+                <button id="menu-toggle" class="icon-button"></button> </div>
+            <div class="header-center">
+                <span class="app-title">Add Mint</span>
             </div>
             <div class="header-right">
-                <div id="gift-icon" class="header-icon gift-pulsing">
-                    <i class="fas fa-gift"></i>
-                    <span id="gift-countdown" class="gift-countdown-text" style="display: none;"></span>
-                </div>
-                <div id="refresh-posts-icon" class="header-icon" style="display: none;">
-                    <i class="fas fa-sync-alt"></i>
-                </div>
-                <div class="header-icon"><i class="fas fa-bell"></i></div>
-                <div class="header-icon"><i class="fas fa-user-circle"></i></div>
+                <button id="gift-button" class="icon-button gift-icon"></button>
+                <button id="refresh-posts-button" class="icon-button refresh-icon"></button>
             </div>
         </header>
 
-        <main class="app-main">
-            <nav class="app-nav">
-                <ul class="nav-list">
-                    <li class="nav-item active" data-section="feed"><a href="#"><i class="fas fa-home"></i> Home</a></li>
-                    <li class="nav-item" data-section="upload"><a href="#"><i class="fas fa-upload"></i> Upload Post</a></li>
-                    <li class="nav-item" data-section="messages"><a href="#"><i class="fas fa-envelope"></i> Messages</a></li>
-                    <li class="nav-item" data-section="profile"><a href="#"><i class="fas fa-user"></i> Profile</a></li>
-                </ul>
-            </nav>
+        <nav id="side-menu" class="side-menu">
+            <ul class="menu-list">
+                <li><a href="#" id="menu-profile">My Profile</a></li>
+                <li><a href="#" id="menu-search">Search</a></li>
+                <li><a href="#" id="menu-messages">Messages</a></li>
+                <li><a href="#" id="menu-upload">Upload Post</a></li>
+                <li class="menu-separator"></li>
+                <li><a href="#" id="menu-data-saver">Data Saver <span class="toggle-switch"></span></a></li>
+                <li><a href="#" id="menu-instagram">Instagram <span class="social-icon instagram-icon"></span></a></li>
+                <li><a href="#" id="menu-youtube">YouTube <span class="social-icon youtube-icon"></span></a></li>
+                <li><a href="#" id="menu-about">About Us</a></li>
+                <li><a href="#" id="menu-privacy-policy">Privacy Policy</a></li>
+                <li><button id="logout-button">Logout</button></li>
+            </ul>
+        </nav>
+        <div id="overlay" class="overlay"></div> <main class="main-content">
+            <section id="auth-section" class="auth-section active">
+                <h2>Welcome to Add Mint</h2>
+                <div id="login-form">
+                    <h3>Login</h3>
+                    <input type="email" id="login-email" placeholder="Email">
+                    <input type="password" id="login-password" placeholder="Password">
+                    <button id="login-btn">Login</button>
+                </div>
+                <div id="signup-form">
+                    <h3>Sign Up</h3>
+                    <input type="email" id="signup-email" placeholder="Email">
+                    <input type="password" id="signup-password" placeholder="Password">
+                    <button id="signup-btn">Sign Up</button>
+                </div>
+            </section>
 
-            <section id="feed-section" class="content-section active">
-                <h2>Post Feed</h2>
+            <section id="profile-setup-section" class="profile-setup-section hidden">
+                <h2>Complete Your Profile</h2>
+                <input type="text" id="setup-name" placeholder="Full Name">
+                <input type="text" id="setup-username" placeholder="Unique Username">
+                <span id="username-status"></span> <input type="text" id="setup-whatsapp" placeholder="WhatsApp Number (Optional)">
+                <input type="text" id="setup-instagram" placeholder="Instagram ID (Optional)">
+                <div class="profile-logo-selection">
+                    <h3>Choose a Profile Logo:</h3>
+                    <div id="logo-options">
+                        </div>
+                </div>
+                <button id="complete-profile-btn">Complete Profile</button>
+            </section>
+
+            <section id="feed-section" class="feed-section hidden active-section">
                 <div id="posts-container" class="posts-container">
-                    <p>Loading posts...</p>
+                    </div>
+                <div id="loading-spinner" class="loading-spinner hidden"></div>
+            </section>
+
+            <section id="user-profile-section" class="user-profile-section hidden">
+                <div class="profile-header">
+                    <div class="profile-avatar"></div>
+                    <h3 id="profile-display-name"></h3>
+                    <p id="profile-display-username"></p>
+                    <div class="profile-stats">
+                        <span id="profile-followers">0 Followers</span>
+                        <span id="profile-following">0 Following</span>
+                    </div>
+                    <div class="profile-actions">
+                        <button id="follow-button" class="action-button follow-button">Follow</button>
+                        <button id="message-button" class="action-button message-button">Message</button>
+                        <button id="profile-whatsapp-button" class="social-button whatsapp-icon hidden"></button>
+                        <button id="profile-instagram-button" class="social-button instagram-icon hidden"></button>
+                    </div>
+                </div>
+                <div id="user-posts-container" class="user-posts-container">
+                    </div>
+            </section>
+
+            <section id="search-section" class="search-section hidden">
+                <input type="text" id="search-input" placeholder="Search users, posts...">
+                <div id="search-results" class="search-results">
+                    <div id="user-search-results" class="user-search-results">
+                        <h4>Users</h4>
+                        </div>
+                    <div id="post-search-results" class="post-search-results">
+                        <h4>Posts</h4>
+                        </div>
                 </div>
             </section>
 
-            <section id="upload-section" class="content-section" style="display: none;">
+            <section id="messages-section" class="messages-section hidden">
+                <div class="chat-list" id="chat-list">
+                    </div>
+                <div class="chat-window hidden" id="chat-window">
+                    <div class="chat-header">
+                        <button class="back-to-chat-list">&lt; Back</button>
+                        <h4 id="chat-partner-name"></h4>
+                    </div>
+                    <div class="messages-display" id="messages-display">
+                        </div>
+                    <div class="message-input-area">
+                        <input type="text" id="message-input" placeholder="Type your message...">
+                        <button id="send-message-button">Send</button>
+                        <button id="emoji-reaction-button" class="emoji-button"></button> </div>
+                </div>
+            </section>
+
+            <section id="upload-section" class="upload-section hidden">
                 <h2>Upload New Post</h2>
-                <form id="upload-post-form">
-                    <input type="text" id="post-title" placeholder="Post Title" required>
-                    <textarea id="post-content" placeholder="What's on your mind?" rows="5" required></textarea>
-                    <input type="file" id="post-image" accept="image/*">
-                    <button type="submit">Upload Post</button>
-                </form>
-                <div id="upload-status" class="status-message"></div>
+                <input type="file" id="post-image-input" accept="image/*">
+                <textarea id="post-caption-input" placeholder="Write your caption..."></textarea>
+                <div class="post-boost-options">
+                    <label>
+                        <input type="radio" name="boost-hours" value="12" checked> 12 Hours (Free)
+                    </label>
+                    <label>
+                        <input type="radio" name="boost-hours" value="18"> 18 Hours (1 Ad)
+                    </label>
+                    <label>
+                        <input type="radio" name="boost-hours" value="24"> 24 Hours (2 Ads)
+                    </label>
+                    <label>
+                        <input type="radio" name="boost-hours" value="30"> 30 Hours (3 Ads)
+                    </label>
+                </div>
+                <button id="upload-post-button">Upload Post</button>
             </section>
 
-            <section id="messages-section" class="content-section" style="display: none;">
-                <h2>Your Messages</h2>
-                <div id="message-chats-list" class="message-chats-list">
-                    <p>Select a chat from the footer or start a new one.</p>
+            <div id="reward-popup" class="reward-popup hidden">
+                <div class="reward-content">
+                    <h3 id="reward-title">Daily Reward!</h3>
+                    <p id="reward-message"></p>
+                    <button id="claim-reward-button">Claim</button>
+                    <button id="close-reward-popup">Close</button>
                 </div>
-                <div id="chat-input-area" class="chat-input-area" style="display: none;">
-                    <input type="text" id="message-text" placeholder="Type your message...">
-                    <button id="send-message-btn">Send</button>
-                    <div id="message-status" class="status-message"></div>
-                </div>
-            </section>
+            </div>
 
-            <section id="profile-section" class="content-section" style="display: none;">
-                <h2>User Profile</h2>
-                <p>Welcome, User!</p>
-                </section>
+            <div id="ad-viewer" class="ad-viewer hidden">
+                <p>Watching an Ad...</p>
+                <div class="ad-progress-bar"></div>
+                <button id="skip-ad-button" class="hidden">Skip Ad (for testing)</button>
+            </div>
+
 
         </main>
 
-        <footer class="app-footer">
-            <div class="footer-item active" data-section="feed">
-                <i class="fas fa-home"></i>
-                <span>Home</span>
-            </div>
-            <div class="footer-item" data-section="upload">
-                <i class="fas fa-upload"></i>
-                <span>Upload</span>
-            </div>
-            <div class="footer-item" data-section="messages-list">
-                <i class="fas fa-envelope"></i>
-                <span>Messages</span>
-            </div>
-            <div class="footer-item" data-section="profile">
-                <i class="fas fa-user"></i>
-                <span>Profile</span>
-            </div>
-        </footer>
-
-        <div id="reward-modal" class="modal" style="display: none;">
-            <div class="modal-content">
-                <span class="close-button">&times;</span>
-                <h2>Daily Reward!</h2>
-                <p>Congratulations! You've received:</p>
-                <ul>
-                    <li>2 Limits</li>
-                    <li>10 Coins</li>
-                    <li>10 Credits</li>
-                </ul>
-                <button id="claim-reward-btn">Claim Now</button>
-            </div>
-        </div>
-
-        <div id="app-notification" class="app-notification" style="display: none;">
-            <p id="notification-text"></p>
-            <button class="close-notification">&times;</button>
-        </div>
-
+        <nav class="bottom-nav">
+            <button id="nav-home" class="nav-button active"><span class="icon home-icon"></span><span class="label">Home</span></button>
+            <button id="nav-search" class="nav-button"><span class="icon search-icon"></span><span class="label">Search</span></button>
+            <button id="nav-add-post" class="nav-button"><span class="icon add-post-icon"></span><span class="label">Post</span></button>
+            <button id="nav-messages" class="nav-button"><span class="icon messages-icon"></span><span class="label">Messages</span></button>
+            <button id="nav-profile" class="nav-button"><span class="icon profile-icon"></span><span class="label">Profile</span></button>
+        </nav>
     </div>
 
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
-    <script src="script.js"></script> </body>
+    <script src="app.js"></script>
+</body>
 </html>
