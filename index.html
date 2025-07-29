@@ -1,2564 +1,301 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AddMint</title>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-storage-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-analytics-compat.js"></script>
-    <style>
-        /* Basic Reset & Body Styles */
-        body {
-            margin: 0;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background-color: #000;
-            color: #fff;
-            overflow-x: hidden; /* Prevent horizontal scroll due to animations/off-screen elements */
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-
-        /* Splash Screen */
-        #splash-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e); /* Dark gradient */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            opacity: 1;
-            transition: opacity 0.8s ease-out;
-        }
-        #splash-logo {
-            font-size: 3rem;
-            font-weight: bold;
-            color: #0ff; /* Cyan/Neon color */
-            text-shadow: 0 0 10px #0ff, 0 0 20px #0ff, 0 0 30px #0ff;
-            animation: pulse 1.5s infinite alternate;
-        }
-
-        @keyframes pulse {
-            from { transform: scale(1); opacity: 0.8; }
-            to { transform: scale(1.05); opacity: 1; }
-        }
-
-        /* Main App Container */
-        #app-container {
-            display: none; /* Hidden by default, shown after splash */
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* Header */
-        header {
-            background-color: #1a1a1a;
-            padding: 10px 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #333;
-            position: sticky;
-            top: 0;
-            z-index: 50;
-        }
-        .header-title {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #fff;
-        }
-        .header-icons button {
-            background: none;
-            border: none;
-            color: #fff;
-            font-size: 1.2rem;
-            margin-left: 15px;
-            cursor: pointer;
-            transition: color 0.3s ease;
-        }
-        .header-icons button:hover {
-            color: #0ff;
-        }
-        /* Custom SVG-based Icons for header */
-        .icon {
-            display: inline-block;
-            width: 24px;
-            height: 24px;
-            vertical-align: middle;
-            fill: currentColor;
-        }
-
-        /* Example: Menu Icon (Three Dots/Lines) */
-        .icon-menu {
-            /* You'd draw your SVG here or load from an SVG sprite */
-        }
-        .icon-gift {
-            /* You'd draw your SVG here */
-        }
-        .icon-refresh {
-            /* You'd draw your SVG here */
-        }
-
-
-        /* Main Content Area */
-        main {
-            flex: 1;
-            padding: 15px;
-            overflow-y: auto; /* For scrollable content */
-        }
-
-        /* Section Headings */
-        .section-heading {
-            font-size: 1.8rem;
-            margin-bottom: 20px;
-            color: #0ff;
-            text-align: center;
-            text-shadow: 0 0 5px #0ff;
-        }
-
-        /* Authentication Forms (Login/Signup) */
-        #auth-section {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            flex: 1;
-            padding: 20px;
-        }
-        .auth-form {
-            background-color: #1a1a1a;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
-        }
-        .auth-form h2 {
-            color: #0ff;
-            margin-bottom: 20px;
-        }
-        .auth-form input {
-            width: calc(100% - 20px);
-            padding: 12px 10px;
-            margin-bottom: 15px;
-            border: 1px solid #333;
-            border-radius: 4px;
-            background-color: #2a2a2a;
-            color: #fff;
-            font-size: 1rem;
-        }
-        .auth-form button {
-            width: 100%;
-            padding: 12px;
-            background-color: #0ff;
-            color: #000;
-            border: none;
-            border-radius: 4px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-        }
-        .auth-form button:hover {
-            background-color: #0cc;
-            transform: translateY(-2px);
-        }
-        .auth-form p {
-            margin-top: 15px;
-            font-size: 0.9rem;
-        }
-        .auth-form a {
-            color: #0ff;
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
-        .auth-form a:hover {
-            color: #0cc;
-        }
-
-        /* Profile Info Form (After Sign Up) */
-        #profile-info-form-section {
-            display: none; /* Hidden by default */
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            flex: 1;
-            padding: 20px;
-        }
-        #profile-info-form {
-            background-color: #1a1a1a;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
-        }
-        .username-status {
-            font-size: 0.9em;
-            margin-top: -10px;
-            margin-bottom: 10px;
-            text-align: left;
-            padding-left: 5px;
-        }
-        .username-status.available { color: limegreen; }
-        .username-status.unavailable { color: red; }
-
-
-        /* Post Feed */
-        #post-feed {
-            padding-bottom: 70px; /* Space for bottom navigation */
-        }
-        .post-card {
-            background-color: #1a1a1a;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            padding: 15px;
-            box-shadow: 0 0 10px rgba(0, 255, 255, 0.1);
-            position: relative;
-            transition: box-shadow 0.3s ease-in-out;
-        }
-        .post-card.neon-active {
-            box-shadow: 0 0 15px #0ff, 0 0 30px #0ff; /* Neon effect on click */
-        }
-        .post-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-        .profile-logo {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background-color: #3a3a3a; /* Placeholder for generated logo */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: #0ff;
-            margin-right: 10px;
-        }
-        .post-username {
-            font-weight: bold;
-            color: #0ff;
-            cursor: pointer;
-        }
-        .post-content {
-            margin-bottom: 10px;
-            word-wrap: break-word; /* Ensure long words break */
-        }
-        .post-content a {
-            color: #4CAF50; /* Green for links */
-            text-decoration: underline;
-        }
-        .post-actions {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-top: 10px;
-            border-top: 1px solid #333;
-            padding-top: 10px;
-        }
-        .post-stats {
-            display: flex;
-            gap: 15px;
-            font-size: 0.9rem;
-            color: #aaa;
-        }
-        .like-button {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: #fff; /* White heart */
-            transition: color 0.2s ease, transform 0.2s ease;
-        }
-        .like-button.liked {
-            color: red; /* Red heart when liked */
-            animation: heartBeat 0.5s;
-        }
-        @keyframes heartBeat {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-            100% { transform: scale(1); }
-        }
-
-        .reaction-container {
-            position: absolute;
-            bottom: -50px; /* Position below the post */
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: rgba(0, 0, 0, 0.8);
-            border-radius: 20px;
-            padding: 8px 15px;
-            display: flex;
-            gap: 10px;
-            box-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
-            z-index: 10;
-            display: none; /* Hidden by default */
-        }
-        .reaction-container.show {
-            display: flex;
-            animation: fadeInScale 0.3s ease-out;
-        }
-        @keyframes fadeInScale {
-            from { opacity: 0; transform: translateX(-50%) scale(0.8); }
-            to { opacity: 1; transform: translateX(-50%) scale(1); }
-        }
-        .reaction-emoji {
-            font-size: 1.5rem;
-            cursor: pointer;
-            transition: transform 0.2s ease;
-        }
-        .reaction-emoji:hover {
-            transform: scale(1.2);
-        }
-        .emoji-reaction-line {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            margin-top: 10px;
-            font-size: 0.9rem;
-            color: #aaa;
-            border-top: 1px solid #333;
-            padding-top: 5px;
-        }
-        .emoji-reaction-line span {
-            margin-right: 5px;
-        }
-        .emoji-count {
-            color: #0ff;
-            font-weight: bold;
-        }
-
-
-        /* Horizontal Post Section */
-        .horizontal-posts-container {
-            display: flex;
-            overflow-x: auto;
-            gap: 15px;
-            padding: 10px 0;
-            margin-bottom: 20px;
-            scrollbar-width: thin;
-            scrollbar-color: #0ff #333;
-        }
-        .horizontal-posts-container::-webkit-scrollbar {
-            height: 8px;
-        }
-        .horizontal-posts-container::-webkit-scrollbar-track {
-            background: #333;
-            border-radius: 10px;
-        }
-        .horizontal-posts-container::-webkit-scrollbar-thumb {
-            background-color: #0ff;
-            border-radius: 10px;
-            border: 2px solid #333;
-        }
-        .horizontal-post-card {
-            flex: 0 0 250px; /* Fixed width for horizontal cards */
-            background-color: #2a2a2a;
-            border-radius: 8px;
-            padding: 15px;
-            box-shadow: 0 0 8px rgba(0, 255, 255, 0.2);
-            transition: transform 0.2s ease;
-        }
-        .horizontal-post-card:hover {
-            transform: translateY(-5px);
-        }
-
-        /* Table Post Section (Conceptual for layout) */
-        .table-posts-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* 2-4 posts per row */
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-        .table-post-card {
-            background-color: #2a2a2a;
-            border-radius: 8px;
-            padding: 10px;
-            box-shadow: 0 0 6px rgba(0, 255, 255, 0.15);
-            text-align: center;
-            transition: transform 0.2s ease;
-        }
-        .table-post-card:hover {
-            transform: scale(1.03);
-        }
-        .table-post-card .post-content {
-            font-size: 0.85rem;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-
-        /* User Profile Page */
-        #profile-page {
-            display: none; /* Hidden by default */
-            padding-bottom: 70px;
-        }
-        .profile-header {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        .profile-header .profile-logo {
-            width: 80px;
-            height: 80px;
-            font-size: 2rem;
-            margin-bottom: 10px;
-        }
-        .profile-name {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #0ff;
-        }
-        .profile-username {
-            font-size: 1rem;
-            color: #aaa;
-            margin-top: 5px;
-        }
-        .profile-buttons {
-            margin-top: 20px;
-            display: flex;
-            gap: 15px;
-        }
-        .profile-buttons button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-        }
-        .profile-buttons .follow-button {
-            background-color: #0ff;
-            color: #000;
-        }
-        .profile-buttons .follow-button.following {
-            background-color: #555;
-            color: #fff;
-        }
-        .profile-buttons .message-button {
-            background-color: #4CAF50; /* Green for WhatsApp/Message */
-            color: #fff;
-        }
-        .profile-buttons .social-button {
-            background-color: #333;
-            color: #fff;
-            padding: 8px 15px;
-            font-size: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        .profile-buttons .social-button svg {
-            width: 20px;
-            height: 20px;
-            fill: currentColor;
-        }
-
-        .profile-stats-container {
-            display: flex;
-            justify-content: space-around;
-            width: 100%;
-            max-width: 400px;
-            margin: 20px auto;
-            padding: 15px;
-            background-color: #1a1a1a;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 255, 255, 0.1);
-        }
-        .profile-stat {
-            text-align: center;
-            cursor: pointer;
-            transition: transform 0.2s ease;
-        }
-        .profile-stat:hover {
-            transform: translateY(-3px);
-        }
-        .profile-stat-number {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #0ff;
-        }
-        .profile-stat-label {
-            font-size: 0.9rem;
-            color: #aaa;
-        }
-        #profile-posts-section .post-card {
-            /* styles for posts within profile */
-        }
-
-        /* Search Page */
-        #search-page {
-            display: none; /* Hidden by default */
-            padding-bottom: 70px;
-        }
-        .search-input-container {
-            position: relative;
-            margin-bottom: 20px;
-        }
-        .search-input {
-            width: calc(100% - 20px);
-            padding: 12px 10px;
-            border: 1px solid #333;
-            border-radius: 25px;
-            background-color: #2a2a2a;
-            color: #fff;
-            font-size: 1rem;
-            padding-left: 40px; /* Space for search icon */
-        }
-        .search-icon {
-            position: absolute;
-            left: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #aaa;
-            width: 20px;
-            height: 20px;
-        }
-        #search-results-container {
-            max-height: 400px; /* Limit height for scrollable results */
-            overflow-y: auto;
-        }
-        .search-result-item {
-            display: flex;
-            align-items: center;
-            padding: 10px;
-            border-bottom: 1px solid #333;
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-        }
-        .search-result-item:hover {
-            background-color: #2a2a2a;
-        }
-        .search-result-item .profile-logo {
-            width: 30px;
-            height: 30px;
-            font-size: 1rem;
-            margin-right: 10px;
-        }
-        .search-result-info {
-            flex-grow: 1;
-        }
-        .search-result-username {
-            font-weight: bold;
-            color: #0ff;
-        }
-        .search-result-name {
-            font-size: 0.9rem;
-            color: #aaa;
-        }
-        .search-result-follow-btn {
-            background-color: #0ff;
-            color: #000;
-            padding: 8px 15px;
-            border: none;
-            border-radius: 5px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-
-        /* Message Page */
-        #message-page {
-            display: none; /* Hidden by default */
-            padding-bottom: 70px;
-            flex-direction: column;
-            flex: 1;
-        }
-        #chat-list-container {
-            display: none; /* Show when chat list is active */
-            flex: 1;
-            overflow-y: auto;
-        }
-        .chat-list-item {
-            display: flex;
-            align-items: center;
-            padding: 12px 15px;
-            border-bottom: 1px solid #333;
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-        }
-        .chat-list-item:hover {
-            background-color: #2a2a2a;
-        }
-        .chat-list-item .profile-logo {
-            width: 45px;
-            height: 45px;
-            font-size: 1.2rem;
-            margin-right: 12px;
-        }
-        .chat-info {
-            flex-grow: 1;
-        }
-        .chat-username {
-            font-weight: bold;
-            color: #0ff;
-        }
-        .last-message {
-            font-size: 0.9rem;
-            color: #aaa;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        #chat-conversation-container {
-            display: none; /* Hidden by default */
-            flex: 1;
-            flex-direction: column;
-        }
-        .chat-header {
-            background-color: #1a1a1a;
-            padding: 10px 15px;
-            display: flex;
-            align-items: center;
-            border-bottom: 1px solid #333;
-        }
-        .chat-header .back-button {
-            background: none;
-            border: none;
-            color: #fff;
-            font-size: 1.5rem;
-            margin-right: 10px;
-            cursor: pointer;
-        }
-        .chat-messages {
-            flex: 1;
-            overflow-y: auto;
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        .message-bubble {
-            max-width: 70%;
-            padding: 10px 15px;
-            border-radius: 15px;
-            word-wrap: break-word;
-        }
-        .message-bubble.sent {
-            background-color: #0ff; /* Neon for sent */
-            color: #000;
-            align-self: flex-end;
-            border-bottom-right-radius: 0;
-        }
-        .message-bubble.received {
-            background-color: #333;
-            color: #fff;
-            align-self: flex-start;
-            border-bottom-left-radius: 0;
-        }
-        .message-time {
-            font-size: 0.75rem;
-            color: #aaa;
-            margin-top: 5px;
-            text-align: right;
-        }
-        .message-input-container {
-            display: flex;
-            padding: 10px 15px;
-            border-top: 1px solid #333;
-            background-color: #1a1a1a;
-        }
-        .message-input {
-            flex: 1;
-            padding: 10px;
-            border-radius: 20px;
-            border: 1px solid #333;
-            background-color: #2a2a2a;
-            color: #fff;
-            margin-right: 10px;
-        }
-        .send-message-button {
-            background-color: #0ff;
-            color: #000;
-            border: none;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 1.2rem;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        /* Post Upload Section */
-        #post-upload-section {
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            flex: 1;
-            padding: 20px;
-        }
-        .upload-form {
-            background-color: #1a1a1a;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
-            width: 100%;
-            max-width: 500px;
-        }
-        .upload-form textarea {
-            width: calc(100% - 20px);
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 1px solid #333;
-            border-radius: 4px;
-            background-color: #2a2a2a;
-            color: #fff;
-            font-size: 1rem;
-            min-height: 100px;
-            resize: vertical;
-        }
-        .boost-options {
-            margin-bottom: 15px;
-        }
-        .boost-options label {
-            display: block;
-            margin-bottom: 8px;
-            color: #fff;
-        }
-        .boost-options select {
-            width: 100%;
-            padding: 10px;
-            border-radius: 5px;
-            background-color: #2a2a2a;
-            color: #fff;
-            border: 1px solid #333;
-        }
-        .upload-status {
-            margin-top: 10px;
-            color: #0ff;
-        }
-
-
-        /* Sidebar/Menu (Off-canvas) */
-        #sidebar-menu {
-            position: fixed;
-            top: 0;
-            left: -300px; /* Off-screen initially */
-            width: 280px;
-            height: 100%;
-            background-color: #1a1a1a;
-            box-shadow: 5px 0 15px rgba(0, 0, 0, 0.5);
-            transition: left 0.3s ease-in-out;
-            z-index: 100;
-            padding-top: 20px;
-            border-right: 1px solid #333;
-        }
-        #sidebar-menu.open {
-            left: 0;
-        }
-        .menu-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 15px 20px;
-            border-bottom: 1px solid #333;
-            margin-bottom: 20px;
-        }
-        .menu-header h3 {
-            color: #0ff;
-            margin: 0;
-        }
-        .close-menu-btn {
-            background: none;
-            border: none;
-            color: #fff;
-            font-size: 1.5rem;
-            cursor: pointer;
-        }
-        .menu-item {
-            display: flex;
-            align-items: center;
-            padding: 12px 15px;
-            color: #fff;
-            text-decoration: none;
-            transition: background-color 0.2s ease;
-        }
-        .menu-item:hover {
-            background-color: #2a2a2a;
-        }
-        .menu-item .icon {
-            margin-right: 10px;
-            width: 20px;
-            height: 20px;
-        }
-        /* Specific menu item icons - you'd add SVGs here */
-        .icon-data-saver { /* ... */ }
-        .icon-about { /* ... */ }
-        .icon-privacy { /* ... */ }
-        .icon-logout { /* ... */ }
-
-
-        /* Bottom Navigation */
-        #bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background-color: #1a1a1a;
-            display: flex;
-            justify-content: space-around;
-            padding: 10px 0;
-            border-top: 1px solid #333;
-            z-index: 90;
-            min-height: 60px; /* Adjust height as needed */
-            align-items: center;
-        }
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            color: #aaa;
-            text-decoration: none;
-            font-size: 0.75rem;
-            transition: color 0.3s ease;
-            cursor: pointer;
-        }
-        .nav-item.active {
-            color: #0ff;
-        }
-        .nav-item .icon {
-            font-size: 1.8rem; /* Adjust icon size */
-            margin-bottom: 5px;
-            width: 30px; /* Consistent width/height for all bottom nav icons */
-            height: 30px;
-            fill: currentColor;
-        }
-
-        /* Custom SVG Icons for Bottom Nav */
-        /* Home Icon (Example: House) */
-        .icon-home {
-            /* Example SVG, replace with your preferred design */
-            width: 24px; height: 24px; fill: currentColor;
-        }
-        /* Search Icon */
-        .icon-search {
-            width: 24px; height: 24px; fill: currentColor;
-        }
-        /* Upload Icon */
-        .icon-upload {
-            width: 24px; height: 24px; fill: currentColor;
-        }
-        /* Messages Icon */
-        .icon-messages {
-            width: 24px; height: 24px; fill: currentColor;
-        }
-        /* Profile Icon */
-        .icon-profile {
-            width: 24px; height: 24px; fill: currentColor;
-        }
-
-
-        /* Overlay for sidebar */
-        #overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: 99;
-            display: none;
-        }
-
-        /* Popups/Modals */
-        .popup {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: #1a1a1a;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.4);
-            z-index: 200;
-            display: none;
-            text-align: center;
-        }
-        .popup.show {
-            display: block;
-            animation: fadeInZoom 0.3s ease-out;
-        }
-        @keyframes fadeInZoom {
-            from { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
-            to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-        }
-        .popup h3 {
-            color: #0ff;
-            margin-bottom: 15px;
-        }
-        .popup p {
-            margin-bottom: 20px;
-            font-size: 1.1rem;
-        }
-        .popup button {
-            background-color: #0ff;
-            color: #000;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        /* Responsive Adjustments */
-        @media (max-width: 600px) {
-            .auth-form, #profile-info-form, .upload-form {
-                padding: 20px;
-                box-shadow: none; /* Lighter on small screens */
-            }
-            #bottom-nav .nav-item .icon {
-                font-size: 1.5rem;
-                width: 26px; height: 26px;
-            }
-            .nav-item {
-                font-size: 0.7rem;
-            }
-            .horizontal-post-card {
-                flex: 0 0 200px;
-            }
-        }
-    </style>
+    <title>AddMint - Ultra Professional</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
 
-    <div id="splash-screen">
-        <div id="splash-logo">AddMint</div>
+    <div id="splash-screen" class="splash-screen">
+        <div class="splash-content">
+            <div class="app-logo-splash"></div> <h1>AddMint</h1>
+            <p>Connecting the World, One Post at a Time</p>
+            <div class="loader"></div>
+        </div>
     </div>
 
-    <div id="app-container">
+    <div id="app-container" class="app-container hidden">
 
-        <header id="app-header">
-            <button class="header-icon" id="menu-button">
-                <svg class="icon icon-menu" viewBox="0 0 24 24">
-                    <path d="M4 18h16c.55 0 1-.45 1-1s-.45-1-1-1H4c-.55 0-1 .45-1 1s.45 1 1 1zm0-5h16c.55 0 1-.45 1-1s-.45-1-1-1H4c-.55 0-1 .45-1 1s.45 1 1 1zm0-5h16c.55 0 1-.45 1-1s-.45-1-1-1H4c-.55 0-1 .45-1 1s.45 1 1 1z"/>
-                </svg>
-            </button>
-            <div class="header-title">AddMint</div>
-            <div class="header-icons">
-                <button class="header-icon" id="gift-button" title="Claim Daily Reward">
-                    <svg class="icon icon-gift" viewBox="0 0 24 24">
-                        <path d="M20 9c0-.55-.45-1-1-1H5c-.55 0-1 .45-1 1v2c0 .55.45 1 1 1h14c.55 0 1-.45 1-1V9zm-1 3H5c-.55 0-1 .45-1 1v4c0 .55.45 1 1 1h14c.55 0 1-.45 1-1v-4c0-.55-.45-1-1-1zm1-5V5c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v2c0 .55.45 1 1 1h18c.55 0 1-.45 1-1zM5 4h14c.55 0 1 .45 1 1s-.45 1-1 1H5c-.55 0-1-.45-1-1s.45-1 1-1zM5 19h14c.55 0 1 .45 1 1s-.45 1-1 1H5c-.55 0-1-.45-1-1s.45-1 1-1z"/>
-                    </svg>
-                </button>
-                <button class="header-icon" id="refresh-posts-button" title="Refresh Feed">
-                    <svg class="icon icon-refresh" viewBox="0 0 24 24">
-                        <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.78 2.37-3.01 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.76 0 3.3.73 4.46 1.9L14 12h7V5l-3.35 3.35z"/>
-                    </svg>
-                </button>
+        <header class="app-header">
+            <div class="header-left">
+                <div class="menu-icon" id="menu-toggle">
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                </div>
+                <div class="app-title">AddMint</div>
             </div>
+            <div class="header-center">
+                <div class="status-display">
+                    <span id="header-coins">0 C</span> |
+                    <span id="header-credits">0 Cr</span> |
+                    <span id="header-limit">0 L</span>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="icon-button" id="refresh-posts-btn" title="Refresh Feed">
+                    <i class="fas fa-sync-alt"></i>
+                </div>
+                <div class="icon-button" id="gift-claim-btn" title="Claim Daily Reward">
+                    <i class="fas fa-gift"></i>
+                </div>
+                </div>
         </header>
 
-        <div id="sidebar-menu">
-            <div class="menu-header">
-                <h3>Menu</h3>
-                <button class="close-menu-btn">&times;</button>
+        <nav id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <h3>AddMint Menu</h3>
+                <div class="close-sidebar" id="close-sidebar">&times;</div>
             </div>
-            <a href="#" class="menu-item" id="data-saver-toggle">
-                <svg class="icon icon-data-saver" viewBox="0 0 24 24">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-14h2v6h-2zm0 8h2v2h-2z"/>
-                </svg>
-                <span>Data Saver: <span id="data-saver-status">Off</span></span>
-            </a>
-            <a href="https://instagram.com/addmint__" target="_blank" class="menu-item">
-                <svg class="icon icon-instagram" viewBox="0 0 24 24">
-                    <path d="M7.8 2h8.4C19.4 2 22 4.6 22 7.8v8.4c0 3.2-2.6 5.8-5.8 5.8H7.8C4.6 22 2 19.4 2 16.2V7.8C2 4.6 4.6 2 7.8 2zm-.2 2.7v.5h.5c1.4 0 2.5 1.1 2.5 2.5v.5H7.6V5.4zM12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zm0 8c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm6.5-11.3c-.63 0-1.15-.52-1.15-1.15S17.87 3.4 18.5 3.4s1.15.52 1.15 1.15S19.13 5.7 18.5 5.7z"/>
-                </svg>
-                <span>AddMint Instagram</span>
-            </a>
-            <a href="https://youtube.com/@add_mintmint" target="_blank" class="menu-item">
-                <svg class="icon icon-youtube" viewBox="0 0 24 24">
-                    <path d="M10 16.5l6-4.5-6-4.5v9zM21.58 7.36c.15-.92-.22-1.85-.92-2.55-.7-.7-1.63-1.07-2.55-.92-2.2 0-7.06-.02-9.06-.02-2 0-6.86.02-9.06.02-.92-.15-1.85.22-2.55.92-.7.7-1.07 1.63-.92 2.55.15 2.22.02 7.06.02 9.06 0 2-.02 6.86-.02 9.06-.15.92.22 1.85.92 2.55.7.7 1.63 1.07 2.55.92 2.2 0 7.06.02 9.06.02 2 0 6.86-.02 9.06-.02.92.15 1.85-.22 2.55-.92.7-.7 1.07-1.63.92-2.55-.15-2.22-.02-7.06-.02-9.06z"/>
-                </svg>
-                <span>AddMint YouTube</span>
-            </a>
-            <a href="#" class="menu-item" id="about-app-button">
-                <svg class="icon icon-about" viewBox="0 0 24 24">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
-                </svg>
-                <span>About App</span>
-            </a>
-            <a href="#" class="menu-item" id="privacy-policy-button">
-                <svg class="icon icon-privacy" viewBox="0 0 24 24">
-                    <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 18.52c-3.83-1.2-6.5-5.07-6.5-9.52V6.36l6.5-2.92 6.5 2.92v3.64c0 4.45-2.67 8.32-6.5 9.52z"/>
-                </svg>
-                <span>Privacy Policy</span>
-            </a>
-            <a href="#" class="menu-item" id="logout-button">
-                <svg class="icon icon-logout" viewBox="0 0 24 24">
-                    <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5-5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>
-                </svg>
-                <span>Logout</span>
-            </a>
-        </div>
-        <div id="overlay"></div> <main>
-            <section id="auth-section">
-                <form id="login-form" class="auth-form">
-                    <h2>Login</h2>
-                    <input type="email" id="login-email" placeholder="Email" required>
-                    <input type="password" id="login-password" placeholder="Password" required>
-                    <button type="submit">Login</button>
-                    <p>Don't have an account? <a href="#" id="show-signup">Sign Up</a></p>
-                </form>
-
-                <form id="signup-form" class="auth-form" style="display: none;">
-                    <h2>Sign Up</h2>
-                    <input type="email" id="signup-email" placeholder="Email" required>
-                    <input type="password" id="signup-password" placeholder="Password" required>
-                    <button type="submit">Sign Up</button>
-                    <p>Already have an account? <a href="#" id="show-login">Login</a></p>
-                </form>
-            </section>
-
-            <section id="profile-info-form-section">
-                <form id="profile-info-form">
-                    <h2>Complete Your Profile</h2>
-                    <input type="text" id="profile-name" placeholder="Full Name" required>
-                    <input type="text" id="profile-username" placeholder="Unique Username" required>
-                    <div id="username-feedback" class="username-status"></div>
-                    <input type="text" id="profile-whatsapp" placeholder="WhatsApp Number (Optional)">
-                    <input type="text" id="profile-instagram" placeholder="Instagram ID (Optional)">
-                    <p style="font-size: 0.9em; color: #aaa;">* At least one of WhatsApp, Instagram, or Username is required.</p>
-                    <button type="submit" id="save-profile-button">Save Profile</button>
-                </form>
-            </section>
-
-            <section id="home-feed-section" style="display: none;">
-                <h2 class="section-heading">Recent Posts</h2>
-                <div id="post-feed">
-                    </div>
-                <div id="loading-posts" style="text-align: center; color: #aaa; padding: 20px; display: none;">Loading more posts...</div>
-            </section>
-
-            <section id="search-page" style="display: none;">
-                <h2 class="section-heading">Search</h2>
-                <div class="search-input-container">
-                    <input type="text" id="search-input" class="search-input" placeholder="Search users, posts...">
-                    <svg class="icon search-icon" viewBox="0 0 24 24">
-                        <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
-                    </svg>
-                </div>
-                <div id="search-results-container">
-                    </div>
-            </section>
-
-            <section id="post-upload-section" style="display: none;">
-                <h2 class="section-heading">Upload New Post</h2>
-                <form id="upload-form" class="upload-form">
-                    <textarea id="post-content-input" placeholder="What's on your mind?" required></textarea>
-                    <div class="boost-options">
-                        <label for="post-boost-hours">Boost Post For:</label>
-                        <select id="post-boost-hours">
-                            <option value="12">12 Hours (Free)</option>
-                            <option value="18">18 Hours (1 Ad)</option>
-                            <option value="24">24 Hours (2 Ads)</option>
-                            <option value="30">30 Hours (3 Ads)</option>
-                        </select>
-                    </div>
-                    <button type="submit" id="publish-post-button">Publish Post</button>
-                    <p id="upload-status" class="upload-status"></p>
-                </form>
-            </section>
-
-            <section id="message-page" style="display: none;">
-                <div id="chat-list-container">
-                    <h2 class="section-heading">Chats</h2>
-                    </div>
-
-                <div id="chat-conversation-container">
-                    <div class="chat-header">
-                        <button class="back-button" id="back-to-chat-list">&lt;</button>
-                        <div class="profile-logo" id="current-chat-user-logo"></div>
-                        <span class="chat-username" id="current-chat-username"></span>
-                    </div>
-                    <div class="chat-messages" id="chat-messages">
-                        </div>
-                    <div class="message-input-container">
-                        <input type="text" id="message-input" class="message-input" placeholder="Type a message...">
-                        <button id="send-message-button" class="send-message-button">➤</button>
-                    </div>
-                </div>
-            </section>
-
-            <section id="profile-page" style="display: none;">
-                <div class="profile-header">
-                    <div class="profile-logo" id="profile-page-logo"></div>
-                    <h1 class="profile-name" id="profile-page-name"></h1>
-                    <p class="profile-username" id="profile-page-username"></p>
-                    <div class="profile-buttons">
-                        <button class="follow-button" id="follow-user-button">Follow</button>
-                        <button class="message-button" id="message-user-button">Message</button>
-                        <a href="#" target="_blank" class="social-button" id="profile-whatsapp-button" style="display:none;">
-                            <svg class="icon" viewBox="0 0 24 24">
-                                <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.47 1.35 4.96L2.05 22l5.25-1.38c1.45.79 3.09 1.25 4.74 1.25 5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2zm3.39 14.4c-.16.27-.63.52-.89.52-.27 0-.7-.27-.99-.54-.27-.27-.89-1.09-1.09-1.36-.2-.27-.4-.27-.6-.27-.2 0-.54.27-.8.54-.27.27-1.03 1.03-1.29 1.29-.27.27-.54.27-.8.27-.27 0-1.09-.4-1.63-.89-.54-.54-1.39-1.29-1.9-2.19-.52-.89-.52-1.27-.37-1.54.14-.27.32-.4.49-.54.16-.14.27-.2.4-.4.14-.2.2-.27.27-.4.07-.14.07-.27 0-.4-.07-.14-.6-.54-.8-.8-.2-.27-.2-.2-2-.54-.14-.27-.14-.52-.14-.8 0-.27-.72-1.85-.99-2.52-.27-.67-.54-.54-.74-.54-.2 0-.43-.02-.66-.02-.27 0-.72.07-.99.34-.27.27-1.03 1.03-1.03 2.52s1.06 2.92 1.2 3.19c.14.27 2.07 3.17 5.03 4.46 2.4 1.06 2.87.89 3.46.89.59 0 1.54-.62 1.76-.89.22-.27.4-.37.59-.64.2-.27.14-.49.1-.64-.04-.14-.16-.2-.37-.4z"/>
-                            </svg>
-                            WhatsApp
-                        </a>
-                        <a href="#" target="_blank" class="social-button" id="profile-instagram-button" style="display:none;">
-                            <svg class="icon" viewBox="0 0 24 24">
-                                <path d="M7.8 2h8.4C19.4 2 22 4.6 22 7.8v8.4c0 3.2-2.6 5.8-5.8 5.8H7.8C4.6 22 2 19.4 2 16.2V7.8C2 4.6 4.6 2 7.8 2zm-.2 2.7v.5h.5c1.4 0 2.5 1.1 2.5 2.5v.5H7.6V5.4zM12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zm0 8c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm6.5-11.3c-.63 0-1.15-.52-1.15-1.15S17.87 3.4 18.5 3.4s1.15.52 1.15 1.15S19.13 5.7 18.5 5.7z"/>
-                            </svg>
-                            Instagram
-                        </a>
-                    </div>
-                </div>
-                <div class="profile-stats-container">
-                    <div class="profile-stat" id="followers-stat">
-                        <div class="profile-stat-number" id="followers-count">0</div>
-                        <div class="profile-stat-label">Followers</div>
-                    </div>
-                    <div class="profile-stat" id="following-stat">
-                        <div class="profile-stat-number" id="following-count">0</div>
-                        <div class="profile-stat-label">Following</div>
-                    </div>
-                    <div class="profile-stat" id="posts-stat">
-                        <div class="profile-stat-number" id="posts-count">0</div>
-                        <div class="profile-stat-label">Posts</div>
-                    </div>
-                </div>
-                <h2 class="section-heading" style="margin-top: 30px;">User's Posts</h2>
-                <div id="profile-posts-section">
-                    </div>
-            </section>
-
-        </main>
-
-        <nav id="bottom-nav">
-            <a href="#" class="nav-item active" data-page="home">
-                <svg class="icon icon-home" viewBox="0 0 24 24">
-                    <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
-                </svg>
-                <span>Home</span>
-            </a>
-            <a href="#" class="nav-item" data-page="search">
-                <svg class="icon icon-search" viewBox="0 0 24 24">
-                    <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
-                </svg>
-                <span>Search</span>
-            </a>
-            <a href="#" class="nav-item" data-page="upload">
-                <svg class="icon icon-upload" viewBox="0 0 24 24">
-                    <path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/>
-                </svg>
-                <span>Upload</span>
-            </a>
-            <a href="#" class="nav-item" data-page="messages">
-                <svg class="icon icon-messages" viewBox="0 0 24 24">
-                    <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/>
-                </svg>
-                <span>Messages</span>
-            </a>
-            <a href="#" class="nav-item" data-page="profile">
-                <svg class="icon icon-profile" viewBox="0 0 24 24">
-                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                </svg>
-                <span>Profile</span>
-            </a>
+            <ul>
+                <li><a href="#" data-screen="home"><i class="fas fa-home"></i> Home Feed</a></li>
+                <li><a href="#" data-screen="profile"><i class="fas fa-user-circle"></i> My Profile</a></li>
+                <li><a href="#" data-screen="upload"><i class="fas fa-plus-circle"></i> Upload Post</a></li>
+                <li><a href="#" data-screen="messages"><i class="fas fa-comments"></i> Messages</a></li>
+                <li><a href="#" data-screen="search"><i class="fas fa-search"></i> Search Users</a></li>
+                <li><a href="#" id="data-saver-toggle"><i class="fas fa-wifi"></i> Data Saver <span class="toggle-switch"><input type="checkbox" id="data-saver-checkbox"><label for="data-saver-checkbox"></label></span></a></li>
+                <li><a href="https://www.instagram.com/addmint__" target="_blank"><i class="fab fa-instagram"></i> Our Instagram</a></li>
+                <li><a href="https://www.youtube.com/@add_mintmint" target="_blank"><i class="fab fa-youtube"></i> Our YouTube</a></li>
+                <li><a href="#" data-screen="about"><i class="fas fa-info-circle"></i> About Us</a></li>
+                <li><a href="#" data-screen="privacy"><i class="fas fa-shield-alt"></i> Privacy Policy</a></li>
+                <li><a href="#" id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            </ul>
         </nav>
 
-    </div> <div id="reward-popup" class="popup">
-        <h3>Daily Reward!</h3>
-        <p id="reward-message"></p>
-        <button id="claim-reward-button">Claim Reward</button>
-    </div>
+        <main class="main-content">
+            <section id="home-screen" class="app-screen active">
+                <h2>Recent Posts</h2>
+                <div id="posts-feed" class="posts-feed">
+                    </div>
+                <div id="loading-spinner" class="loading-spinner hidden"></div>
+            </section>
 
-    <div id="info-popup" class="popup">
-        <h3 id="info-popup-title"></h3>
-        <p id="info-popup-message"></p>
-        <button id="info-popup-close">OK</button>
-    </div>
+            <section id="profile-screen" class="app-screen">
+                <div id="user-profile-display">
+                    <div class="profile-header-area">
+                        <div class="profile-avatar-large" id="my-profile-avatar"></div>
+                        <h2 id="my-profile-username">@myusername</h2>
+                        <div class="profile-stats">
+                            <div><span id="my-posts-count">0</span> Posts</div>
+                            <div class="clickable-stat" data-stat="followers"><span id="my-followers-count">0</span> Followers</div>
+                            <div class="clickable-stat" data-stat="following"><span id="my-following-count">0</span> Following</div>
+                        </div>
+                        <div class="profile-actions">
+                            <button class="btn primary-btn" id="edit-profile-btn"><i class="fas fa-edit"></i> Edit Profile</button>
+                            <button class="btn secondary-btn hidden" id="follow-user-btn"><i class="fas fa-user-plus"></i> Follow</button>
+                            <button class="btn danger-btn hidden" id="unfollow-user-btn"><i class="fas fa-user-minus"></i> Unfollow</button>
+                            <button class="btn primary-btn hidden" id="message-user-btn"><i class="fas fa-paper-plane"></i> Message</button>
+                            <a href="#" id="profile-whatsapp-link" class="btn social-btn hidden"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+                            <a href="#" id="profile-instagram-link" class="btn social-btn hidden"><i class="fab fa-instagram"></i> Instagram</a>
+                        </div>
+                    </div>
 
-    <script>
-        // Firebase Configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyDlZA4grzF3fx95-11E4s7ASXwkIij1k1w",
-            authDomain: "addmint-7ab6b.firebaseapp.com",
-            databaseURL: "https://addmint-7ab6b-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "addmint-7ab6b",
-            storageBucket: "addmint-7ab6b.firebasestorage.app",
-            messagingSenderId: "504015450137",
-            appId: "1:504015450137:web:694b176313582cce1e7a88",
-            measurementId: "G-H7J7M23Z82"
-        };
+                    <div id="edit-profile-modal" class="modal hidden">
+                        <div class="modal-content">
+                            <h3>Edit Profile</h3>
+                            <div class="form-group">
+                                <label for="edit-username">Username:</label>
+                                <input type="text" id="edit-username" placeholder="Enter new username">
+                                <span id="username-availability"></span>
+                            </div>
+                            <div class="form-group">
+                                <label for="edit-whatsapp">WhatsApp (Optional):</label>
+                                <input type="text" id="edit-whatsapp" placeholder="e.g., +919876543210">
+                            </div>
+                            <div class="form-group">
+                                <label for="edit-instagram">Instagram ID (Optional):</label>
+                                <input type="text" id="edit-instagram" placeholder="e.g., my_insta_id">
+                            </div>
+                            <div class="form-group">
+                                <label>Profile Logo:</label>
+                                <div id="profile-logo-options" class="logo-options-grid">
+                                    </div>
+                            </div>
+                            <button class="btn primary-btn" id="save-profile-btn">Save Changes</button>
+                            <button class="btn secondary-btn" id="cancel-edit-profile-btn">Cancel</button>
+                        </div>
+                    </div>
 
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-        const storage = firebase.storage();
-        const analytics = firebase.analytics();
+                    <div id="follow-list-modal" class="modal hidden">
+                        <div class="modal-content">
+                            <h3 id="follow-list-title"></h3>
+                            <div id="follow-list-content">
+                                </div>
+                            <button class="btn secondary-btn" id="close-follow-list-modal">Close</button>
+                        </div>
+                    </div>
 
-        // --- DOM Elements ---
-        const splashScreen = document.getElementById('splash-screen');
-        const appContainer = document.getElementById('app-container');
-        const authSection = document.getElementById('auth-section');
-        const loginForm = document.getElementById('login-form');
-        const signupForm = document.getElementById('signup-form');
-        const showSignupLink = document.getElementById('show-signup');
-        const showLoginLink = document.getElementById('show-login');
-        const profileInfoFormSection = document.getElementById('profile-info-form-section');
-        const profileInfoForm = document.getElementById('profile-info-form');
-        const profileUsernameInput = document.getElementById('profile-username');
-        const usernameFeedback = document.getElementById('username-feedback');
-        const saveProfileButton = document.getElementById('save-profile-button');
-
-        const homeFeedSection = document.getElementById('home-feed-section');
-        const postFeed = document.getElementById('post-feed');
-        const loadingPosts = document.getElementById('loading-posts');
-        let lastVisiblePost = null; // For pagination
-
-        const searchPage = document.getElementById('search-page');
-        const searchInput = document.getElementById('search-input');
-        const searchResultsContainer = document.getElementById('search-results-container');
-
-        const postUploadSection = document.getElementById('post-upload-section');
-        const uploadForm = document.getElementById('upload-form');
-        const postContentInput = document.getElementById('post-content-input');
-        const postBoostHours = document.getElementById('post-boost-hours');
-        const publishPostButton = document.getElementById('publish-post-button');
-        const uploadStatus = document.getElementById('upload-status');
-
-        const messagePage = document.getElementById('message-page');
-        const chatListContainer = document.getElementById('chat-list-container');
-        const chatConversationContainer = document.getElementById('chat-conversation-container');
-        const backToChatListButton = document.getElementById('back-to-chat-list');
-        const currentChatUserLogo = document.getElementById('current-chat-user-logo');
-        const currentChatUsername = document.getElementById('current-chat-username');
-        const chatMessages = document.getElementById('chat-messages');
-        const messageInput = document.getElementById('message-input');
-        const sendMessageButton = document.getElementById('send-message-button');
-
-        const profilePage = document.getElementById('profile-page');
-        const profilePageLogo = document.getElementById('profile-page-logo');
-        const profilePageName = document.getElementById('profile-page-name');
-        const profilePageUsername = document.getElementById('profile-page-username');
-        const followUserButton = document.getElementById('follow-user-button');
-        const messageUserButton = document.getElementById('message-user-button');
-        const profileWhatsappButton = document.getElementById('profile-whatsapp-button');
-        const profileInstagramButton = document.getElementById('profile-instagram-button');
-        const followersCount = document.getElementById('followers-count');
-        const followingCount = document.getElementById('following-count');
-        const postsCount = document.getElementById('posts-count');
-        const profilePostsSection = document.getElementById('profile-posts-section');
-
-        const bottomNav = document.getElementById('bottom-nav');
-        const navItems = document.querySelectorAll('.nav-item');
-
-        const menuButton = document.getElementById('menu-button');
-        const giftButton = document.getElementById('gift-button');
-        const refreshPostsButton = document.getElementById('refresh-posts-button');
-        const sidebarMenu = document.getElementById('sidebar-menu');
-        const closeMenuBtn = document.getElementById('close-menu-btn');
-        const overlay = document.getElementById('overlay');
-        const dataSaverToggle = document.getElementById('data-saver-toggle');
-        const dataSaverStatus = document.getElementById('data-saver-status');
-        const aboutAppButton = document.getElementById('about-app-button');
-        const privacyPolicyButton = document.getElementById('privacy-policy-button');
-        const logoutButton = document.getElementById('logout-button');
-
-        const rewardPopup = document.getElementById('reward-popup');
-        const rewardMessage = document.getElementById('reward-message');
-        const claimRewardButton = document.getElementById('claim-reward-button');
-
-        const infoPopup = document.getElementById('info-popup');
-        const infoPopupTitle = document.getElementById('info-popup-title');
-        const infoPopupMessage = document.getElementById('info-popup-message');
-        const infoPopupCloseButton = document.getElementById('info-popup-close');
-
-
-        // --- Global Variables ---
-        let currentUser = null;
-        let currentPage = 'home';
-        let isFetchingPosts = false;
-        let isDataSaverOn = false;
-        let activeNeonPost = null;
-        const PROFILE_LOGOS = [ // 50 simple unique logos based on characters/patterns
-            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
-            'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
-            '🌟', '⚡', '✨', '🌈', '🚀', '💡', '🎵', '🎨', '🧩', '💎', '👑',
-            '🍀', '🌸', '🌀', '🌊', '🌲', '🔥', '💧', '☀️', '🌙', '🌌'
-        ];
-        let currentChatTargetUserId = null;
-
-
-        // --- Utility Functions ---
-
-        // Function to show a specific page and hide others
-        function showPage(pageId) {
-            document.querySelectorAll('section').forEach(section => {
-                section.style.display = 'none';
-            });
-            document.getElementById(pageId).style.display = 'flex'; // Use flex for sections that need it
-
-            // Adjust app-container display for sections
-            if (pageId === 'auth-section' || pageId === 'profile-info-form-section') {
-                 appContainer.style.display = 'flex'; // Allow auth/profile setup to fill screen
-                 appContainer.style.flexDirection = 'column';
-                 appContainer.style.justifyContent = 'center';
-                 appContainer.style.alignItems = 'center';
-            } else {
-                appContainer.style.display = 'flex';
-                appContainer.style.flexDirection = 'column';
-                appContainer.style.justifyContent = 'flex-start'; // Reset for normal content
-                appContainer.style.alignItems = 'stretch'; // Reset for normal content
-            }
-
-
-            // Update active nav item
-            navItems.forEach(item => {
-                item.classList.remove('active');
-                if (item.dataset.page === pageId.replace('-section', '').replace('-page', '')) {
-                    item.classList.add('active');
-                }
-            });
-
-            // Hide chat conversation if switching away from messages
-            if (pageId !== 'message-page') {
-                chatConversationContainer.style.display = 'none';
-                chatListContainer.style.display = 'block'; // Ensure chat list is default for messages
-            }
-
-            currentPage = pageId; // Update current page state
-            console.log("Current page:", currentPage);
-        }
-
-        // Generate a random profile logo (simple character or emoji)
-        function generateProfileLogo(userId) {
-            // A more deterministic but varied way to pick a logo based on userId
-            const hash = userId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-            const logoIndex = hash % PROFILE_LOGOS.length;
-            return PROFILE_LOGOS[logoIndex];
-        }
-
-        // Format numbers (1000 -> 1K, 100000 -> 100K, etc.)
-        function formatNumber(num) {
-            if (num >= 1000000) {
-                return (num / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
-            }
-            if (num >= 1000) {
-                return (num / 1000).toFixed(1).replace(/\.0$/, '') + 'K';
-            }
-            return num;
-        }
-
-        // Show generic info/error popup
-        function showInfoPopup(title, message) {
-            infoPopupTitle.textContent = title;
-            infoPopupMessage.textContent = message;
-            infoPopup.classList.add('show');
-        }
-
-        // Hide info popup
-        infoPopupCloseButton.addEventListener('click', () => {
-            infoPopup.classList.remove('show');
-        });
-
-        // Function to create an SVG icon element
-        function createSvgIcon(dPath, className) {
-            const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-            svg.setAttribute("class", `icon ${className}`);
-            svg.setAttribute("viewBox", "0 0 24 24");
-            const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-            path.setAttribute("d", dPath);
-            svg.appendChild(path);
-            return svg;
-        }
-
-        // --- Core App Logic ---
-
-        // Splash screen dismissal
-        setTimeout(() => {
-            splashScreen.style.opacity = '0';
-            setTimeout(() => {
-                splashScreen.style.display = 'none';
-                appContainer.style.display = 'flex'; // Show main app after splash
-                checkAuthState(); // Check user authentication state
-            }, 800); // Allow fade-out transition
-        }, 1500); // Display for 1.5 seconds
-
-        // Authentication State Listener
-        auth.onAuthStateChanged(async (user) => {
-            if (user) {
-                currentUser = user;
-                const userDoc = await db.collection('users').doc(user.uid).get();
-                if (!userDoc.exists || !userDoc.data().username) {
-                    showPage('profile-info-form-section');
-                } else {
-                    showPage('home-feed-section'); // Go to home if profile complete
-                    // Load initial posts
-                    loadPosts();
-                    // Check for daily reward
-                    checkAndShowDailyReward();
-                }
-            } else {
-                currentUser = null;
-                showPage('auth-section');
-            }
-        });
-
-        // Auth Form Switching
-        showSignupLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            loginForm.style.display = 'none';
-            signupForm.style.display = 'block';
-        });
-
-        showLoginLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            signupForm.style.display = 'none';
-            loginForm.style.display = 'block';
-        });
-
-        // Login
-        loginForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = loginForm['login-email'].value;
-            const password = loginForm['login-password'].value;
-            try {
-                await auth.signInWithEmailAndPassword(email, password);
-                // Auth state change listener will handle page redirection
-            } catch (error) {
-                showInfoPopup("Login Error", error.message);
-            }
-        });
-
-        // Signup
-        signupForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = signupForm['signup-email'].value;
-            const password = signupForm['signup-password'].value;
-            try {
-                await auth.createUserWithEmailAndPassword(email, password);
-                // Auth state change listener will handle page redirection to profile setup
-            } catch (error) {
-                showInfoPopup("Signup Error", error.message);
-            }
-        });
-
-        // Profile Information Submission
-        profileUsernameInput.addEventListener('input', async () => {
-            const username = profileUsernameInput.value.trim();
-            if (username.length > 3) {
-                const snapshot = await db.collection('users').where('username', '==', username).get();
-                if (!snapshot.empty) {
-                    usernameFeedback.textContent = 'Username is already taken.';
-                    usernameFeedback.classList.remove('available');
-                    usernameFeedback.classList.add('unavailable');
-                    saveProfileButton.disabled = true;
-                } else {
-                    usernameFeedback.textContent = 'Username available!';
-                    usernameFeedback.classList.remove('unavailable');
-                    usernameFeedback.classList.add('available');
-                    saveProfileButton.disabled = false;
-                }
-            } else {
-                usernameFeedback.textContent = '';
-                saveProfileButton.disabled = true;
-            }
-        });
-
-        profileInfoForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const name = profileInfoForm['profile-name'].value.trim();
-            const username = profileInfoForm['profile-username'].value.trim();
-            const whatsapp = profileInfoForm['profile-whatsapp'].value.trim();
-            const instagram = profileInfoForm['profile-instagram'].value.trim();
-
-            if (!name || !username || (!whatsapp && !instagram && !username)) {
-                showInfoPopup("Profile Error", "Please fill in your Full Name, a Unique Username, and at least one of WhatsApp/Instagram.");
-                return;
-            }
-
-            try {
-                if (currentUser) {
-                    // Check username again to prevent race condition (though Firestore rules help)
-                    const snapshot = await db.collection('users').where('username', '==', username).get();
-                    if (!snapshot.empty && snapshot.docs[0].id !== currentUser.uid) {
-                        showInfoPopup("Profile Error", "This username is already taken by another user.");
-                        return;
-                    }
-
-                    await db.collection('users').doc(currentUser.uid).set({
-                        name: name,
-                        username: username,
-                        whatsapp: whatsapp || '',
-                        instagram: instagram || '',
-                        profileLogo: generateProfileLogo(currentUser.uid), // Assign a unique logo
-                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                        followers: 0,
-                        following: 0,
-                        postsCount: 0
-                    }, { merge: true }); // Use merge to not overwrite existing data
-
-                    showPage('home-feed-section');
-                    loadPosts(); // Load posts after profile setup
-                    checkAndShowDailyReward();
-                }
-            } catch (error) {
-                showInfoPopup("Profile Setup Error", error.message);
-            }
-        });
-
-        // --- Post Feed Logic ---
-
-        // Function to create a post card element
-        function createPostCard(post) {
-            const postCard = document.createElement('div');
-            postCard.classList.add('post-card');
-            postCard.dataset.postId = post.id; // Store post ID for interactions
-
-            const profileInitial = post.profileLogo || generateProfileLogo(post.userId); // Fallback
-            const postHeader = `
-                <div class="post-header">
-                    <div class="profile-logo">${profileInitial}</div>
-                    <span class="post-username" data-user-id="${post.userId}">${post.username}</span>
-                </div>
-            `;
-
-            // Replace URLs with clickable links
-            const contentWithLinks = post.content.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" style="color:#4CAF50;">$1</a>');
-
-            const postContent = `<div class="post-content"><p>${contentWithLinks}</p></div>`;
-
-            const likeButtonSvg = `
-                <svg class="icon" viewBox="0 0 24 24" style="width: 24px; height: 24px;">
-                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                </svg>
-            `;
-
-            // Placeholder for actual like state from DB
-            const likedClass = post.likedBy && post.likedBy[currentUser.uid] ? 'liked' : '';
-
-            const postActions = `
-                <div class="post-actions">
-                    <button class="like-button ${likedClass}" data-liked="${likedClass ? 'true' : 'false'}">
-                        ${likeButtonSvg}
-                    </button>
-                    <div class="post-stats">
-                        <span>Likes: <span class="like-count">${formatNumber(post.likes || 0)}</span></span>
-                        <span>Views: <span class="view-count">${formatNumber(post.views || 0)}</span></span>
+                    <div class="profile-posts-area">
+                        <h3>Posts by <span id="current-profile-username-posts">Me</span></h3>
+                        <div id="profile-posts-feed" class="posts-feed">
+                            </div>
                     </div>
                 </div>
-            `;
+            </section>
 
-            // Emoji Reactions (placeholder, will be updated by JS)
-            const reactionEmojisHtml = ['👍', '😂', '❤️', '🔥', '🤔'].map(emoji =>
-                `<span class="reaction-emoji" data-emoji="${emoji}">${emoji}</span>`
-            ).join('');
-            const reactionLineHtml = `
-                <div class="emoji-reaction-line">
-                    <span class="top-emojis"></span> Total: <span class="emoji-count">0</span>
+            <section id="upload-screen" class="app-screen">
+                <h2>Upload New Post</h2>
+                <div class="form-group">
+                    <label for="post-content">Post Content:</label>
+                    <textarea id="post-content" placeholder="What's on your mind?"></textarea>
                 </div>
-                <div class="reaction-container">
-                    ${reactionEmojisHtml}
+                <div class="form-group">
+                    <label for="post-image">Upload Image (Optional):</label>
+                    <input type="file" id="post-image" accept="image/*">
                 </div>
-            `;
+                <div class="form-group">
+                    <label for="post-boost">Post Boost Hours:</label>
+                    <select id="post-boost">
+                        <option value="12">12 Hours (Free)</option>
+                        <option value="18">18 Hours (1 Ad)</option>
+                        <option value="24">24 Hours (2 Ads)</option>
+                        <option value="30">30 Hours (3 Ads)</option>
+                    </select>
+                </div>
+                <button class="btn primary-btn" id="publish-post-btn">Publish Post</button>
+                <div id="upload-status"></div>
+            </section>
 
+            <section id="messages-screen" class="app-screen">
+                <h2>Messages</h2>
+                <div id="message-list-container">
+                    <h3>Recent Chats</h3>
+                    <ul id="recent-chats-list" class="recent-chats-list">
+                        </ul>
+                </div>
 
-            postCard.innerHTML = postHeader + postContent + postActions + reactionLineHtml;
-
-            // Event Listeners for post card (delegated or added after creation)
-            postCard.addEventListener('click', (e) => {
-                // Neon effect on post click
-                if (activeNeonPost) {
-                    activeNeonPost.classList.remove('neon-active');
-                }
-                postCard.classList.add('neon-active');
-                activeNeonPost = postCard;
-                setTimeout(() => {
-                    postCard.classList.remove('neon-active');
-                    if (activeNeonPost === postCard) { // Ensure no new post has become active
-                        activeNeonPost = null;
-                    }
-                }, 3000); // Neon effect lasts 3 seconds
-            });
-
-            // Double click to like
-            let lastClickTime = 0;
-            postCard.addEventListener('dblclick', (e) => {
-                const now = new Date().getTime();
-                if (now - lastClickTime < 300) { // Double click threshold
-                    handleLike(post.id);
-                }
-                lastClickTime = now;
-            });
-
-
-            // Long press for emoji reactions
-            let pressTimer;
-            postCard.addEventListener('touchstart', (e) => {
-                pressTimer = setTimeout(() => {
-                    const reactionContainer = postCard.querySelector('.reaction-container');
-                    reactionContainer.classList.add('show');
-                }, 700); // 0.7 seconds for long press
-            });
-            postCard.addEventListener('touchend', () => {
-                clearTimeout(pressTimer);
-            });
-            postCard.addEventListener('touchmove', () => {
-                clearTimeout(pressTimer); // Cancel if finger moves
-            });
-
-            // Click listener for emojis within the reaction container
-            postCard.querySelectorAll('.reaction-emoji').forEach(emojiBtn => {
-                emojiBtn.addEventListener('click', (e) => {
-                    e.stopPropagation(); // Prevent post click from triggering
-                    const emoji = emojiBtn.dataset.emoji;
-                    handleEmojiReaction(post.id, emoji);
-                    postCard.querySelector('.reaction-container').classList.remove('show');
-                });
-            });
-
-
-            // Click on username to go to profile
-            postCard.querySelector('.post-username').addEventListener('click', (e) => {
-                e.stopPropagation(); // Prevent post click from triggering
-                const userId = e.target.dataset.userId;
-                if (userId) {
-                    loadUserProfile(userId);
-                    showPage('profile-page');
-                }
-            });
-
-            return postCard;
-        }
-
-        // Handle Like
-        async function handleLike(postId) {
-            if (!currentUser) {
-                showInfoPopup("Login Required", "Please log in to like posts.");
-                return;
-            }
-            const postRef = db.collection('posts').doc(postId);
-            try {
-                await db.runTransaction(async (transaction) => {
-                    const postDoc = await transaction.get(postRef);
-                    if (!postDoc.exists) {
-                        throw "Post does not exist!";
-                    }
-
-                    const currentLikes = postDoc.data().likes || 0;
-                    const likedBy = postDoc.data().likedBy || {};
-                    const isLiked = likedBy[currentUser.uid];
-
-                    if (isLiked) {
-                        // Unlike
-                        transaction.update(postRef, {
-                            likes: currentLikes - 1,
-                            [`likedBy.${currentUser.uid}`]: firebase.firestore.FieldValue.delete()
-                        });
-                    } else {
-                        // Like
-                        transaction.update(postRef, {
-                            likes: currentLikes + 1,
-                            [`likedBy.${currentUser.uid}`]: true
-                        });
-                    }
-                });
-                console.log("Like/Unlike successful");
-                // Refresh post data or update UI directly (more complex for real-time)
-            } catch (error) {
-                console.error("Error liking post:", error);
-                showInfoPopup("Like Error", "Failed to update like. " + error.message);
-            }
-        }
-
-        // Handle Emoji Reaction
-        async function handleEmojiReaction(postId, emoji) {
-            if (!currentUser) {
-                showInfoPopup("Login Required", "Please log in to react to posts.");
-                return;
-            }
-            const postRef = db.collection('posts').doc(postId);
-            try {
-                await db.runTransaction(async (transaction) => {
-                    const postDoc = await transaction.get(postRef);
-                    if (!postDoc.exists) {
-                        throw "Post does not exist!";
-                    }
-
-                    const reactions = postDoc.data().reactions || {};
-                    const userReaction = reactions[currentUser.uid];
-
-                    if (userReaction === emoji) {
-                        // User clicked same emoji again, remove reaction
-                        transaction.update(postRef, {
-                            [`reactions.${currentUser.uid}`]: firebase.firestore.FieldValue.delete()
-                        });
-                    } else {
-                        // Add or change reaction
-                        transaction.update(postRef, {
-                            [`reactions.${currentUser.uid}`]: emoji
-                        });
-                    }
-                });
-                console.log("Emoji reaction updated successfully");
-            } catch (error) {
-                console.error("Error adding emoji reaction:", error);
-                showInfoPopup("Reaction Error", "Failed to add reaction. " + error.message);
-            }
-        }
-
-
-        // Load Posts (with pagination and mixed layouts)
-        async function loadPosts(isRefresh = false) {
-            if (isFetchingPosts) return;
-            isFetchingPosts = true;
-            loadingPosts.style.display = 'block';
-
-            let query = db.collection('posts')
-                        .orderBy('createdAt', 'desc')
-                        .limit(10); // Fetch 10 posts at a time
-
-            if (lastVisiblePost && !isRefresh) {
-                query = query.startAfter(lastVisiblePost);
-            }
-
-            try {
-                const snapshot = await query.get();
-                if (snapshot.empty) {
-                    loadingPosts.textContent = 'No more posts.';
-                    isFetchingPosts = false;
-                    return;
-                }
-
-                if (isRefresh) {
-                    postFeed.innerHTML = ''; // Clear existing posts on refresh
-                }
-
-                const newPosts = [];
-                for (const doc of snapshot.docs) {
-                    const postData = doc.data();
-                    const userDoc = await db.collection('users').doc(postData.userId).get();
-                    const userData = userDoc.exists ? userDoc.data() : { username: 'Unknown User', profileLogo: '?' };
-
-                    // Simulate view count increment (one view per user per post)
-                    const viewsRef = db.collection('posts').doc(doc.id);
-                    const viewCountDoc = await viewsRef.collection('views').doc(currentUser.uid).get();
-
-                    if (!viewCountDoc.exists) {
-                        await viewsRef.collection('views').doc(currentUser.uid).set({ viewedAt: firebase.firestore.FieldValue.serverTimestamp() });
-                        await viewsRef.update({ views: firebase.firestore.FieldValue.increment(1) });
-                    }
-
-                    // Fetch likes and reactions for display
-                    const likesSnapshot = await viewsRef.collection('likes').get();
-                    const reactionsSnapshot = await viewsRef.collection('reactions').get();
-                    const reactions = {};
-                    reactionsSnapshot.forEach(rDoc => {
-                        const reactionData = rDoc.data();
-                        reactions[reactionData.emoji] = (reactions[reactionData.emoji] || 0) + 1;
-                    });
-                    const totalReactions = reactionsSnapshot.size;
-
-
-                    newPosts.push({
-                        id: doc.id,
-                        ...postData,
-                        username: userData.username,
-                        profileLogo: userData.profileLogo,
-                        likes: likesSnapshot.size,
-                        reactions: reactions,
-                        totalReactions: totalReactions,
-                        views: postData.views || 0 // Use updated view count
-                    });
-                }
-
-                lastVisiblePost = snapshot.docs[snapshot.docs.length - 1];
-
-                // --- Dynamic Layout Implementation ---
-                // This is a conceptual example. You'd need more sophisticated logic
-                // to truly mix vertical, horizontal, and table layouts dynamically
-                // based on post content or a predefined pattern.
-
-                let currentPostCount = postFeed.children.length;
-
-                newPosts.forEach((post, index) => {
-                    const postCard = createPostCard(post);
-                    const overallIndex = currentPostCount + index;
-
-                    if (overallIndex % 10 === 0 && overallIndex > 0) { // Every 10th post, add a horizontal section
-                        const horizontalContainer = document.createElement('div');
-                        horizontalContainer.classList.add('horizontal-posts-container');
-                        // Add some placeholder horizontal posts
-                        for (let i = 0; i < Math.floor(Math.random() * 7) + 4; i++) { // 4-10 horizontal posts
-                            const hPostCard = document.createElement('div');
-                            hPostCard.classList.add('horizontal-post-card');
-                            hPostCard.innerHTML = `<div class="profile-logo">H</div><div style="font-size:0.9em; color:#ccc;">Horizontal Post Example ${i+1}</div><p style="font-size:0.8em; margin-top:5px;">${post.content.substring(0, 50)}...</p>`;
-                            horizontalContainer.appendChild(hPostCard);
-                        }
-                        postFeed.appendChild(horizontalContainer);
-                    } else if (overallIndex % 7 === 0 && overallIndex > 0) { // Every 7th post, add a table section
-                        const tableContainer = document.createElement('div');
-                        tableContainer.classList.add('table-posts-container');
-                        for (let i = 0; i < Math.floor(Math.random() * 3) + 4; i++) { // 4-6 table posts
-                            const tPostCard = document.createElement('div');
-                            tPostCard.classList.add('table-post-card');
-                            tPostCard.innerHTML = `<div class="profile-logo">T</div><div class="post-content">${post.content.substring(0, 30)}...</div>`;
-                            tableContainer.appendChild(tPostCard);
-                        }
-                        postFeed.appendChild(tableContainer);
-                    }
-
-                    postFeed.appendChild(postCard); // Append the actual post
-                });
-
-
-                // Implement "never-ending" scroll by re-adding posts if list is short
-                if (postFeed.children.length < 15 && snapshot.docs.length < 10) { // If few posts and no more from DB
-                    // If less than 15 posts total after load, and less than 10 new posts,
-                    // it means we've hit the end of unique posts. Start showing duplicates.
-                    console.log("End of unique posts reached, recycling posts...");
-                    // Shuffle the newPosts and append them again.
-                    const recycledPosts = [...newPosts].sort(() => 0.5 - Math.random());
-                    recycledPosts.forEach(postData => {
-                        postFeed.appendChild(createPostCard(postData));
-                    });
-                }
-
-
-            } catch (error) {
-                console.error("Error loading posts:", error);
-                showInfoPopup("Post Loading Error", "Failed to load posts: " + error.message);
-            } finally {
-                loadingPosts.style.display = 'none';
-                isFetchingPosts = false;
-            }
-        }
-
-
-        // Infinite scroll for posts
-        postFeed.parentElement.addEventListener('scroll', () => {
-            if (postFeed.parentElement.scrollTop + postFeed.parentElement.clientHeight >= postFeed.parentElement.scrollHeight - 100) { // 100px from bottom
-                if (currentPage === 'home-feed-section') {
-                    loadPosts();
-                }
-            }
-        });
-
-        // Refresh posts button
-        refreshPostsButton.addEventListener('click', () => {
-            lastVisiblePost = null; // Reset for full refresh
-            loadPosts(true); // Pass true to indicate a refresh
-        });
-
-        // --- Post Upload Logic ---
-        uploadForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            if (!currentUser) {
-                showInfoPopup("Login Required", "Please log in to upload posts.");
-                return;
-            }
-
-            const content = postContentInput.value.trim();
-            const boostHours = parseInt(postBoostHours.value, 10);
-
-            if (!content) {
-                showInfoPopup("Upload Error", "Post content cannot be empty.");
-                return;
-            }
-
-            try {
-                // Check user balance (coins and limit) - This should ideally be verified by a Cloud Function for security
-                const userBalanceRef = db.collection('user_balances').doc(currentUser.uid);
-                const balanceDoc = await userBalanceRef.get();
-                const balance = balanceDoc.exists ? balanceDoc.data() : { coins: 0, limits: 0, credits: 0 };
-
-                let requiredCoins = 5;
-                let requiredLimit = 1;
-                let adsNeeded = 0;
-
-                if (boostHours === 18) adsNeeded = 1;
-                if (boostHours === 24) adsNeeded = 2;
-                if (boostHours === 30) adsNeeded = 3;
-
-                // For simplicity, we'll check client-side, but again, server-side is best.
-                if (balance.coins < requiredCoins || balance.limits < requiredLimit) {
-                    uploadStatus.textContent = 'Insufficient coins or limits. Watch an ad to get more.';
-                    showInfoPopup("Insufficient Funds", "You need 5 coins and 1 limit to upload a post. Please watch an ad to earn more.");
-                    // Implement ad-watching logic here
-                    return;
-                }
-
-                publishPostButton.disabled = true;
-                uploadStatus.textContent = 'Publishing post...';
-
-                // Calculate expiry date
-                const expiresAt = firebase.firestore.Timestamp.fromMillis(Date.now() + (boostHours * 60 * 60 * 1000));
-
-                await db.collection('posts').add({
-                    userId: currentUser.uid,
-                    username: (await db.collection('users').doc(currentUser.uid).get()).data().username, // Fetch current username
-                    profileLogo: (await db.collection('users').doc(currentUser.uid).get()).data().profileLogo, // Fetch current logo
-                    content: content,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    expiresAt: expiresAt, // Store expiry timestamp
-                    likes: 0,
-                    views: 0,
-                    reactions: {}, // Store reactions as { userId: emoji }
-                    boostHours: boostHours
-                });
-
-                // Deduct coins and limit (again, ideally via Cloud Function)
-                await userBalanceRef.update({
-                    coins: firebase.firestore.FieldValue.increment(-requiredCoins),
-                    limits: firebase.firestore.FieldValue.increment(-requiredLimit)
-                });
-
-                uploadStatus.textContent = 'Post published successfully!';
-                postContentInput.value = ''; // Clear textarea
-                publishPostButton.disabled = false;
-                loadPosts(true); // Refresh post feed
-            } catch (error) {
-                console.error("Error publishing post:", error);
-                uploadStatus.textContent = 'Error publishing post: ' + error.message;
-                showInfoPopup("Publish Error", "Error publishing post: " + error.message);
-                publishPostButton.disabled = false;
-            }
-        });
-
-
-        // --- Search Logic ---
-        searchInput.addEventListener('input', debounce(async (e) => {
-            const searchTerm = e.target.value.toLowerCase().trim();
-            searchResultsContainer.innerHTML = ''; // Clear previous results
-
-            if (searchTerm.length < 2) return;
-
-            // Search Users by username or name
-            const userQuery1 = db.collection('users')
-                                .where('username', '>=', searchTerm)
-                                .where('username', '<=', searchTerm + '\uf8ff')
-                                .limit(5);
-            const userQuery2 = db.collection('users')
-                                .where('name', '>=', searchTerm)
-                                .where('name', '<=', searchTerm + '\uf8ff')
-                                .limit(5);
-
-            const [usersSnapshot1, usersSnapshot2] = await Promise.all([userQuery1.get(), userQuery2.get()]);
-
-            const userResults = new Set(); // Use a Set to store unique user IDs
-            usersSnapshot1.forEach(doc => userResults.add(doc.id));
-            usersSnapshot2.forEach(doc => userResults.add(doc.id));
-
-            for (const userId of userResults) {
-                const userDoc = await db.collection('users').doc(userId).get();
-                const userData = userDoc.data();
-                if (userData) {
-                    const resultItem = document.createElement('div');
-                    resultItem.classList.add('search-result-item');
-                    resultItem.innerHTML = `
-                        <div class="profile-logo">${userData.profileLogo || generateProfileLogo(userId)}</div>
-                        <div class="search-result-info">
-                            <div class="search-result-username">${userData.username}</div>
-                            <div class="search-result-name">${userData.name}</div>
+                <div id="chat-window-container" class="chat-window-container hidden">
+                    <div class="chat-header">
+                        <button id="back-to-chats-btn" class="icon-button"><i class="fas fa-arrow-left"></i></button>
+                        <div class="profile-avatar small"></div>
+                        <span id="chat-partner-username">@ChatUser</span>
+                    </div>
+                    <div id="chat-messages" class="chat-messages">
                         </div>
-                        <button class="search-result-follow-btn" data-user-id="${userId}">Follow</button>
-                    `;
-                    resultItem.addEventListener('click', () => {
-                        loadUserProfile(userId);
-                        showPage('profile-page');
-                    });
-                    searchResultsContainer.appendChild(resultItem);
-                }
-            }
-
-            // Search Posts by content (more complex, consider a dedicated search service for scale)
-            // For now, a simple text search:
-            const postQuery = db.collection('posts')
-                                .orderBy('content')
-                                .startAt(searchTerm)
-                                .endAt(searchTerm + '\uf8ff')
-                                .limit(5);
-            const postsSnapshot = await postQuery.get();
-            postsSnapshot.forEach(async doc => {
-                const postData = doc.data();
-                const userDoc = await db.collection('users').doc(postData.userId).get();
-                const userData = userDoc.exists ? userDoc.data() : { username: 'Unknown User', profileLogo: '?' };
-
-                const postCard = createPostCard({ id: doc.id, ...postData, username: userData.username, profileLogo: userData.profileLogo });
-                searchResultsContainer.appendChild(postCard);
-            });
-
-
-            if (userResults.size === 0 && postsSnapshot.empty) {
-                searchResultsContainer.innerHTML = '<p style="text-align: center; color: #aaa;">No results found.</p>';
-            }
-
-        }, 300)); // Debounce search input to avoid too many requests
-
-        function debounce(func, delay) {
-            let timeout;
-            return function(...args) {
-                const context = this;
-                clearTimeout(timeout);
-                timeout = setTimeout(() => func.apply(context, args), delay);
-            };
-        }
-
-
-        // --- Messaging Logic ---
-
-        let currentChatSnapshotUnsubscribe = null; // To unsubscribe from real-time updates
-
-        // Load chat list
-        async function loadChatList() {
-            if (!currentUser) return;
-            chatListContainer.innerHTML = '<h2 class="section-heading">Chats</h2>'; // Clear and re-add heading
-
-            // Fetch chats where current user is user1 or user2
-            const chatsQuery = db.collection('chats')
-                .where('participants', 'array-contains', currentUser.uid)
-                .orderBy('lastMessageAt', 'desc');
-
-            chatsQuery.onSnapshot(async (snapshot) => {
-                chatListContainer.innerHTML = '<h2 class="section-heading">Chats</h2>'; // Clear for fresh load
-                if (snapshot.empty) {
-                    chatListContainer.innerHTML += '<p style="text-align: center; color: #aaa;">No chats yet.</p>';
-                }
-
-                for (const doc of snapshot.docs) {
-                    const chat = doc.data();
-                    const otherUserId = chat.participants.find(uid => uid !== currentUser.uid);
-
-                    if (otherUserId) {
-                        const otherUserDoc = await db.collection('users').doc(otherUserId).get();
-                        const otherUserData = otherUserDoc.exists ? otherUserDoc.data() : { username: 'Unknown', profileLogo: '?' };
-
-                        const chatItem = document.createElement('div');
-                        chatItem.classList.add('chat-list-item');
-                        chatItem.dataset.chatId = doc.id;
-                        chatItem.dataset.otherUserId = otherUserId;
-                        chatItem.innerHTML = `
-                            <div class="profile-logo">${otherUserData.profileLogo}</div>
-                            <div class="chat-info">
-                                <div class="chat-username">${otherUserData.username}</div>
-                                <div class="last-message">${chat.lastMessage || 'No messages yet.'}</div>
-                            </div>
-                        `;
-                        chatItem.addEventListener('click', () => openChatConversation(doc.id, otherUserId));
-                        chatListContainer.appendChild(chatItem);
-                    }
-                }
-            }, (error) => {
-                console.error("Error loading chat list:", error);
-                showInfoPopup("Chat Error", "Failed to load chat list.");
-            });
-        }
-
-
-        // Open specific chat conversation
-        async function openChatConversation(chatId, otherUserId) {
-            chatListContainer.style.display = 'none';
-            chatConversationContainer.style.display = 'flex';
-            chatMessages.innerHTML = ''; // Clear previous messages
-
-            currentChatTargetUserId = otherUserId; // Store for sending messages
-
-            const otherUserDoc = await db.collection('users').doc(otherUserId).get();
-            const otherUserData = otherUserDoc.exists ? otherUserDoc.data() : { username: 'Unknown', profileLogo: '?' };
-            currentChatUserLogo.textContent = otherUserData.profileLogo;
-            currentChatUsername.textContent = otherUserData.username;
-
-            // Unsubscribe from previous chat listener if active
-            if (currentChatSnapshotUnsubscribe) {
-                currentChatSnapshotUnsubscribe();
-            }
-
-            const messagesQuery = db.collection('chats').doc(chatId).collection('messages')
-                .where('timestamp', '>', firebase.firestore.Timestamp.fromMillis(Date.now() - 12 * 60 * 60 * 1000)) // Only show last 12 hours
-                .orderBy('timestamp', 'asc');
-
-            currentChatSnapshotUnsubscribe = messagesQuery.onSnapshot((snapshot) => {
-                chatMessages.innerHTML = ''; // Clear for real-time updates
-                snapshot.forEach(doc => {
-                    const message = doc.data();
-                    const messageBubble = document.createElement('div');
-                    messageBubble.classList.add('message-bubble');
-                    messageBubble.classList.add(message.senderId === currentUser.uid ? 'sent' : 'received');
-                    const time = message.timestamp ? new Date(message.timestamp.toDate()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'N/A';
-                    messageBubble.innerHTML = `<p>${message.content}</p><span class="message-time">${time}</span>`;
-                    chatMessages.appendChild(messageBubble);
-                });
-                chatMessages.scrollTop = chatMessages.scrollHeight; // Scroll to bottom
-            }, (error) => {
-                console.error("Error loading messages:", error);
-                showInfoPopup("Message Error", "Failed to load messages.");
-            });
-        }
-
-        backToChatListButton.addEventListener('click', () => {
-            chatConversationContainer.style.display = 'none';
-            chatListContainer.style.display = 'block';
-            if (currentChatSnapshotUnsubscribe) {
-                currentChatSnapshotUnsubscribe(); // Stop listening to messages
-                currentChatSnapshotUnsubscribe = null;
-            }
-            currentChatTargetUserId = null;
-            loadChatList(); // Refresh chat list
-        });
-
-        // Send message
-        sendMessageButton.addEventListener('click', async () => {
-            const content = messageInput.value.trim();
-            if (!content || !currentChatTargetUserId) return;
-
-            // Check credits before sending
-            const userBalanceRef = db.collection('user_balances').doc(currentUser.uid);
-            const balanceDoc = await userBalanceRef.get();
-            const balance = balanceDoc.exists ? balanceDoc.data() : { credits: 0 };
-
-            if (balance.credits < 1) {
-                showInfoPopup("Insufficient Credits", "You need 1 credit to send a message. Please watch an ad to earn more.");
-                return;
-            }
-
-            try {
-                // Determine chat ID (sorted combination of UIDs)
-                const participants = [currentUser.uid, currentChatTargetUserId].sort();
-                const chatId = participants.join('_');
-                const chatRef = db.collection('chats').doc(chatId);
-
-                await db.runTransaction(async (transaction) => {
-                    const chatDoc = await transaction.get(chatRef);
-
-                    if (!chatDoc.exists) {
-                        // Create new chat
-                        transaction.set(chatRef, {
-                            participants: participants,
-                            lastMessage: content,
-                            lastMessageAt: firebase.firestore.FieldValue.serverTimestamp()
-                        });
-                    } else {
-                        // Update existing chat
-                        transaction.update(chatRef, {
-                            lastMessage: content,
-                            lastMessageAt: firebase.firestore.FieldValue.serverTimestamp()
-                        });
-                    }
-
-                    // Add message to messages subcollection
-                    await chatRef.collection('messages').add({
-                        senderId: currentUser.uid,
-                        receiverId: currentChatTargetUserId,
-                        content: content,
-                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-
-                    // Deduct credit (again, server-side is more secure)
-                    await transaction.update(userBalanceRef, {
-                        credits: firebase.firestore.FieldValue.increment(-1)
-                    });
-                });
-
-                messageInput.value = ''; // Clear input
-                console.log("Message sent successfully!");
-            } catch (error) {
-                console.error("Error sending message:", error);
-                showInfoPopup("Message Send Error", "Failed to send message: " + error.message);
-            }
-        });
-
-
-        // --- User Profile Logic ---
-
-        async function loadUserProfile(userId) {
-            const userRef = db.collection('users').doc(userId);
-            try {
-                const userDoc = await userRef.get();
-                if (!userDoc.exists) {
-                    showInfoPopup("User Not Found", "The requested user profile does not exist.");
-                    return;
-                }
-                const userData = userDoc.data();
-
-                profilePageLogo.textContent = userData.profileLogo || generateProfileLogo(userId);
-                profilePageName.textContent = userData.name;
-                profilePageUsername.textContent = `@${userData.username}`;
-
-                // Social Media Links
-                if (userData.whatsapp) {
-                    profileWhatsappButton.style.display = 'flex';
-                    profileWhatsappButton.href = `https://wa.me/${userData.whatsapp}`;
-                } else {
-                    profileWhatsappButton.style.display = 'none';
-                }
-                if (userData.instagram) {
-                    profileInstagramButton.style.display = 'flex';
-                    profileInstagramButton.href = `https://instagram.com/${userData.instagram}`;
-                } else {
-                    profileInstagramButton.style.display = 'none';
-                }
-
-                // Follow button state
-                if (currentUser && currentUser.uid !== userId) {
-                    followUserButton.style.display = 'block';
-                    messageUserButton.style.display = 'block';
-
-                    const followDoc = await db.collection('follows').doc(`${currentUser.uid}_${userId}`).get();
-                    if (followDoc.exists) {
-                        followUserButton.textContent = 'Following';
-                        followUserButton.classList.add('following');
-                    } else {
-                        followUserButton.textContent = 'Follow';
-                        followUserButton.classList.remove('following');
-                    }
-                } else {
-                    followUserButton.style.display = 'none';
-                    messageUserButton.style.display = 'none';
-                }
-
-
-                // Fetch follower/following counts (and lists on click)
-                const followersSnapshot = await db.collection('follows').where('followingId', '==', userId).get();
-                const followingSnapshot = await db.collection('follows').where('followerId', '==', userId).get();
-                const postsSnapshot = await db.collection('posts').where('userId', '==', userId).get();
-
-                followersCount.textContent = formatNumber(followersSnapshot.size);
-                followingCount.textContent = formatNumber(followingSnapshot.size);
-                postsCount.textContent = formatNumber(postsSnapshot.size);
-
-                // Load user's posts
-                profilePostsSection.innerHTML = ''; // Clear existing posts
-                if (postsSnapshot.empty) {
-                    profilePostsSection.innerHTML = '<p style="text-align: center; color: #aaa;">No posts from this user yet.</p>';
-                } else {
-                    postsSnapshot.forEach(doc => {
-                        const postData = doc.data();
-                        const postCard = createPostCard({ id: doc.id, ...postData, username: userData.username, profileLogo: userData.profileLogo });
-                        profilePostsSection.appendChild(postCard);
-                    });
-                }
-
-                // Event listeners for follower/following stats to show lists
-                followersCount.parentElement.onclick = () => showFollowList(userId, 'followers');
-                followingCount.parentElement.onclick = () => showFollowList(userId, 'following');
-
-            } catch (error) {
-                console.error("Error loading user profile:", error);
-                showInfoPopup("Profile Error", "Failed to load profile: " + error.message);
-            }
-        }
-
-        // Follow/Unfollow User
-        followUserButton.addEventListener('click', async () => {
-            if (!currentUser) {
-                showInfoPopup("Login Required", "Please log in to follow users.");
-                return;
-            }
-            const targetUserId = profilePage.dataset.currentUserId; // Get the ID of the user whose profile is open
-            if (!targetUserId || targetUserId === currentUser.uid) return;
-
-            const followRef = db.collection('follows').doc(`${currentUser.uid}_${targetUserId}`);
-            try {
-                const followDoc = await followRef.get();
-                if (followDoc.exists) {
-                    // Unfollow
-                    await followRef.delete();
-                    await db.collection('users').doc(currentUser.uid).update({ following: firebase.firestore.FieldValue.increment(-1) });
-                    await db.collection('users').doc(targetUserId).update({ followers: firebase.firestore.FieldValue.increment(-1) });
-                    followUserButton.textContent = 'Follow';
-                    followUserButton.classList.remove('following');
-                    followersCount.textContent = formatNumber(parseInt(followersCount.textContent) - 1); // Update UI immediately
-                } else {
-                    // Follow
-                    await followRef.set({
-                        followerId: currentUser.uid,
-                        followingId: targetUserId,
-                        followedAt: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                    await db.collection('users').doc(currentUser.uid).update({ following: firebase.firestore.FieldValue.increment(1) });
-                    await db.collection('users').doc(targetUserId).update({ followers: firebase.firestore.FieldValue.increment(1) });
-                    followUserButton.textContent = 'Following';
-                    followUserButton.classList.add('following');
-                    followersCount.textContent = formatNumber(parseInt(followersCount.textContent) + 1); // Update UI immediately
-                }
-            } catch (error) {
-                console.error("Error following/unfollowing:", error);
-                showInfoPopup("Follow Error", "An error occurred. Please try again. " + error.message);
-            }
-        });
-
-        // Message User from Profile
-        messageUserButton.addEventListener('click', async () => {
-            if (!currentUser) {
-                showInfoPopup("Login Required", "Please log in to message users.");
-                return;
-            }
-            const targetUserId = profilePage.dataset.currentUserId;
-            if (!targetUserId || targetUserId === currentUser.uid) return;
-
-            // Find or create a chat
-            const participants = [currentUser.uid, targetUserId].sort();
-            const chatId = participants.join('_');
-
-            await openChatConversation(chatId, targetUserId);
-            showPage('message-page');
-        });
-
-        // Function to show followers/following list (popup or new section)
-        async function showFollowList(userId, type) {
-            const listContainer = document.createElement('div');
-            listContainer.classList.add('popup'); // Re-use popup styling
-            listContainer.innerHTML = `
-                <h3>${type === 'followers' ? 'Followers' : 'Following'}</h3>
-                <div class="follow-list-content" style="max-height: 400px; overflow-y: auto;"></div>
-                <button id="close-follow-list" style="margin-top: 20px;">Close</button>
-            `;
-            document.body.appendChild(listContainer);
-            listContainer.classList.add('show');
-
-            const followListContent = listContainer.querySelector('.follow-list-content');
-            const query = type === 'followers' ?
-                db.collection('follows').where('followingId', '==', userId) :
-                db.collection('follows').where('followerId', '==', userId);
-
-            try {
-                const snapshot = await query.get();
-                if (snapshot.empty) {
-                    followListContent.innerHTML = '<p style="text-align: center; color: #aaa;">No users found.</p>';
-                } else {
-                    for (const doc of snapshot.docs) {
-                        const followData = doc.data();
-                        const otherUserId = type === 'followers' ? followData.followerId : followData.followingId;
-                        const otherUserDoc = await db.collection('users').doc(otherUserId).get();
-                        if (otherUserDoc.exists) {
-                            const otherUserData = otherUserDoc.data();
-                            const listItem = document.createElement('div');
-                            listItem.classList.add('search-result-item'); // Re-use search item styling
-                            listItem.innerHTML = `
-                                <div class="profile-logo">${otherUserData.profileLogo || generateProfileLogo(otherUserId)}</div>
-                                <div class="search-result-info">
-                                    <div class="search-result-username">${otherUserData.username}</div>
-                                    <div class="search-result-name">${otherUserData.name}</div>
-                                </div>
-                            `;
-                            listItem.addEventListener('click', () => {
-                                listContainer.remove(); // Close list
-                                loadUserProfile(otherUserId);
-                                showPage('profile-page');
-                            });
-                            followListContent.appendChild(listItem);
-                        }
-                    }
-                }
-            } catch (error) {
-                console.error("Error loading follow list:", error);
-                followListContent.innerHTML = `<p style="color:red;">Error loading list: ${error.message}</p>`;
-            }
-
-            listContainer.querySelector('#close-follow-list').addEventListener('click', () => {
-                listContainer.remove();
-            });
-        }
-
-
-        // --- Navigation ---
-        bottomNav.addEventListener('click', (e) => {
-            const navItem = e.target.closest('.nav-item');
-            if (navItem) {
-                const page = navItem.dataset.page;
-                if (page === 'home') {
-                    showPage('home-feed-section');
-                    loadPosts(true); // Refresh home feed on navigation
-                } else if (page === 'search') {
-                    showPage('search-page');
-                } else if (page === 'upload') {
-                    showPage('post-upload-section');
-                } else if (page === 'messages') {
-                    showPage('message-page');
-                    loadChatList();
-                } else if (page === 'profile') {
-                    if (currentUser) {
-                        loadUserProfile(currentUser.uid); // Load own profile
-                        showPage('profile-page');
-                    } else {
-                        showInfoPopup("Login Required", "Please log in to view your profile.");
-                    }
-                }
-            }
-        });
-
-        // Sidebar Menu Toggle
-        menuButton.addEventListener('click', () => {
-            sidebarMenu.classList.add('open');
-            overlay.style.display = 'block';
-        });
-        closeMenuBtn.addEventListener('click', () => {
-            sidebarMenu.classList.remove('open');
-            overlay.style.display = 'none';
-        });
-        overlay.addEventListener('click', () => {
-            sidebarMenu.classList.remove('open');
-            overlay.style.display = 'none';
-        });
-
-
-        // Data Saver Toggle
-        dataSaverToggle.addEventListener('click', (e) => {
-            e.preventDefault();
-            isDataSaverOn = !isDataSaverOn;
-            dataSaverStatus.textContent = isDataSaverOn ? 'On' : 'Off';
-            showInfoPopup("Data Saver", `Data Saver is now ${isDataSaverOn ? 'On' : 'Off'}.`);
-            // Implement actual data saving logic (e.g., lower image quality, less frequent updates)
-        });
-
-        // About App / Privacy Policy
-        aboutAppButton.addEventListener('click', (e) => {
-            e.preventDefault();
-            showInfoPopup("About AddMint", "AddMint is a social media app designed for sharing posts, connecting with users, and more! Developed by @add_mint.");
-        });
-        privacyPolicyButton.addEventListener('click', (e) => {
-            e.preventDefault();
-            showInfoPopup("Privacy Policy", "Your privacy is important to us. We collect minimal data for app functionality. For full details, please refer to our website (link coming soon).");
-        });
-
-
-        // Logout
-        logoutButton.addEventListener('click', async () => {
-            try {
-                await auth.signOut();
-                showInfoPopup("Logged Out", "You have been successfully logged out.");
-                // onAuthStateChanged will handle redirection to auth page
-            } catch (error) {
-                showInfoPopup("Logout Error", error.message);
-            }
-        });
-
-        // Daily Reward System
-        async function checkAndShowDailyReward() {
-            if (!currentUser) return;
-
-            const lastClaimDoc = await db.collection('user_rewards').doc(currentUser.uid).get();
-            const lastClaimTime = lastClaimDoc.exists ? lastClaimDoc.data().lastClaimedAt.toDate() : null;
-            const now = new Date();
-
-            if (!lastClaimTime || (now.getTime() - lastClaimTime.getTime()) >= (24 * 60 * 60 * 1000)) {
-                // It's been at least 24 hours or never claimed
-                rewardMessage.textContent = "Claim your daily reward of 2 Limits, 10 Coins, and 10 Credits!";
-                rewardPopup.classList.add('show');
-                // You might add an animation to the gift icon here
-                giftButton.classList.add('animate-pulse'); // Add a CSS class for animation
-            } else {
-                const nextClaimTime = new Date(lastClaimTime.getTime() + (24 * 60 * 60 * 1000));
-                const timeLeft = nextClaimTime.getTime() - now.getTime();
-                const hoursLeft = Math.floor(timeLeft / (1000 * 60 * 60));
-                const minutesLeft = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-                console.log(`Next reward in: ${hoursLeft}h ${minutesLeft}m`);
-                // You can show a notification or update UI with countdown
-            }
-        }
-
-        claimRewardButton.addEventListener('click', async () => {
-            if (!currentUser) {
-                showInfoPopup("Login Required", "Please log in to claim rewards.");
-                return;
-            }
-
-            try {
-                // This transaction is CRUCIAL to prevent double-claiming if users click rapidly
-                await db.runTransaction(async (transaction) => {
-                    const userBalanceRef = db.collection('user_balances').doc(currentUser.uid);
-                    const lastClaimDocRef = db.collection('user_rewards').doc(currentUser.uid);
-
-                    const [balanceDoc, lastClaimDoc] = await transaction.getAll(userBalanceRef, lastClaimDocRef);
-
-                    const lastClaimTime = lastClaimDoc.exists ? lastClaimDoc.data().lastClaimedAt.toDate() : null;
-                    const now = new Date();
-
-                    if (!lastClaimTime || (now.getTime() - lastClaimTime.getTime()) >= (24 * 60 * 60 * 1000)) {
-                        // Update balance
-                        const currentBalance = balanceDoc.exists ? balanceDoc.data() : { limits: 0, coins: 0, credits: 0 };
-                        transaction.set(userBalanceRef, {
-                            limits: (currentBalance.limits || 0) + 2,
-                            coins: (currentBalance.coins || 0) + 10,
-                            credits: (currentBalance.credits || 0) + 10
-                        }, { merge: true });
-
-                        // Record last claim time
-                        transaction.set(lastClaimDocRef, {
-                            lastClaimedAt: firebase.firestore.FieldValue.serverTimestamp()
-                        }, { merge: true });
-
-                        rewardPopup.classList.remove('show');
-                        giftButton.classList.remove('animate-pulse');
-                        showInfoPopup("Reward Claimed!", "You received 2 Limits, 10 Coins, and 10 Credits!");
-                    } else {
-                        const nextClaimTime = new Date(lastClaimTime.getTime() + (24 * 60 * 60 * 1000));
-                        const timeLeft = nextClaimTime.getTime() - now.getTime();
-                        const hoursLeft = Math.floor(timeLeft / (1000 * 60 * 60));
-                        const minutesLeft = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-                        showInfoPopup("Daily Reward", `You can claim your next reward in ${hoursLeft} hours and ${minutesLeft} minutes.`);
-                        rewardPopup.classList.remove('show'); // Hide reward popup if not ready
-                    }
-                });
-            } catch (error) {
-                console.error("Error claiming reward:", error);
-                showInfoPopup("Reward Error", "Failed to claim reward. " + error.message);
-            }
-        });
-
-        // This function would be called by your ad platform's callback
-        // In a real app, this would be a secure Cloud Function endpoint.
-        async function rewardUserForAd(userId, rewardType) {
-            // This entire function MUST be a Cloud Function for security.
-            // Client-side execution of this is exploitable.
-            if (!userId) return;
-
-            const userBalanceRef = db.collection('user_balances').doc(userId);
-            try {
-                await db.runTransaction(async (transaction) => {
-                    const balanceDoc = await transaction.get(userBalanceRef);
-                    const currentBalance = balanceDoc.exists ? balanceDoc.data() : { limits: 0, coins: 0, credits: 0 };
-
-                    if (rewardType === 'limit') {
-                        transaction.set(userBalanceRef, { limits: (currentBalance.limits || 0) + 1 }, { merge: true });
-                        showInfoPopup("Reward Earned", "You earned 1 Limit!");
-                    } else if (rewardType === 'coins') {
-                        transaction.set(userBalanceRef, { coins: (currentBalance.coins || 0) + 10 }, { merge: true });
-                        showInfoPopup("Reward Earned", "You earned 10 Coins!");
-                    } else if (rewardType === 'credits') {
-                        transaction.set(userBalanceRef, { credits: (currentBalance.credits || 0) + 10 }, { merge: true });
-                        showInfoPopup("Reward Earned", "You earned 10 Credits!");
-                    }
-                });
-            } catch (error) {
-                console.error("Error rewarding user for ad:", error);
-                showInfoPopup("Reward Error", "Failed to process ad reward: " + error.message);
-            }
-        }
-
-
-        // Global Error Handling
-        window.onerror = function(message, source, lineno, colno, error) {
-            console.error("Global JS Error:", message, source, lineno, colno, error);
-            // Optionally, log this to a backend for monitoring
-            // showInfoPopup("App Error", "An unexpected error occurred: " + message);
-            return true; // Suppress default browser error
-        };
-
-        // Initialize with default page view
-        // The onAuthStateChanged listener will handle the initial page display.
-    </script>
+                    <div class="chat-input-area">
+                        <textarea id="message-input" placeholder="Type your message..."></textarea>
+                        <button id="send-message-btn" class="btn primary-btn"><i class="fas fa-paper-plane"></i></button>
+                    </div>
+                    <div class="emoji-picker-chat hidden">
+                        <span class="emoji-option" data-emoji="👍">👍</span>
+                        <span class="emoji-option" data-emoji="❤️">❤️</span>
+                        <span class="emoji-option" data-emoji="😂">😂</span>
+                        <span class="emoji-option" data-emoji="😢">😢</span>
+                        <span class="emoji-option" data-emoji="🔥">🔥</span>
+                    </div>
+                </div>
+            </section>
+
+            <section id="search-screen" class="app-screen">
+                <h2>Search Users & Posts</h2>
+                <div class="search-input-group">
+                    <input type="text" id="search-query" placeholder="Search by username, keyword...">
+                    <button class="btn primary-btn" id="search-btn"><i class="fas fa-search"></i></button>
+                </div>
+                <div id="search-results" class="search-results-container">
+                    <h3>Users</h3>
+                    <ul id="search-user-list" class="search-list">
+                        </ul>
+                    <h3>Posts</h3>
+                    <div id="search-post-list" class="posts-feed">
+                        </div>
+                    <div id="no-search-results" class="hidden">No results found.</div>
+                </div>
+            </section>
+
+            <section id="about-screen" class="app-screen">
+                <h2>About AddMint</h2>
+                <p>AddMint is a revolutionary social media platform designed to connect people through shared interests and engaging content. We believe in fostering a positive and vibrant community where every voice can be heard.</p>
+                <p>Our mission is to provide a seamless and professional experience for all users, offering unique features like dynamic post feeds, real-time messaging, and interactive user profiles.</p>
+                <p>For support or inquiries, please contact us at support@addmint.com.</p>
+            </section>
+
+            <section id="privacy-screen" class="app-screen">
+                <h2>Privacy Policy</h2>
+                <p>Your privacy is paramount to us at AddMint. This policy outlines how we collect, use, and protect your personal information.</p>
+                <h3>Information We Collect:</h3>
+                <ul>
+                    <li><strong>Account Information:</strong> Username, email, password (hashed).</li>
+                    <li><strong>Profile Information:</strong> Optional WhatsApp number, Instagram ID, chosen profile logo.</li>
+                    <li><strong>Content Data:</strong> Posts, messages, likes, reactions, views.</li>
+                    <li><strong>Usage Data:</strong> Interactions with the app, features used, and technical data (e.g., device type).</li>
+                </ul>
+                <h3>How We Use Your Information:</h3>
+                <ul>
+                    <li>To provide and maintain our services.</li>
+                    <li>To personalize your experience and show relevant content.</li>
+                    <li>To communicate with you regarding updates, security alerts, and support.</li>
+                    <li>To monitor and analyze usage patterns for service improvement.</li>
+                    <li>To enforce our terms and conditions and prevent misuse.</li>
+                </ul>
+                <h3>Data Sharing:</h3>
+                <p>We do not share your personal information with third parties except as necessary to provide our services (e.g., Firebase for database), comply with legal obligations, or with your explicit consent.</p>
+                <h3>Data Security:</h3>
+                <p>We implement robust security measures, including encryption and access controls, to protect your data. However, no internet transmission is 100% secure.</p>
+                <h3>Your Choices:</h3>
+                <ul>
+                    <li>You can update your profile information at any time.</li>
+                    <li>You can delete your account by contacting support.</li>
+                    <li>You can control notification preferences.</li>
+                </ul>
+                <p>By using AddMint, you agree to the terms of this Privacy Policy. We may update this policy periodically, and we will notify you of any significant changes.</p>
+            </section>
+        </main>
+
+        <footer class="app-bottom-nav">
+            <a href="#" class="nav-item active" data-screen="home">
+                <div class="icon-wrapper home-icon"></div>
+                <span>Home</span>
+            </a>
+            <a href="#" class="nav-item" data-screen="search">
+                <div class="icon-wrapper search-icon"></div>
+                <span>Search</span>
+            </a>
+            <a href="#" class="nav-item" data-screen="upload">
+                <div class="icon-wrapper upload-icon"></div>
+                <span>Upload</span>
+            </a>
+            <a href="#" class="nav-item" data-screen="messages">
+                <div class="icon-wrapper messages-icon"></div>
+                <span>Messages</span>
+            </a>
+            <a href="#" class="nav-item" data-screen="profile">
+                <div class="icon-wrapper profile-icon"></div>
+                <span>Profile</span>
+            </a>
+        </footer>
+
+        <div id="ad-modal" class="modal hidden">
+            <div class="modal-content">
+                <h3>Watch Ad to Earn Reward</h3>
+                <p>Please watch a short ad to claim your reward (e.g., coins, credit, limit).</p>
+                <div id="ad-placeholder">
+                    <p>Simulating Ad (5 seconds)...</p>
+                </div>
+                <button class="btn secondary-btn" id="close-ad-modal" disabled>Close Ad</button>
+            </div>
+        </div>
+
+        <div id="reward-popup" class="modal hidden">
+            <div class="modal-content reward-content">
+                <h3>Reward Claimed! <i class="fas fa-trophy"></i></h3>
+                <p id="reward-message"></p>
+                <button class="btn primary-btn" id="close-reward-popup">Great!</button>
+            </div>
+        </div>
+
+        <div id="toast-notification" class="toast-notification"></div>
+
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
