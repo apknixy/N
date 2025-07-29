@@ -2042,46 +2042,69 @@
 
         // --- Splash Screen & Initial Load ---
         // Get references to your elements
+const sp// Ensure these elements exist in your HTML with these IDs
 const splashScreen = document.getElementById('splash-screen');
-const appContainer = document.getElementById('app-container');
-const authScreen = document.getElementById('auth-screen');
+const appContainer = document.getElementById('app-container'); // Your main app content
+const authScreen = document.getElementById('auth-screen');   // Your login/signup screen
 
-// Function to show a specific screen
+// Optional: If you have a function to show specific screens
+// Make sure this function handles hiding other screens
 function showScreen(screenId) {
-    // Hide all main screens first (if you have multiple)
-    // For simplicity, we'll just show the target and hide the other main one.
-    if (screenId === 'feed-screen') {
-        appContainer.classList.remove('hidden');
-        authScreen.classList.add('hidden'); // Ensure auth screen is hidden
-        // Potentially show the specific feed-screen div within appContainer if needed
-        document.getElementById('feed-screen').classList.remove('hidden'); // If feed-screen is also hidden initially
-    } else if (screenId === 'auth-screen') {
-        authScreen.classList.remove('hidden');
-        appContainer.classList.add('hidden'); // Ensure app container is hidden
+    // Example: Hide all main screens first, then show the desired one
+    document.querySelectorAll('.app-screen').forEach(screen => {
+        screen.classList.add('hidden');
+    });
+    const targetScreen = document.getElementById(screenId);
+    if (targetScreen) {
+        targetScreen.classList.remove('hidden');
     }
 }
 
-
 window.addEventListener('load', () => {
-    // Splash screen visible for 2 seconds (initial delay)
+    // Initial state: Splash screen visible, other screens hidden (via CSS or JS here)
+    if (splashScreen) {
+        splashScreen.classList.remove('hidden'); // Ensure it's visible initially
+    }
+    if (appContainer) appContainer.classList.add('hidden');
+    if (authScreen) authScreen.classList.add('hidden');
+
     setTimeout(() => {
-        splashScreen.style.opacity = '0'; // Start fading out the splash screen
+        if (splashScreen) {
+            splashScreen.style.opacity = '0'; // Start fade-out
+        }
 
-        // Wait for splash fade-out animation (1 second)
         setTimeout(() => {
-            splashScreen.classList.add('hidden'); // Fully remove splash screen from layout
+            if (splashScreen) {
+                splashScreen.classList.add('hidden'); // Fully hide after fade
+            }
 
-            // Check auth state and show correct screen after splash fades
-            auth.onAuthStateChanged(user => {
-                if (user) {
-                    showScreen('feed-screen'); // User logged in, show feed
-                } else {
-                    showScreen('auth-screen'); // User not logged in, show auth screen
+            // Check authentication state
+            // Make sure 'auth' is defined and initialized (e.g., from Firebase)
+            if (typeof auth !== 'undefined' && auth.onAuthStateChanged) {
+                auth.onAuthStateChanged(user => {
+                    if (user) {
+                        if (appContainer) {
+                            appContainer.classList.remove('hidden');
+                            // Assuming 'feed-screen' is inside appContainer or managed by showScreen
+                            showScreen('feed-screen');
+                        }
+                    } else {
+                        if (authScreen) {
+                            authScreen.classList.remove('hidden');
+                        }
+                    }
+                });
+            } else {
+                console.error("Firebase 'auth' object not found or not initialized.");
+                // Fallback if auth isn't ready, maybe show authScreen by default
+                if (authScreen) {
+                    authScreen.classList.remove('hidden');
                 }
-            });
-        }, 1000); // This should match the CSS transition duration for opacity
-    }, 2000); // Splash screen remains fully opaque for 2 seconds
+            }
+        }, 1000); // Wait for splash fade-out (CSS transition duration)
+    }, 2000); // Splash screen visible for 2 seconds initially
 });
+
 
         // --- Authentication Logic ---
         auth.onAuthStateChanged(user => {
