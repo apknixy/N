@@ -9,7 +9,8 @@
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-storage-compat.js"></script>
-    </head>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-functions-compat.js"></script>
+</head>
 <body>
     <div id="splash-screen" class="splash-screen">
         <div class="splash-logo"></div>
@@ -19,60 +20,69 @@
     <div id="app-container" class="app-container hidden">
         <header class="app-header">
             <div class="header-left">
-                <button id="menu-toggle" class="icon-button"></button> </div>
+                <button id="menu-toggle" class="icon-button hamburger-icon" aria-label="Open menu"></button>
+            </div>
             <div class="header-center">
                 <span class="app-title">Add Mint</span>
             </div>
             <div class="header-right">
-                <button id="gift-button" class="icon-button gift-icon"></button>
-                <button id="refresh-posts-button" class="icon-button refresh-icon"></button>
+                <button id="gift-button" class="icon-button gift-icon" aria-label="Daily Reward"></button>
+                <button id="refresh-posts-button" class="icon-button refresh-icon" aria-label="Refresh Posts"></button>
             </div>
         </header>
 
-        <nav id="side-menu" class="side-menu">
+        <nav id="side-menu" class="side-menu" aria-label="Main navigation">
             <ul class="menu-list">
                 <li><a href="#" id="menu-profile">My Profile</a></li>
                 <li><a href="#" id="menu-search">Search</a></li>
                 <li><a href="#" id="menu-messages">Messages</a></li>
                 <li><a href="#" id="menu-upload">Upload Post</a></li>
                 <li class="menu-separator"></li>
-                <li><a href="#" id="menu-data-saver">Data Saver <span class="toggle-switch"></span></a></li>
-                <li><a href="#" id="menu-instagram">Instagram <span class="social-icon instagram-icon"></span></a></li>
-                <li><a href="#" id="menu-youtube">YouTube <span class="social-icon youtube-icon"></span></a></li>
+                <li><label for="data-saver-toggle">Data Saver</label><input type="checkbox" id="data-saver-toggle" class="toggle-switch"></li>
+                <li><a href="#" id="menu-instagram">Instagram <span class="social-icon instagram-icon" aria-hidden="true"></span></a></li>
+                <li><a href="#" id="menu-youtube">YouTube <span class="social-icon youtube-icon" aria-hidden="true"></span></a></li>
+                <li class="menu-separator"></li>
                 <li><a href="#" id="menu-about">About Us</a></li>
                 <li><a href="#" id="menu-privacy-policy">Privacy Policy</a></li>
                 <li><button id="logout-button">Logout</button></li>
             </ul>
         </nav>
-        <div id="overlay" class="overlay"></div> <main class="main-content">
+        <div id="overlay" class="overlay" aria-hidden="true"></div> <main class="main-content">
             <section id="auth-section" class="auth-section active">
                 <h2>Welcome to Add Mint</h2>
-                <div id="login-form">
+                <div class="form-container">
                     <h3>Login</h3>
-                    <input type="email" id="login-email" placeholder="Email">
-                    <input type="password" id="login-password" placeholder="Password">
+                    <input type="email" id="login-email" placeholder="Email" aria-label="Login Email">
+                    <input type="password" id="login-password" placeholder="Password" aria-label="Login Password">
                     <button id="login-btn">Login</button>
+                    <p class="auth-toggle">Don't have an account? <a href="#" id="show-signup">Sign Up</a></p>
                 </div>
-                <div id="signup-form">
+                <div class="form-container hidden" id="signup-form-container">
                     <h3>Sign Up</h3>
-                    <input type="email" id="signup-email" placeholder="Email">
-                    <input type="password" id="signup-password" placeholder="Password">
+                    <input type="email" id="signup-email" placeholder="Email" aria-label="Signup Email">
+                    <input type="password" id="signup-password" placeholder="Password" aria-label="Signup Password">
                     <button id="signup-btn">Sign Up</button>
+                    <p class="auth-toggle">Already have an account? <a href="#" id="show-login">Login</a></p>
                 </div>
             </section>
 
             <section id="profile-setup-section" class="profile-setup-section hidden">
                 <h2>Complete Your Profile</h2>
-                <input type="text" id="setup-name" placeholder="Full Name">
-                <input type="text" id="setup-username" placeholder="Unique Username">
-                <span id="username-status"></span> <input type="text" id="setup-whatsapp" placeholder="WhatsApp Number (Optional)">
-                <input type="text" id="setup-instagram" placeholder="Instagram ID (Optional)">
-                <div class="profile-logo-selection">
-                    <h3>Choose a Profile Logo:</h3>
-                    <div id="logo-options">
-                        </div>
+                <div class="profile-setup-form">
+                    <input type="text" id="setup-name" placeholder="Full Name (Required)" aria-label="Full Name">
+                    <div class="username-input-container">
+                        <input type="text" id="setup-username" placeholder="Unique Username (Required)" aria-label="Unique Username">
+                        <span id="username-status" class="username-status"></span> </div>
+                    <input type="text" id="setup-whatsapp" placeholder="WhatsApp Number (Optional, or Instagram)" aria-label="WhatsApp Number">
+                    <input type="text" id="setup-instagram" placeholder="Instagram ID (Optional, or WhatsApp)" aria-label="Instagram ID">
+                    <p class="required-note">Please provide at least one of WhatsApp or Instagram.</p>
+                    <div class="profile-logo-selection">
+                        <h3>Choose a Profile Logo:</h3>
+                        <div id="logo-options" class="logo-grid">
+                            </div>
+                    </div>
+                    <button id="complete-profile-btn">Complete Profile</button>
                 </div>
-                <button id="complete-profile-btn">Complete Profile</button>
             </section>
 
             <section id="feed-section" class="feed-section hidden active-section">
@@ -87,22 +97,23 @@
                     <h3 id="profile-display-name"></h3>
                     <p id="profile-display-username"></p>
                     <div class="profile-stats">
-                        <span id="profile-followers">0 Followers</span>
-                        <span id="profile-following">0 Following</span>
+                        <span id="profile-followers" class="clickable-stat">0 Followers</span>
+                        <span id="profile-following" class="clickable-stat">0 Following</span>
                     </div>
                     <div class="profile-actions">
-                        <button id="follow-button" class="action-button follow-button">Follow</button>
-                        <button id="message-button" class="action-button message-button">Message</button>
-                        <button id="profile-whatsapp-button" class="social-button whatsapp-icon hidden"></button>
-                        <button id="profile-instagram-button" class="social-button instagram-icon hidden"></button>
+                        <button id="follow-button" class="action-button follow-button hidden"></button>
+                        <button id="message-button" class="action-button message-button hidden">Message</button>
+                        <button id="profile-whatsapp-button" class="social-button whatsapp-icon hidden" aria-label="WhatsApp"></button>
+                        <button id="profile-instagram-button" class="social-button instagram-icon hidden" aria-label="Instagram"></button>
                     </div>
+                    <button id="edit-profile-button" class="action-button edit-button hidden">Edit Profile</button>
                 </div>
                 <div id="user-posts-container" class="user-posts-container">
                     </div>
             </section>
 
             <section id="search-section" class="search-section hidden">
-                <input type="text" id="search-input" placeholder="Search users, posts...">
+                <input type="text" id="search-input" placeholder="Search users, posts..." aria-label="Search Input">
                 <div id="search-results" class="search-results">
                     <div id="user-search-results" class="user-search-results">
                         <h4>Users</h4>
@@ -114,46 +125,53 @@
             </section>
 
             <section id="messages-section" class="messages-section hidden">
-                <div class="chat-list" id="chat-list">
-                    </div>
+                <div class="chat-list-container" id="chat-list-container">
+                    <h4>Your Chats</h4>
+                    <div class="chat-list" id="chat-list">
+                        </div>
+                </div>
+
                 <div class="chat-window hidden" id="chat-window">
                     <div class="chat-header">
-                        <button class="back-to-chat-list">&lt; Back</button>
+                        <button class="back-to-chat-list" aria-label="Back to Chat List">&lt; Back</button>
                         <h4 id="chat-partner-name"></h4>
                     </div>
                     <div class="messages-display" id="messages-display">
                         </div>
                     <div class="message-input-area">
-                        <input type="text" id="message-input" placeholder="Type your message...">
-                        <button id="send-message-button">Send</button>
-                        <button id="emoji-reaction-button" class="emoji-button"></button> </div>
+                        <input type="text" id="message-input" placeholder="Type your message..." aria-label="Message Input">
+                        <button id="send-message-button" aria-label="Send Message">Send</button>
+                        <button id="message-emoji-reaction-button" class="emoji-button" aria-label="Emoji reaction"></button> </div>
                 </div>
             </section>
 
             <section id="upload-section" class="upload-section hidden">
                 <h2>Upload New Post</h2>
-                <input type="file" id="post-image-input" accept="image/*">
-                <textarea id="post-caption-input" placeholder="Write your caption..."></textarea>
-                <div class="post-boost-options">
-                    <label>
-                        <input type="radio" name="boost-hours" value="12" checked> 12 Hours (Free)
-                    </label>
-                    <label>
-                        <input type="radio" name="boost-hours" value="18"> 18 Hours (1 Ad)
-                    </label>
-                    <label>
-                        <input type="radio" name="boost-hours" value="24"> 24 Hours (2 Ads)
-                    </label>
-                    <label>
-                        <input type="radio" name="boost-hours" value="30"> 30 Hours (3 Ads)
-                    </label>
+                <div class="upload-form">
+                    <input type="file" id="post-image-input" accept="image/*" aria-label="Upload Post Image">
+                    <textarea id="post-caption-input" placeholder="Write your caption..." aria-label="Post Caption"></textarea>
+                    <div class="post-boost-options">
+                        <h3>Boost Post Duration:</h3>
+                        <label>
+                            <input type="radio" name="boost-hours" value="12" checked> 12 Hours (Free)
+                        </label>
+                        <label>
+                            <input type="radio" name="boost-hours" value="18"> 18 Hours (1 Ad)
+                        </label>
+                        <label>
+                            <input type="radio" name="boost-hours" value="24"> 24 Hours (2 Ads)
+                        </label>
+                        <label>
+                            <input type="radio" name="boost-hours" value="30"> 30 Hours (3 Ads)
+                        </label>
+                    </div>
+                    <button id="upload-post-button">Upload Post</button>
                 </div>
-                <button id="upload-post-button">Upload Post</button>
             </section>
 
             <div id="reward-popup" class="reward-popup hidden">
                 <div class="reward-content">
-                    <h3 id="reward-title">Daily Reward!</h3>
+                    <h3 id="reward-title"></h3>
                     <p id="reward-message"></p>
                     <button id="claim-reward-button">Claim</button>
                     <button id="close-reward-popup">Close</button>
@@ -162,19 +180,45 @@
 
             <div id="ad-viewer" class="ad-viewer hidden">
                 <p>Watching an Ad...</p>
-                <div class="ad-progress-bar"></div>
+                <div class="ad-progress-bar">
+                    <div class="ad-progress-fill"></div>
+                </div>
                 <button id="skip-ad-button" class="hidden">Skip Ad (for testing)</button>
+            </div>
+
+            <div id="follow-list-modal" class="follow-list-modal hidden">
+                <div class="modal-content">
+                    <h3 id="follow-list-title"></h3>
+                    <div id="follow-list-container" class="follow-list-container">
+                        </div>
+                    <button class="close-modal-button">Close</button>
+                </div>
             </div>
 
 
         </main>
 
         <nav class="bottom-nav">
-            <button id="nav-home" class="nav-button active"><span class="icon home-icon"></span><span class="label">Home</span></button>
-            <button id="nav-search" class="nav-button"><span class="icon search-icon"></span><span class="label">Search</span></button>
-            <button id="nav-add-post" class="nav-button"><span class="icon add-post-icon"></span><span class="label">Post</span></button>
-            <button id="nav-messages" class="nav-button"><span class="icon messages-icon"></span><span class="label">Messages</span></button>
-            <button id="nav-profile" class="nav-button"><span class="icon profile-icon"></span><span class="label">Profile</span></button>
+            <button id="nav-home" class="nav-button active" aria-label="Home Feed">
+                <span class="icon home-icon" aria-hidden="true"></span>
+                <span class="label">Home</span>
+            </button>
+            <button id="nav-search" class="nav-button" aria-label="Search">
+                <span class="icon search-icon" aria-hidden="true"></span>
+                <span class="label">Search</span>
+            </button>
+            <button id="nav-add-post" class="nav-button" aria-label="Add New Post">
+                <span class="icon add-post-icon" aria-hidden="true"></span>
+                <span class="label">Post</span>
+            </button>
+            <button id="nav-messages" class="nav-button" aria-label="Messages">
+                <span class="icon messages-icon" aria-hidden="true"></span>
+                <span class="label">Messages</span>
+            </button>
+            <button id="nav-profile" class="nav-button" aria-label="My Profile">
+                <span class="icon profile-icon" aria-hidden="true"></span>
+                <span class="label">Profile</span>
+            </button>
         </nav>
     </div>
 
