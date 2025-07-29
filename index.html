@@ -2,226 +2,3194 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Mint</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-storage-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-functions-compat.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AddMint</title>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-analytics-compat.js"></script>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    
+    <style>
+        :root {
+            --primary-color: #2E7D32; /* Deep Green */
+            --background-color: #121212;
+            --surface-color: #1E1E1E;
+            --text-color: #E0E0E0;
+            --accent-color: #FFC107; /* Gold */
+            --button-color: #388E3C; /* Muted Green */
+            --red-color: #D32F2F; /* Red */
+            --link-color: #2196F3; /* Blue for links */
+            --neon-glow: #00ffcc; /* Cyan for neon effect */
+        }
+
+        /* Basic Resets & Fonts */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            height: 100%;
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Splash Screen */
+        #splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--background-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 1;
+            transition: opacity 1s ease-out;
+        }
+
+        #splash-logo {
+            font-size: 3rem;
+            color: var(--primary-color);
+            font-weight: 700;
+            text-shadow: 0 0 10px rgba(46, 125, 50, 0.5);
+            animation: pulse-glow 2s infinite ease-in-out;
+            margin-bottom: 20px;
+        }
+
+        @keyframes pulse-glow {
+            0% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.05); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.8; }
+        }
+
+        #splash-screen p {
+            color: var(--text-color);
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+
+        /* Main App Layout */
+        #app-container {
+            display: none;
+            flex-direction: column;
+            height: 100%;
+            width: 100%;
+            transition: opacity 0.5s;
+        }
+
+        header {
+            background-color: var(--surface-color);
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            z-index: 50;
+            height: 56px;
+            justify-content: space-between;
+        }
+
+        .header-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            animation: pulse-glow 3s infinite ease-in-out;
+            cursor: pointer; /* To make it clickable for refresh */
+        }
+
+        .header-icons {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .header-icon-btn, .bottom-nav-btn {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            cursor: pointer;
+            padding: 8px;
+            transition: transform 0.2s, color 0.2s;
+            position: relative;
+        }
+
+        .header-icon-btn:hover, .bottom-nav-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .icon-text-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 0.6rem;
+            line-height: 1.2;
+            color: var(--accent-color);
+            margin-left: 4px;
+        }
+        
+        .icon-text-container .material-symbols-outlined {
+            font-size: 1.2rem;
+            color: var(--accent-color);
+        }
+        
+        .header-credit-info {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.8rem;
+            color: var(--accent-color);
+        }
+
+        .header-credit-info .material-symbols-outlined {
+            font-size: 1.2rem;
+        }
+        
+        /* Menu Button Styling */
+        .menu-btn {
+            position: relative;
+            z-index: 100;
+            width: 30px;
+            height: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            cursor: pointer;
+        }
+        .menu-btn span {
+            display: block;
+            width: 100%;
+            height: 3px;
+            background-color: var(--text-color);
+            border-radius: 2px;
+            transition: all 0.3s ease-in-out;
+        }
+        .menu-btn.open span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+        .menu-btn.open span:nth-child(2) { opacity: 0; }
+        .menu-btn.open span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+
+        /* Side Menu */
+        #side-menu {
+            position: fixed;
+            top: 0;
+            right: -250px; /* Hidden by default */
+            width: 250px;
+            height: 100%;
+            background-color: var(--surface-color);
+            box-shadow: -4px 0 10px rgba(0,0,0,0.5);
+            z-index: 90;
+            transition: right 0.3s ease-in-out;
+            padding-top: 60px; /* Space for header */
+            display: flex;
+            flex-direction: column;
+        }
+        #side-menu.open { right: 0; }
+        #side-menu ul {
+            list-style: none;
+            padding: 20px;
+        }
+        #side-menu ul li {
+            margin-bottom: 15px;
+        }
+        #side-menu ul li a, #side-menu ul li button {
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: none;
+            border: none;
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+        }
+        #side-menu ul li a:hover, #side-menu ul li button:hover {
+            color: var(--primary-color);
+        }
+
+        main {
+            flex-grow: 1;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 16px;
+            transition: transform 0.3s ease-in-out;
+            padding-bottom: 70px; /* Space for bottom nav */
+        }
+        
+        .main-screen {
+            display: none;
+            height: 100%;
+        }
+
+        .main-screen.active {
+            display: block;
+        }
+        
+        nav.bottom-menu {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            height: 56px; /* Reduced height */
+            background-color: var(--surface-color);
+            justify-content: space-around;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            animation: slide-up 0.5s ease-out;
+            box-shadow: 0 -2px 4px rgba(0,0,0,0.2);
+            z-index: 50;
+        }
+
+        @keyframes slide-up {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+
+        .bottom-nav-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            line-height: 1.2;
+            color: #B0B0B0;
+            width: 100%;
+            height: 100%;
+            padding: 0;
+        }
+
+        .bottom-nav-btn .icon-placeholder {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 2px;
+        }
+
+        .bottom-nav-btn.active {
+            color: var(--primary-color);
+            transform: scale(1.05);
+        }
+
+        /* --- Custom Icons/Logos (CSS Only) --- */
+        .logo-whatsapp {
+            background-color: #25D366;
+            width: 24px; height: 24px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px; font-weight: bold; color: white;
+            position: relative;
+        }
+        .logo-whatsapp::before { content: 'WA'; font-family: 'Arial'; }
+
+        .logo-youtube {
+            background-color: #FF0000;
+            width: 24px; height: 24px; border-radius: 4px;
+            display: flex; align-items: center; justify-content: center;
+            position: relative;
+        }
+        .logo-youtube::before {
+            content: ''; position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 0; height: 0; border-style: solid;
+            border-width: 6px 0 6px 10px; border-color: transparent transparent transparent white;
+        }
+
+        .logo-instagram {
+            background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%);
+            width: 24px; height: 24px; border-radius: 6px;
+            display: flex; align-items: center; justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .logo-instagram::before {
+            content: ''; position: absolute; border: 2px solid white; border-radius: 6px;
+            width: 16px; height: 16px;
+        }
+        .logo-instagram::after {
+            content: ''; position: absolute; background-color: white; border-radius: 50%;
+            width: 4px; height: 4px; top: 4px; right: 4px;
+        }
+
+        .logo-home {
+            width: 24px; height: 24px; background-color: var(--primary-color); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-weight: bold;
+        }
+        .logo-home::before { content: 'H'; font-family: 'Roboto'; }
+
+        .logo-add-box {
+            width: 24px; height: 24px; background-color: var(--button-color); border-radius: 4px;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-weight: bold;
+        }
+        .logo-add-box::before { content: '+'; font-size: 20px; }
+        
+        .logo-person {
+            width: 24px; height: 24px; background-color: #555; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-weight: bold;
+        }
+        .logo-person::before { content: 'P'; font-family: 'Roboto'; }
+        
+        .logo-chat {
+            width: 24px; height: 24px; background-color: #4CAF50; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-weight: bold;
+        }
+        .logo-chat::before { content: 'C'; font-family: 'Roboto'; }
+
+        .logo-search {
+            width: 24px; height: 24px; background-color: #FF5722; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-weight: bold;
+        }
+        .logo-search::before { content: 'S'; font-family: 'Roboto'; }
+
+        .logo-settings {
+            width: 24px; height: 24px; background-color: #607D8B; border-radius: 4px;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-weight: bold;
+        }
+        .logo-settings::before { content: '⚙'; font-family: 'sans-serif'; font-size: 16px; } /* Unicode gear for settings */
+
+
+        /* Post Feed Styling */
+        #feed-screen {
+            display: flex; /* Changed to flex for custom flow */
+            flex-direction: column;
+            gap: 16px;
+        }
+        .post-grid {
+            display: grid;
+            gap: 16px;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); /* Smaller cards in grid */
+        }
+        .post-horizontal-container {
+            display: flex;
+            overflow-x: auto;
+            gap: 16px;
+            padding: 10px 0;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none; /* Firefox */
+        }
+        .post-horizontal-container::-webkit-scrollbar { /* Chrome, Safari, Edge */
+            display: none;
+        }
+
+
+        .post-card {
+            background-color: var(--surface-color);
+            border-radius: 12px;
+            padding: 16px;
+            position: relative;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            overflow: hidden;
+            transition: transform 0.3s ease-out, box-shadow 0.3s ease-out, border-color 0.3s, box-shadow 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            animation: fade-in 0.5s ease-out;
+            min-width: 250px; /* For horizontal scroll */
+            flex-shrink: 0;
+        }
+        
+        @keyframes fade-in {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .post-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.5);
+        }
+
+        .post-card.neon-glow {
+            border: 2px solid var(--neon-glow);
+            box-shadow: 0 0 15px var(--neon-glow), inset 0 0 5px var(--neon-glow);
+        }
+        
+        .post-card.horizontal-style {
+            min-width: 300px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 20px;
+            background: linear-gradient(90deg, #2a2a2a, #1a1a1a);
+        }
+        
+        .post-card.horizontal-style .post-title { font-size: 1.2rem; }
+        .post-card.horizontal-style .post-description { flex-grow: 1; }
+        .post-card.horizontal-style .post-actions { flex-direction: column; gap: 10px; }
+
+        .post-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .post-title-link {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .post-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            word-wrap: break-word;
+        }
+
+        .post-info {
+            font-size: 0.8rem;
+            color: #B0B0B0;
+        }
+
+        .post-description {
+            font-size: 0.9rem;
+            margin-bottom: 16px;
+            line-height: 1.5;
+            color: var(--text-color);
+            white-space: pre-wrap; /* Preserve line breaks */
+            word-break: break-word; /* Break long words */
+        }
+        
+        .post-description a {
+            color: var(--link-color);
+            text-decoration: underline;
+        }
+
+        .post-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: auto;
+        }
+
+        .post-social-icons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .social-icon-btn {
+            background-color: var(--button-color);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.2s;
+        }
+
+        .social-icon-btn:hover {
+            transform: scale(1.1);
+            background-color: var(--primary-color);
+        }
+        
+        .social-icon-btn .icon-placeholder {
+            width: 24px;
+            height: 24px;
+        }
+
+        .like-btn {
+            background: none;
+            border: none;
+            color: #B0B0B0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.9rem;
+            transition: color 0.2s, transform 0.2s;
+        }
+        
+        .like-btn.liked {
+            color: var(--red-color);
+            animation: heart-beat 0.5s;
+        }
+        .like-btn .material-symbols-outlined {
+            fill: 0;
+            color: #B0B0B0;
+        }
+        .like-btn.liked .material-symbols-outlined {
+            fill: 1;
+            color: var(--red-color);
+        }
+        @keyframes heart-beat {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .post-views {
+            font-size: 0.8rem;
+            color: #B0B0B0;
+            margin-left: 10px;
+        }
+
+        .post-options-btn {
+            background: none;
+            border: none;
+            color: #B0B0B0;
+            cursor: pointer;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 1.2rem;
+        }
+        .post-options-menu {
+            position: absolute;
+            top: 30px;
+            right: 10px;
+            background-color: var(--surface-color);
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.4);
+            z-index: 10;
+            padding: 8px 0;
+        }
+        .post-options-menu button {
+            display: block;
+            width: 100%;
+            padding: 8px 15px;
+            background: none;
+            border: none;
+            color: var(--text-color);
+            text-align: left;
+            cursor: pointer;
+        }
+        .post-options-menu button:hover {
+            background-color: #333;
+        }
+
+        /* Reaction section */
+        .post-reactions {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #333;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+            color: #B0B0B0;
+        }
+        .reaction-emoji {
+            font-size: 1.2rem;
+        }
+        .reaction-count {
+            font-weight: bold;
+            color: var(--text-color);
+        }
+        .reaction-options {
+            position: absolute;
+            bottom: 60px; /* Above social icons */
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--surface-color);
+            border-radius: 20px;
+            padding: 8px 15px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            display: flex;
+            gap: 15px;
+            z-index: 5;
+        }
+        .reaction-options button {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .reaction-options button:hover {
+            transform: scale(1.2);
+        }
+
+        /* Auth Screen */
+        #auth-screen {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 24px;
+            animation: fade-in 0.5s ease-out;
+            height: 100%;
+            width: 100%;
+            background-color: var(--background-color);
+        }
+
+        .auth-container {
+            background-color: var(--surface-color);
+            padding: 32px;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+
+        .auth-logo {
+            text-align: center;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 24px;
+        }
+
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .input-group {
+            position: relative;
+        }
+        
+        .input-group input, .input-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            background-color: var(--background-color);
+            border: 1px solid #444;
+            border-radius: 8px;
+            color: var(--text-color);
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .input-group input:focus, .input-group textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+        
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #888;
+        }
+        
+        .auth-btn {
+            padding: 12px;
+            background-color: var(--button-color);
+            color: var(--text-color);
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.2s;
+        }
+
+        .auth-btn:hover {
+            background-color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        .auth-footer {
+            text-align: center;
+            margin-top: 16px;
+        }
+        
+        .auth-footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 700;
+            transition: color 0.2s;
+        }
+
+        .auth-footer a:hover {
+            color: var(--accent-color);
+        }
+
+        .error-message, .success-message {
+            margin-top: 8px;
+            text-align: center;
+        }
+
+        .error-message {
+            color: var(--red-color);
+        }
+
+        .success-message {
+            color: var(--primary-color);
+        }
+        
+        .validation-icon {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2rem;
+        }
+        .validation-icon.valid { color: var(--primary-color); }
+        .validation-icon.invalid { color: var(--red-color); }
+
+        /* Create Post Screen */
+        #create-post-screen {
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            overflow-y: auto;
+        }
+        
+        #create-post-screen h2 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 16px;
+        }
+        
+        #create-post-form input, #create-post-form textarea {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--surface-color);
+            border: 1px solid #444;
+            border-radius: 8px;
+            color: var(--text-color);
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        #create-post-form textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        #create-post-form input:focus, #create-post-form textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+        
+        .input-group.social-fields {
+            display: flex;
+            gap: 16px;
+        }
+        
+        .input-group.social-fields input {
+            flex-grow: 1;
+        }
+
+        #post-create-btn {
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.2s;
+        }
+        
+        #post-create-btn:hover {
+            background-color: var(--button-color);
+            transform: translateY(-2px);
+        }
+        
+        /* Post Boost Options */
+        .post-boost-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #2a2a2a;
+            border-radius: 8px;
+        }
+        .post-boost-options label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+        .post-boost-options input[type="radio"] {
+            margin-right: 5px;
+        }
+        .post-boost-options span {
+            font-size: 0.9rem;
+            color: #B0B0B0;
+        }
+
+        /* Profile Screen */
+        #profile-screen, #view-profile-screen {
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            overflow-y: auto;
+        }
+        
+        .profile-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            background-color: var(--surface-color);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background-color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 12px;
+            border: 2px solid var(--primary-color);
+            overflow: hidden; /* For custom logo */
+        }
+        .profile-logo-custom {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+        }
+
+        .profile-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .profile-stats {
+            display: flex;
+            gap: 24px;
+            margin-top: 16px;
+        }
+
+        .profile-stat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 0.9rem;
+            color: #B0B0B0;
+        }
+        
+        .profile-stat span:first-child {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-color);
+        }
+        
+        #my-posts-grid, #view-profile-posts-grid {
+            display: grid;
+            gap: 16px;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        }
+        
+        .profile-post-card {
+            background-color: var(--surface-color);
+            padding: 12px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            transition: transform 0.2s;
+        }
+        
+        .profile-post-card:hover {
+            transform: translateY(-3px);
+        }
+        
+        .profile-post-card .post-title {
+            font-size: 1rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .profile-post-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        
+        .profile-post-actions button {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .profile-post-actions .edit-btn {
+            background-color: var(--accent-color);
+            color: var(--background-color);
+        }
+        
+        .profile-post-actions .delete-btn {
+            background-color: var(--red-color);
+            color: var(--text-color);
+        }
+        
+        .profile-follow-btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            border: none;
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+        
+        .profile-follow-btn.follow {
+            background-color: var(--primary-color);
+            color: var(--text-color);
+        }
+        
+        .profile-follow-btn.unfollow {
+            background-color: var(--red-color);
+            color: var(--text-color);
+        }
+
+        /* Edit Profile Screen */
+        #edit-profile-screen {
+            padding: 24px;
+            display: none;
+            flex-direction: column;
+            gap: 20px;
+            overflow-y: auto;
+        }
+        #edit-profile-form .profile-logo-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        #edit-profile-form .profile-logo-selector .logo-option {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: border-color 0.2s;
+        }
+        #edit-profile-form .profile-logo-selector .logo-option.selected {
+            border-color: var(--primary-color);
+        }
+
+        /* Chat Screen */
+        #chat-screen {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        #chat-list-container {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .chat-list-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 12px;
+            background-color: var(--surface-color);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .chat-list-item:hover {
+            background-color: #2a2a2a;
+        }
+        
+        .chat-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--primary-color);
+            font-size: 1.2rem;
+            overflow: hidden;
+        }
+        
+        .chat-info h3 {
+            font-size: 1rem;
+            font-weight: 700;
+        }
+        
+        .chat-info p {
+            font-size: 0.8rem;
+            color: #B0B0B0;
+        }
+
+        #chat-messages-container {
+            display: none; /* Hidden by default */
+            flex-direction: column;
+            flex-grow: 1;
+            padding: 16px;
+            background-color: var(--background-color);
+        }
+        
+        #chat-messages-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #333;
+            margin-bottom: 10px;
+        }
+
+        #chat-messages-header h3 {
+            flex-grow: 1;
+            font-size: 1.2rem;
+        }
+
+        #chat-messages {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .chat-message {
+            max-width: 80%;
+            padding: 10px;
+            border-radius: 15px;
+            word-wrap: break-word;
+            position: relative;
+        }
+        
+        .chat-message.sent {
+            background-color: var(--primary-color);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 0;
+        }
+        
+        .chat-message.received {
+            background-color: var(--surface-color);
+            color: var(--text-color);
+            align-self: flex-start;
+            border-bottom-left-radius: 0;
+        }
+
+        .chat-input-form {
+            display: flex;
+            padding-top: 10px;
+            border-top: 1px solid #333;
+            gap: 10px;
+        }
+
+        .chat-input-form input {
+            flex-grow: 1;
+            background-color: var(--surface-color);
+            border: 1px solid #444;
+            border-radius: 20px;
+            padding: 8px 16px;
+            color: var(--text-color);
+        }
+        
+        .chat-input-form button {
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        /* Add/Settings Screen */
+        #add-screen {
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            overflow-y: auto;
+        }
+        
+        #monetize-info {
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            padding: 16px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            animation: slide-in-top 0.5s ease-out;
+        }
+        
+        @keyframes slide-in-top {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        #in-app-currency-section {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        
+        .currency-card {
+            background-color: var(--surface-color);
+            padding: 16px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .currency-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .currency-info .material-symbols-outlined {
+            font-size: 2rem;
+            color: var(--accent-color);
+        }
+        
+        .currency-details h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+        
+        .currency-details p {
+            font-size: 0.9rem;
+            color: #B0B0B0;
+        }
+        
+        .currency-card button {
+            background-color: var(--button-color);
+            color: var(--text-color);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.2s;
+        }
+        
+        .currency-card button:hover {
+            background-color: var(--primary-color);
+            transform: scale(1.05);
+        }
+        
+        /* Utility Classes & Animations */
+        .hidden { display: none !important; }
+        .loading { text-align: center; padding: 20px; }
+        .loading .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Search Screen */
+        #search-screen {
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            overflow-y: auto;
+        }
+        #search-input-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        #search-input {
+            flex-grow: 1;
+            padding: 12px 16px;
+            background-color: var(--surface-color);
+            border: 1px solid #444;
+            border-radius: 8px;
+            color: var(--text-color);
+            font-size: 1rem;
+        }
+        #search-results-users, #search-results-posts {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .search-user-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background-color: var(--surface-color);
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .search-user-item:hover {
+            background-color: #2a2a2a;
+        }
+        .search-user-info {
+            flex-grow: 1;
+        }
+        .search-user-info h4 {
+            font-size: 1rem;
+        }
+        .search-user-info p {
+            font-size: 0.8rem;
+            color: #B0B0B0;
+        }
+        .search-user-item .profile-avatar {
+            width: 40px;
+            height: 40px;
+            font-size: 1.5rem;
+            margin-bottom: 0;
+            border-width: 1px;
+        }
+        
+        /* Popup Styling (for daily reward, etc.) */
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .popup-content {
+            background-color: var(--surface-color);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            animation: popup-fade-in 0.3s ease-out;
+            max-width: 80%;
+        }
+        @keyframes popup-fade-in {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .popup-content h3 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+        .popup-content p {
+            margin-bottom: 20px;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+        .popup-content button {
+            background-color: var(--button-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.2s;
+        }
+        .popup-content button:hover {
+            background-color: var(--primary-color);
+        }
+        .countdown-timer {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--accent-color);
+            margin-top: 10px;
+        }
+    </style>
 </head>
 <body>
-    <div id="splash-screen" class="splash-screen">
-        <div class="splash-logo"></div>
-        <p class="splash-text">Add Mint</p>
+
+    <div id="splash-screen">
+        <h1 id="splash-logo">AddMint</h1>
+        <p>Your connections, your growth.</p>
     </div>
 
-    <div id="app-container" class="app-container hidden">
-        <header class="app-header">
-            <div class="header-left">
-                <button id="menu-toggle" class="icon-button hamburger-icon" aria-label="Open menu"></button>
-            </div>
-            <div class="header-center">
-                <span class="app-title">Add Mint</span>
-            </div>
-            <div class="header-right">
-                <button id="gift-button" class="icon-button gift-icon" aria-label="Daily Reward"></button>
-                <button id="refresh-posts-button" class="icon-button refresh-icon" aria-label="Refresh Posts"></button>
+    <div id="app-container" class="hidden">
+        
+        <header>
+            <div class="header-logo" id="refresh-feed-btn">AddMint</div>
+            <div class="header-icons">
+                <div class="header-credit-info">
+                    <span class="material-symbols-outlined">monetization_on</span>
+                    <span id="header-coins">0</span>
+                </div>
+                <div class="header-credit-info">
+                    <span class="material-symbols-outlined">data_usage</span>
+                    <span id="header-limits">0</span>
+                </div>
+                <div class="header-credit-info">
+                    <span class="material-symbols-outlined">drafts</span>
+                    <span id="header-credits">0</span>
+                </div>
+                <button id="daily-reward-btn" class="header-icon-btn">
+                    <span class="material-symbols-outlined">card_giftcard</span>
+                </button>
+                <div id="menu-toggle" class="menu-btn">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
             </div>
         </header>
 
-        <nav id="side-menu" class="side-menu" aria-label="Main navigation">
-            <ul class="menu-list">
-                <li><a href="#" id="menu-profile">My Profile</a></li>
-                <li><a href="#" id="menu-search">Search</a></li>
-                <li><a href="#" id="menu-messages">Messages</a></li>
-                <li><a href="#" id="menu-upload">Upload Post</a></li>
-                <li class="menu-separator"></li>
-                <li><label for="data-saver-toggle">Data Saver</label><input type="checkbox" id="data-saver-toggle" class="toggle-switch"></li>
-                <li><a href="#" id="menu-instagram">Instagram <span class="social-icon instagram-icon" aria-hidden="true"></span></a></li>
-                <li><a href="#" id="menu-youtube">YouTube <span class="social-icon youtube-icon" aria-hidden="true"></span></a></li>
-                <li class="menu-separator"></li>
-                <li><a href="#" id="menu-about">About Us</a></li>
-                <li><a href="#" id="menu-privacy-policy">Privacy Policy</a></li>
-                <li><button id="logout-button">Logout</button></li>
+        <div id="side-menu">
+            <ul>
+                <li><button id="side-menu-monetization-btn"><span class="material-symbols-outlined">currency_rupee</span> Monetization</button></li>
+                <li><button id="side-menu-add-currency-btn"><span class="material-symbols-outlined">add_circle</span> Add Currency</button></li>
+                <li><a href="https://www.instagram.com/addmint__" target="_blank"><span class="icon-placeholder logo-instagram"></span> AddMint Instagram</a></li>
+                <li><a href="https://www.youtube.com/@add_mintmint" target="_blank"><span class="icon-placeholder logo-youtube"></span> AddMint YouTube</a></li>
+                <li><button id="side-menu-about-btn"><span class="material-symbols-outlined">info</span> About Us</button></li>
+                <li><button id="side-menu-privacy-btn"><span class="material-symbols-outlined">policy</span> Privacy Policy</button></li>
+                <li><button id="side-menu-logout-btn"><span class="material-symbols-outlined">logout</span> Logout</button></li>
             </ul>
-        </nav>
-        <div id="overlay" class="overlay" aria-hidden="true"></div> <main class="main-content">
-            <section id="auth-section" class="auth-section active">
-                <h2>Welcome to Add Mint</h2>
-                <div class="form-container">
-                    <h3>Login</h3>
-                    <input type="email" id="login-email" placeholder="Email" aria-label="Login Email">
-                    <input type="password" id="login-password" placeholder="Password" aria-label="Login Password">
-                    <button id="login-btn">Login</button>
-                    <p class="auth-toggle">Don't have an account? <a href="#" id="show-signup">Sign Up</a></p>
-                </div>
-                <div class="form-container hidden" id="signup-form-container">
-                    <h3>Sign Up</h3>
-                    <input type="email" id="signup-email" placeholder="Email" aria-label="Signup Email">
-                    <input type="password" id="signup-password" placeholder="Password" aria-label="Signup Password">
-                    <button id="signup-btn">Sign Up</button>
-                    <p class="auth-toggle">Already have an account? <a href="#" id="show-login">Login</a></p>
-                </div>
-            </section>
+        </div>
 
-            <section id="profile-setup-section" class="profile-setup-section hidden">
-                <h2>Complete Your Profile</h2>
-                <div class="profile-setup-form">
-                    <input type="text" id="setup-name" placeholder="Full Name (Required)" aria-label="Full Name">
-                    <div class="username-input-container">
-                        <input type="text" id="setup-username" placeholder="Unique Username (Required)" aria-label="Unique Username">
-                        <span id="username-status" class="username-status"></span> </div>
-                    <input type="text" id="setup-whatsapp" placeholder="WhatsApp Number (Optional, or Instagram)" aria-label="WhatsApp Number">
-                    <input type="text" id="setup-instagram" placeholder="Instagram ID (Optional, or WhatsApp)" aria-label="Instagram ID">
-                    <p class="required-note">Please provide at least one of WhatsApp or Instagram.</p>
-                    <div class="profile-logo-selection">
-                        <h3>Choose a Profile Logo:</h3>
-                        <div id="logo-options" class="logo-grid">
-                            </div>
+        <main>
+            <div id="feed-screen" class="main-screen active">
+                <div class="loading hidden">
+                    <div class="spinner"></div>
+                </div>
+                </div>
+            
+            <div id="create-post-screen" class="main-screen hidden">
+                <h2>Create a New Post</h2>
+                <form id="create-post-form">
+                    <div class="input-group">
+                        <input type="text" id="post-title" placeholder="Title" required>
                     </div>
-                    <button id="complete-profile-btn">Complete Profile</button>
-                </div>
-            </section>
-
-            <section id="feed-section" class="feed-section hidden active-section">
-                <div id="posts-container" class="posts-container">
+                    <div class="input-group">
+                        <textarea id="post-description" placeholder="Description" required></textarea>
                     </div>
-                <div id="loading-spinner" class="loading-spinner hidden"></div>
-            </section>
-
-            <section id="user-profile-section" class="user-profile-section hidden">
-                <div class="profile-header">
-                    <div class="profile-avatar"></div>
-                    <h3 id="profile-display-name"></h3>
-                    <p id="profile-display-username"></p>
-                    <div class="profile-stats">
-                        <span id="profile-followers" class="clickable-stat">0 Followers</span>
-                        <span id="profile-following" class="clickable-stat">0 Following</span>
+                    <div class="input-group">
+                        <input type="text" id="post-area" placeholder="Area" required>
                     </div>
-                    <div class="profile-actions">
-                        <button id="follow-button" class="action-button follow-button hidden"></button>
-                        <button id="message-button" class="action-button message-button hidden">Message</button>
-                        <button id="profile-whatsapp-button" class="social-button whatsapp-icon hidden" aria-label="WhatsApp"></button>
-                        <button id="profile-instagram-button" class="social-button instagram-icon hidden" aria-label="Instagram"></button>
+                    <div class="input-group social-fields">
+                        <input type="text" id="post-whatsapp" placeholder="WhatsApp Number (optional)">
+                        <input type="text" id="post-instagram" placeholder="Instagram ID (optional)">
                     </div>
-                    <button id="edit-profile-button" class="action-button edit-button hidden">Edit Profile</button>
-                </div>
-                <div id="user-posts-container" class="user-posts-container">
-                    </div>
-            </section>
-
-            <section id="search-section" class="search-section hidden">
-                <input type="text" id="search-input" placeholder="Search users, posts..." aria-label="Search Input">
-                <div id="search-results" class="search-results">
-                    <div id="user-search-results" class="user-search-results">
-                        <h4>Users</h4>
-                        </div>
-                    <div id="post-search-results" class="post-search-results">
-                        <h4>Posts</h4>
-                        </div>
-                </div>
-            </section>
-
-            <section id="messages-section" class="messages-section hidden">
-                <div class="chat-list-container" id="chat-list-container">
-                    <h4>Your Chats</h4>
-                    <div class="chat-list" id="chat-list">
-                        </div>
-                </div>
-
-                <div class="chat-window hidden" id="chat-window">
-                    <div class="chat-header">
-                        <button class="back-to-chat-list" aria-label="Back to Chat List">&lt; Back</button>
-                        <h4 id="chat-partner-name"></h4>
-                    </div>
-                    <div class="messages-display" id="messages-display">
-                        </div>
-                    <div class="message-input-area">
-                        <input type="text" id="message-input" placeholder="Type your message..." aria-label="Message Input">
-                        <button id="send-message-button" aria-label="Send Message">Send</button>
-                        <button id="message-emoji-reaction-button" class="emoji-button" aria-label="Emoji reaction"></button> </div>
-                </div>
-            </section>
-
-            <section id="upload-section" class="upload-section hidden">
-                <h2>Upload New Post</h2>
-                <div class="upload-form">
-                    <input type="file" id="post-image-input" accept="image/*" aria-label="Upload Post Image">
-                    <textarea id="post-caption-input" placeholder="Write your caption..." aria-label="Post Caption"></textarea>
+                    
                     <div class="post-boost-options">
-                        <h3>Boost Post Duration:</h3>
+                        <h4>Boost Your Post Visibility:</h4>
                         <label>
-                            <input type="radio" name="boost-hours" value="12" checked> 12 Hours (Free)
+                            <input type="radio" name="post-boost" value="12" checked>
+                            <span>12 Hours (Free)</span>
                         </label>
                         <label>
-                            <input type="radio" name="boost-hours" value="18"> 18 Hours (1 Ad)
+                            <input type="radio" name="post-boost" value="18">
+                            <span>18 Hours (+1 Ad)</span>
                         </label>
                         <label>
-                            <input type="radio" name="boost-hours" value="24"> 24 Hours (2 Ads)
+                            <input type="radio" name="post-boost" value="24">
+                            <span>24 Hours (+2 Ads)</span>
                         </label>
                         <label>
-                            <input type="radio" name="boost-hours" value="30"> 30 Hours (3 Ads)
+                            <input type="radio" name="post-boost" value="30">
+                            <span>30 Hours (+3 Ads)</span>
                         </label>
                     </div>
-                    <button id="upload-post-button">Upload Post</button>
-                </div>
-            </section>
 
-            <div id="reward-popup" class="reward-popup hidden">
-                <div class="reward-content">
-                    <h3 id="reward-title"></h3>
-                    <p id="reward-message"></p>
-                    <button id="claim-reward-button">Claim</button>
-                    <button id="close-reward-popup">Close</button>
+                    <p id="post-creation-info">
+                        You have <span id="post-creation-limit">0</span> post limits. Posting costs 5 coins if no limits.
+                    </p>
+                    <button type="submit" id="post-create-btn">Post</button>
+                </form>
+            </div>
+            
+            <div id="profile-screen" class="main-screen hidden">
+                <div class="profile-container">
+                    <div id="my-profile-avatar" class="profile-avatar"></div>
+                    <h2 id="my-profile-name" class="profile-name"></h2>
+                    <p id="my-profile-email"></p>
+                    <div class="profile-stats">
+                        <div class="profile-stat" id="my-followers-btn"><span id="my-follower-count">0</span><span>Followers</span></div>
+                        <div class="profile-stat" id="my-following-btn"><span id="my-following-count">0</span><span>Following</span></div>
+                        <div class="profile-stat"><span id="my-post-count">0</span><span>Posts</span></div>
+                    </div>
+                    <div style="margin-top: 20px; display: flex; gap: 10px;">
+                        <button id="edit-profile-btn" class="profile-follow-btn follow">Edit Profile</button>
+                        <button id="signout-btn" class="profile-follow-btn unfollow">Sign Out</button>
+                    </div>
                 </div>
+                <hr style="margin: 20px 0; border: 1px solid #333;">
+                <h3 style="text-align: center; margin-bottom: 15px;">My Active Posts</h3>
+                <div id="my-posts-grid">
+                    </div>
             </div>
 
-            <div id="ad-viewer" class="ad-viewer hidden">
-                <p>Watching an Ad...</p>
-                <div class="ad-progress-bar">
-                    <div class="ad-progress-fill"></div>
-                </div>
-                <button id="skip-ad-button" class="hidden">Skip Ad (for testing)</button>
-            </div>
-
-            <div id="follow-list-modal" class="follow-list-modal hidden">
-                <div class="modal-content">
-                    <h3 id="follow-list-title"></h3>
-                    <div id="follow-list-container" class="follow-list-container">
+            <div id="edit-profile-screen" class="main-screen hidden">
+                <h2>Edit Your Profile</h2>
+                <form id="edit-profile-form">
+                    <div class="input-group">
+                        <input type="text" id="edit-username" placeholder="Username" required>
+                        <span id="username-validation-icon" class="validation-icon hidden"></span>
+                    </div>
+                    <div class="input-group">
+                        <input type="tel" id="edit-whatsapp" placeholder="WhatsApp Number (optional)">
+                    </div>
+                    <div class="input-group">
+                        <input type="text" id="edit-instagram" placeholder="Instagram ID (optional)">
+                    </div>
+                    
+                    <h4>Choose a Profile Logo:</h4>
+                    <div class="profile-logo-selector" id="profile-logo-selector">
                         </div>
-                    <button class="close-modal-button">Close</button>
+
+                    <p id="edit-profile-error" class="error-message hidden"></p>
+                    <p id="edit-profile-success" class="success-message hidden"></p>
+                    <button type="submit" class="auth-btn">Save Changes</button>
+                    <button type="button" class="auth-btn" id="cancel-edit-profile-btn">Cancel</button>
+                </form>
+            </div>
+            
+            <div id="view-profile-screen" class="main-screen hidden">
+                <div class="profile-container">
+                    <div id="view-profile-avatar" class="profile-avatar"></div>
+                    <h2 id="view-profile-name" class="profile-name"></h2>
+                    <p id="view-profile-email"></p>
+                    <div class="profile-stats">
+                        <div class="profile-stat"><span id="view-follower-count">0</span><span>Followers</span></div>
+                        <div class="profile-stat"><span id="view-following-count">0</span><span>Following</span></div>
+                        <div class="profile-stat"><span id="view-post-count">0</span><span>Posts</span></div>
+                    </div>
+                    <div id="view-profile-actions" style="display:flex; gap: 10px; margin-top: 15px;">
+                        <button id="follow-btn" class="profile-follow-btn"></button>
+                        <button id="view-profile-whatsapp-btn" class="social-icon-btn hidden"><span class="icon-placeholder logo-whatsapp"></span></button>
+                        <button id="view-profile-instagram-btn" class="social-icon-btn hidden"><span class="icon-placeholder logo-instagram"></span></button>
+                        <button id="view-profile-message-btn" class="social-icon-btn"><span class="icon-placeholder logo-chat"></span></button>
+                    </div>
+                </div>
+                <hr style="margin: 20px 0; border: 1px solid #333;">
+                <h3 style="text-align: center; margin-bottom: 15px;">Active Posts</h3>
+                <div id="view-profile-posts-grid">
+                    </div>
+            </div>
+
+            <div id="user-list-screen" class="main-screen hidden">
+                <h2 id="user-list-title" style="text-align: center; margin-bottom: 20px;"></h2>
+                <div id="user-list-content" style="display: flex; flex-direction: column; gap: 10px;">
+                    </div>
+            </div>
+
+            <div id="chat-screen" class="main-screen hidden">
+                <div id="chat-list-container">
+                    <h2>Chats</h2>
+                    </div>
+                <div id="chat-messages-container">
+                    <div id="chat-messages-header">
+                        <button id="back-to-chat-list-btn" class="header-icon-btn">
+                            <span class="material-symbols-outlined">arrow_back</span>
+                        </button>
+                        <h3 id="current-chat-name"></h3>
+                    </div>
+                    <div id="chat-messages">
+                        </div>
+                    <form id="chat-input-form" class="chat-input-form">
+                        <input type="text" id="chat-input" placeholder="Type a message...">
+                        <button type="submit" id="send-chat-btn"><span class="material-symbols-outlined">send</span></button>
+                    </form>
+                </div>
+            </div>
+            
+            <div id="search-screen" class="main-screen hidden">
+                <h2>Search AddMint</h2>
+                <div id="search-input-container">
+                    <input type="text" id="search-input" placeholder="Search users or posts...">
+                    <button class="auth-btn" id="execute-search-btn">Search</button>
+                </div>
+                
+                <h3 style="margin-bottom: 10px;">Users:</h3>
+                <div id="search-results-users">
+                    <p id="no-user-results" class="hidden" style="color:#B0B0B0;">No users found.</p>
+                </div>
+                
+                <h3 style="margin-top: 20px; margin-bottom: 10px;">Posts:</h3>
+                <div id="search-results-posts" class="post-grid">
+                    <p id="no-post-results" class="hidden" style="color:#B0B0B0;">No posts found.</p>
                 </div>
             </div>
 
+            <div id="add-screen" class="main-screen hidden">
+                <h2>App Features & Settings</h2>
+                
+                <div id="monetize-info">
+                    <h3>Monetization: Coming Soon!</h3>
+                    <p>Start earning with 100 followers! Earn ₹10-100 for every 150 posts. Share the app and grow your following!</p>
+                </div>
+                
+                <div id="in-app-currency-section">
+                    <h3>Get More Currency:</h3>
+                    <div class="currency-card">
+                        <div class="currency-info">
+                            <span class="material-symbols-outlined">monetization_on</span>
+                            <div class="currency-details">
+                                <h3>Coins</h3>
+                                <p id="current-coins">Current: 0</p>
+                            </div>
+                        </div>
+                        <button onclick="watchAdAndReward('coins')" class="ad-reward-btn">Get More</button>
+                    </div>
+                    
+                    <div class="currency-card">
+                        <div class="currency-info">
+                            <span class="material-symbols-outlined">data_usage</span>
+                            <div class="currency-details">
+                                <h3>Post Limits</h3>
+                                <p id="current-limits">Current: 0</p>
+                            </div>
+                        </div>
+                        <button onclick="watchAdAndReward('limits')" class="ad-reward-btn">Get More</button>
+                    </div>
+                    
+                    <div class="currency-card">
+                        <div class="currency-info">
+                            <span class="material-symbols-outlined">drafts</span>
+                            <div class="currency-details">
+                                <h3>Credits</h3>
+                                <p id="current-credits">Current: 0</p>
+                            </div>
+                        </div>
+                        <button onclick="watchAdAndReward('credits')" class="ad-reward-btn">Get More</button>
+                    </div>
+                </div>
 
+                <div style="margin-top: 20px;">
+                    <h3>About Us</h3>
+                    <p style="color: #B0B0B0;">AddMint is a community-driven platform designed to connect people through shared interests and content. Discover, create, and engage with a vibrant network.</p>
+                </div>
+                
+                <div style="margin-top: 20px;">
+                    <h3>Privacy Policy</h3>
+                    <p style="color: #B0B0B0;">Your privacy is important to us. We collect minimal data necessary for app functionality and do not share your personal information without explicit consent. For a detailed policy, please visit our website.</p>
+                </div>
+            </div>
+            
         </main>
 
-        <nav class="bottom-nav">
-            <button id="nav-home" class="nav-button active" aria-label="Home Feed">
-                <span class="icon home-icon" aria-hidden="true"></span>
-                <span class="label">Home</span>
+        <nav class="bottom-menu">
+            <button id="feed-nav-btn" class="bottom-nav-btn active">
+                <span class="icon-placeholder logo-home"></span>
+                <span>Feed</span>
             </button>
-            <button id="nav-search" class="nav-button" aria-label="Search">
-                <span class="icon search-icon" aria-hidden="true"></span>
-                <span class="label">Search</span>
+            <button id="create-post-nav-btn" class="bottom-nav-btn">
+                <span class="icon-placeholder logo-add-box"></span>
+                <span>Post</span>
             </button>
-            <button id="nav-add-post" class="nav-button" aria-label="Add New Post">
-                <span class="icon add-post-icon" aria-hidden="true"></span>
-                <span class="label">Post</span>
+            <button id="search-nav-btn" class="bottom-nav-btn">
+                <span class="icon-placeholder logo-search"></span>
+                <span>Search</span>
             </button>
-            <button id="nav-messages" class="nav-button" aria-label="Messages">
-                <span class="icon messages-icon" aria-hidden="true"></span>
-                <span class="label">Messages</span>
+            <button id="chat-nav-btn" class="bottom-nav-btn">
+                <span class="icon-placeholder logo-chat"></span>
+                <span>Chat</span>
             </button>
-            <button id="nav-profile" class="nav-button" aria-label="My Profile">
-                <span class="icon profile-icon" aria-hidden="true"></span>
-                <span class="label">Profile</span>
+            <button id="profile-nav-btn" class="bottom-nav-btn">
+                <span class="icon-placeholder logo-person"></span>
+                <span>Profile</span>
             </button>
         </nav>
+
+        <div id="auth-screen">
+            <div class="auth-container">
+                <h1 class="auth-logo">AddMint</h1>
+                
+                <div id="auth-forms">
+                    <form id="signin-form" class="auth-form">
+                        <div class="input-group">
+                            <input type="email" id="signin-email" placeholder="Email" required>
+                        </div>
+                        <div class="input-group">
+                            <input type="password" id="signin-password" placeholder="Password" required>
+                            <button type="button" class="toggle-password" onclick="togglePasswordVisibility('signin-password')">
+                                <span class="material-symbols-outlined">visibility_off</span>
+                            </button>
+                        </div>
+                        <p id="signin-error" class="error-message hidden"></p>
+                        <button type="submit" class="auth-btn">Sign In</button>
+                    </form>
+                    
+                    <form id="signup-form" class="auth-form hidden">
+                        <div class="input-group">
+                            <input type="text" id="signup-name" placeholder="Name" required>
+                            <span id="signup-name-validation" class="validation-icon hidden"></span>
+                        </div>
+                        <div class="input-group">
+                            <input type="email" id="signup-email" placeholder="Email" required>
+                        </div>
+                        <div class="input-group">
+                            <input type="password" id="signup-password" placeholder="Password" required>
+                            <button type="button" class="toggle-password" onclick="togglePasswordVisibility('signup-password')">
+                                <span class="material-symbols-outlined">visibility_off</span>
+                            </button>
+                        </div>
+                        <div class="input-group">
+                            <input type="password" id="signup-confirm-password" placeholder="Confirm Password" required>
+                            <button type="button" class="toggle-password" onclick="togglePasswordVisibility('signup-confirm-password')">
+                                <span class="material-symbols-outlined">visibility_off</span>
+                            </button>
+                        </div>
+                        <div class="input-group">
+                            <input type="tel" id="signup-phone" placeholder="WhatsApp Number (Optional)">
+                        </div>
+                        <div class="input-group">
+                            <input type="text" id="signup-insta" placeholder="Instagram ID (Optional)">
+                        </div>
+                        <p id="signup-field-warning" class="error-message hidden">Please provide at least one of WhatsApp Number or Instagram ID.</p>
+                        <p id="signup-error" class="error-message hidden"></p>
+                        <p id="signup-success" class="success-message hidden"></p>
+                        <button type="submit" class="auth-btn">Sign Up</button>
+                    </form>
+                </div>
+
+                <div class="auth-footer">
+                    <a href="#" id="toggle-auth-form">Don't have an account? Sign Up</a>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <script src="app.js"></script>
+    <script>
+        // --- Firebase Configuration and Initialization ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyDlZA4grzF3fx95-11E4s7ASXwkIij1k1w",
+            authDomain: "addmint-7ab6b.firebaseapp.com",
+            databaseURL: "https://addmint-7ab6b-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "addmint-7ab6b",
+            storageBucket: "addmint-7ab6b.firebasestorage.app",
+            messagingSenderId: "504015450137",
+            appId: "1:504015450137:web:694b176313582cce1e7a88",
+            measurementId: "G-H7J7M23Z82"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // --- DOM Elements ---
+        const splashScreen = document.getElementById('splash-screen');
+        const appContainer = document.getElementById('app-container');
+        const authScreen = document.getElementById('auth-screen');
+        const signinForm = document.getElementById('signin-form');
+        const signupForm = document.getElementById('signup-form');
+        const signinEmailInput = document.getElementById('signin-email');
+        const signinPasswordInput = document.getElementById('signin-password');
+        const signupNameInput = document.getElementById('signup-name');
+        const signupNameValidation = document.getElementById('signup-name-validation');
+        const signupEmailInput = document.getElementById('signup-email');
+        const signupPasswordInput = document.getElementById('signup-password');
+        const signupConfirmPasswordInput = document.getElementById('signup-confirm-password');
+        const signupPhoneInput = document.getElementById('signup-phone');
+        const signupInstaInput = document.getElementById('signup-insta');
+        const signupFieldWarning = document.getElementById('signup-field-warning');
+        const toggleAuthFormLink = document.getElementById('toggle-auth-form');
+        const signinError = document.getElementById('signin-error');
+        const signupError = document.getElementById('signup-error');
+        const signupSuccess = document.getElementById('signup-success');
+        const mainScreens = document.querySelectorAll('.main-screen');
+        const bottomNavBtns = document.querySelectorAll('.bottom-nav-btn');
+        const feedScreen = document.getElementById('feed-screen');
+        const createPostScreen = document.getElementById('create-post-screen');
+        const myProfileScreen = document.getElementById('profile-screen');
+        const viewProfileScreen = document.getElementById('view-profile-screen');
+        const chatScreen = document.getElementById('chat-screen');
+        const addScreen = document.getElementById('add-screen');
+        const searchScreen = document.getElementById('search-screen');
+        const createPostForm = document.getElementById('create-post-form');
+        const postTitleInput = document.getElementById('post-title');
+        const postDescriptionInput = document.getElementById('post-description');
+        const postAreaInput = document.getElementById('post-area');
+        const postWhatsappInput = document.getElementById('post-whatsapp');
+        const postInstagramInput = document.getElementById('post-instagram');
+        const headerCoins = document.getElementById('header-coins');
+        const headerLimits = document.getElementById('header-limits');
+        const headerCredits = document.getElementById('header-credits');
+        const myProfileAvatar = document.getElementById('my-profile-avatar');
+        const myProfileName = document.getElementById('my-profile-name');
+        const myProfileEmail = document.getElementById('my-profile-email');
+        const myFollowerCount = document.getElementById('my-follower-count');
+        const myFollowingCount = document.getElementById('my-following-count');
+        const myPostCount = document.getElementById('my-post-count');
+        const myPostsGrid = document.getElementById('my-posts-grid');
+        const postCreationLimitText = document.getElementById('post-creation-limit');
+        const viewProfileAvatar = document.getElementById('view-profile-avatar');
+        const viewProfileName = document.getElementById('view-profile-name');
+        const viewProfileEmail = document.getElementById('view-profile-email');
+        const viewFollowerCount = document.getElementById('view-follower-count');
+        const viewFollowingCount = document.getElementById('view-following-count');
+        const viewPostCount = document.getElementById('view-post-count');
+        const viewProfilePostsGrid = document.getElementById('view-profile-posts-grid');
+        const followBtn = document.getElementById('follow-btn');
+        const viewProfileWhatsappBtn = document.getElementById('view-profile-whatsapp-btn');
+        const viewProfileInstagramBtn = document.getElementById('view-profile-instagram-btn');
+        const viewProfileMessageBtn = document.getElementById('view-profile-message-btn');
+        const chatListContainer = document.getElementById('chat-list-container');
+        const chatMessagesContainer = document.getElementById('chat-messages-container');
+        const backToChatListBtn = document.getElementById('back-to-chat-list-btn');
+        const currentChatName = document.getElementById('current-chat-name');
+        const chatMessages = document.getElementById('chat-messages');
+        const chatInputForm = document.getElementById('chat-input-form');
+        const chatInput = document.getElementById('chat-input');
+        const searchInput = document.getElementById('search-input');
+        const executeSearchBtn = document.getElementById('execute-search-btn');
+        const searchResultsUsers = document.getElementById('search-results-users');
+        const searchResultsPosts = document.getElementById('search-results-posts');
+        const noUserResults = document.getElementById('no-user-results');
+        const noPostResults = document.getElementById('no-post-results');
+        const refreshFeedBtn = document.getElementById('refresh-feed-btn');
+        const dailyRewardBtn = document.getElementById('daily-reward-btn');
+        const menuToggle = document.getElementById('menu-toggle');
+        const sideMenu = document.getElementById('side-menu');
+        const sideMenuMonetizationBtn = document.getElementById('side-menu-monetization-btn');
+        const sideMenuAddCurrencyBtn = document.getElementById('side-menu-add-currency-btn');
+        const sideMenuAboutBtn = document.getElementById('side-menu-about-btn');
+        const sideMenuPrivacyBtn = document.getElementById('side-menu-privacy-btn');
+        const sideMenuLogoutBtn = document.getElementById('side-menu-logout-btn');
+        const myFollowersBtn = document.getElementById('my-followers-btn');
+        const myFollowingBtn = document.getElementById('my-following-btn');
+        const userListScreen = document.getElementById('user-list-screen');
+        const userListTitle = document.getElementById('user-list-title');
+        const userListContent = document.getElementById('user-list-content');
+        const editProfileBtn = document.getElementById('edit-profile-btn');
+        const signoutBtn = document.getElementById('signout-btn');
+        const editProfileScreen = document.getElementById('edit-profile-screen');
+        const editProfileForm = document.getElementById('edit-profile-form');
+        const editUsernameInput = document.getElementById('edit-username');
+        const usernameValidationIcon = document.getElementById('username-validation-icon');
+        const editWhatsappInput = document.getElementById('edit-whatsapp');
+        const editInstagramInput = document.getElementById('edit-instagram');
+        const profileLogoSelector = document.getElementById('profile-logo-selector');
+        const cancelEditProfileBtn = document.getElementById('cancel-edit-profile-btn');
+        const editProfileError = document.getElementById('edit-profile-error');
+        const editProfileSuccess = document.getElementById('edit-profile-success');
+
+        let currentUserData = null;
+        let allPosts = []; // To store all fetched posts for infinite/shuffled display
+        let currentPostIndex = 0; // For shuffled/endless post display
+        let currentChatUser = null;
+        let audioContext;
+        let lastTappedPost = null; // To manage neon glow
+        let usernameCheckTimeout = null;
+        
+        // Custom profile logos
+        const customProfileLogos = [
+            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+            '🌟', '❤️', '💡', '🚀', '🌈', '🔥', '🌊', '🌳', '🌸', '⚡', '💧', '☀️', '🌙', '⭐', '🍀', '🍎', '💎', '👑', '🎵', '🎨', '🧩', '🔗', '🛡️', '⚙️', '💬'
+        ];
+
+        // --- Sound Effect Initialization ---
+        function initSound() {
+            try {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            } catch (e) {
+                console.error('Web Audio API is not supported in this browser:', e);
+            }
+        }
+        initSound();
+        
+        function playSound(frequency, duration) {
+            if (!audioContext) return;
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.type = 'sine';
+            oscillator.frequency.value = frequency;
+            gainNode.gain.setValueAtTime(0.5, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + duration);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + duration);
+        }
+        
+        // --- Splash Screen & Initial Load ---
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                splashScreen.style.opacity = '0';
+                setTimeout(() => {
+                    splashScreen.classList.add('hidden');
+                    auth.onAuthStateChanged(user => {
+                        if (user) {
+                            appContainer.classList.remove('hidden');
+                            fetchUserData(user.uid);
+                            fetchPosts(true); // Fetch initial posts
+                            setupRealtimeListeners();
+                            fetchUserChats();
+                            checkDailyReward();
+                        } else {
+                            authScreen.classList.remove('hidden');
+                        }
+                    });
+                }, 1000); // Wait for opacity transition
+            }, 2000); // Display splash for 2 seconds
+        });
+
+        // --- Authentication Logic ---
+        toggleAuthFormLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (signinForm.classList.contains('hidden')) {
+                signinForm.classList.remove('hidden');
+                signupForm.classList.add('hidden');
+                toggleAuthFormLink.textContent = "Already have an account? Sign In";
+            } else {
+                signinForm.classList.add('hidden');
+                signupForm.classList.remove('hidden');
+                toggleAuthFormLink.textContent = "Don't have an account? Sign Up";
+            }
+            signinError.textContent = '';
+            signinError.classList.add('hidden');
+            signupError.textContent = '';
+            signupError.classList.add('hidden');
+            signupSuccess.textContent = '';
+            signupSuccess.classList.add('hidden');
+            signupFieldWarning.classList.add('hidden');
+        });
+
+        signinForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            signinError.classList.add('hidden');
+            try {
+                await auth.signInWithEmailAndPassword(signinEmailInput.value, signinPasswordInput.value);
+            } catch (error) {
+                signinError.textContent = `Sign-in failed: ${error.message}`;
+                signinError.classList.remove('hidden');
+            }
+        });
+
+        signupForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            signupError.classList.add('hidden');
+            signupSuccess.classList.add('hidden');
+            signupFieldWarning.classList.add('hidden');
+
+            if (signupPasswordInput.value !== signupConfirmPasswordInput.value) {
+                signupError.textContent = "Passwords do not match!";
+                signupError.classList.remove('hidden');
+                return;
+            }
+
+            if (!signupPhoneInput.value && !signupInstaInput.value) {
+                signupFieldWarning.textContent = "Please provide at least one of WhatsApp Number or Instagram ID.";
+                signupFieldWarning.classList.remove('hidden');
+                return;
+            }
+            
+            const username = signupNameInput.value.trim();
+            if (!(await isUsernameUnique(username))) {
+                signupError.textContent = "This username is already taken. Please choose another.";
+                signupError.classList.remove('hidden');
+                return;
+            }
+
+            try {
+                const userCredential = await auth.createUserWithEmailAndPassword(signupEmailInput.value, signupPasswordInput.value);
+                
+                // Add username to unique usernames collection
+                await db.collection('usernames').doc(username).set({
+                    uid: userCredential.user.uid,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                await db.collection('users').doc(userCredential.user.uid).set({
+                    name: username,
+                    email: signupEmailInput.value,
+                    phone: signupPhoneInput.value,
+                    instagram: signupInstaInput.value,
+                    coins: 10,
+                    limits: 2,
+                    credits: 10,
+                    followers: 0,
+                    following: 0,
+                    postCount: 0,
+                    uid: userCredential.user.uid,
+                    lastDailyRewardClaimed: firebase.firestore.FieldValue.serverTimestamp(), // Set initial claim time
+                    profileLogo: customProfileLogos[Math.floor(Math.random() * customProfileLogos.length)] // Random initial logo
+                });
+                
+                signupSuccess.textContent = "Account created successfully! You can now sign in.";
+                signupSuccess.classList.remove('hidden');
+                // Optional: await userCredential.user.sendEmailVerification();
+                // await auth.signOut(); // Keep signed in for initial app experience
+                signinForm.classList.remove('hidden');
+                signupForm.classList.add('hidden');
+                toggleAuthFormLink.textContent = "Don't have an account? Sign Up";
+                
+            } catch (error) {
+                signupError.textContent = `Error creating account: ${error.message}`;
+                signupError.classList.remove('hidden');
+            }
+        });
+        
+        signupNameInput.addEventListener('input', () => {
+            const username = signupNameInput.value.trim();
+            usernameValidationIcon.classList.add('hidden');
+            if (username.length > 0) {
+                if (usernameCheckTimeout) clearTimeout(usernameCheckTimeout);
+                usernameCheckTimeout = setTimeout(async () => {
+                    const isUnique = await isUsernameUnique(username);
+                    usernameValidationIcon.classList.remove('hidden');
+                    if (isUnique) {
+                        usernameValidationIcon.classList.remove('invalid');
+                        usernameValidationIcon.classList.add('valid');
+                        usernameValidationIcon.textContent = 'check_circle';
+                    } else {
+                        usernameValidationIcon.classList.remove('valid');
+                        usernameValidationIcon.classList.add('invalid');
+                        usernameValidationIcon.textContent = 'cancel';
+                    }
+                }, 500); // Debounce
+            }
+        });
+
+        async function isUsernameUnique(username) {
+            const doc = await db.collection('usernames').doc(username).get();
+            return !doc.exists;
+        }
+
+        function togglePasswordVisibility(id) {
+            const input = document.getElementById(id);
+            const icon = input.nextElementSibling.querySelector('.material-symbols-outlined');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.textContent = 'visibility';
+            } else {
+                input.type = 'password';
+                icon.textContent = 'visibility_off';
+            }
+        }
+        
+        signoutBtn.addEventListener('click', async () => {
+            try {
+                await auth.signOut();
+                alert('You have been signed out.');
+                window.location.reload(); // Reload to show auth screen
+            } catch (error) {
+                alert('Error signing out. Please try again.');
+                console.error(error);
+            }
+        });
+
+
+        // --- App Navigation ---
+        bottomNavBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                let screenId = btn.id.replace('-nav-btn', '-screen');
+                showScreen(screenId);
+                bottomNavBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            });
+        });
+        
+        // Side menu toggles
+        menuToggle.addEventListener('click', () => {
+            sideMenu.classList.toggle('open');
+            menuToggle.classList.toggle('open');
+        });
+        
+        document.body.addEventListener('click', (e) => {
+            if (!sideMenu.contains(e.target) && !menuToggle.contains(e.target) && sideMenu.classList.contains('open')) {
+                sideMenu.classList.remove('open');
+                menuToggle.classList.remove('open');
+            }
+        });
+
+        sideMenuMonetizationBtn.addEventListener('click', () => {
+            showScreen('add-screen');
+            sideMenu.classList.remove('open');
+            menuToggle.classList.remove('open');
+        });
+        sideMenuAddCurrencyBtn.addEventListener('click', () => {
+            showScreen('add-screen');
+            sideMenu.classList.remove('open');
+            menuToggle.classList.remove('open');
+        });
+        sideMenuAboutBtn.addEventListener('click', () => {
+            showScreen('add-screen'); // Re-direct to 'add-screen' which contains About/Privacy sections
+            sideMenu.classList.remove('open');
+            menuToggle.classList.remove('open');
+        });
+        sideMenuPrivacyBtn.addEventListener('click', () => {
+            showScreen('add-screen'); // Re-direct to 'add-screen' which contains About/Privacy sections
+            sideMenu.classList.remove('open');
+            menuToggle.classList.remove('open');
+        });
+        sideMenuLogoutBtn.addEventListener('click', async () => {
+            await auth.signOut();
+            window.location.reload();
+        });
+
+
+        function showScreen(id) {
+            mainScreens.forEach(screen => screen.classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
+            // Hide messages container if switching to chat list
+            if (id === 'chat-screen' && chatMessagesContainer.style.display !== 'none') {
+                 chatMessagesContainer.style.display = 'none';
+                 chatListContainer.style.display = 'flex';
+                 currentChatUser = null;
+            }
+        }
+        
+        // --- User Data Fetch & UI Update ---
+        async function fetchUserData(uid) {
+            const userRef = db.collection('users').doc(uid);
+            userRef.onSnapshot(doc => {
+                if (doc.exists) {
+                    currentUserData = doc.data();
+                    updateHeaderCurrency();
+                    updateMyProfileScreen();
+                } else {
+                    console.warn("User data not found for UID:", uid);
+                    // This might happen for new users before initial data is written by signup, or if somehow corrupted.
+                }
+            }, error => {
+                console.error("Error listening to user data:", error);
+                // Handle error, e.g., show an alert or sign user out.
+            });
+        }
+        
+        function formatNumber(num) {
+            if (num >= 1000000) {
+                return (num / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
+            }
+            if (num >= 1000) {
+                return (num / 1000).toFixed(1).replace(/\.0$/, '') + 'K';
+            }
+            return num;
+        }
+
+        function updateHeaderCurrency() {
+            if (currentUserData) {
+                headerCoins.textContent = formatNumber(currentUserData.coins);
+                headerLimits.textContent = formatNumber(currentUserData.limits);
+                headerCredits.textContent = formatNumber(currentUserData.credits);
+                postCreationLimitText.textContent = formatNumber(currentUserData.limits);
+                document.getElementById('current-coins').textContent = `Current: ${formatNumber(currentUserData.coins)}`;
+                document.getElementById('current-limits').textContent = `Current: ${formatNumber(currentUserData.limits)}`;
+                document.getElementById('current-credits').textContent = `Current: ${formatNumber(currentUserData.credits)}`;
+            }
+        }
+        
+        function updateMyProfileScreen() {
+            if (currentUserData) {
+                myProfileName.textContent = currentUserData.name;
+                myProfileEmail.textContent = currentUserData.email;
+                myProfileAvatar.innerHTML = `<span class="profile-logo-custom">${currentUserData.profileLogo}</span>`;
+                myFollowerCount.textContent = formatNumber(currentUserData.followers);
+                myFollowingCount.textContent = formatNumber(currentUserData.following);
+                myPostCount.textContent = formatNumber(currentUserData.postCount);
+                fetchUserPosts(auth.currentUser.uid, myPostsGrid, true);
+            }
+        }
+
+        // --- Posts Management (Infinite Scroll, Mixed Layouts, Neon Glow) ---
+        async function fetchPosts(clearExisting = false) {
+            if (loadingPosts) return;
+            loadingPosts = true;
+            feedScreen.querySelector('.loading').classList.remove('hidden');
+
+            try {
+                // Fetch all posts initially (or periodically refresh all to get new posts)
+                const snapshot = await db.collection('posts').orderBy('timestamp', 'desc').get();
+                allPosts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                
+                // Shuffle posts for dynamic display
+                shuffleArray(allPosts); 
+                currentPostIndex = 0; // Reset index for fresh load
+                
+                displayMorePosts(clearExisting);
+
+            } catch (error) {
+                console.error("Error fetching all posts:", error);
+            } finally {
+                loadingPosts = false;
+                feedScreen.querySelector('.loading').classList.add('hidden');
+            }
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function displayMorePosts(clearExisting) {
+            if (allPosts.length === 0) {
+                feedScreen.innerHTML = '<p style="text-align:center; margin-top:20px; color:#B0B0B0;">No posts available. Be the first to post!</p>';
+                return;
+            }
+
+            if (clearExisting) {
+                feedScreen.innerHTML = '';
+            }
+
+            let postsAdded = 0;
+            const targetCount = 15; // Number of posts to try and add per scroll/fetch
+
+            while (postsAdded < targetCount) {
+                if (allPosts.length === 0) break; // If no posts at all
+                
+                if (currentPostIndex >= allPosts.length) {
+                    currentPostIndex = 0; // Loop back to start if all have been displayed
+                }
+
+                const post = allPosts[currentPostIndex];
+                currentPostIndex++;
+
+                const layoutType = Math.random(); // Determine layout type
+
+                if (layoutType < 0.2 && postsAdded < targetCount - 1) { // 20% chance for horizontal
+                    feedScreen.appendChild(createPostCard(post, 'horizontal-style'));
+                    postsAdded++;
+                } else if (layoutType < 0.4 && postsAdded < targetCount - 3) { // 20% chance for grid (4 items)
+                    const gridContainer = document.createElement('div');
+                    gridContainer.className = 'post-grid';
+                    for (let i = 0; i < 4 && currentPostIndex <= allPosts.length; i++) {
+                        if (currentPostIndex >= allPosts.length) currentPostIndex = 0; // Loop if needed
+                        gridContainer.appendChild(createPostCard(allPosts[currentPostIndex], 'grid-item'));
+                        currentPostIndex++;
+                    }
+                    feedScreen.appendChild(gridContainer);
+                    postsAdded += 4; // Count 4 posts for the grid
+                } else { // Remaining for vertical (default)
+                    feedScreen.appendChild(createPostCard(post, 'vertical-style'));
+                    postsAdded++;
+                }
+            }
+        }
+
+        feedScreen.addEventListener('scroll', () => {
+            if (feedScreen.scrollTop + feedScreen.clientHeight >= feedScreen.scrollHeight - 300) {
+                displayMorePosts(false); // Load more posts when near bottom
+            }
+        });
+
+        refreshFeedBtn.addEventListener('click', () => {
+            fetchPosts(true); // Clear and re-fetch all posts
+        });
+
+        function createPostCard(post, styleClass) {
+            const postCard = document.createElement('div');
+            postCard.className = `post-card ${styleClass}`;
+            postCard.dataset.postId = post.id; // Store post ID for reference
+
+            const descriptionWithLinks = post.description.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
+
+            postCard.innerHTML = `
+                <button class="post-options-btn" data-post-id="${post.id}" onclick="togglePostOptions(event, '${post.id}', '${post.userId}')">
+                    <span class="material-symbols-outlined">more_vert</span>
+                </button>
+                <div class="post-header">
+                    <h3 class="post-title"><a href="#" class="post-title-link" data-user-id="${post.userId}">${post.title}</a></h3>
+                    <div class="post-info">
+                        <p>Area: ${post.area}</p>
+                    </div>
+                </div>
+                <p class="post-description">${descriptionWithLinks}</p>
+                <div class="post-actions">
+                    <div class="post-social-icons">
+                        ${post.whatsapp ? `<a href="https://wa.me/91${post.whatsapp}" target="_blank" class="social-icon-btn"><span class="icon-placeholder logo-whatsapp"></span></a>` : ''}
+                        ${post.instagram ? `<a href="https://instagram.com/${post.instagram}" target="_blank" class="social-icon-btn"><span class="icon-placeholder logo-instagram"></span></a>` : ''}
+                        <button class="social-icon-btn" onclick="startChat('${post.userId}', '${post.userName}')"><span class="icon-placeholder logo-chat"></span></button>
+                    </div>
+                    <button class="like-btn" data-post-id="${post.id}">
+                        <span class="material-symbols-outlined">favorite</span>
+                        <span class="like-count">${formatNumber(post.likes || 0)}</span>
+                    </button>
+                    <span class="post-views">Views: ${formatNumber(post.views || 0)}</span>
+                </div>
+                <div class="post-reactions" data-post-id="${post.id}">
+                    </div>
+                <div class="reaction-options hidden" data-post-id="${post.id}">
+                    <button onclick="sendReaction(event, '${post.id}', '👍')">👍</button>
+                    <button onclick="sendReaction(event, '${post.id}', '❤️')">❤️</button>
+                    <button onclick="sendReaction(event, '${post.id}', '😂')">😂</button>
+                </div>
+            `;
+            
+            // Event listeners
+            const likeBtn = postCard.querySelector('.like-btn');
+            likeBtn.addEventListener('click', () => handleLike(post.id, likeBtn));
+
+            const titleLink = postCard.querySelector('.post-title-link');
+            if (titleLink) {
+                titleLink.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    showOtherUserProfile(e.target.dataset.userId);
+                });
+            }
+
+            // Double tap to like
+            let lastTapTime = 0;
+            postCard.addEventListener('touchend', function(e) {
+                const currentTime = new Date().getTime();
+                const tapLength = currentTime - lastTapTime;
+                if (tapLength < 300 && tapLength > 0) { // Double tap detected
+                    e.preventDefault();
+                    handleLike(post.id, postCard.querySelector('.like-btn'));
+                }
+                lastTapTime = currentTime;
+            });
+            postCard.addEventListener('dblclick', function(e) {
+                 handleLike(post.id, postCard.querySelector('.like-btn'));
+            });
+
+            // Long press for reactions
+            let touchStartTime;
+            postCard.addEventListener('touchstart', (e) => {
+                touchStartTime = new Date().getTime();
+            });
+            postCard.addEventListener('touchend', (e) => {
+                const touchEndTime = new Date().getTime();
+                if (touchEndTime - touchStartTime > 500) { // Long press detected (e.g., > 500ms)
+                    e.preventDefault();
+                    toggleReactionOptions(post.id);
+                }
+            });
+
+            // Neon glow on click
+            postCard.addEventListener('click', () => {
+                if (lastTappedPost && lastTappedPost !== postCard) {
+                    lastTappedPost.classList.remove('neon-glow');
+                }
+                postCard.classList.add('neon-glow');
+                lastTappedPost = postCard;
+                setTimeout(() => {
+                    postCard.classList.remove('neon-glow');
+                }, 3000); // Remove glow after 3 seconds
+            });
+
+            // Track post views
+            trackPostView(post.id);
+            fetchPostReactions(post.id);
+
+            return postCard;
+        }
+
+        async function trackPostView(postId) {
+            if (!auth.currentUser) return;
+            const userId = auth.currentUser.uid;
+            const viewRef = db.collection('posts').doc(postId).collection('views').doc(userId);
+            const postRef = db.collection('posts').doc(postId);
+
+            try {
+                const viewDoc = await viewRef.get();
+                if (viewDoc.exists) {
+                    const viewCount = viewDoc.data().viewCount || 0;
+                    if (viewCount < 3) { // Limit to 3 views per user per post
+                        await viewRef.update({ viewCount: firebase.firestore.FieldValue.increment(1) });
+                        await postRef.update({ views: firebase.firestore.FieldValue.increment(1) });
+                    }
+                } else {
+                    await viewRef.set({ viewCount: 1, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
+                    await postRef.update({ views: firebase.firestore.FieldValue.increment(1) });
+                }
+            } catch (error) {
+                console.error("Error tracking post view:", error);
+            }
+        }
+        
+        async function handleLike(postId, button) {
+            if (!auth.currentUser) return;
+            playSound(600, 0.1); // Play a sound on like
+            const userId = auth.currentUser.uid;
+            const likeRef = db.collection('posts').doc(postId).collection('likes').doc(userId);
+            const postRef = db.collection('posts').doc(postId);
+            
+            try {
+                const likeDoc = await likeRef.get();
+                if (likeDoc.exists) {
+                    await likeRef.delete();
+                    await postRef.update({ likes: firebase.firestore.FieldValue.increment(-1) });
+                    button.classList.remove('liked');
+                } else {
+                    await likeRef.set({ likedAt: firebase.firestore.FieldValue.serverTimestamp() });
+                    await postRef.update({ likes: firebase.firestore.FieldValue.increment(1) });
+                    button.classList.add('liked');
+                }
+            } catch (error) {
+                console.error("Error handling like:", error);
+                alert("Error performing action. Please try again.");
+            }
+        }
+
+        function toggleReactionOptions(postId) {
+            const reactionOptions = document.querySelector(`.reaction-options[data-post-id="${postId}"]`);
+            if (reactionOptions) {
+                reactionOptions.classList.toggle('hidden');
+            }
+        }
+
+        async function sendReaction(event, postId, emoji) {
+            event.stopPropagation(); // Prevent long press from re-triggering
+            if (!auth.currentUser) return;
+            playSound(700, 0.1); // Play sound for reaction
+            const userId = auth.currentUser.uid;
+            const reactionRef = db.collection('posts').doc(postId).collection('reactions').doc(userId);
+            const postRef = db.collection('posts').doc(postId);
+
+            try {
+                const existingReaction = await reactionRef.get();
+                if (existingReaction.exists && existingReaction.data().emoji === emoji) {
+                    // If same emoji, remove it
+                    await reactionRef.delete();
+                    await postRef.update({ reactions: firebase.firestore.FieldValue.increment(-1) });
+                } else if (existingReaction.exists) {
+                    // If different emoji, update it
+                    await reactionRef.update({ emoji: emoji, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
+                } else {
+                    // If no existing reaction, add new
+                    await reactionRef.set({ emoji: emoji, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
+                    await postRef.update({ reactions: firebase.firestore.FieldValue.increment(1) });
+                }
+                toggleReactionOptions(postId); // Hide options after selecting
+                fetchPostReactions(postId); // Refresh reactions for this post
+            } catch (error) {
+                console.error("Error sending reaction:", error);
+                alert("Error sending reaction. Please try again.");
+            }
+        }
+
+        function fetchPostReactions(postId) {
+            const reactionsContainer = document.querySelector(`.post-reactions[data-post-id="${postId}"]`);
+            if (!reactionsContainer) return;
+
+            db.collection('posts').doc(postId).collection('reactions').onSnapshot(snapshot => {
+                let reactionCounts = {};
+                snapshot.forEach(doc => {
+                    const reaction = doc.data().emoji;
+                    reactionCounts[reaction] = (reactionCounts[reaction] || 0) + 1;
+                });
+
+                let totalReactions = 0;
+                let topEmojis = [];
+                for (const emoji in reactionCounts) {
+                    totalReactions += reactionCounts[emoji];
+                    topEmojis.push({ emoji: emoji, count: reactionCounts[emoji] });
+                }
+
+                topEmojis.sort((a, b) => b.count - a.count); // Sort by count descending
+
+                reactionsContainer.innerHTML = '';
+                if (totalReactions > 0) {
+                    reactionsContainer.innerHTML += `
+                        ${topEmojis.slice(0, 3).map(r => `<span class="reaction-emoji">${r.emoji}</span>`).join('')}
+                        <span class="reaction-count">${formatNumber(totalReactions)}</span>
+                    `;
+                }
+            }, error => {
+                console.error("Error fetching reactions:", error);
+            });
+        }
+        
+        function togglePostOptions(event, postId, postOwnerId) {
+            event.stopPropagation(); // Prevent tap from affecting neon glow
+            const btn = event.currentTarget;
+            let menu = btn.parentElement.querySelector('.post-options-menu');
+
+            if (!menu) {
+                menu = document.createElement('div');
+                menu.className = 'post-options-menu';
+                
+                if (auth.currentUser.uid === postOwnerId) {
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.textContent = 'Delete Post';
+                    deleteBtn.onclick = () => deletePost(postId);
+                    menu.appendChild(deleteBtn);
+                    
+                    const editBtn = document.createElement('button');
+                    editBtn.textContent = 'Edit Post';
+                    editBtn.onclick = () => alert('Edit functionality coming soon!'); // Placeholder
+                    menu.appendChild(editBtn);
+
+                } else {
+                    const reportBtn = document.createElement('button');
+                    reportBtn.textContent = 'Report Post';
+                    reportBtn.onclick = () => alert('Post reported. Thank you!'); // Placeholder
+                    menu.appendChild(reportBtn);
+                }
+                btn.parentElement.appendChild(menu);
+            }
+            menu.classList.toggle('hidden'); // Toggle visibility
+            
+            // Close menu if clicking outside
+            document.body.addEventListener('click', (e) => {
+                if (!menu.contains(e.target) && e.target !== btn) {
+                    menu.classList.add('hidden');
+                }
+            }, { once: true });
+        }
+
+
+        db.collection('posts').onSnapshot(snapshot => {
+            snapshot.docChanges().forEach(change => {
+                if (change.type === 'modified') {
+                    const postElement = feedScreen.querySelector(`.post-card[data-post-id="${change.doc.id}"]`);
+                    if (postElement) {
+                        const newLikes = change.doc.data().likes || 0;
+                        postElement.querySelector('.like-count').textContent = formatNumber(newLikes);
+                        const newViews = change.doc.data().views || 0;
+                        postElement.querySelector('.post-views').textContent = `Views: ${formatNumber(newViews)}`;
+                    }
+                }
+            });
+        });
+        
+        createPostForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!auth.currentUser || !currentUserData) return;
+            
+            const selectedBoostHours = parseInt(document.querySelector('input[name="post-boost"]:checked').value);
+            let adsRequired = 0;
+            if (selectedBoostHours === 18) adsRequired = 1;
+            else if (selectedBoostHours === 24) adsRequired = 2;
+            else if (selectedBoostHours === 30) adsRequired = 3;
+
+            const hasLimit = currentUserData.limits > 0;
+            const hasCoins = currentUserData.coins >= 5;
+            
+            if (adsRequired > 0) {
+                // If ads are required, trigger ad watching flow
+                alert(`You need to watch ${adsRequired} ad(s) to boost this post for ${selectedBoostHours} hours.`);
+                // Here, you would call Unity Ads. For simulation, we'll bypass it for now.
+                // In a real app, you'd integrate with your WebView.
+                // Assuming ads are watched and rewarded:
+                // If (ad_watched_successfully) { proceedWithPostCreation(); }
+                // For this example, we'll let it proceed.
+            }
+
+            if (!hasLimit && !hasCoins) {
+                alert("You don't have enough limits or coins to post. Please get more from the 'Add' section.");
+                return;
+            }
+            
+            const postData = {
+                title: postTitleInput.value,
+                description: postDescriptionInput.value,
+                area: postAreaInput.value,
+                whatsapp: postWhatsappInput.value,
+                instagram: postInstagramInput.value,
+                userId: auth.currentUser.uid,
+                userName: currentUserData.name,
+                likes: 0,
+                views: 0,
+                reactions: 0, // Initialize reactions count
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                expiresAt: firebase.firestore.Timestamp.fromMillis(Date.now() + (selectedBoostHours * 60 * 60 * 1000)) // Expiry time
+            };
+            
+            try {
+                await db.collection('posts').add(postData);
+                
+                let update = {};
+                if (hasLimit) {
+                    update.limits = firebase.firestore.FieldValue.increment(-1);
+                } else {
+                    update.coins = firebase.firestore.FieldValue.increment(-5);
+                }
+                update.postCount = firebase.firestore.FieldValue.increment(1);
+                
+                await db.collection('users').doc(auth.currentUser.uid).update(update);
+                
+                alert('Post created successfully!');
+                createPostForm.reset();
+                fetchPosts(true); // Re-fetch to see new post
+                showScreen('feed-screen');
+                document.getElementById('feed-nav-btn').classList.add('active');
+                
+            } catch (error) {
+                alert(`Error publishing post: ${error.message}`);
+                console.error("Error publishing post:", error);
+            }
+        });
+        
+        function fetchUserPosts(userId, container, isMyPosts = false) {
+            db.collection('posts').where('userId', '==', userId).orderBy('timestamp', 'desc').get().then(snapshot => {
+                container.innerHTML = '';
+                if (snapshot.empty) {
+                    container.innerHTML = '<p style="text-align:center; color:#B0B0B0;">No posts yet.</p>';
+                    return;
+                }
+                snapshot.forEach(doc => {
+                    const post = doc.data();
+                    const postCard = document.createElement('div');
+                    postCard.className = 'profile-post-card';
+                    postCard.innerHTML = `
+                        <h4 class="post-title">${post.title}</h4>
+                        <p style="font-size: 0.8rem; color: #B0B0B0;">Area: ${post.area}</p>
+                        ${isMyPosts ? `
+                        <div class="profile-post-actions">
+                            <button class="edit-btn">Edit</button>
+                            <button class="delete-btn" data-post-id="${doc.id}">Delete</button>
+                        </div>
+                        ` : ''}
+                    `;
+                    container.appendChild(postCard);
+                    
+                    if (isMyPosts) {
+                        postCard.querySelector('.delete-btn').addEventListener('click', () => deletePost(doc.id));
+                    }
+                });
+            }).catch(error => {
+                console.error("Error fetching user posts:", error);
+            });
+        }
+        
+        async function deletePost(postId) {
+            if (confirm("Are you sure you want to delete this post?")) {
+                try {
+                    await db.collection('posts').doc(postId).delete();
+                    await db.collection('users').doc(auth.currentUser.uid).update({
+                        postCount: firebase.firestore.FieldValue.increment(-1)
+                    });
+                    fetchUserPosts(auth.currentUser.uid, myPostsGrid, true); // Refresh my posts
+                    fetchPosts(true); // Refresh main feed
+                    alert('Post deleted successfully!');
+                } catch (error) {
+                    console.error("Error deleting post: ", error);
+                    alert("Error deleting post. Please check permissions or try again.");
+                }
+            }
+        }
+
+        async function showOtherUserProfile(userId) {
+            if (userId === auth.currentUser.uid) {
+                showScreen('profile-screen'); // My own profile
+                return;
+            }
+
+            const userRef = db.collection('users').doc(userId);
+            const userDoc = await userRef.get();
+
+            if (userDoc.exists) {
+                const userData = userDoc.data();
+                viewProfileName.textContent = userData.name;
+                viewProfileEmail.textContent = userData.email;
+                viewProfileAvatar.innerHTML = `<span class="profile-logo-custom">${userData.profileLogo}</span>`;
+                viewFollowerCount.textContent = formatNumber(userData.followers);
+                viewFollowingCount.textContent = formatNumber(userData.following);
+                viewPostCount.textContent = formatNumber(userData.postCount);
+
+                const isFollowing = (await db.collection('followers').doc(userId).collection('following_me').doc(auth.currentUser.uid).get()).exists;
+                followBtn.textContent = isFollowing ? 'Unfollow' : 'Follow';
+                followBtn.className = `profile-follow-btn ${isFollowing ? 'unfollow' : 'follow'}`;
+                followBtn.onclick = () => toggleFollow(userId, isFollowing);
+
+                if (userData.whatsapp) {
+                    viewProfileWhatsappBtn.classList.remove('hidden');
+                    viewProfileWhatsappBtn.onclick = () => window.open(`https://wa.me/91${userData.whatsapp}`, '_blank');
+                } else {
+                    viewProfileWhatsappBtn.classList.add('hidden');
+                }
+                if (userData.instagram) {
+                    viewProfileInstagramBtn.classList.remove('hidden');
+                    viewProfileInstagramBtn.onclick = () => window.open(`https://instagram.com/${userData.instagram}`, '_blank');
+                } else {
+                    viewProfileInstagramBtn.classList.add('hidden');
+                }
+                viewProfileMessageBtn.onclick = () => startChat(userId, userData.name);
+
+                fetchUserPosts(userId, viewProfilePostsGrid);
+                showScreen('view-profile-screen');
+            } else {
+                alert('User not found.');
+            }
+        }
+        
+        async function toggleFollow(userId, isCurrentlyFollowing) {
+            const myId = auth.currentUser.uid;
+            const userRef = db.collection('users').doc(userId);
+            const myRef = db.collection('users').doc(myId);
+            
+            try {
+                if (isCurrentlyFollowing) {
+                    await db.collection('followers').doc(userId).collection('following_me').doc(myId).delete();
+                    await db.collection('following').doc(myId).collection('i_follow').doc(userId).delete();
+                    await userRef.update({ followers: firebase.firestore.FieldValue.increment(-1) });
+                    await myRef.update({ following: firebase.firestore.FieldValue.increment(-1) });
+                } else {
+                    await db.collection('followers').doc(userId).collection('following_me').doc(myId).set({ timestamp: firebase.firestore.FieldValue.serverTimestamp() });
+                    await db.collection('following').doc(myId).collection('i_follow').doc(userId).set({ timestamp: firebase.firestore.FieldValue.serverTimestamp() });
+                    await userRef.update({ followers: firebase.firestore.FieldValue.increment(1) });
+                    await myRef.update({ following: firebase.firestore.FieldValue.increment(1) });
+                }
+                playSound(800, 0.1); // Sound for follow/unfollow
+                showOtherUserProfile(userId); // Refresh profile to show updated status
+            } catch (error) {
+                console.error("Error toggling follow:", error);
+                alert("An error occurred. Please try again.");
+            }
+        }
+        
+        myFollowersBtn.addEventListener('click', () => displayUserList('followers', auth.currentUser.uid));
+        myFollowingBtn.addEventListener('click', () => displayUserList('following', auth.currentUser.uid));
+
+        async function displayUserList(type, userId) {
+            userListContent.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+            userListTitle.textContent = type === 'followers' ? 'Followers' : 'Following';
+            showScreen('user-list-screen');
+
+            const collectionRef = type === 'followers' ? 
+                db.collection('followers').doc(userId).collection('following_me') :
+                db.collection('following').doc(userId).collection('i_follow');
+
+            try {
+                const snapshot = await collectionRef.get();
+                userListContent.innerHTML = ''; // Clear loading spinner
+                if (snapshot.empty) {
+                    userListContent.innerHTML = `<p style="text-align:center; color:#B0B0B0;">No ${type} found.</p>`;
+                    return;
+                }
+
+                const userIds = snapshot.docs.map(doc => doc.id);
+                const userDocs = await db.collection('users').where(firebase.firestore.FieldPath.documentId(), 'in', userIds).get();
+
+                userDocs.forEach(doc => {
+                    const userData = doc.data();
+                    const listItem = document.createElement('div');
+                    listItem.className = 'search-user-item';
+                    listItem.dataset.userId = userData.uid;
+                    listItem.innerHTML = `
+                        <div class="profile-avatar"><span class="profile-logo-custom">${userData.profileLogo}</span></div>
+                        <div class="search-user-info">
+                            <h4>${userData.name}</h4>
+                            <p>${userData.email}</p>
+                        </div>
+                        <button class="profile-follow-btn ${currentUserData.following.includes(userData.uid) ? 'unfollow' : 'follow'}" 
+                                onclick="toggleFollow('${userData.uid}', ${currentUserData.following.includes(userData.uid)})">
+                            ${currentUserData.following.includes(userData.uid) ? 'Unfollow' : 'Follow'}
+                        </button>
+                    `;
+                    listItem.querySelector('.profile-avatar, .search-user-info').addEventListener('click', () => showOtherUserProfile(userData.uid));
+                    userListContent.appendChild(listItem);
+                });
+
+            } catch (error) {
+                console.error(`Error fetching ${type} list:`, error);
+                userListContent.innerHTML = `<p style="text-align:center; color:${var(--red-color)};">Error loading list. Please try again.</p>`;
+            }
+        }
+
+        // --- Profile Editing ---
+        editProfileBtn.addEventListener('click', () => {
+            if (currentUserData) {
+                editUsernameInput.value = currentUserData.name || '';
+                editWhatsappInput.value = currentUserData.phone || '';
+                editInstagramInput.value = currentUserData.instagram || '';
+                renderProfileLogoSelector(currentUserData.profileLogo);
+                showScreen('edit-profile-screen');
+                editProfileError.classList.add('hidden');
+                editProfileSuccess.classList.add('hidden');
+            }
+        });
+
+        cancelEditProfileBtn.addEventListener('click', () => {
+            showScreen('profile-screen');
+        });
+
+        function renderProfileLogoSelector(currentLogo) {
+            profileLogoSelector.innerHTML = '';
+            customProfileLogos.forEach(logo => {
+                const option = document.createElement('div');
+                option.className = 'logo-option';
+                option.innerHTML = `<span class="profile-logo-custom">${logo}</span>`;
+                option.dataset.logo = logo;
+                if (logo === currentLogo) {
+                    option.classList.add('selected');
+                }
+                option.addEventListener('click', () => {
+                    document.querySelectorAll('.logo-option').forEach(opt => opt.classList.remove('selected'));
+                    option.classList.add('selected');
+                });
+                profileLogoSelector.appendChild(option);
+            });
+        }
+
+        editProfileForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            editProfileError.classList.add('hidden');
+            editProfileSuccess.classList.add('hidden');
+
+            const newUsername = editUsernameInput.value.trim();
+            const newWhatsapp = editWhatsappInput.value.trim();
+            const newInstagram = editInstagramInput.value.trim();
+            const selectedLogo = document.querySelector('.logo-option.selected')?.dataset.logo || currentUserData.profileLogo;
+
+            if (!newWhatsapp && !newInstagram) {
+                editProfileError.textContent = "Please provide at least one of WhatsApp Number or Instagram ID.";
+                editProfileError.classList.remove('hidden');
+                return;
+            }
+
+            try {
+                const userRef = db.collection('users').doc(auth.currentUser.uid);
+                const oldUsername = currentUserData.name;
+
+                if (newUsername !== oldUsername) {
+                    const isUnique = await isUsernameUnique(newUsername);
+                    if (!isUnique) {
+                        editProfileError.textContent = "This username is already taken. Please choose another.";
+                        editProfileError.classList.remove('hidden');
+                        return;
+                    }
+                    // Update username in unique usernames collection
+                    await db.collection('usernames').doc(oldUsername).delete();
+                    await db.collection('usernames').doc(newUsername).set({
+                        uid: auth.currentUser.uid,
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                }
+
+                await userRef.update({
+                    name: newUsername,
+                    phone: newWhatsapp,
+                    instagram: newInstagram,
+                    profileLogo: selectedLogo
+                });
+
+                editProfileSuccess.textContent = "Profile updated successfully!";
+                editProfileSuccess.classList.remove('hidden');
+                // Refresh currentUserData via snapshot listener
+                setTimeout(() => showScreen('profile-screen'), 1500);
+
+            } catch (error) {
+                editProfileError.textContent = `Error updating profile: ${error.message}`;
+                editProfileError.classList.remove('hidden');
+                console.error("Error updating profile:", error);
+            }
+        });
+
+        // --- Chat Functionality ---
+        function startChat(userId, userName) {
+            currentChatUser = { id: userId, name: userName };
+            currentChatName.textContent = userName;
+            chatMessagesContainer.style.display = 'flex';
+            chatListContainer.style.display = 'none';
+            fetchMessages(auth.currentUser.uid, userId);
+            showScreen('chat-screen');
+            document.getElementById('chat-nav-btn').classList.add('active');
+        }
+
+        backToChatListBtn.addEventListener('click', () => {
+            chatMessagesContainer.style.display = 'none';
+            chatListContainer.style.display = 'flex';
+            currentChatUser = null;
+        });
+
+        chatInputForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!chatInput.value.trim() || !currentChatUser) return;
+            const myId = auth.currentUser.uid;
+            const otherId = currentChatUser.id;
+            
+            const chatId = myId < otherId ? `${myId}_${otherId}` : `${otherId}_${myId}`;
+            
+            const message = {
+                senderId: myId,
+                text: chatInput.value,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            };
+            
+            try {
+                await db.collection('chats').doc(chatId).collection('messages').add(message);
+                
+                // Deduct one credit per message
+                if (currentUserData.credits > 0) {
+                    await db.collection('users').doc(myId).update({
+                        credits: firebase.firestore.FieldValue.increment(-1)
+                    });
+                } else {
+                    alert("You don't have enough credits to send a message. Please get more from the 'Add' section.");
+                }
+                chatInput.value = '';
+            } catch (error) {
+                console.error("Error sending message:", error);
+                alert(`Error sending message: ${error.message}. Please check your credits.`);
+            }
+        });
+        
+        async function fetchUserChats() {
+            if (!auth.currentUser) return;
+            chatListContainer.innerHTML = '<h2>Chats</h2><p style="text-align:center; color:#B0B0B0; margin-top:10px;">Loading chats...</p>';
+
+            // Fetch chat IDs where current user is a participant
+            const myId = auth.currentUser.uid;
+            const chatSnap = await db.collection('chats').get(); // Simplified: fetching all chat IDs to find relevant ones.
+                                                                // In a real app, you might query for chats where user is a member
+            
+            const chatPartners = new Set();
+            chatSnap.forEach(doc => {
+                const participants = doc.id.split('_'); // Assuming chatId is like user1_user2
+                if (participants.includes(myId)) {
+                    const partnerId = participants.find(id => id !== myId);
+                    if (partnerId) chatPartners.add(partnerId);
+                }
+            });
+
+            if (chatPartners.size === 0) {
+                chatListContainer.innerHTML = '<h2>Chats</h2><p style="text-align:center; color:#B0B0B0; margin-top:10px;">No ongoing chats. Start one from a user profile!</p>';
+                return;
+            }
+
+            const partnerIdsArray = Array.from(chatPartners);
+            const partnerUserDocs = await db.collection('users').where(firebase.firestore.FieldPath.documentId(), 'in', partnerIdsArray).get();
+            
+            chatListContainer.innerHTML = '<h2>Chats</h2>';
+            partnerUserDocs.forEach(doc => {
+                const partnerData = doc.data();
+                const listItem = document.createElement('div');
+                listItem.className = 'chat-list-item';
+                listItem.onclick = () => startChat(partnerData.uid, partnerData.name);
+                listItem.innerHTML = `
+                    <div class="chat-avatar"><span class="profile-logo-custom">${partnerData.profileLogo}</span></div>
+                    <div class="chat-info">
+                        <h3>${partnerData.name}</h3>
+                        <p>Start chatting...</p> </div>
+                `;
+                chatListContainer.appendChild(listItem);
+            });
+        }
+
+        function fetchMessages(myId, otherId) {
+            chatMessages.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+            const chatId = myId < otherId ? `${myId}_${otherId}` : `${otherId}_${myId}`;
+            
+            db.collection('chats').doc(chatId).collection('messages')
+                .where('timestamp', '>', firebase.firestore.Timestamp.fromMillis(Date.now() - (12 * 60 * 60 * 1000))) // Only show last 12 hours
+                .orderBy('timestamp')
+                .onSnapshot(snapshot => {
+                chatMessages.innerHTML = ''; // Clear loading spinner
+                if (snapshot.empty) {
+                    chatMessages.innerHTML = '<p style="text-align:center; color:#B0B0B0;">No messages in the last 12 hours. Start the conversation!</p>';
+                }
+                snapshot.forEach(doc => {
+                    const msg = doc.data();
+                    const messageElement = document.createElement('div');
+                    messageElement.className = `chat-message ${msg.senderId === myId ? 'sent' : 'received'}`;
+                    
+                    // Long press for message reactions
+                    let touchStartTime;
+                    messageElement.addEventListener('touchstart', (e) => { touchStartTime = new Date().getTime(); });
+                    messageElement.addEventListener('touchend', (e) => {
+                        const touchEndTime = new Date().getTime();
+                        if (touchEndTime - touchStartTime > 500) { // Long press
+                            e.preventDefault();
+                            // Implement message reaction UI here, similar to post reactions
+                            alert(`React to message: "${msg.text}" coming soon!`);
+                        }
+                    });
+
+                    messageElement.textContent = msg.text;
+                    chatMessages.appendChild(messageElement);
+                });
+                chatMessages.scrollTop = chatMessages.scrollHeight; // Scroll to bottom
+            }, error => {
+                console.error("Error fetching messages:", error);
+                chatMessages.innerHTML = `<p style="text-align:center; color:${var(--red-color)};">Error loading messages.</p>`;
+            });
+        }
+        
+        // --- Search Functionality ---
+        executeSearchBtn.addEventListener('click', () => performSearch());
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                performSearch();
+            }
+        });
+
+        async function performSearch() {
+            const queryText = searchInput.value.trim().toLowerCase();
+            searchResultsUsers.innerHTML = '';
+            searchResultsPosts.innerHTML = '';
+            noUserResults.classList.add('hidden');
+            noPostResults.classList.add('hidden');
+
+            if (queryText.length < 2) {
+                searchResultsUsers.innerHTML = '<p style="text-align:center; color:#B0B0B0;">Enter at least 2 characters to search users.</p>';
+                searchResultsPosts.innerHTML = '<p style="text-align:center; color:#B0B0B0;">Enter at least 2 characters to search posts.</p>';
+                return;
+            }
+
+            // Search Users
+            try {
+                const userSnapshot = await db.collection('users')
+                    .where('name', '>=', queryText)
+                    .where('name', '<=', queryText + '\uf8ff')
+                    .limit(10)
+                    .get();
+
+                if (userSnapshot.empty) {
+                    noUserResults.classList.remove('hidden');
+                } else {
+                    userSnapshot.forEach(doc => {
+                        const userData = doc.data();
+                        const listItem = document.createElement('div');
+                        listItem.className = 'search-user-item';
+                        listItem.dataset.userId = userData.uid;
+                        const isFollowing = currentUserData && currentUserData.following.includes(userData.uid);
+                        listItem.innerHTML = `
+                            <div class="profile-avatar"><span class="profile-logo-custom">${userData.profileLogo}</span></div>
+                            <div class="search-user-info">
+                                <h4>${userData.name}</h4>
+                                <p>${userData.email}</p>
+                            </div>
+                            ${userData.uid !== auth.currentUser.uid ? `
+                            <button class="profile-follow-btn ${isFollowing ? 'unfollow' : 'follow'}" 
+                                    onclick="toggleFollow('${userData.uid}', ${isFollowing})">
+                                ${isFollowing ? 'Unfollow' : 'Follow'}
+                            </button>` : ''}
+                        `;
+                        listItem.querySelector('.profile-avatar, .search-user-info').addEventListener('click', () => showOtherUserProfile(userData.uid));
+                        searchResultsUsers.appendChild(listItem);
+                    });
+                }
+            } catch (error) {
+                console.error("Error searching users:", error);
+                searchResultsUsers.innerHTML = `<p class="error-message" style="text-align:center;">Error searching users.</p>`;
+            }
+
+            // Search Posts
+            try {
+                const postSnapshot = await db.collection('posts')
+                    .where('title', '>=', queryText)
+                    .where('title', '<=', queryText + '\uf8ff')
+                    .limit(10)
+                    .get();
+
+                if (postSnapshot.empty) {
+                    noPostResults.classList.remove('hidden');
+                } else {
+                    postSnapshot.forEach(doc => {
+                        searchResultsPosts.appendChild(createPostCard(doc.data(), 'search-result-post'));
+                    });
+                }
+            } catch (error) {
+                console.error("Error searching posts:", error);
+                searchResultsPosts.innerHTML = `<p class="error-message" style="text-align:center;">Error searching posts.</p>`;
+            }
+        }
+
+
+        // --- In-App Currency & Ads Logic ---
+        function watchAdAndReward(type) {
+            // Simulate Unity Ads call
+            alert('Playing an ad. Please wait...');
+            
+            // In a real MIT App Inventor setup, you'd use WebViewString to communicate:
+            // For example, in App Inventor: WebView.WebViewString = "showUnityAd";
+            // And in JS, after ad completes (callback from WebViewString in App Inventor):
+            // window.AppInventor.setWebViewString("rewardUser|" + type);
+            // Then in App Inventor, parse this string and call a JS function on successful ad completion.
+
+            const rewards = {
+                coins: 10,
+                limits: 1, // Changed to 1 limit per ad as per request
+                credits: 10
+            };
+            
+            const amount = rewards[type];
+            
+            setTimeout(async () => {
+                if (!auth.currentUser) return;
+                
+                const update = {};
+                update[type] = firebase.firestore.FieldValue.increment(amount);
+                
+                try {
+                    await db.collection('users').doc(auth.currentUser.uid).update(update);
+                    alert(`Ad watched! You have been rewarded with ${amount} ${type}.`);
+                    playSound(900, 0.1); // Success sound
+                } catch (error) {
+                    console.error('Error updating user currency after ad:', error);
+                    alert("Error rewarding currency. Please try again.");
+                }
+            }, 5000); // Simulate 5 seconds for the ad
+        }
+        
+        // Daily Reward Logic
+        dailyRewardBtn.addEventListener('click', claimDailyReward);
+
+        function checkDailyReward() {
+            if (!currentUserData || !currentUserData.lastDailyRewardClaimed) {
+                // If never claimed, allow claiming immediately
+                dailyRewardBtn.classList.add('animate__animated', 'animate__pulse', 'infinite'); // Animate gift icon
+                return;
+            }
+
+            const lastClaimTime = currentUserData.lastDailyRewardClaimed.toDate();
+            const twentyFourHoursAgo = new Date(Date.now() - (24 * 60 * 60 * 1000));
+
+            if (lastClaimTime < twentyFourHoursAgo) {
+                dailyRewardBtn.classList.add('animate__animated', 'animate__pulse', 'infinite'); // Animate gift icon
+                showPopup("Daily Reward Available!", "Your daily reward of 2 Limits, 10 Coins, and 10 Credits is ready to be claimed!", "Claim Now", claimDailyRewardAndClosePopup);
+            } else {
+                dailyRewardBtn.classList.remove('animate__animated', 'animate__pulse', 'infinite');
+                const timeRemaining = (lastClaimTime.getTime() + (24 * 60 * 60 * 1000)) - Date.now();
+                updateCountdown(timeRemaining);
+            }
+        }
+
+        async function claimDailyReward() {
+            if (!auth.currentUser || !currentUserData) return;
+
+            const lastClaimTime = currentUserData.lastDailyRewardClaimed ? currentUserData.lastDailyRewardClaimed.toDate() : new Date(0); // If null, treat as very old
+            const twentyFourHoursAgo = new Date(Date.now() - (24 * 60 * 60 * 1000));
+
+            if (lastClaimTime < twentyFourHoursAgo) {
+                try {
+                    await db.collection('users').doc(auth.currentUser.uid).update({
+                        coins: firebase.firestore.FieldValue.increment(10),
+                        limits: firebase.firestore.FieldValue.increment(2),
+                        credits: firebase.firestore.FieldValue.increment(10),
+                        lastDailyRewardClaimed: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    alert('Daily reward claimed: 10 Coins, 2 Limits, 10 Credits!');
+                    playSound(1000, 0.2); // Reward sound
+                    dailyRewardBtn.classList.remove('animate__animated', 'animate__pulse', 'infinite');
+                    // Notification for App Inventor: You'd send a WebViewString to trigger it.
+                } catch (error) {
+                    console.error('Error claiming daily reward:', error);
+                    alert('Error claiming daily reward. Please try again.');
+                }
+            } else {
+                const timeRemaining = (lastClaimTime.getTime() + (24 * 60 * 60 * 1000)) - Date.now();
+                showPopup("Daily Reward", "Your daily reward will be available soon.", "OK", closePopup, timeRemaining);
+            }
+        }
+
+        function claimDailyRewardAndClosePopup() {
+            claimDailyReward();
+            closePopup();
+        }
+
+        let countdownInterval;
+        function updateCountdown(ms) {
+            const popupTimer = document.querySelector('.countdown-timer');
+            if (!popupTimer) return;
+
+            clearInterval(countdownInterval);
+            countdownInterval = setInterval(() => {
+                ms -= 1000;
+                if (ms <= 0) {
+                    clearInterval(countdownInterval);
+                    popupTimer.textContent = 'Ready to claim!';
+                    dailyRewardBtn.classList.add('animate__animated', 'animate__pulse', 'infinite');
+                } else {
+                    const hours = Math.floor(ms / (1000 * 60 * 60));
+                    const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((ms % (1000 * 60)) / 1000);
+                    popupTimer.textContent = `Next reward in: ${hours}h ${minutes}m ${seconds}s`;
+                }
+            }, 1000);
+        }
+
+        function showPopup(title, message, buttonText, buttonAction, countdownMs = 0) {
+            const existingPopup = document.querySelector('.popup-overlay');
+            if (existingPopup) existingPopup.remove(); // Remove any existing popup
+
+            const overlay = document.createElement('div');
+            overlay.className = 'popup-overlay';
+            overlay.innerHTML = `
+                <div class="popup-content">
+                    <h3>${title}</h3>
+                    <p>${message}</p>
+                    <button>${buttonText}</button>
+                    ${countdownMs > 0 ? '<p class="countdown-timer"></p>' : ''}
+                </div>
+            `;
+            document.body.appendChild(overlay);
+            
+            overlay.querySelector('button').addEventListener('click', buttonAction);
+            if (countdownMs > 0) {
+                updateCountdown(countdownMs);
+            }
+        }
+
+        function closePopup() {
+            const popup = document.querySelector('.popup-overlay');
+            if (popup) {
+                popup.remove();
+            }
+        }
+
+
+        // --- Other Realtime Listeners ---
+        function setupRealtimeListeners() {
+            // Listen for changes in my own posts to update the count
+            db.collection('posts').where('userId', '==', auth.currentUser.uid).onSnapshot(snapshot => {
+                myPostCount.textContent = formatNumber(snapshot.size);
+            });
+            
+            // Listen for changes in my followers
+            db.collection('followers').doc(auth.currentUser.uid).collection('following_me').onSnapshot(snapshot => {
+                myFollowerCount.textContent = formatNumber(snapshot.size);
+            });
+            
+            // Listen for changes in who I'm following
+            db.collection('following').doc(auth.currentUser.uid).collection('i_follow').onSnapshot(snapshot => {
+                myFollowingCount.textContent = formatNumber(snapshot.size);
+            });
+        }
+        
+        // Initial setup for the app
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                appContainer.classList.remove('hidden');
+                authScreen.classList.add('hidden');
+                showScreen('feed-screen'); // Default screen after login
+                document.getElementById('feed-nav-btn').classList.add('active');
+            } else {
+                appContainer.classList.add('hidden');
+                authScreen.classList.remove('hidden');
+            }
+        });
+        
+    </script>
 </body>
 </html>
