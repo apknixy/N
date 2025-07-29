@@ -31,9 +31,9 @@
             </div>
             <div class="header-center">
                 <div class="status-display">
-                    <span id="header-coins" class="clickable-status" data-reward-type="coins">0 C</span> |
-                    <span id="header-credits" class="clickable-status" data-reward-type="credits">0 Cr</span> |
-                    <span id="header-limit" class="clickable-status" data-reward-type="limit">0 L</span>
+                    <span id="header-coins" class="clickable-stat" data-resource-type="coins">0 C</span> |
+                    <span id="header-credits" class="clickable-stat" data-resource-type="credits">0 Cr</span> |
+                    <span id="header-limit" class="clickable-stat" data-resource-type="limit">0 L</span>
                 </div>
             </div>
             <div class="header-right">
@@ -57,8 +57,8 @@
                 <li><a href="#" data-screen="upload"><i class="fas fa-plus-circle"></i> Upload Post</a></li>
                 <li><a href="#" data-screen="messages"><i class="fas fa-comments"></i> Messages</a></li>
                 <li><a href="#" data-screen="search"><i class="fas fa-search"></i> Search Users</a></li>
+                <li><a href="#" data-screen="monetization"><i class="fas fa-dollar-sign"></i> Earn & Boost</a></li> <!-- NEW -->
                 <li><a href="#" id="data-saver-toggle"><i class="fas fa-wifi"></i> Data Saver <span class="toggle-switch"><input type="checkbox" id="data-saver-checkbox"><label for="data-saver-checkbox"></label></span></a></li>
-                <li><a href="#" data-screen="monetization"><i class="fas fa-dollar-sign"></i> Monetization</a></li> <!-- New Menu Item -->
                 <li><a href="https://www.instagram.com/addmint__" target="_blank"><i class="fab fa-instagram"></i> Our Instagram</a></li>
                 <li><a href="https://www.youtube.com/@add_mintmint" target="_blank"><i class="fab fa-youtube"></i> Our YouTube</a></li>
                 <li><a href="#" data-screen="about"><i class="fas fa-info-circle"></i> About Us</a></li>
@@ -208,17 +208,35 @@
                 </div>
             </section>
 
+            <!-- NEW: Monetization Screen -->
             <section id="monetization-screen" class="app-screen">
-                <h2>Monetization on AddMint</h2>
-                <p>AddMint offers various ways to earn coins and credits, which can be used to boost your posts, send messages, and unlock special features.</p>
+                <h2>Earn & Boost</h2>
+                <p>Welcome to the Earn & Boost section! Here you can gain valuable resources (Coins, Credits, Post Limits) to enhance your AddMint experience and boost your content visibility.</p>
+
                 <h3>How to Earn:</h3>
-                <ul>
-                    <li><strong>Daily Rewards:</strong> Claim free coins, credits, and post limits every 24 hours. Look for the gift icon in the header!</li>
-                    <li><strong>Watch Ads:</strong> You can watch short video ads to gain more coins, credits, or extend your post limits. Click on your Coins, Credits, or Limit display in the header to watch an ad.</li>
-                    <li><strong>Engage with Content:</strong> More engagement (likes, views, reactions) on your posts might unlock future earning opportunities.</li>
-                    <li><strong>Referrals:</strong> (Coming Soon) Invite friends to AddMint and earn rewards when they join.</li>
-                </ul>
-                <p>We believe in rewarding our active community members! Stay tuned for more earning features.</p>
+                <div class="info-card">
+                    <h4>Watch Ads</h4>
+                    <p>Watching short video ads is the primary way to earn resources. Each ad grants you a specific reward.</p>
+                    <button class="btn primary-btn" onclick="showAdModal('coins', { coins: 10 })">Watch Ad for 10 Coins</button>
+                    <button class="btn primary-btn" onclick="showAdModal('credits', { credits: 5 })">Watch Ad for 5 Credits</button>
+                    <button class="btn primary-btn" onclick="showAdModal('limit', { limit: 1 })">Watch Ad for 1 Post Limit</button>
+                </div>
+
+                <h3>Resource Benefits:</h3>
+                <div class="info-card">
+                    <h4><i class="fas fa-coins"></i> Coins</h4>
+                    <p>Coins are used for premium actions and to boost your posts beyond the free 12 hours. More coins mean more visibility for your content.</p>
+                </div>
+                <div class="info-card">
+                    <h4><i class="fas fa-credit-card"></i> Credits</h4>
+                    <p>Credits are essential for sending private messages to other users. Keep your credits topped up to stay connected.</p>
+                </div>
+                <div class="info-card">
+                    <h4><i class="fas fa-chart-line"></i> Post Limits</h4>
+                    <p>Each post you upload consumes one post limit. Earn more limits to share more content with the community.</p>
+                </div>
+
+                <p style="margin-top: 20px;">Stay tuned for more earning opportunities and exclusive features!</p>
             </section>
 
             <section id="about-screen" class="app-screen">
