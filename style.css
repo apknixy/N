@@ -1,4 +1,4 @@
-/* General Body and Container Styles */
+ /* General Body and Container Styles */
 body {
     font-family: 'Montserrat', sans-serif;
     margin: 0;
@@ -124,6 +124,8 @@ body {
 }
 
 .status-display {
+    display: flex;
+    align-items: center;
     font-size: 0.9em;
     background-color: #1a1a2e;
     padding: 5px 10px;
@@ -135,6 +137,17 @@ body {
 .status-display span {
     margin: 0 5px;
     font-weight: bold;
+}
+
+.clickable-stat-header {
+    cursor: pointer;
+    transition: transform 0.2s ease, color 0.2s ease;
+    padding: 0 5px;
+}
+
+.clickable-stat-header:hover {
+    transform: scale(1.1);
+    color: #ff00ff;
 }
 
 .icon-button {
@@ -336,12 +349,12 @@ h2 {
     padding: 15px;
     box-shadow: 0 0 10px rgba(0, 255, 255, 0.08);
     border: 1px solid #0d2a4a;
-    transition: box-shadow 0.3s ease-in-out;
+    transition: box-shadow 0.3s ease-in-out, border-color 0.3s ease-in-out;
     position: relative; /* For neon effect */
 }
 
 .post-card.neon-glow {
-    box-shadow: 0 0 5px #00ffff, 0 0 15px #00ffff, 0 0 25px #00ffff, 0 0 35px #00ffff;
+    box-shadow: 0 0 5px #00ffff, 0 0 15px #00ffff, 0 0 25px #ff00ff, 0 0 35px #ff00ff;
     border-color: #00ffff;
 }
 
@@ -361,51 +374,14 @@ h2 {
     position: relative;
     border: 2px solid #00ffff;
     flex-shrink: 0;
-}
-
-/* Styles for coded avatars */
-.profile-avatar.logo-1::before { content: '🧑'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
-.profile-avatar.logo-2::before { content: '👩'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
-/* ... (You'll need to define 50 of these in JavaScript and CSS) */
-/* Example for more complex CSS logos */
-.profile-avatar.logo-3 {
-    background: #FF5733; /* Orange base */
-    border-color: #FFC300;
-}
-.profile-avatar.logo-3::before {
-    content: '';
-    position: absolute;
-    width: 60%;
-    height: 60%;
-    background: #fff;
-    border-radius: 50%;
-    top: 20%;
-    left: 20%;
-    box-shadow: inset 0 0 10px rgba(0,0,0,0.3);
-}
-.profile-avatar.logo-3::after {
-    content: '';
-    position: absolute;
-    width: 30%;
-    height: 30%;
-    background: #33FF57; /* Green accent */
-    border-radius: 50%;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-}
-
-
-.profile-avatar.small {
-    width: 30px;
-    height: 30px;
-    border-width: 1px;
+    cursor: pointer;
 }
 
 .username {
     font-weight: bold;
     color: #fff;
     flex-grow: 1;
+    cursor: pointer;
 }
 
 .post-options {
@@ -449,6 +425,7 @@ h2 {
 
 .post-content p {
     margin: 0 0 10px 0;
+    word-wrap: break-word;
 }
 
 .post-content img {
@@ -499,6 +476,7 @@ h2 {
     gap: 10px;
     font-size: 0.9em;
     color: #aaa;
+    min-height: 20px;
 }
 
 .emoji-reaction-display {
@@ -526,7 +504,7 @@ h2 {
 
 .emoji-picker, .emoji-picker-chat {
     position: absolute;
-    bottom: 10px; /* Adjust based on footer position */
+    bottom: 45px; /* Adjust based on footer position */
     left: 50%;
     transform: translateX(-50%);
     background-color: #1a1a2e;
@@ -563,6 +541,15 @@ h2 {
     padding: 15px;
     box-shadow: inset 0 0 10px rgba(0, 255, 255, 0.1);
     border: 1px solid #0f3460;
+}
+
+.horizontal-post-container::-webkit-scrollbar {
+    height: 8px;
+}
+
+.horizontal-post-container::-webkit-scrollbar-thumb {
+    background: #00ffff;
+    border-radius: 4px;
 }
 
 .horizontal-post-container .post-card {
@@ -767,6 +754,22 @@ input[type="file"] {
     width: 100%;
 }
 
+.modal-content ul {
+    list-style: none;
+    padding-left: 0;
+}
+.modal-content ul li {
+    margin-bottom: 10px;
+    padding-left: 20px;
+    position: relative;
+}
+.modal-content ul li::before {
+    content: '⭐';
+    position: absolute;
+    left: 0;
+    color: #00ffff;
+}
+
 .logo-options-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
@@ -807,7 +810,7 @@ input[type="file"] {
     background-color: #ff6347; /* Tomato */
 }
 .profile-avatar.user-logo-1::before {
-    content: '🚀';
+    content: '🧑';
     font-size: 28px;
     position: absolute;
     top: 50%; left: 50%; transform: translate(-50%, -50%);
@@ -846,16 +849,6 @@ input[type="file"] {
     position: relative;
     border: 4px solid #00ffff;
     box-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
-}
-
-.profile-avatar-large::before {
-    content: '👤'; /* Default large avatar */
-    font-size: 60px;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: #1a1a2e;
 }
 
 .profile-stats {
