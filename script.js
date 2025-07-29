@@ -232,22 +232,7 @@ auth.onAuthStateChanged(async (user) => {
     }
 });
 
-// --- Dummy Login/Signup (Replace with actual Firebase Auth UI) ---
-function showDummyLogin() {
-    // This is a placeholder. In a real app, you'd show a login/signup form.
-    // For now, let's auto-sign in anonymously or with a fixed user for testing.
-    auth.signInAnonymously().catch((error) => {
-        console.error("Error signing in anonymously:", error);
-        showToast("Error logging in. Please try again.", 'error');
-    });
-    // Or, prompt for email/password and call auth.createUserWithEmailAndPassword / signInWithEmailAndPassword
-}
-
-// --- Splash Screen Transition ---
-function hideSplashScreen() {
-    setTimeout(() => {
-        splashScreen.style.opacity = '0';
-        setTimeout(() => {
+// --- Dummy Login/Signup (Replace 
             splashScreen.classList.add('hidden');
             appContainer.classList.remove('hidden');
         }, 500); // Wait for fade out to complete
@@ -1971,3 +1956,632 @@ document.addEventListener('DOMContentLoaded', () => {
 // This will be called by onAuthStateChanged after successful login
 // or by bottom nav / sidebar click for 'home'.
 // loadPosts(); // Don't call here, let onAuthStateChanged or nav handle it.
+// =======================================================
+// Global Constants and Initializations
+// =======================================================
+
+const postsContainer = document.getElementById('posts-container');
+const profileLogo = document.getElementById('profile-logo');
+const fileInput = document.getElementById('profile-file-input');
+const changeButton = document.getElementById('change-profile-button');
+const earnCoinsButton = document.getElementById('earn-coins-button');
+const coinDisplay = document.getElementById('coin-display');
+const monetizationMenuItem = document.getElementById('monetization-menu-item'); // Assuming an ID for your menu item
+
+let isLoadingPosts = false;
+let currentPage = 1;
+let lastPostId = null; // For cursor-based pagination
+let userProfile = {}; // Store current user's profile data
+let adPlacementId = 'Rewarded_Video'; // Default Unity Ads placement ID
+
+// Store original profile logo source for error fallback
+if (profileLogo) {
+    profileLogo.dataset.originalSrc = profileLogo.src;
+}
+
+// =======================================================
+// Unity Ads Integration (Conceptual)
+// You MUST include Unity Ads Web SDK script in your HTML
+// e.g., <script src="https://player.unity3d.com/webgl/3.x/unity-webgl-loader.js"></script>
+// =======================================================
+
+function initializeUnityAds() {
+    const unityGameId = 'YOUR_UNITY_GAME_ID'; // <<< REPLACE WITH YOUR UNITY GAME ID
+    if (typeof UnityAds !== 'undefined') {
+        UnityAds.initialize(unityGameId)
+            .then(() => {
+                console.log('Unity Ads initialized successfully.');
+                if (earnCoinsButton) {
+                    // Optionally enable button or change text if ad is ready
+                    earnCoinsButton.disabled = false;
+                    earnCoinsButton.textContent = 'Watch Ad to Earn Coins';
+                }
+            })
+            .catch(error => {
+                console.error('Unity Ads initialization failed:', error);
+                if (earnCoinsButton) {
+                    earnCoinsButton.disabled = true;
+                    earnCoinsButton.textContent = 'Ad Service Unavailable';
+                }
+            });
+    } else {
+        console.warn('UnityAds SDK not loaded. Make sure the script is included in HTML.');
+        if (earnCoinsButton) {
+            earnCoinsButton.disabled = true;
+            earnCoinsButton.textContent = 'Ad SDK not loaded';
+        }
+    }
+}
+
+// =======================================================
+// Helper Functions for UI Updates and Event Attachment
+// =======================================================
+
+/**
+ * Creates an HTML element for a post.
+ * @param {Object} postData - The data for the post.
+ * @returns {HTMLElement} The created post element.
+ */
+function createPostElement(postData) {
+    const postElement = document.createElement('div');
+    postElement.classList.add('post');
+    postElement.dataset.postId = postData.id;
+
+    // Build the post content (simplified for brevity, adapt to your needs)
+    postElement.innerHTML = `
+        <div class="post-header">
+            <img class="user-avatar" src="${postData.userAvatar || 'default_avatar.jpg'}" alt="User Avatar">
+            <span class="username" data-user-id="${postData.userId}">${postData.username}</span>
+        </div>
+        <div class="post-content">
+            <p class="post-text" data-original-text="${postData.text}">${postData.text}</p>
+            ${postData.imageUrl ? `<img class="post-image" src="${postData.imageUrl}" alt="Post Image">` : ''}
+        </div>
+        <div class="post-actions">
+            <button class="like-button ${postData.isLiked ? 'liked' : ''}">${postData.isLiked ? 'Unlike' : 'Like'}</button>
+            <span class="like-count">${postData.likes}</span>
+            <div class="reaction-emojis-container" style="display: none;"></div>
+            <button class="translate-button">Translate</button>
+        </div>
+    `;
+    return postElement;
+}
+
+/**
+ * Attaches all necessary event listeners to a newly created or loaded post element.
+ * This is crucial for infinite scrolling where new posts are added dynamically.
+ * @param {HTMLElement} postElement - The post element to attach listeners to.
+ */
+function attachPostEventListeners(postElement) {
+    // 1. Like Button (Single Click)
+    const likeButton = postElement.querySelector('.like-button');
+    if (likeButton) {
+        likeButton.addEventListener('click', toggleLike);
+    }
+
+    // 2. Double Click Like on Post Content
+    const postContent = postElement.querySelector('.post-content');
+    if (postContent) {
+        postContent.addEventListener('dblclick', function() {
+            // Trigger the like button's click handler
+            const targetLikeButton = this.closest('.post').querySelector('.like-button');
+            if (targetLikeButton) {
+                targetLikeButton.click();
+            }
+        });
+    }
+
+    // 3. Reaction Emojis (Long Press)
+    let pressTimer;
+    const reactionContainer = postElement.querySelector('.reaction-emojis-container');
+    const postId = postElement.dataset.postId;
+    const emojis = ['❤️', '😂', '👍', '😢', '🔥']; // Example emojis
+
+    const startPress = () => {
+        pressTimer = setTimeout(() => {
+            if (reactionContainer) {
+                reactionContainer.style.display = 'flex'; // Show container
+
+                // Dynamically add emojis if not already present
+                if (!reactionContainer.hasChildNodes()) {
+                    emojis.forEach(emoji => {
+                        const span = document.createElement('span');
+                        span.textContent = emoji;
+                        span.classList.add('reaction-emoji');
+                        span.addEventListener('click', function(event) {
+                            event.stopPropagation(); // Prevent post click
+                            recordReaction(postId, emoji);
+                            reactionContainer.style.display = 'none'; // Hide after selection
+                        });
+                        reactionContainer.appendChild(span);
+                    });
+                }
+            }
+        }, 500); // 500ms for long press
+    };
+
+    const endPress = () => {
+        clearTimeout(pressTimer);
+        // Optionally, hide the reaction container if mouse/finger lifts without selecting
+        // but it's often better to keep it visible until an emoji is picked or user clicks away
+        // For simplicity, we hide it only on emoji selection in this example.
+    };
+
+    postElement.addEventListener('mousedown', startPress);
+    postElement.addEventListener('mouseup', endPress);
+    postElement.addEventListener('mouseleave', endPress);
+
+    // For mobile (touch events)
+    postElement.addEventListener('touchstart', startPress);
+    postElement.addEventListener('touchend', endPress);
+    postElement.addEventListener('touchcancel', endPress);
+
+
+    // 4. User Profile Navigation
+    const usernameElement = postElement.querySelector('.username');
+    if (usernameElement) {
+        usernameElement.addEventListener('click', function() {
+            const userId = this.dataset.userId;
+            if (userId) {
+                window.location.href = `/profile/${userId}`; // Navigate to profile page
+            }
+        });
+    }
+
+    // 5. Post Translation
+    const translateButton = postElement.querySelector('.translate-button');
+    if (translateButton) {
+        translateButton.addEventListener('click', toggleTranslation);
+    }
+}
+
+// =======================================================
+// Core Feature Functions (Likings, Reactions, Translation, etc.)
+// =======================================================
+
+/**
+ * Toggles the like status of a post.
+ * @param {Event} event - The click event from the like button.
+ */
+async function toggleLike(event) {
+    const button = event.currentTarget;
+    const postElement = button.closest('.post');
+    const postId = postElement.dataset.postId;
+    const likeCountSpan = postElement.querySelector('.like-count');
+
+    let currentLikes = parseInt(likeCountSpan.textContent);
+    const isLiked = button.classList.contains('liked');
+
+    // Optimistic UI update
+    if (isLiked) {
+        button.classList.remove('liked');
+        button.textContent = 'Like';
+        currentLikes--;
+    } else {
+        button.classList.add('liked');
+        button.textContent = 'Unlike';
+        currentLikes++;
+    }
+    likeCountSpan.textContent = currentLikes;
+
+    try {
+        const response = await fetch('/api/toggleLike', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ postId: postId, action: isLiked ? 'unlike' : 'like' })
+        });
+        const data = await response.json();
+
+        if (!data.success) {
+            // Revert UI if backend failed
+            button.classList.toggle('liked'); // Revert class
+            button.textContent = isLiked ? 'Unlike' : 'Like'; // Revert text
+            likeCountSpan.textContent = isLiked ? currentLikes + 1 : currentLikes - 1; // Revert count
+            console.error('Like action failed:', data.message);
+            alert('Failed to update like. Please try again.');
+        } else {
+            // Optionally, update count with actual count from backend if needed
+            // likeCountSpan.textContent = data.newLikeCount;
+        }
+    } catch (error) {
+        console.error('Error toggling like:', error);
+        // Revert UI on network error
+        button.classList.toggle('liked');
+        button.textContent = isLiked ? 'Unlike' : 'Like';
+        likeCountSpan.textContent = isLiked ? currentLikes + 1 : currentLikes - 1;
+        alert('Network error. Failed to update like.');
+    }
+}
+
+/**
+ * Records a reaction for a post.
+ * @param {string} postId - The ID of the post.
+ * @param {string} emoji - The emoji character representing the reaction.
+ */
+async function recordReaction(postId, emoji) {
+    try {
+        const response = await fetch('/api/recordReaction', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ postId: postId, emoji: emoji })
+        });
+        const data = await response.json();
+
+        if (data.success) {
+            console.log(`Reaction "${emoji}" recorded for post ${postId}`);
+            // TODO: Update UI to show reaction summary below the post
+        } else {
+            console.error('Failed to record reaction:', data.message);
+            alert('Failed to record reaction. Please try again.');
+        }
+    } catch (error) {
+        console.error('Error recording reaction:', error);
+        alert('Network error. Failed to record reaction.');
+    }
+}
+
+/**
+ * Toggles translation for a post.
+ * @param {Event} event - The click event from the translate button.
+ */
+async function toggleTranslation(event) {
+    const button = event.currentTarget;
+    const postElement = button.closest('.post');
+    const postTextElement = postElement.querySelector('.post-text');
+
+    const originalText = postTextElement.dataset.originalText; // Stored when post is first loaded
+
+    // If currently translated, revert to original
+    if (postTextElement.classList.contains('translated')) {
+        postTextElement.textContent = originalText;
+        postTextElement.classList.remove('translated');
+        button.textContent = 'Translate';
+        return;
+    }
+
+    button.textContent = 'Translating...'; // Show loading state
+
+    try {
+        // Replace with your actual translation API endpoint on your backend
+        const response = await fetch('/api/translate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text: originalText, targetLang: 'en' }) // Target language should be dynamic or user's preference
+        });
+        const data = await response.json();
+
+        if (data.translatedText) {
+            postTextElement.textContent = data.translatedText;
+            postTextElement.classList.add('translated');
+            button.textContent = 'See Original';
+        } else {
+            alert('Translation failed. No translated text received.');
+            button.textContent = 'Translate'; // Revert button text
+        }
+    } catch (error) {
+        console.error('Error during translation:', error);
+        alert('An error occurred during translation. Please try again.');
+        button.textContent = 'Translate'; // Revert button text
+    }
+}
+
+// =======================================================
+// Infinite Scrolling / Post Loading
+// =======================================================
+
+/**
+ * Fetches more posts from the backend and appends them to the container.
+ */
+async function fetchMorePosts() {
+    if (isLoadingPosts || !postsContainer) return;
+
+    isLoadingPosts = true;
+    // Show a loading indicator (e.g., a spinner at the bottom)
+    const loadingIndicator = document.createElement('div');
+    loadingIndicator.textContent = 'Loading more posts...';
+    loadingIndicator.id = 'loading-indicator';
+    postsContainer.appendChild(loadingIndicator);
+
+    try {
+        // Adjust URL based on your backend API (pagination or cursor-based)
+        const response = await fetch(`/api/posts?page=${currentPage}&lastId=${lastPostId || ''}`);
+        const newPosts = await response.json();
+
+        // Remove loading indicator
+        if (document.getElementById('loading-indicator')) {
+            document.getElementById('loading-indicator').remove();
+        }
+
+        if (newPosts && newPosts.length > 0) {
+            newPosts.forEach(postData => {
+                const newPostElement = createPostElement(postData);
+                postsContainer.appendChild(newPostElement);
+                attachPostEventListeners(newPostElement); // Attach listeners to new elements
+            });
+            currentPage++;
+            lastPostId = newPosts[newPosts.length - 1].id; // Update last ID for next fetch
+        } else {
+            console.log('No more posts to load.');
+            // Optionally, show a "No more posts" message permanently
+            const noMorePostsMsg = document.createElement('div');
+            noMorePostsMsg.textContent = 'You have reached the end of the feed.';
+            noMorePostsMsg.style.textAlign = 'center';
+            noMorePostsMsg.style.padding = '20px';
+            postsContainer.appendChild(noMorePostsMsg);
+            window.removeEventListener('scroll', handleScroll); // Stop listening for scroll
+        }
+    } catch (error) {
+        console.error('Error fetching more posts:', error);
+        // Remove loading indicator and show error message
+        if (document.getElementById('loading-indicator')) {
+            document.getElementById('loading-indicator').remove();
+        }
+        const errorMsg = document.createElement('div');
+        errorMsg.textContent = 'Failed to load posts. Please try again later.';
+        errorMsg.style.color = 'red';
+        errorMsg.style.textAlign = 'center';
+        postsContainer.appendChild(errorMsg);
+    } finally {
+        isLoadingPosts = false;
+    }
+}
+
+/**
+ * Handles the scroll event for infinite scrolling.
+ * Uses a simple debounce for performance.
+ */
+let scrollTimeout = null;
+function handleScroll() {
+    if (scrollTimeout) clearTimeout(scrollTimeout);
+    scrollTimeout = setTimeout(() => {
+        const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+        // Trigger fetch when user is 100px from the bottom
+        if (scrollTop + clientHeight >= scrollHeight - 100 && !isLoadingPosts) {
+            fetchMorePosts();
+        }
+    }, 100); // Debounce to prevent too many calls
+}
+
+
+// =======================================================
+// Profile Logo Change
+// =======================================================
+
+/**
+ * Handles the profile image upload process.
+ * @param {Event} event - The change event from the file input.
+ */
+async function handleProfileImageChange(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // 1. Client-side preview
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        if (profileLogo) {
+            profileLogo.src = e.target.result;
+        }
+    };
+    reader.readAsDataURL(file);
+
+    // 2. Upload to backend
+    const formData = new FormData();
+    formData.append('profileImage', file); // 'profileImage' is the field name your backend expects
+
+    try {
+        // Assume you have a user ID or authentication token for the backend
+        const response = await fetch('/api/uploadProfileImage', {
+            method: 'POST',
+            // You might need to add headers for authentication (e.g., 'Authorization': 'Bearer YOUR_TOKEN')
+            body: formData
+        });
+        const data = await response.json();
+
+        if (data.success && data.imageUrl && profileLogo) {
+            profileLogo.src = data.imageUrl; // Update with permanent URL from backend
+            profileLogo.dataset.originalSrc = data.imageUrl; // Update original source
+            alert('Profile image updated successfully!');
+            // Update userProfile object if you're storing it client-side
+            userProfile.avatarUrl = data.imageUrl;
+        } else {
+            alert('Failed to update profile image: ' + (data.message || 'Unknown error.'));
+            // Revert to original image if upload failed
+            if (profileLogo && profileLogo.dataset.originalSrc) {
+                profileLogo.src = profileLogo.dataset.originalSrc;
+            }
+        }
+    } catch (error) {
+        console.error('Error uploading profile image:', error);
+        alert('An error occurred during upload. Please try again.');
+        // Revert to original image on network error
+        if (profileLogo && profileLogo.dataset.originalSrc) {
+            profileLogo.src = profileLogo.dataset.originalSrc;
+        }
+    }
+}
+
+// =======================================================
+// Credit/Coin System with Ads
+// =======================================================
+
+/**
+ * Handles the click event for earning coins by watching an ad.
+ */
+async function handleEarnCoinsClick() {
+    if (typeof UnityAds === 'undefined' || !UnityAds.isReady(adPlacementId)) {
+        alert('Ad is not ready yet. Please try again in a moment or ensure ad service is initialized.');
+        return;
+    }
+
+    try {
+        // This is a conceptual call to Unity Ads SDK.
+        // The actual API might involve event listeners for ad completion/skip/fail.
+        // Refer to Unity Ads Web SDK documentation for precise implementation.
+        console.log('Attempting to show Unity Ad...');
+        const result = await UnityAds.show(adPlacementId); // This is a simplified representation
+
+        // In a real scenario, Unity Ads SDK might provide callbacks for ad states
+        // On ad completion (verified by S2S callback to your backend)
+        if (result === 'completed') { // Or whatever success indicator Unity Ads provides
+            console.log('Unity Ad completed on client-side.');
+            // Crucial: You must rely on a SERVER-TO-SERVER (S2S) callback
+            // from Unity Ads to your backend to actually grant the reward.
+            // This client-side call is just to *inform* your backend to expect it,
+            // or to trigger a UI update *after* your backend confirms.
+            sendAdCompletionToBackend();
+        } else if (result === 'skipped') {
+            alert('Ad was skipped. No rewards granted.');
+        } else if (result === 'failed') {
+            alert('Ad failed to load or play properly.');
+        }
+    } catch (error) {
+        console.error('Error showing Unity Ad:', error);
+        alert('Failed to show ad. Please check console for details.');
+    }
+}
+
+/**
+ * Sends a client-side confirmation of ad completion to your backend.
+ * Your backend *must* verify this with Unity Ads' S2S callback.
+ */
+async function sendAdCompletionToBackend() {
+    const userId = userProfile.id; // Get current user's ID
+    if (!userId) {
+        console.error('User ID not available for ad completion callback.');
+        alert('Cannot verify ad completion. Please log in.');
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/adCompletedCallback', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId: userId, adPlacementId: adPlacementId, clientTimestamp: Date.now() })
+        });
+        const data = await response.json();
+
+        if (data.success && coinDisplay) {
+            alert('Congratulations! You earned ' + (data.earnedAmount || 'some') + ' coins!');
+            coinDisplay.textContent = data.newBalance; // Update UI with new balance from backend
+            userProfile.coins = data.newBalance; // Update local user profile
+        } else {
+            alert('Failed to award coins. ' + (data.message || 'Please contact support.'));
+        }
+    } catch (error) {
+        console.error('Error sending ad completion to backend:', error);
+        alert('Network error. Coins might not be awarded. Please check your balance.');
+    }
+}
+
+/**
+ * Fetches the user's current coin balance from the backend.
+ */
+async function fetchUserCoinBalance() {
+    if (!coinDisplay) return;
+
+    try {
+        const userId = userProfile.id; // Get current user's ID
+        if (!userId) {
+            coinDisplay.textContent = 'N/A';
+            return;
+        }
+
+        const response = await fetch(`/api/user/${userId}/coins`);
+        const data = await response.json();
+
+        if (data.success && typeof data.balance === 'number') {
+            coinDisplay.textContent = data.balance;
+            userProfile.coins = data.balance;
+        } else {
+            console.error('Failed to fetch coin balance:', data.message);
+            coinDisplay.textContent = 'Error';
+        }
+    } catch (error) {
+        console.error('Network error fetching coin balance:', error);
+        coinDisplay.textContent = 'Error';
+    }
+}
+
+// =======================================================
+// Monetization Menu Item (Conceptual)
+// =======================================================
+
+function handleMonetizationClick() {
+    if (monetizationMenuItem) {
+        monetizationMenuItem.addEventListener('click', () => {
+            // Navigate to a dedicated monetization page or show a modal/section
+            window.location.href = '/monetization'; // Example navigation
+            // Or if it's a SPA:
+            // showMonetizationSection();
+        });
+    }
+}
+
+// =======================================================
+// Initial Load & Event Listeners (Once on page load)
+// =======================================================
+
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. Initialize Unity Ads
+    initializeUnityAds();
+
+    // 2. Fetch initial posts
+    fetchMorePosts();
+
+    // 3. Attach infinite scroll listener
+    window.addEventListener('scroll', handleScroll);
+
+    // 4. Attach profile logo change listeners
+    if (changeButton && fileInput) {
+        changeButton.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', handleProfileImageChange);
+    }
+
+    // 5. Attach earn coins button listener
+    if (earnCoinsButton) {
+        earnCoinsButton.addEventListener('click', handleEarnCoinsClick);
+        // Initially disable until Unity Ads is ready or check balance
+        earnCoinsButton.disabled = true;
+    }
+
+    // 6. Fetch initial user data (including coin balance)
+    // In a real app, this would come from an authenticated API endpoint
+    // For demonstration, let's mock a user profile or fetch if logged in
+    async function fetchCurrentUserProfile() {
+        try {
+            const response = await fetch('/api/currentUser'); // Your backend API for current user
+            const data = await response.json();
+            if (data.success && data.user) {
+                userProfile = data.user;
+                // Update coin display if available
+                if (coinDisplay && userProfile.coins !== undefined) {
+                    coinDisplay.textContent = userProfile.coins;
+                }
+            } else {
+                console.warn('Could not fetch current user profile.');
+                // Handle unauthenticated state, e.g., redirect to login
+            }
+        } catch (error) {
+            console.error('Error fetching current user profile:', error);
+        }
+    }
+    fetchCurrentUserProfile(); // Call on DOM load
+
+    // 7. Monetization Menu Item
+    handleMonetizationClick();
+
+    // IMPORTANT: Event delegation for dynamically added post features (likes, reactions, etc.)
+    // While attachPostEventListeners works for new posts, for existing elements on initial load,
+    // you could either call attachPostEventListeners for each initial post,
+    // or use event delegation for better performance on large numbers of elements.
+
+    // Example of event delegation for like button (alternative to individual listeners)
+    // postsContainer.addEventListener('click', (event) => {
+    //     if (event.target.classList.contains('like-button')) {
+    //         toggleLike(event);
+    //     }
+    // });
+    // This is more efficient for large lists, but requires rewriting the function
+    // to use event.target instead of 'this' or assuming direct target.
+    // For simplicity, I've kept individual listeners for `attachPostEventListeners`.
+});
