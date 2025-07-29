@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -31,44 +31,51 @@
             </div>
             <div class="header-center">
                 <div class="status-display">
-                    <span id="header-coins">0 C</span> |
-                    <span id="header-credits">0 Cr</span> |
-                    <span id="header-limit">0 L</span>
+                    <div id="header-coins-wrapper" class="clickable-stat-header" title="Klicken, um Münzen zu verdienen">
+                        <span id="header-coins">0 C</span>
+                    </div> |
+                    <div id="header-credits-wrapper" class="clickable-stat-header" title="Klicken, um Credits zu verdienen">
+                        <span id="header-credits">0 Cr</span>
+                    </div> |
+                    <div id="header-limit-wrapper" class="clickable-stat-header" title="Klicken, um Limits zu verdienen">
+                        <span id="header-limit">0 L</span>
+                    </div>
                 </div>
             </div>
             <div class="header-right">
-                <div class="icon-button" id="refresh-posts-btn" title="Refresh Feed">
+                <div class="icon-button" id="refresh-posts-btn" title="Feed aktualisieren">
                     <i class="fas fa-sync-alt"></i>
                 </div>
-                <div class="icon-button" id="gift-claim-btn" title="Claim Daily Reward">
+                <div class="icon-button" id="gift-claim-btn" title="Tägliche Belohnung einfordern">
                     <i class="fas fa-gift"></i>
                 </div>
-                </div>
+            </div>
         </header>
 
         <nav id="sidebar" class="sidebar">
             <div class="sidebar-header">
-                <h3>AddMint Menu</h3>
-                <div class="close-sidebar" id="close-sidebar">&times;</div>
+                <h3>AddMint Menü</h3>
+                <div class="close-sidebar" id="close-sidebar">×</div>
             </div>
             <ul>
                 <li><a href="#" data-screen="home"><i class="fas fa-home"></i> Home Feed</a></li>
-                <li><a href="#" data-screen="profile"><i class="fas fa-user-circle"></i> My Profile</a></li>
-                <li><a href="#" data-screen="upload"><i class="fas fa-plus-circle"></i> Upload Post</a></li>
-                <li><a href="#" data-screen="messages"><i class="fas fa-comments"></i> Messages</a></li>
-                <li><a href="#" data-screen="search"><i class="fas fa-search"></i> Search Users</a></li>
-                <li><a href="#" id="data-saver-toggle"><i class="fas fa-wifi"></i> Data Saver <span class="toggle-switch"><input type="checkbox" id="data-saver-checkbox"><label for="data-saver-checkbox"></label></span></a></li>
-                <li><a href="https://www.instagram.com/addmint__" target="_blank"><i class="fab fa-instagram"></i> Our Instagram</a></li>
-                <li><a href="https://www.youtube.com/@add_mintmint" target="_blank"><i class="fab fa-youtube"></i> Our YouTube</a></li>
-                <li><a href="#" data-screen="about"><i class="fas fa-info-circle"></i> About Us</a></li>
-                <li><a href="#" data-screen="privacy"><i class="fas fa-shield-alt"></i> Privacy Policy</a></li>
-                <li><a href="#" id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                <li><a href="#" data-screen="profile"><i class="fas fa-user-circle"></i> Mein Profil</a></li>
+                <li><a href="#" data-screen="upload"><i class="fas fa-plus-circle"></i> Beitrag hochladen</a></li>
+                <li><a href="#" data-screen="messages"><i class="fas fa-comments"></i> Nachrichten</a></li>
+                <li><a href="#" data-screen="search"><i class="fas fa-search"></i> Benutzer suchen</a></li>
+                <li><a href="#" id="monetize-menu-btn"><i class="fas fa-dollar-sign"></i> Verdienen & Monetarisieren</a></li>
+                <li><a href="#" id="data-saver-toggle"><i class="fas fa-wifi"></i> Datensparmodus <span class="toggle-switch"><input type="checkbox" id="data-saver-checkbox"><label for="data-saver-checkbox"></label></span></a></li>
+                <li><a href="https://www.instagram.com/addmint__" target="_blank"><i class="fab fa-instagram"></i> Unser Instagram</a></li>
+                <li><a href="https://www.youtube.com/@add_mintmint" target="_blank"><i class="fab fa-youtube"></i> Unser YouTube</a></li>
+                <li><a href="#" data-screen="about"><i class="fas fa-info-circle"></i> Über uns</a></li>
+                <li><a href="#" data-screen="privacy"><i class="fas fa-shield-alt"></i> Datenschutzrichtlinie</a></li>
+                <li><a href="#" id="logout-btn"><i class="fas fa-sign-out-alt"></i> Abmelden</a></li>
             </ul>
         </nav>
 
         <main class="main-content">
             <section id="home-screen" class="app-screen active">
-                <h2>Recent Posts</h2>
+                <h2>Aktuelle Beiträge</h2>
                 <div id="posts-feed" class="posts-feed">
                     </div>
                 <div id="loading-spinner" class="loading-spinner hidden"></div>
@@ -80,15 +87,15 @@
                         <div class="profile-avatar-large" id="my-profile-avatar"></div>
                         <h2 id="my-profile-username">@myusername</h2>
                         <div class="profile-stats">
-                            <div><span id="my-posts-count">0</span> Posts</div>
-                            <div class="clickable-stat" data-stat="followers"><span id="my-followers-count">0</span> Followers</div>
+                            <div><span id="my-posts-count">0</span> Beiträge</div>
+                            <div class="clickable-stat" data-stat="followers"><span id="my-followers-count">0</span> Follower</div>
                             <div class="clickable-stat" data-stat="following"><span id="my-following-count">0</span> Following</div>
                         </div>
                         <div class="profile-actions">
-                            <button class="btn primary-btn" id="edit-profile-btn"><i class="fas fa-edit"></i> Edit Profile</button>
-                            <button class="btn secondary-btn hidden" id="follow-user-btn"><i class="fas fa-user-plus"></i> Follow</button>
-                            <button class="btn danger-btn hidden" id="unfollow-user-btn"><i class="fas fa-user-minus"></i> Unfollow</button>
-                            <button class="btn primary-btn hidden" id="message-user-btn"><i class="fas fa-paper-plane"></i> Message</button>
+                            <button class="btn primary-btn" id="edit-profile-btn"><i class="fas fa-edit"></i> Profil bearbeiten</button>
+                            <button class="btn secondary-btn hidden" id="follow-user-btn"><i class="fas fa-user-plus"></i> Folgen</button>
+                            <button class="btn danger-btn hidden" id="unfollow-user-btn"><i class="fas fa-user-minus"></i> Nicht mehr folgen</button>
+                            <button class="btn primary-btn hidden" id="message-user-btn"><i class="fas fa-paper-plane"></i> Nachricht</button>
                             <a href="#" id="profile-whatsapp-link" class="btn social-btn hidden"><i class="fab fa-whatsapp"></i> WhatsApp</a>
                             <a href="#" id="profile-instagram-link" class="btn social-btn hidden"><i class="fab fa-instagram"></i> Instagram</a>
                         </div>
@@ -96,27 +103,27 @@
 
                     <div id="edit-profile-modal" class="modal hidden">
                         <div class="modal-content">
-                            <h3>Edit Profile</h3>
+                            <h3>Profil bearbeiten</h3>
                             <div class="form-group">
-                                <label for="edit-username">Username:</label>
-                                <input type="text" id="edit-username" placeholder="Enter new username">
+                                <label for="edit-username">Benutzername:</label>
+                                <input type="text" id="edit-username" placeholder="Neuen Benutzernamen eingeben">
                                 <span id="username-availability"></span>
                             </div>
                             <div class="form-group">
                                 <label for="edit-whatsapp">WhatsApp (Optional):</label>
-                                <input type="text" id="edit-whatsapp" placeholder="e.g., +919876543210">
+                                <input type="text" id="edit-whatsapp" placeholder="z.B. +49123456789">
                             </div>
                             <div class="form-group">
                                 <label for="edit-instagram">Instagram ID (Optional):</label>
-                                <input type="text" id="edit-instagram" placeholder="e.g., my_insta_id">
+                                <input type="text" id="edit-instagram" placeholder="z.B. mein_insta_id">
                             </div>
                             <div class="form-group">
-                                <label>Profile Logo:</label>
+                                <label>Profil-Logo:</label>
                                 <div id="profile-logo-options" class="logo-options-grid">
                                     </div>
                             </div>
-                            <button class="btn primary-btn" id="save-profile-btn">Save Changes</button>
-                            <button class="btn secondary-btn" id="cancel-edit-profile-btn">Cancel</button>
+                            <button class="btn primary-btn" id="save-profile-btn">Änderungen speichern</button>
+                            <button class="btn secondary-btn" id="cancel-edit-profile-btn">Abbrechen</button>
                         </div>
                     </div>
 
@@ -125,12 +132,12 @@
                             <h3 id="follow-list-title"></h3>
                             <div id="follow-list-content">
                                 </div>
-                            <button class="btn secondary-btn" id="close-follow-list-modal">Close</button>
+                            <button class="btn secondary-btn" id="close-follow-list-modal">Schließen</button>
                         </div>
                     </div>
 
                     <div class="profile-posts-area">
-                        <h3>Posts by <span id="current-profile-username-posts">Me</span></h3>
+                        <h3>Beiträge von <span id="current-profile-username-posts">Mir</span></h3>
                         <div id="profile-posts-feed" class="posts-feed">
                             </div>
                     </div>
@@ -138,32 +145,32 @@
             </section>
 
             <section id="upload-screen" class="app-screen">
-                <h2>Upload New Post</h2>
+                <h2>Neuen Beitrag hochladen</h2>
                 <div class="form-group">
-                    <label for="post-content">Post Content:</label>
-                    <textarea id="post-content" placeholder="What's on your mind?"></textarea>
+                    <label for="post-content">Beitragsinhalt:</label>
+                    <textarea id="post-content" placeholder="Was gibt's Neues?"></textarea>
                 </div>
                 <div class="form-group">
-                    <label for="post-image">Upload Image (Optional):</label>
+                    <label for="post-image">Bild hochladen (Optional):</label>
                     <input type="file" id="post-image" accept="image/*">
                 </div>
                 <div class="form-group">
-                    <label for="post-boost">Post Boost Hours:</label>
+                    <label for="post-boost">Beitrags-Boost-Stunden:</label>
                     <select id="post-boost">
-                        <option value="12">12 Hours (Free)</option>
-                        <option value="18">18 Hours (1 Ad)</option>
-                        <option value="24">24 Hours (2 Ads)</option>
-                        <option value="30">30 Hours (3 Ads)</option>
+                        <option value="12">12 Stunden (Kostenlos)</option>
+                        <option value="18">18 Stunden (1 Werbung)</option>
+                        <option value="24">24 Stunden (2 Werbungen)</option>
+                        <option value="30">30 Stunden (3 Werbungen)</option>
                     </select>
                 </div>
-                <button class="btn primary-btn" id="publish-post-btn">Publish Post</button>
+                <button class="btn primary-btn" id="publish-post-btn">Beitrag veröffentlichen</button>
                 <div id="upload-status"></div>
             </section>
 
             <section id="messages-screen" class="app-screen">
-                <h2>Messages</h2>
+                <h2>Nachrichten</h2>
                 <div id="message-list-container">
-                    <h3>Recent Chats</h3>
+                    <h3>Letzte Chats</h3>
                     <ul id="recent-chats-list" class="recent-chats-list">
                         </ul>
                 </div>
@@ -177,7 +184,7 @@
                     <div id="chat-messages" class="chat-messages">
                         </div>
                     <div class="chat-input-area">
-                        <textarea id="message-input" placeholder="Type your message..."></textarea>
+                        <textarea id="message-input" placeholder="Deine Nachricht..."></textarea>
                         <button id="send-message-btn" class="btn primary-btn"><i class="fas fa-paper-plane"></i></button>
                     </div>
                     <div class="emoji-picker-chat hidden">
@@ -191,58 +198,58 @@
             </section>
 
             <section id="search-screen" class="app-screen">
-                <h2>Search Users & Posts</h2>
+                <h2>Benutzer & Beiträge suchen</h2>
                 <div class="search-input-group">
-                    <input type="text" id="search-query" placeholder="Search by username, keyword...">
+                    <input type="text" id="search-query" placeholder="Suche nach Benutzername, Stichwort...">
                     <button class="btn primary-btn" id="search-btn"><i class="fas fa-search"></i></button>
                 </div>
                 <div id="search-results" class="search-results-container">
-                    <h3>Users</h3>
+                    <h3>Benutzer</h3>
                     <ul id="search-user-list" class="search-list">
                         </ul>
-                    <h3>Posts</h3>
+                    <h3>Beiträge</h3>
                     <div id="search-post-list" class="posts-feed">
                         </div>
-                    <div id="no-search-results" class="hidden">No results found.</div>
+                    <div id="no-search-results" class="hidden">Keine Ergebnisse gefunden.</div>
                 </div>
             </section>
 
             <section id="about-screen" class="app-screen">
-                <h2>About AddMint</h2>
-                <p>AddMint is a revolutionary social media platform designed to connect people through shared interests and engaging content. We believe in fostering a positive and vibrant community where every voice can be heard.</p>
-                <p>Our mission is to provide a seamless and professional experience for all users, offering unique features like dynamic post feeds, real-time messaging, and interactive user profiles.</p>
-                <p>For support or inquiries, please contact us at support@addmint.com.</p>
+                <h2>Über AddMint</h2>
+                <p>AddMint ist eine revolutionäre Social-Media-Plattform, die entwickelt wurde, um Menschen durch gemeinsame Interessen und ansprechende Inhalte zu verbinden. Wir glauben an die Förderung einer positiven und lebendigen Gemeinschaft, in der jede Stimme gehört werden kann.</p>
+                <p>Unsere Mission ist es, allen Benutzern ein nahtloses und professionelles Erlebnis zu bieten, mit einzigartigen Funktionen wie dynamischen Beitrags-Feeds, Echtzeit-Messaging und interaktiven Benutzerprofilen.</p>
+                <p>Für Support oder Anfragen kontaktieren Sie uns bitte unter support@addmint.com.</p>
             </section>
 
             <section id="privacy-screen" class="app-screen">
-                <h2>Privacy Policy</h2>
-                <p>Your privacy is paramount to us at AddMint. This policy outlines how we collect, use, and protect your personal information.</p>
-                <h3>Information We Collect:</h3>
+                <h2>Datenschutzrichtlinie</h2>
+                <p>Ihre Privatsphäre ist uns bei AddMint sehr wichtig. Diese Richtlinie beschreibt, wie wir Ihre persönlichen Daten sammeln, verwenden und schützen.</p>
+                <h3>Informationen, die wir sammeln:</h3>
                 <ul>
-                    <li><strong>Account Information:</strong> Username, email, password (hashed).</li>
-                    <li><strong>Profile Information:</strong> Optional WhatsApp number, Instagram ID, chosen profile logo.</li>
-                    <li><strong>Content Data:</strong> Posts, messages, likes, reactions, views.</li>
-                    <li><strong>Usage Data:</strong> Interactions with the app, features used, and technical data (e.g., device type).</li>
+                    <li><strong>Kontoinformationen:</strong> Benutzername, E-Mail, Passwort (gehasht).</li>
+                    <li><strong>Profilinformationen:</strong> Optionale WhatsApp-Nummer, Instagram-ID, gewähltes Profil-Logo.</li>
+                    <li><strong>Inhaltsdaten:</strong> Beiträge, Nachrichten, Likes, Reaktionen, Aufrufe.</li>
+                    <li><strong>Nutzungsdaten:</strong> Interaktionen mit der App, genutzte Funktionen und technische Daten (z. B. Gerätetyp).</li>
                 </ul>
-                <h3>How We Use Your Information:</h3>
+                <h3>Wie wir Ihre Informationen verwenden:</h3>
                 <ul>
-                    <li>To provide and maintain our services.</li>
-                    <li>To personalize your experience and show relevant content.</li>
-                    <li>To communicate with you regarding updates, security alerts, and support.</li>
-                    <li>To monitor and analyze usage patterns for service improvement.</li>
-                    <li>To enforce our terms and conditions and prevent misuse.</li>
+                    <li>Zur Bereitstellung und Wartung unserer Dienste.</li>
+                    <li>Zur Personalisierung Ihres Erlebnisses und zur Anzeige relevanter Inhalte.</li>
+                    <li>Zur Kommunikation mit Ihnen bezüglich Updates, Sicherheitswarnungen und Support.</li>
+                    <li>Zur Überwachung und Analyse von Nutzungsmustern zur Verbesserung des Dienstes.</li>
+                    <li>Zur Durchsetzung unserer Allgemeinen Geschäftsbedingungen und zur Verhinderung von Missbrauch.</li>
                 </ul>
-                <h3>Data Sharing:</h3>
-                <p>We do not share your personal information with third parties except as necessary to provide our services (e.g., Firebase for database), comply with legal obligations, or with your explicit consent.</p>
-                <h3>Data Security:</h3>
-                <p>We implement robust security measures, including encryption and access controls, to protect your data. However, no internet transmission is 100% secure.</p>
-                <h3>Your Choices:</h3>
+                <h3>Datenweitergabe:</h3>
+                <p>Wir geben Ihre persönlichen Daten nicht an Dritte weiter, außer wenn dies zur Bereitstellung unserer Dienste erforderlich ist (z. B. Firebase für die Datenbank), zur Einhaltung gesetzlicher Verpflichtungen oder mit Ihrer ausdrücklichen Zustimmung.</p>
+                <h3>Datensicherheit:</h3>
+                <p>Wir implementieren robuste Sicherheitsmaßnahmen, einschließlich Verschlüsselung und Zugriffskontrollen, um Ihre Daten zu schützen. Keine Internetübertragung ist jedoch 100% sicher.</p>
+                <h3>Ihre Wahlmöglichkeiten:</h3>
                 <ul>
-                    <li>You can update your profile information at any time.</li>
-                    <li>You can delete your account by contacting support.</li>
-                    <li>You can control notification preferences.</li>
+                    <li>Sie können Ihre Profilinformationen jederzeit aktualisieren.</li>
+                    <li>Sie können Ihr Konto löschen, indem Sie sich an den Support wenden.</li>
+                    <li>Sie können die Benachrichtigungseinstellungen steuern.</li>
                 </ul>
-                <p>By using AddMint, you agree to the terms of this Privacy Policy. We may update this policy periodically, and we will notify you of any significant changes.</p>
+                <p>Durch die Nutzung von AddMint stimmen Sie den Bedingungen dieser Datenschutzrichtlinie zu. Wir können diese Richtlinie regelmäßig aktualisieren und werden Sie über wesentliche Änderungen informieren.</p>
             </section>
         </main>
 
@@ -253,7 +260,7 @@
             </a>
             <a href="#" class="nav-item" data-screen="search">
                 <div class="icon-wrapper search-icon"></div>
-                <span>Search</span>
+                <span>Suchen</span>
             </a>
             <a href="#" class="nav-item" data-screen="upload">
                 <div class="icon-wrapper upload-icon"></div>
@@ -261,30 +268,44 @@
             </a>
             <a href="#" class="nav-item" data-screen="messages">
                 <div class="icon-wrapper messages-icon"></div>
-                <span>Messages</span>
+                <span>Nachrichten</span>
             </a>
             <a href="#" class="nav-item" data-screen="profile">
                 <div class="icon-wrapper profile-icon"></div>
-                <span>Profile</span>
+                <span>Profil</span>
             </a>
         </footer>
 
         <div id="ad-modal" class="modal hidden">
             <div class="modal-content">
-                <h3>Watch Ad to Earn Reward</h3>
-                <p>Please watch a short ad to claim your reward (e.g., coins, credit, limit).</p>
+                <h3>Werbung ansehen, um Belohnung zu erhalten</h3>
+                <p>Bitte sehen Sie sich eine kurze Werbung an, um Ihre Belohnung (z.B. Münzen, Credits, Limits) einzufordern.</p>
                 <div id="ad-placeholder">
-                    <p>Simulating Ad (5 seconds)...</p>
+                    <p>Simuliere Werbung (5 Sekunden)...</p>
                 </div>
-                <button class="btn secondary-btn" id="close-ad-modal" disabled>Close Ad</button>
+                <button class="btn secondary-btn" id="close-ad-modal" disabled>Werbung schließen</button>
+            </div>
+        </div>
+        
+        <div id="monetize-modal" class="modal hidden">
+            <div class="modal-content">
+                <h3>Verdienen & Monetarisieren</h3>
+                <p>Bei AddMint können Sie In-App-Ressourcen auf verschiedene Weisen verdienen:</p>
+                <ul>
+                    <li><strong>Tägliche Belohnung:</strong> Fordern Sie jeden Tag kostenlose Limits, Münzen und Credits ein, indem Sie auf das Geschenk-Symbol klicken.</li>
+                    <li><strong>Werbung ansehen:</strong> Ihnen gehen die Ressourcen aus? Klicken Sie auf die Münzen-, Credit- oder Limit-Anzeige in der Kopfzeile, um eine Werbung anzusehen und mehr zu verdienen.</li>
+                    <li><strong>Beiträge boosten:</strong> Verwenden Sie Ihre verdienten Ressourcen, um Ihre Beiträge zu boosten und sie für eine längere Zeit sichtbar zu machen.</li>
+                </ul>
+                <p>Wir arbeiten an weiteren Möglichkeiten, wie Sie mit Ihren Inhalten interagieren und Belohnungen verdienen können. Bleiben Sie dran!</p>
+                <button class="btn primary-btn" id="close-monetize-modal">Verstanden</button>
             </div>
         </div>
 
         <div id="reward-popup" class="modal hidden">
             <div class="modal-content reward-content">
-                <h3>Reward Claimed! <i class="fas fa-trophy"></i></h3>
+                <h3>Belohnung eingefordert! <i class="fas fa-trophy"></i></h3>
                 <p id="reward-message"></p>
-                <button class="btn primary-btn" id="close-reward-popup">Great!</button>
+                <button class="btn primary-btn" id="close-reward-popup">Super!</button>
             </div>
         </div>
 
