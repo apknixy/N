@@ -1,32 +1,3 @@
- Here's the updated HTML, CSS, and JavaScript code for your AddMint application, incorporating all the requested features and fixes.
-
-I've added a robust authentication flow, improved the post interactions, refined the infinite scroll, included text-to-speech, and addressed the search functionality. Please note that **real money withdrawal** and **actual language translation** require secure backend services (like Firebase Cloud Functions, payment gateways, and translation APIs with proper authentication) that cannot be implemented purely client-side in an HTML file for security and functional reasons. I've provided simulated or placeholder implementations for these.
-
-**Key Changes Implemented:**
-
-1.  **Splash Screen Centering:** The logo and text in the splash screen are now perfectly centered using flexbox.
-2.  **Login/Signup Page:**
-    *   A new `auth-screen` is introduced with separate login and signup forms.
-    *   Users are redirected here if not authenticated or after logging out.
-    *   Password visibility toggle (eye icon) is implemented for all password fields.
-    *   Firebase `signInWithEmailAndPassword` and `createUserWithEmailAndPassword` are integrated.
-3.  **First-Time Profile Setup:** New users are automatically prompted to complete their profile (username, WhatsApp, Instagram, profile logo) after successful signup.
-4.  **Logout Flow:** The "Logout" button now correctly returns the user to the `auth-screen`.
-5.  **Translate Button:** A placeholder with a toast message is implemented, explaining that full translation requires a backend API.
-6.  **Speak Post (Text-to-Speech):** A speaker icon is added to each post. Clicking it will read the post content aloud, and if another post is speaking, it will stop the previous one.
-7.  **Enhanced Post Options:** The three-dot menu now includes "Copy Post Link" and a placeholder for "Remix" with an informative toast message.
-8.  **Never-Ending Posts:** The home feed now seamlessly loops back to older posts when new ones run out, creating a continuous scroll experience.
-9.  **Mixed Post Layouts:** The random display of vertical, horizontal, and table-style post sections is confirmed and made more robust, mimicking popular social media feeds.
-10. **Coin Withdrawal (Simulated):** A "Withdraw Coins" button and a modal are added to the "Monetization" screen. This is a **simulated feature** with an explanation of real-world requirements.
-11. **Gift Reward & Ads:** The daily gift claim requires watching a simulated ad, and rewards (coins, credits, limits) are granted only after the ad completes. The ad mechanism for earning resources has been generalized.
-12. **Search Users Fix:** The user search functionality for users is now more robust, ensuring that usernames are converted to lowercase when saved and searched, which improves matching.
-13. **Profile Links:** Direct links to WhatsApp and Instagram on other users' profiles are now functional (if the user has provided them).
-14. **Follow/Unfollow Logic Refinement:** Added checks to prevent following/unfollowing self and to ensure counts are updated correctly.
-15. **User ID and Profile Logo Consistency:** Ensured that user IDs and their chosen profile logos are correctly propagated and displayed across different parts of the app (posts, chats, search results).
-
----
-
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -4258,4 +4229,4 @@ I've added a robust authentication flow, improved the post interactions, refined
     </script>
 </body>
 </html>
-```
+
