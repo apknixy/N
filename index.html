@@ -455,6 +455,40 @@
             box-shadow: 0 0 5px #00ffff, 0 0 15px #00ffff, 0 0 25px #00ffff, 0 0 35px #00ffff;
             border-color: #00ffff;
         }
+        
+        /* NEW: Remix effect */
+        .post-card.remixed {
+            background-color: #2a163e; /* Lighter purple/darker blue for remixed */
+            border-color: #ff00ff; /* Pink border */
+            box-shadow: 0 0 10px rgba(255, 0, 255, 0.2);
+        }
+        .remix-content-wrapper {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+            border-top: 1px dashed #0d2a4a;
+            padding-top: 15px;
+        }
+        .remix-original, .remix-reply {
+            flex: 1;
+            padding: 10px;
+            border-radius: 8px;
+            background-color: #1a1a2e; /* Darker background for remix sections */
+            border: 1px solid #0f3460;
+        }
+        .remix-original h5, .remix-reply h5 {
+            margin-top: 0;
+            color: #00ffff;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+        .remix-original p, .remix-reply p {
+            font-size: 0.9em;
+            color: #e0e0e0;
+            margin-bottom: 0;
+        }
+        /* End NEW: Remix effect */
+
 
         .post-header {
             display: flex;
@@ -1407,6 +1441,49 @@
         .toast-notification.info { background-color: #3498db; }
 
 
+        /* NEW: Language Selection Modal */
+        #language-select-modal .language-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            max-height: 250px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #0f3460;
+            border-radius: 8px;
+            background-color: #0d2a4a;
+        }
+        #language-select-modal .language-option {
+            padding: 10px;
+            border-radius: 6px;
+            background-color: #1a1a2e;
+            border: 1px solid #00ffff;
+            color: #e0e0e0;
+            cursor: pointer;
+            text-align: center;
+            transition: background-color 0.2s ease, transform 0.2s ease;
+        }
+        #language-select-modal .language-option.selected {
+            background-color: #00ffff;
+            color: #1a1a2e;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.4);
+        }
+        #language-select-modal .language-option:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Animation for shake effect on remix */
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            20% { transform: translateX(-5px); }
+            40% { transform: translateX(5px); }
+            60% { transform: translateX(-5px); }
+            80% { transform: translateX(5px); }
+            100% { transform: translateX(0); }
+        }
+
+
         /* Animations */
         @keyframes fadeIn {
             from { opacity: 0; }
@@ -1622,7 +1699,8 @@
                 <div class="status-display">
                     <span id="header-coins" class="clickable-stat" data-resource-type="coins">0 C</span> |
                     <span id="header-credits" class="clickable-stat" data-resource-type="credits">0 Cr</span> |
-                    <span id="header-limit" class="clickable-stat" data-resource-type="limit">0 L</span>
+                    <span id="header-limit" class="clickable-stat" data-resource-type="limit">0 L</span> |
+                    <span id="header-mint" class="clickable-stat" data-resource-type="mint">0 M</span>
                 </div>
             </div>
             <div class="header-right">
@@ -1662,7 +1740,6 @@
                 <div id="posts-feed" class="posts-feed">
                     </div>
                 <div id="loading-spinner" class="loader hidden"></div>
-                <p id="end-of-feed-message" class="hidden" style="text-align: center; color: #bbb; margin-top: 20px;">No new posts. Loading older posts...</p>
             </section>
 
             <section id="profile-screen" class="app-screen">
@@ -1736,7 +1813,7 @@
                 </div>
                 <div class="form-group">
                     <label for="post-image">Upload Image (Optional):</label>
-                    <input type="file" id="post-image" accept="image/*">
+                    <input type="file" id="post-image" accept="image/*" disabled> <span style="font-size: 0.9em; color: #bbb;">Coming Soon</span>
                 </div>
                 <div class="form-group">
                     <label for="post-boost">Post Boost Hours:</label>
@@ -1825,11 +1902,15 @@
                     <h4><i class="fas fa-chart-line"></i> Post Limits</h4>
                     <p>Each post you upload consumes one post limit. Earn more limits to share more content with the community.</p>
                 </div>
+                 <div class="info-card">
+                    <h4><i class="fas fa-gem"></i> Mint <small>(New Currency)</small></h4>
+                    <p>Mint is our premium currency earned from every ad watched. You can withdraw Mint to real money.</p>
+                </div>
 
-                <h3>Withdraw Coins</h3>
+                <h3>Withdraw Mint</h3>
                 <div class="info-card">
-                    <p>You can withdraw your earned coins to real money. Minimum withdrawal is 10,000 coins for ₹10-₹500 (value may vary).</p>
-                    <button class="btn primary-btn" id="withdraw-coins-btn"><i class="fas fa-wallet"></i> Withdraw Coins</button>
+                    <p>You can withdraw your earned Mint to real money. Minimum withdrawal is 1,000 Mint.</p>
+                    <button class="btn primary-btn" id="withdraw-coins-btn"><i class="fas fa-wallet"></i> Withdraw Mint</button>
                 </div>
 
                 <p style="margin-top: 20px;">Stay tuned for more earning opportunities and exclusive features!</p>
@@ -1861,7 +1942,7 @@
                     <li>To enforce our terms and conditions and prevent misuse.</li>
                 </ul>
                 <h3>Data Sharing:</h3>
-                <p>We do not share your personal information with third parties except as necessary to provide our services (e.g., Firebase for database), comply with legal obligations, or with your explicit consent.</p>
+                <p>We do not share your personal information with third parties except as necessary to provide our services, comply with legal obligations, or with your explicit consent.</p>
                 <h3>Data Security:</h3>
                 <p>We implement robust security measures, including encryption and access controls, to protect your data. However, no internet transmission is 100% secure.</p>
                 <h3>Your Choices:</h3>
@@ -1899,8 +1980,8 @@
 
         <div id="ad-modal" class="modal hidden">
             <div class="modal-content">
-                <h3>Watch Ad to Earn Reward</h3>
-                <p>Please watch a short ad to claim your reward (e.g., coins, credit, limit).</p>
+                <h3>Watch an Advertisement</h3>
+                <p>Please watch a short ad to claim your reward.</p>
                 <div id="ad-placeholder">
                     <p>Simulating Ad (5 seconds)...</p>
                 </div>
@@ -1918,11 +1999,46 @@
 
         <div id="withdraw-modal" class="modal hidden">
             <div class="modal-content">
-                <h3>Withdraw Coins</h3>
-                <p><strong>Minimum withdrawal: 10,000 Coins</strong></p>
-                <p>This feature requires secure backend integration with payment gateways (e.g., UPI, PayPal). For this demo, it's a placeholder.</p>
-                <p>In a real application, you would enter your payment details here and a server would process the transaction.</p>
-                <button class="btn secondary-btn" id="close-withdraw-modal">Close</button>
+                <h3>Withdraw Mint</h3>
+                <p><strong>Minimum withdrawal: 1,000 Mint</strong></p>
+                <p>Your current Mint balance: <strong id="current-mint-balance">0 M</strong></p>
+                <div class="form-group">
+                    <label for="withdraw-paypal-email">PayPal Email:</label>
+                    <input type="email" id="withdraw-paypal-email" placeholder="Enter your PayPal email">
+                </div>
+                <div class="form-group">
+                    <label for="withdraw-real-name">Your Full Name:</label>
+                    <input type="text" id="withdraw-real-name" placeholder="Enter your full name">
+                </div>
+                <div class="form-group">
+                    <label for="withdraw-age">Your Age:</label>
+                    <input type="number" id="withdraw-age" placeholder="Your age">
+                </div>
+                <div class="form-group">
+                    <label for="withdraw-dob">Date of Birth:</label>
+                    <input type="date" id="withdraw-dob">
+                </div>
+                <p style="font-size: 0.9em; color: #bbb;">Your payment will be processed within 1-15 business days.</p>
+                <button class="btn primary-btn" id="confirm-withdraw-btn">Confirm Withdrawal</button>
+                <button class="btn secondary-btn" id="close-withdraw-modal">Cancel</button>
+                <p style="font-size: 0.8em; color: #aaa; margin-top: 15px;">Note: This process is simulated in this demo. Real withdrawals require a secure backend service.</p>
+            </div>
+        </div>
+
+        <!-- NEW: Language Selection Modal for Translate -->
+        <div id="language-select-modal" class="modal hidden">
+            <div class="modal-content">
+                <h3>Select Translation Language</h3>
+                <div class="language-options">
+                    <div class="language-option" data-lang="en">English</div>
+                    <div class="language-option" data-lang="hi">हिन्दी (Hindi)</div>
+                    <div class="language-option" data-lang="es">Español (Spanish)</div>
+                    <div class="language-option" data-lang="fr">Français (French)</div>
+                    <div class="language-option" data-lang="de">Deutsch (German)</div>
+                    <div class="language-option" data-lang="ja">日本語 (Japanese)</div>
+                </div>
+                <button class="btn primary-btn" id="save-language-btn">Save Language</button>
+                <button class="btn secondary-btn" id="cancel-language-btn">Cancel</button>
             </div>
         </div>
 
@@ -1965,6 +2081,7 @@
         const headerCoins = document.getElementById('header-coins');
         const headerCredits = document.getElementById('header-credits');
         const headerLimit = document.getElementById('header-limit');
+        const headerMint = document.getElementById('header-mint'); // NEW Mint display
         const giftClaimBtn = document.getElementById('gift-claim-btn');
         const adModal = document.getElementById('ad-modal');
         const closeAdModalBtn = document.getElementById('close-ad-modal');
@@ -1975,7 +2092,7 @@
         const refreshPostsBtn = document.getElementById('refresh-posts-btn');
         const postsFeed = document.getElementById('posts-feed');
         const loadingSpinner = document.getElementById('loading-spinner');
-        const endOfFeedMessage = document.getElementById('end-of-feed-message');
+        // const endOfFeedMessage = document.getElementById('end-of-feed-message'); // Removed as per request
 
         // Auth Screen
         const authScreen = document.getElementById('auth-screen');
@@ -1996,7 +2113,7 @@
         // Post Upload Screen
         const uploadScreen = document.getElementById('upload-screen');
         const postContentInput = document.getElementById('post-content');
-        const postImageInput = document.getElementById('post-image');
+        const postImageInput = document.getElementById('post-image'); // Disabled by default now
         const postBoostSelect = document.getElementById('post-boost');
         const publishPostBtn = document.getElementById('publish-post-btn');
         const uploadStatus = document.getElementById('upload-status');
@@ -2010,7 +2127,7 @@
         const myFollowingCount = document.getElementById('my-following-count');
         const editProfileBtn = document.getElementById('edit-profile-btn');
         const followUserBtn = document.getElementById('follow-user-btn');
-        const unfollowUserBtn = document.getElementById('unfollow-user-btn');
+        const unfollowUserBtn = document = document.getElementById('unfollow-user-btn');
         const messageUserBtn = document.getElementById('message-user-btn');
         const profileWhatsappLink = document.getElementById('profile-whatsapp-link');
         const profileInstagramLink = document.getElementById('profile-instagram-link');
@@ -2050,10 +2167,22 @@
         const searchPostList = document.getElementById('search-post-list');
         const noSearchResults = document.getElementById('no-search-results');
 
-        // Monetization Screen
+        // Monetization Screen & Withdraw Modal
         const withdrawCoinsBtn = document.getElementById('withdraw-coins-btn');
         const withdrawModal = document.getElementById('withdraw-modal');
+        const currentMintBalance = document.getElementById('current-mint-balance');
+        const withdrawPaypalEmail = document.getElementById('withdraw-paypal-email');
+        const withdrawRealName = document.getElementById('withdraw-real-name');
+        const withdrawAge = document.getElementById('withdraw-age');
+        const withdrawDob = document.getElementById('withdraw-dob');
+        const confirmWithdrawBtn = document.getElementById('confirm-withdraw-btn');
         const closeWithdrawModalBtn = document.getElementById('close-withdraw-modal');
+
+        // NEW: Translate Language Selection Modal
+        const languageSelectModal = document.getElementById('language-select-modal');
+        const languageOptionsContainer = document.querySelector('#language-select-modal .language-options');
+        const saveLanguageBtn = document.getElementById('save-language-btn');
+        const cancelLanguageBtn = document.getElementById('cancel-language-btn');
 
 
         // --- Global Variables ---
@@ -2064,6 +2193,7 @@
         let fetchingPosts = false;
         const postsToLoadPerScroll = 10;
         let currentSpeaker = null; // For text-to-speech
+        let userSelectedTranslationLanguage = 'en'; // Default translation language
 
         const PROFILE_LOGOS = [
             { class: 'logo-1', emoji: '🧑', color: '#ff6347' }, // Tomato
@@ -2087,7 +2217,7 @@
             { class: 'logo-19', emoji: '🔑', color: '#b0e0e6' }, // PowderBlue
             { class: 'logo-20', emoji: '⚡', color: '#ffff00' }, // Yellow
             { class: 'logo-21', emoji: '🎵', color: '#ff69b4' }, // HotPink
-            { class: 'logo-22', emoji: '🎨', color: '#7b68ee' }, // MediumSlateBlue
+            { class: 'logo-22', emoji: '🎨', color: '#7b68ee; }', // MediumSlateBlue
             { class: 'logo-23', emoji: '🧩', color: '#ffa07a' }, // LightSalmon
             { class: 'logo-24', emoji: '🍔', color: '#cd853f' }, // Peru
             { class: 'logo-25', emoji: '🍕', color: '#f08080' }, // LightCoral
@@ -2118,7 +2248,6 @@
             { class: 'logo-50', emoji: '📈', color: '#c71585' }  // MediumVioletRed
         ];
 
-
         // --- Utility Functions ---
 
         function showToast(message, type = 'info', duration = 3000) {
@@ -2130,6 +2259,7 @@
         }
 
         function formatNumber(num) {
+            if (num === null || num === undefined) return '0';
             if (num >= 1000000) return (num / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
             if (num >= 1000) return (num / 1000).toFixed(1).replace(/\.0$/, '') + 'k';
             return num;
@@ -2284,6 +2414,7 @@
                 const defaultLogo = getRandomLogoClass();
                 await db.collection('users').doc(user.uid).set({
                     username: `user${Date.now().toString().slice(-6)}`, // Temporary username
+                    username_lowercase: `user${Date.now().toString().slice(-6)}`.toLowerCase(), // For search
                     email: email,
                     profileLogo: defaultLogo,
                     postCount: 0,
@@ -2292,6 +2423,7 @@
                     coins: 100, // Starting bonus
                     credits: 50, // Starting bonus
                     postLimit: 5, // Starting bonus
+                    mint: 0, // NEW: Starting mint
                     lastRewardClaim: 0,
                     whatsapp: '',
                     instagram: '',
@@ -2316,22 +2448,27 @@
             }, 1000); // Show splash for at least 1 second
         }
 
-        // --- Header Coins/Credits/Limits Display ---
+        // --- Header Coins/Credits/Limits/Mint Display ---
         async function loadUserCoinsCreditsLimits(userId) {
             if (!userId) return;
             try {
                 const userDocRef = db.collection('users').doc(userId);
+                // Use onSnapshot for real-time updates to header values
                 userDocRef.onSnapshot(doc => {
                     if (doc.exists) {
                         const data = doc.data();
                         headerCoins.textContent = `${formatNumber(data.coins || 0)} C`;
                         headerCredits.textContent = `${formatNumber(data.credits || 0)} Cr`;
                         headerLimit.textContent = `${formatNumber(data.postLimit || 0)} L`;
+                        headerMint.textContent = `${formatNumber(data.mint || 0)} M`; // NEW: Update Mint
                         checkDailyRewardStatus(data.lastRewardClaim || 0); // Check for reward
                     }
+                }, error => {
+                    console.error("Error fetching user stats in real-time:", error);
+                    showToast("Error loading user stats.", 'error');
                 });
             } catch (error) {
-                console.error("Error fetching user stats:", error);
+                console.error("Error setting up user stats listener:", error);
                 showToast("Error loading user stats.", 'error');
             }
         }
@@ -2348,6 +2485,10 @@
                 if (resourceType === 'coins') adDetails = { coins: 10 };
                 else if (resourceType === 'credits') adDetails = { credits: 5 };
                 else if (resourceType === 'limit') adDetails = { limit: 1 };
+                else if (resourceType === 'mint') {
+                    showToast("Mint is earned automatically from any ad watch.", 'info');
+                    return;
+                }
                 showAdModal(resourceType, adDetails);
             });
         });
@@ -2355,7 +2496,7 @@
 
         // --- Daily Reward Logic ---
         const DAILY_REWARD_INTERVAL = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
-        const DAILY_REWARD = { limit: 2, coins: 10, credits: 10 };
+        const DAILY_REWARD = { limit: 2, coins: 10, credits: 10, mint: 5 }; // NEW: Mint in daily reward
 
         async function checkDailyRewardStatus(lastClaimTimestamp) {
             if (!currentUser) return;
@@ -2436,18 +2577,16 @@
                     if (screenId === 'profile') {
                         loadUserProfile(currentUser.uid); // Load own profile
                         currentProfileViewingId = currentUser.uid;
-                        updateProfileDisplay(currentUser.uid);
+                        updateProfileDisplay(currentUser.uid); // Ensure this is called with current user data to set editing state
                     } else if (screenId === 'messages') {
                         loadRecentChats();
                         messageListContainer.classList.remove('hidden');
                         chatWindowContainer.classList.add('hidden');
                     } else if (screenId === 'home') {
                         // Reset feed if navigating back to home
-                        postsFeed.innerHTML = '';
+                        postsFeed.innerHTML = ''; // Clear current posts
                         lastVisiblePost = null; // Reset pagination
                         loadPosts(); // Reload posts from start
-                    } else if (screenId === 'monetization') {
-                        // No specific action needed for monetization screen yet, just show it
                     }
                 }
                 sidebar.classList.remove('open');
@@ -2477,7 +2616,7 @@
                 if (screenId === 'profile') {
                     loadUserProfile(currentUser.uid); // Load own profile
                     currentProfileViewingId = currentUser.uid;
-                    updateProfileDisplay(currentUser.uid);
+                    updateProfileDisplay(currentUser.uid); // Ensure this is called with current user data to set editing state
                 } else if (screenId === 'messages') {
                     loadRecentChats();
                     messageListContainer.classList.remove('hidden');
@@ -2502,31 +2641,33 @@
 
             fetchingPosts = true;
             loadingSpinner.classList.remove('hidden');
-            endOfFeedMessage.classList.add('hidden'); // Hide "loading older posts" message
 
             try {
                 let postsRef = db.collection('posts')
-                                .orderBy('timestamp', 'desc')
+                                .where('expiryTime', '>', firebase.firestore.Timestamp.now()) // Only show unexpired posts
+                                .orderBy('expiryTime', 'desc') // Order by expiry to prioritize newer/more boosted posts
+                                .orderBy('timestamp', 'desc') // Secondary order by creation time
                                 .limit(postsToLoadPerScroll);
 
+                // If lastVisiblePost is set, use it for pagination
                 if (lastVisiblePost) {
                     postsRef = postsRef.startAfter(lastVisiblePost);
                 }
 
                 const snapshot = await postsRef.get();
+
                 if (snapshot.empty) {
-                    if (postsFeed.children.length > 0) { // If there are existing posts but no new ones
-                        // We've reached the end, reset and load from the beginning to make it "never-ending"
-                        showToast("End of new posts. Looping older ones.", 'info', 3000);
-                        endOfFeedMessage.classList.remove('hidden');
+                    if (postsFeed.children.length > 0) {
+                        // If we reached the end of the current feed, try loading from the beginning again
+                        // This creates a "never-ending" feel by looping through available posts.
                         lastVisiblePost = null; // Reset to start from the beginning
-                        postsFeed.innerHTML = ''; // Clear current feed to show fresh loop from top
-                        // Re-call loadPosts immediately after clearing to fetch from beginning
-                        // Add a small delay for better UX before re-fetching
-                        setTimeout(() => loadPosts(), 1000);
+                        // Show a temporary toast for better UX
+                        showToast("Cycling through posts...", 'info', 2000);
+                        setTimeout(() => loadPosts(), 500); // Small delay before re-fetching
                         return; // Exit this function call
-                    } else { // No posts at all
-                        postsFeed.innerHTML = '<p style="text-align: center; color: #ccc;">No posts available. Be the first to post!</p>';
+                    } else {
+                        // No posts available at all, or all posts expired
+                        postsFeed.innerHTML = '<p style="text-align: center; color: #ccc;">No posts available right now. Be the first to post!</p>';
                         loadingSpinner.classList.add('hidden');
                         fetchingPosts = false;
                         return;
@@ -2537,7 +2678,11 @@
 
                 let currentBatch = [];
                 snapshot.docs.forEach(doc => {
-                    currentBatch.push({ id: doc.id, ...doc.data() });
+                    const postData = doc.data();
+                    // Client-side filtering for expired posts (redundant with Firestore query but good fallback)
+                    if (postData.expiryTime && postData.expiryTime.toMillis() > Date.now()) {
+                         currentBatch.push({ id: doc.id, ...postData });
+                    }
                 });
 
                 // Apply random layout logic
@@ -2556,7 +2701,7 @@
 
                     if (layoutChoice === 'vertical') {
                         const post = tempPosts.shift();
-                        renderPost(post, 'vertical-post');
+                        renderPost(post, postsFeed, 'vertical-post');
                     } else if (layoutChoice === 'horizontal') {
                         const numHorizontal = Math.min(remainingPosts, Math.floor(Math.random() * 2) + 2); // 2 or 3 posts
                         const horizontalContainer = document.createElement('div');
@@ -2586,9 +2731,10 @@
             }
         }
 
+        // Renamed to renderPostElement to create the HTML element, and renderPost to append it.
         function createPostElement(postData, layoutClass = 'vertical-post') {
             const postCard = document.createElement('div');
-            postCard.className = `post-card ${layoutClass}`;
+            postCard.className = `post-card ${layoutClass} ${postData.isRemix ? 'remixed' : ''}`; // Add remixed class
             postCard.dataset.postId = postData.id;
 
             // Determine if the current user has liked this post
@@ -2596,6 +2742,24 @@
             const likeIconClass = hasLiked ? 'fas fa-heart' : 'far fa-heart';
 
             const userProfileClass = getLogoCssClass(postData.userProfileLogo || getRandomLogoClass());
+
+            const postContentHtml = `
+                <p data-original-content="${escapeHtml(postData.content)}">${formatPostContent(postData.content)}</p>
+                ${postData.imageUrl ? `<img src="${postData.imageUrl}" alt="Post Image">` : ''}
+            `;
+
+            const remixContentHtml = postData.isRemix && postData.remixOfContent ? `
+                <div class="remix-content-wrapper">
+                    <div class="remix-original">
+                        <h5>Original Post:</h5>
+                        <p>${escapeHtml(postData.remixOfContent)}</p>
+                    </div>
+                    <div class="remix-reply">
+                        <h5>Your Remix:</h5>
+                        <p>${formatPostContent(postData.content)}</p>
+                    </div>
+                </div>
+            ` : postContentHtml; // If not a remix, just show normal content
 
             postCard.innerHTML = `
                 <div class="post-header">
@@ -2606,14 +2770,14 @@
                         <div class="options-dropdown hidden">
                             <span class="report-btn">Report</span>
                             <span class="copy-link-btn">Copy Post Link</span>
-                            <span class="remix-btn">Remix Post</span>
+                            <span class="remix-btn" data-original-post-id="${postData.isRemix ? postData.remixOf : postData.id}" data-original-content="${escapeHtml(postData.isRemix ? postData.remixOfContent : postData.content)}">Remix Post</span>
+                            <span class="change-lang-btn">Change Translation Language</span> <!-- NEW -->
                             ${currentUser && postData.userId === currentUser.uid ? `<span class="delete-btn">Delete</span>` : ''}
                         </div>
                     </div>
                 </div>
                 <div class="post-content">
-                    <p data-original-content="${escapeHtml(postData.content)}">${formatPostContent(postData.content)}</p>
-                    ${postData.imageUrl ? `<img src="${postData.imageUrl}" alt="Post Image">` : ''}
+                    ${remixContentHtml}
                 </div>
                 <div class="post-footer">
                     <div class="post-actions">
@@ -2647,9 +2811,9 @@
             return div.innerHTML;
         }
 
-        function renderPost(postData, layoutClass = 'vertical-post') {
+        function renderPost(postData, parentElement, layoutClass = 'vertical-post') {
             const postElement = createPostElement(postData, layoutClass);
-            postsFeed.appendChild(postElement);
+            parentElement.appendChild(postElement);
         }
 
         function formatPostContent(content) {
@@ -2695,9 +2859,8 @@
             const profileAvatar = postElement.querySelector('.profile-avatar');
             const usernameSpan = postElement.querySelector('.username');
             const emojiPicker = postElement.querySelector('.emoji-picker');
-            const postReactionsDisplay = postElement.querySelector('.post-reactions'); // The container for reaction emojis
-            const postContentP = postElement.querySelector('.post-content p');
-
+            const postContentP = postElement.querySelector('.post-content p[data-original-content]'); // Ensure we get the main content P
+            const changeLangBtn = postElement.querySelector('.change-lang-btn'); // NEW
 
             // Profile Click
             if (profileAvatar) {
@@ -2743,12 +2906,13 @@
                 if (e.target.closest('.like-button') || e.target.closest('.post-options') || e.target.closest('.translate-button') || e.target.closest('.speak-button') || e.target.closest('.emoji-picker') || e.target.closest('.profile-avatar') || e.target.closest('.username')) {
                     return; // Don't trigger long press if these are clicked
                 }
-                e.preventDefault(); // Prevent default touch behavior like scrolling for better long press detection
-                clearTimeout(clickTimer); // Clear potential single/double click
-                longPressTimer = setTimeout(() => {
-                    emojiPicker.classList.remove('hidden');
-                }, 800); // 800ms for long press (adjust as needed)
-            }, { passive: false }); // Use passive: false to allow preventDefault
+                // Only prevent default if it's not a scroll event
+                if (e.touches.length === 1) { // Single touch for interaction
+                    longPressTimer = setTimeout(() => {
+                        emojiPicker.classList.remove('hidden');
+                    }, 800); // 800ms for long press (adjust as needed)
+                }
+            }, { passive: true }); // Use passive: true if you only need to read touch events, false if you need to preventDefault (might impact scroll performance)
 
             postElement.addEventListener('touchend', () => {
                 clearTimeout(longPressTimer);
@@ -2786,7 +2950,7 @@
                 });
             }
 
-            // Post Options (Report/Delete/Copy Link/Remix)
+            // Post Options (Report/Delete/Copy Link/Remix/Change Language)
             if (postOptionsBtn) {
                 postOptionsBtn.addEventListener('click', (e) => {
                     e.stopPropagation(); // Prevent post click/neon effect
@@ -2816,8 +2980,17 @@
             }
 
             if (remixBtn) {
-                remixBtn.addEventListener('click', () => {
-                    showToast("Remix feature is under development!", 'info', 3000);
+                remixBtn.addEventListener('click', (e) => {
+                    const originalPostId = e.target.dataset.originalPostId;
+                    const originalContent = e.target.dataset.originalContent;
+                    handleRemixPost(postElement, originalPostId, originalContent); // Pass original post content
+                    optionsDropdown.classList.add('hidden');
+                });
+            }
+
+            if (changeLangBtn) { // NEW: Add listener for change translation language
+                changeLangBtn.addEventListener('click', () => {
+                    showLanguageSelectModal();
                     optionsDropdown.classList.add('hidden');
                 });
             }
@@ -2833,14 +3006,22 @@
             if (translateBtn) {
                 translateBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    handleTranslatePost(postContentP);
+                    if (postContentP) { // Ensure element exists
+                        handleTranslatePost(postContentP, userSelectedTranslationLanguage);
+                    } else {
+                        showToast("Content for translation not found.", 'error');
+                    }
                 });
             }
             if (speakBtn) {
                 speakBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    const postText = postContentP.textContent;
-                    handleSpeakPost(postText, speakBtn);
+                    const postText = postContentP ? postContentP.textContent : '';
+                    if (postText) {
+                        handleSpeakPost(postText, speakBtn);
+                    } else {
+                        showToast("No content to speak.", 'error');
+                    }
                 });
             }
 
@@ -3041,11 +3222,13 @@
             postsFeed.innerHTML = ''; // Clear current posts
             lastVisiblePost = null; // Reset pagination
             loadPosts(); // Reload posts from the beginning
-            showToast("Posts feed refreshed!", 'info');
+            showToast("Feed refreshed!", 'info');
         });
 
         // Infinite Scroll Listener
         mainContent.addEventListener('scroll', () => {
+            // Check if user is near the bottom of the scrollable content
+            // and if the home screen is active (to avoid loading posts on other screens)
             if (mainContent.scrollTop + mainContent.clientHeight >= mainContent.scrollHeight - 100 &&
                 document.getElementById('home-screen').classList.contains('active')) {
                 loadPosts();
@@ -3061,11 +3244,11 @@
             }
 
             const content = postContentInput.value.trim();
-            const imageFile = postImageInput.files[0];
+            const imageFile = postImageInput.files[0]; // This is now disabled
             const boostHours = parseInt(postBoostSelect.value);
 
-            if (!content && !imageFile) {
-                showToast("Please enter some content or upload an image.", 'error');
+            if (!content) { // Removed imageFile check as it's disabled
+                showToast("Please enter some content for your post.", 'error');
                 return;
             }
 
@@ -3075,22 +3258,41 @@
             const userData = userDoc.data();
 
             const currentLimit = userData.postLimit || 0;
+            const currentCoins = userData.coins || 0;
             const requiredLimit = 1; // Always costs 1 limit
+
+            // Calculate coin cost based on boost hours
+            let coinCost = 0;
+            switch(boostHours) {
+                case 18: coinCost = 10; break; // Example cost, adjust as needed
+                case 24: coinCost = 20; break;
+                case 30: coinCost = 30; break;
+                default: coinCost = 0; // 12 hours is free
+            }
 
             if (currentLimit < requiredLimit) {
                 showToast("You need 1 post limit to upload. Watch an ad to earn.", 'error', 5000);
+                // Optionally auto-open ad modal
                 showAdModal('limit', { limit: 1 });
                 return;
             }
 
-            // Deduct limit
+            if (currentCoins < coinCost) {
+                showToast(`You need ${coinCost} coins for ${boostHours} hours boost. You have ${formatNumber(currentCoins)} C.`, 'error', 5000);
+                // Optionally auto-open ad modal
+                showAdModal('coins', { coins: coinCost - currentCoins }); // Offer to earn missing coins
+                return;
+            }
+
+            // Deduct limit and coins
             try {
                 await userDocRef.update({
-                    postLimit: firebase.firestore.FieldValue.increment(-requiredLimit)
+                    postLimit: firebase.firestore.FieldValue.increment(-requiredLimit),
+                    coins: firebase.firestore.FieldValue.increment(-coinCost)
                 });
             } catch (error) {
-                console.error("Error deducting limit for post:", error);
-                showToast("Failed to deduct post limit. Please try again.", 'error');
+                console.error("Error deducting resources for post:", error);
+                showToast("Failed to deduct resources. Please try again.", 'error');
                 return;
             }
 
@@ -3098,12 +3300,8 @@
             publishPostBtn.disabled = true;
 
             try {
-                let imageUrl = '';
-                if (imageFile) {
-                    const storageRef = storage.ref(`post_images/${currentUser.uid}/${Date.now()}_${imageFile.name}`);
-                    const uploadTask = await storageRef.put(imageFile);
-                    imageUrl = await uploadTask.ref.getDownloadURL();
-                }
+                // Image upload is disabled for now, so imageUrl will always be empty
+                const imageUrl = ''; // imageFile ? await uploadImage(imageFile) : '';
 
                 const newPostRef = db.collection('posts').doc(); // Auto-generated ID
                 await newPostRef.set({
@@ -3111,14 +3309,17 @@
                     username: userData.username, // Use user's current username
                     userProfileLogo: userData.profileLogo || getRandomLogoClass(), // User's chosen logo
                     content: content,
-                    imageUrl: imageUrl,
+                    imageUrl: imageUrl, // Will be empty string now
                     timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                     likes: 0,
                     views: 0,
                     reactions: {},
                     userReactions: {},
                     boostHours: boostHours,
-                    expiryTime: firebase.firestore.Timestamp.fromMillis(Date.now() + (boostHours * 60 * 60 * 1000))
+                    expiryTime: firebase.firestore.Timestamp.fromMillis(Date.now() + (boostHours * 60 * 60 * 1000)),
+                    isRemix: false, // NEW: Not a remix by default
+                    remixOf: null, // NEW: No original post ID
+                    remixOfContent: null // NEW: No original content
                 });
 
                 // Increment user's post count
@@ -3129,7 +3330,7 @@
                 uploadStatus.textContent = "Post uploaded successfully!";
                 showToast("Post uploaded successfully!", 'success');
                 postContentInput.value = '';
-                postImageInput.value = '';
+                // postImageInput.value = ''; // Not needed as it's disabled
                 postBoostSelect.value = '12';
                 showScreen('home-screen'); // Navigate back to home feed
                 postsFeed.innerHTML = ''; // Clear and reload posts
@@ -3139,15 +3340,16 @@
             } catch (error) {
                 console.error("Error publishing post:", error);
                 if (error.code === 'permission-denied' || error.message.includes('Missing or insufficient permissions')) {
-                    uploadStatus.textContent = "Error: Permission denied. Check Firebase rules.";
+                    uploadStatus.textContent = "Error: Permission denied. Contact admin.";
                     showToast("Error publishing post: Missing or insufficient permissions. Contact admin.", 'error', 5000);
                 } else {
                     uploadStatus.textContent = `Error: ${error.message}`;
                     showToast("Failed to upload post. Try again.", 'error');
                 }
-                // Revert limit if upload failed after deduction
+                // Revert resources if upload failed after deduction
                 await userDocRef.update({
-                    postLimit: firebase.firestore.FieldValue.increment(requiredLimit)
+                    postLimit: firebase.firestore.FieldValue.increment(requiredLimit),
+                    coins: firebase.firestore.FieldValue.increment(coinCost)
                 });
             } finally {
                 publishPostBtn.disabled = false;
@@ -3169,15 +3371,19 @@
             adPlaceholder.innerHTML = '<p>Simulating Ad (5 seconds)...</p><div class="loader"></div>';
             
             setTimeout(() => {
-                adPlaceholder.innerHTML = '<p>Ad Complete!</p>';
+                adPlaceholder.innerHTML = '<p>Ad Completed! Click "Close Ad" to claim reward.</p>';
                 closeAdModalBtn.disabled = false;
-                showToast("Ad completed! You can now claim your reward.", 'success');
+                // In a real app, *this* is where your MIT App Inventor app would signal the web app
+                // via a secure backend call that the ad is complete.
+                // For this demo, we auto-enable the close button and let it trigger the reward.
             }, 5000); // Simulate 5-second ad
         }
 
         closeAdModalBtn.addEventListener('click', async () => {
             adModal.classList.add('hidden');
             // Reward logic based on currentAdPurpose and adRewardDetails
+            // In a real scenario, this 'processAdReward' would only be called after a secure
+            // signal from your ad provider/backend that the ad was truly watched.
             await processAdReward();
         });
 
@@ -3189,29 +3395,34 @@
                 let rewardMessageText = "Reward Claimed: ";
                 let updateData = {};
 
+                // All ads give 1 Mint
+                updateData.mint = firebase.firestore.FieldValue.increment(1);
+                rewardMessageText += `+1 Mint`;
+
                 if (currentAdPurpose === 'coins') {
                     const coinsToAward = adRewardDetails.coins || 10;
                     updateData.coins = firebase.firestore.FieldValue.increment(coinsToAward);
-                    rewardMessageText += `+${coinsToAward} Coins`;
+                    rewardMessageText += `, +${coinsToAward} Coins`;
                 } else if (currentAdPurpose === 'credits') {
                     const creditsToAward = adRewardDetails.credits || 5;
                     updateData.credits = firebase.firestore.FieldValue.increment(creditsToAward);
-                    rewardMessageText += `+${creditsToAward} Credits`;
+                    rewardMessageText += `, +${creditsToAward} Credits`;
                 } else if (currentAdPurpose === 'limit') {
                     const limitsToAward = adRewardDetails.limit || 1;
                     updateData.postLimit = firebase.firestore.FieldValue.increment(limitsToAward);
-                    rewardMessageText += `+${limitsToAward} Post Limit`;
+                    rewardMessageText += `, +${limitsToAward} Post Limit`;
                 } else if (currentAdPurpose === 'message-credit') {
                     const creditsToAward = adRewardDetails.credits || 1; // For messaging, usually 1 credit
                     updateData.credits = firebase.firestore.FieldValue.increment(creditsToAward);
-                    rewardMessageText += `+${creditsToAward} Credits for Messaging`;
+                    rewardMessageText += `, +${creditsToAward} Credits for Messaging`;
                 } else if (currentAdPurpose === 'daily-reward') {
                     // This is for the daily gift box claim
                     updateData.coins = firebase.firestore.FieldValue.increment(adRewardDetails.coins);
                     updateData.credits = firebase.firestore.FieldValue.increment(adRewardDetails.credits);
                     updateData.postLimit = firebase.firestore.FieldValue.increment(adRewardDetails.limit);
                     updateData.lastRewardClaim = Date.now(); // Update last claim time
-                    rewardMessageText = `You claimed your daily reward!\n+${adRewardDetails.coins} Coins, +${adRewardDetails.credits} Credits, +${adRewardDetails.limit} Limits.`;
+                    // For daily reward, mint is awarded separately at the start of this function
+                    rewardMessageText = `You claimed your daily reward!\n+${adRewardDetails.coins} Coins, +${adRewardDetails.credits} Credits, +${adRewardDetails.limit} Limits, +1 Mint.`;
                 }
 
                 if (Object.keys(updateData).length > 0) {
@@ -3232,30 +3443,117 @@
             }
         }
 
-        // Withdraw Coins Modal
+        // Withdraw Mint Modal
         withdrawCoinsBtn.addEventListener('click', async () => {
             if (!currentUser) {
-                showToast("Please log in to withdraw coins.", 'info');
+                showToast("Please log in to withdraw Mint.", 'info');
                 return;
             }
-            const userDoc = await db.collection('users').doc(currentUser.uid).get();
-            const currentCoins = userDoc.data().coins || 0;
+            try {
+                const userDoc = await db.collection('users').doc(currentUser.uid).get();
+                const currentMint = userDoc.data().mint || 0;
+                currentMintBalance.textContent = `${formatNumber(currentMint)} M`;
 
-            if (currentCoins < 10000) {
-                showToast(`You need at least 10,000 coins to withdraw. You have ${formatNumber(currentCoins)} C.`, 'error', 5000);
-                return;
+                if (currentMint < 1000) {
+                    showToast(`You need at least 1,000 Mint to withdraw. You have ${formatNumber(currentMint)} M.`, 'error', 5000);
+                    return;
+                }
+                withdrawModal.classList.remove('hidden');
+            } catch (error) {
+                console.error("Error checking mint balance:", error);
+                showToast("Could not retrieve Mint balance.", 'error');
             }
-            withdrawModal.classList.remove('hidden');
         });
 
         closeWithdrawModalBtn.addEventListener('click', () => {
             withdrawModal.classList.add('hidden');
         });
 
+        confirmWithdrawBtn.addEventListener('click', async () => {
+            if (!currentUser) return;
+
+            const paypalEmail = withdrawPaypalEmail.value.trim();
+            const realName = withdrawRealName.value.trim();
+            const age = parseInt(withdrawAge.value.trim());
+            const dob = withdrawDob.value.trim();
+
+            if (!paypalEmail || !realName || isNaN(age) || !dob) {
+                showToast("Please fill all withdrawal details.", 'error');
+                return;
+            }
+            if (age < 13) {
+                showToast("You must be at least 13 years old to withdraw.", 'error');
+                return;
+            }
+
+            try {
+                const userDocRef = db.collection('users').doc(currentUser.uid);
+                const userDoc = await userDocRef.get();
+                const userData = userDoc.data();
+                const currentMint = userData.mint || 0;
+
+                if (currentMint < 1000) {
+                    showToast(`You need at least 1,000 Mint to withdraw. You have ${formatNumber(currentMint)} M.`, 'error', 5000);
+                    return;
+                }
+
+                // Simulate sending withdrawal request to backend
+                showToast("Processing withdrawal request...", 'info', 5000);
+                
+                // --- Backend Integration Point ---
+                // In a real application, you would make an API call to your Firebase Cloud Function here.
+                // Example:
+                /*
+                await firebase.functions().httpsCallable('requestWithdrawal')({
+                    amountMint: currentMint,
+                    paypalEmail: paypalEmail,
+                    realName: realName,
+                    age: age,
+                    dob: dob,
+                    userEmail: currentUser.email, // User's registered email
+                    userId: currentUser.uid,
+                    username: userData.username // User's username
+                });
+                */
+                // For this demo, we'll just simulate success and deduct mint.
+
+                // Deduct all mint from user's balance
+                await userDocRef.update({
+                    mint: 0 // Reset mint balance after withdrawal
+                });
+
+                showToast("Withdrawal request submitted! You will receive an email shortly regarding your payment within 1-15 business days.", 'success', 8000);
+                console.log("Withdrawal details (simulated):", {
+                    userId: currentUser.uid,
+                    username: userData.username,
+                    userEmail: currentUser.email,
+                    amountMint: currentMint,
+                    paypalEmail: paypalEmail,
+                    realName: realName,
+                    age: age,
+                    dob: dob,
+                    timestamp: new Date().toISOString()
+                });
+
+                withdrawModal.classList.add('hidden');
+                withdrawPaypalEmail.value = '';
+                withdrawRealName.value = '';
+                withdrawAge.value = '';
+                withdrawDob.value = '';
+
+            } catch (error) {
+                console.error("Error initiating withdrawal:", error);
+                showToast("Failed to submit withdrawal request. Please try again.", 'error');
+            }
+        });
+
 
         // --- Profile Management ---
         async function loadUserProfile(userId) {
-            if (!userId) return;
+            if (!userId) {
+                showToast("User ID is missing to load profile.", 'error');
+                return;
+            }
             currentProfileViewingId = userId; // Set the ID of the profile currently being viewed
 
             try {
@@ -3318,7 +3616,7 @@
 
         function updateProfileDisplay(userData) {
             // Determine which user's profile is being displayed
-            const isCurrentUserProfile = userData.uid === currentUser.uid;
+            const isCurrentUserProfile = (currentUser && userData.uid === currentUser.uid);
 
             myProfileUsername.textContent = `@${userData.username || 'NewUser'}`;
             currentProfileUsernamePosts.textContent = userData.username || 'Me';
@@ -3341,13 +3639,17 @@
         }
 
         async function loadProfilePosts(userId) {
-            profilePostsFeed.innerHTML = ''; // Clear existing posts
+            profilePostsFeed.innerHTML = '<div class="loader" style="margin: 20px auto;"></div>'; // Show loader
             try {
                 const querySnapshot = await db.collection('posts')
                     .where('userId', '==', userId)
+                    .where('expiryTime', '>', firebase.firestore.Timestamp.now()) // Only show unexpired posts
+                    .orderBy('expiryTime', 'desc')
                     .orderBy('timestamp', 'desc')
                     .limit(10) // Initial load limit for profile posts
                     .get();
+
+                profilePostsFeed.innerHTML = ''; // Clear loader once data is fetched
 
                 if (querySnapshot.empty) {
                     profilePostsFeed.innerHTML = '<p style="text-align: center; color: #ccc;">No posts yet.</p>';
@@ -3355,7 +3657,7 @@
                 }
 
                 querySnapshot.docs.forEach(doc => {
-                    profilePostsFeed.appendChild(createPostElement({ id: doc.id, ...doc.data() }));
+                    renderPost({ id: doc.id, ...doc.data() }, profilePostsFeed); // Render into profilePostsFeed
                 });
                 // Implement infinite scroll for profile posts similarly if needed
             } catch (error) {
@@ -3382,7 +3684,11 @@
             usernameAvailability.className = '';
 
             const newUsername = editUsernameInput.value.trim();
-            if (newUsername === '') return;
+            if (newUsername === '') {
+                usernameAvailability.textContent = 'Username cannot be empty.';
+                usernameAvailability.classList.add('error-text');
+                return;
+            }
 
             const userDoc = await db.collection('users').doc(currentUser.uid).get();
             const currentUsername = userDoc.data().username;
@@ -3422,6 +3728,11 @@
                 logoItem.className = `logo-option-item profile-avatar user-${logo.class}`; // Apply correct class
                 logoItem.dataset.logoClass = logo.class;
                 
+                // Add the emoji content dynamically
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = `<style>.logo-option-item.user-${logo.class}::before { content: '${logo.emoji}'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #1a1a2e; }</style>`;
+                document.head.appendChild(tempDiv); // Append dynamic style
+
                 if (currentLogoClass === logo.class) {
                     logoItem.classList.add('selected');
                 }
@@ -3469,7 +3780,6 @@
                     whatsapp: newWhatsapp,
                     instagram: newInstagram,
                     profileLogo: newProfileLogo,
-                    // Initialize follower/following counts if they don't exist (already handled on signup)
                     // Ensure default values are set if profile is being updated for a very old user
                     followersCount: currentData.followersCount || 0,
                     followingCount: currentData.followingCount || 0,
@@ -3477,16 +3787,20 @@
                     coins: currentData.coins !== undefined ? currentData.coins : 100,
                     credits: currentData.credits !== undefined ? currentData.credits : 50,
                     postLimit: currentData.postLimit !== undefined ? currentData.postLimit : 5,
+                    mint: currentData.mint !== undefined ? currentData.mint : 0, // NEW: Ensure mint is there
                     lastRewardClaim: currentData.lastRewardClaim !== undefined ? currentData.lastRewardClaim : 0
                 });
 
-                // Update username in existing posts if it changed
-                if (newUsername.toLowerCase() !== (currentData.username ? currentData.username.toLowerCase() : '')) {
+                // Update username and profile logo in existing posts if they changed
+                if (newUsername.toLowerCase() !== (currentData.username ? currentData.username.toLowerCase() : '') || newProfileLogo !== currentData.profileLogo) {
                     const postsSnapshot = await db.collection('posts').where('userId', '==', currentUser.uid).get();
                     const batch = db.batch();
                     postsSnapshot.docs.forEach(doc => {
                         const postRef = db.collection('posts').doc(doc.id);
-                        batch.update(postRef, { username: newUsername });
+                        batch.update(postRef, {
+                            username: newUsername,
+                            userProfileLogo: newProfileLogo
+                        });
                     });
                     await batch.commit();
                 }
@@ -3523,8 +3837,7 @@
                     }
 
                     const currentUserData = currentUserDoc.data();
-                    const targetUserData = targetUserDoc.data();
-
+                    
                     // Check if already following
                     if (currentUserData.following && currentUserData.following.includes(targetUserId)) {
                         return { status: 'already-following' };
@@ -3578,7 +3891,6 @@
                     }
 
                     const currentUserData = currentUserDoc.data();
-                    const targetUserData = targetUserDoc.data();
                     
                     // Check if currently following
                     if (!currentUserData.following || !currentUserData.following.includes(targetUserId)) {
@@ -3645,15 +3957,22 @@
 
                 const usersData = [];
                 // Fetch details for each user in the list (can be slow for many users, consider pagination for large lists)
-                for (const uid of userRefs) {
-                    const refDoc = await db.collection('users').doc(uid).get();
+                // Use Promise.all to fetch user data concurrently for better performance
+                const userPromises = userRefs.map(uid => db.collection('users').doc(uid).get());
+                const userDocs = await Promise.all(userPromises);
+
+                userDocs.forEach(refDoc => {
                     if (refDoc.exists) {
                         usersData.push({ id: refDoc.id, ...refDoc.data() });
                     }
-                }
+                });
 
                 followListContent.innerHTML = '';
-                for (const user of usersData) { // Use for...of for async operations
+                // Get current user's following list once outside the loop for efficiency
+                const currentUserFollowingList = currentUser ? (await db.collection('users').doc(currentUser.uid).get()).data().following || [] : [];
+
+
+                usersData.forEach(user => { // Use forEach as data is already fetched
                     const userItem = document.createElement('li');
                     userItem.className = 'search-user-item';
                     userItem.dataset.userId = user.id; // Store user ID
@@ -3662,9 +3981,7 @@
 
                     let followBtnHtml = '';
                     if (currentUser && currentUser.uid !== user.id) { // Don't show follow button for self
-                        const currentUserDoc = await db.collection('users').doc(currentUser.uid).get();
-                        const followingList = currentUserDoc.data().following || [];
-                        const isFollowing = followingList.includes(user.id);
+                        const isFollowing = currentUserFollowingList.includes(user.id);
                         const btnClass = isFollowing ? 'secondary-btn' : 'primary-btn';
                         const btnText = isFollowing ? 'Following' : 'Follow';
                         followBtnHtml = `<button class="btn small ${btnClass} follow-btn" data-target-id="${user.id}">${btnText}</button>`;
@@ -3693,6 +4010,10 @@
                                 e.target.classList.add('primary-btn');
                                 e.target.classList.remove('secondary-btn');
                             }
+                            // Re-fetch current user's profile to update the counts in the header, etc.
+                            loadUserProfile(currentUser.uid);
+                            // Refresh the current follow list modal content to show updated state
+                            showFollowList(userId, type);
                         });
                     }
 
@@ -3717,7 +4038,7 @@
         function openUserProfile(userId) {
             if (currentUser && userId === currentUser.uid) {
                 showScreen('profile-screen'); // If clicking on own profile, just navigate
-                loadUserProfile(currentUser.uid);
+                loadUserProfile(currentUser.uid); // Ensure own profile is loaded
             } else {
                 showScreen('profile-screen');
                 loadUserProfile(userId); // Load specific user's profile
@@ -3726,7 +4047,10 @@
 
         // --- Messaging ---
         messageUserBtn.addEventListener('click', () => {
-            if (!currentProfileViewingId) return;
+            if (!currentProfileViewingId) {
+                showToast("Select a user to message.", 'error');
+                return;
+            }
             openChatWindow(currentProfileViewingId);
         });
 
@@ -3739,30 +4063,51 @@
 
                 // Get all messages where current user is a participant
                 // This will effectively group by chat partners
-                const querySnapshot = await db.collection('messages')
-                    .where('participants', 'array-contains', currentUser.uid)
+                // We need an OR query here, which is not directly supported by Firestore compound queries on `where`.
+                // A common workaround is to query for `participants` array containing [user1, user2] sorted.
+                // However, `participants` array can have the user's ID as `sender` or `receiver`.
+                // A more robust approach for recent chats is to have a `userChats` subcollection or a denormalized field.
+                // For simplicity here, we fetch messages where `currentUser.uid` is *either* sender or receiver,
+                // then filter and group client-side. This might be inefficient for very many messages.
+
+                const sentMessagesSnapshot = await db.collection('messages')
+                    .where('senderId', '==', currentUser.uid)
                     .orderBy('timestamp', 'desc')
-                    .limit(50) // Limit number of messages to process for recent chats
+                    .limit(50)
                     .get();
 
-                querySnapshot.docs.forEach(doc => {
+                sentMessagesSnapshot.docs.forEach(doc => {
                     const data = doc.data();
-                    // Determine the other participant in the chat
-                    const otherParticipantId = data.senderId === currentUser.uid ? data.receiverId : data.senderId;
-
-                    // Skip if the other participant ID is current user's ID (self-messaging, though unlikely)
-                    if (otherParticipantId === currentUser.uid) return;
-
-                    // Keep track of the latest message for each chat partner
+                    const otherParticipantId = data.receiverId;
                     if (!chats[otherParticipantId] || data.timestamp.toMillis() > chats[otherParticipantId].timestamp) {
                         chats[otherParticipantId] = {
                             partnerId: otherParticipantId,
                             lastMessage: data.content,
                             timestamp: data.timestamp.toMillis(),
-                            isSender: data.senderId === currentUser.uid
+                            isSender: true
                         };
                     }
                 });
+
+                const receivedMessagesSnapshot = await db.collection('messages')
+                    .where('receiverId', '==', currentUser.uid)
+                    .orderBy('timestamp', 'desc')
+                    .limit(50)
+                    .get();
+                
+                receivedMessagesSnapshot.docs.forEach(doc => {
+                    const data = doc.data();
+                    const otherParticipantId = data.senderId;
+                    if (!chats[otherParticipantId] || data.timestamp.toMillis() > chats[otherParticipantId].timestamp) {
+                        chats[otherParticipantId] = {
+                            partnerId: otherParticipantId,
+                            lastMessage: data.content,
+                            timestamp: data.timestamp.toMillis(),
+                            isSender: false
+                        };
+                    }
+                });
+
 
                 const chatPartners = Object.values(chats).sort((a, b) => b.timestamp - a.timestamp);
 
@@ -3772,10 +4117,14 @@
                 }
 
                 recentChatsList.innerHTML = '';
-                for (const chat of chatPartners) { // Use for...of for async operations
-                    const partnerDoc = await db.collection('users').doc(chat.partnerId).get();
+                // Fetch partner details concurrently
+                const partnerPromises = chatPartners.map(chat => db.collection('users').doc(chat.partnerId).get());
+                const partnerDocs = await Promise.all(partnerPromises);
+
+                partnerDocs.forEach((partnerDoc, index) => {
                     if (partnerDoc.exists) {
                         const partnerData = partnerDoc.data();
+                        const chat = chatPartners[index]; // Get corresponding chat object
                         const chatItem = document.createElement('li');
                         chatItem.className = 'chat-item';
                         chatItem.dataset.userId = partnerData.uid;
@@ -3792,7 +4141,7 @@
                         chatItem.addEventListener('click', () => openChatWindow(partnerData.uid));
                         recentChatsList.appendChild(chatItem);
                     }
-                }
+                });
             } catch (error) {
                 console.error("Error loading recent chats:", error);
                 showToast("Error loading chats.", 'error');
@@ -3859,7 +4208,7 @@
                         longPressTimer = setTimeout(() => {
                             emojiPickerChat.classList.remove('hidden');
                         }, 800);
-                    }, { passive: false });
+                    }, { passive: true }); // passive:true for better scroll performance
 
                     messageInput.addEventListener('touchend', () => {
                         clearTimeout(longPressTimer);
@@ -3945,7 +4294,7 @@
             } catch (error) {
                 console.error("Error sending message:", error);
                 if (error.code === 'permission-denied' || error.message.includes('Missing or insufficient permissions')) {
-                    showToast("Error sending message: Missing or insufficient permissions. Check Firebase rules.", 'error', 5000);
+                    showToast("Error sending message: Missing or insufficient permissions. Contact admin.", 'error', 5000);
                 } else {
                     showToast("Failed to send message. Try again.", 'error');
                 }
@@ -3988,7 +4337,10 @@
 
                 if (!userSnapshot.empty) {
                     foundResults = true;
-                    for (const doc of userSnapshot.docs) { // Use for...of for async inside loop
+                    // Get current user's following list once for efficiency
+                    const currentUserFollowingList = currentUser ? (await db.collection('users').doc(currentUser.uid).get()).data().following || [] : [];
+
+                    userSnapshot.docs.forEach(doc => {
                         const userData = { id: doc.id, ...doc.data() };
                         const userItem = document.createElement('li');
                         userItem.className = 'search-user-item';
@@ -3998,9 +4350,7 @@
 
                         let followBtnHtml = '';
                         if (currentUser && currentUser.uid !== userData.id) { // Don't show follow button for self
-                            const currentUserDoc = await db.collection('users').doc(currentUser.uid).get();
-                            const followingList = currentUserDoc.data().following || [];
-                            const isFollowing = followingList.includes(userData.id);
+                            const isFollowing = currentUserFollowingList.includes(userData.id);
                             const btnClass = isFollowing ? 'secondary-btn' : 'primary-btn';
                             const btnText = isFollowing ? 'Following' : 'Follow';
                             followBtnHtml = `<button class="btn small ${btnClass} follow-btn" data-target-id="${userData.id}">${btnText}</button>`;
@@ -4023,20 +4373,17 @@
                                     e.target.textContent = 'Following';
                                     e.target.classList.add('secondary-btn');
                                     e.target.classList.remove('primary-btn');
-                                    // Update follow state on item
-                                    e.target.closest('.search-user-item').dataset.isFollowing = 'true';
                                 } else {
                                     await handleUnfollow(targetId);
                                     e.target.textContent = 'Follow';
                                     e.target.classList.add('primary-btn');
                                     e.target.classList.remove('secondary-btn');
-                                    // Update follow state on item
-                                    e.target.closest('.search-user-item').dataset.isFollowing = 'false';
                                 }
+                                loadUserProfile(currentUser.uid); // Refresh counts
                             });
                         }
                         userItem.addEventListener('click', () => openUserProfile(userData.id));
-                    }
+                    });
                 }
             } catch (error) {
                 console.error("Error searching users:", error);
@@ -4048,8 +4395,10 @@
                 // This is highly inefficient for large datasets for full-text search.
                 // For production, use Algolia or client-side indexing.
                 const postSnapshot = await db.collection('posts')
+                    .where('expiryTime', '>', firebase.firestore.Timestamp.now()) // Only show unexpired posts
+                    .orderBy('expiryTime', 'desc')
                     .orderBy('timestamp', 'desc')
-                    .limit(20) // Search more posts to find matches
+                    .limit(50) // Search more posts to find matches
                     .get();
 
                 postSnapshot.docs.forEach(doc => {
@@ -4057,7 +4406,7 @@
                     // Simple client-side check if content includes query (case-insensitive)
                     if (postData.content && postData.content.toLowerCase().includes(query)) {
                         foundResults = true;
-                        searchPostList.appendChild(createPostElement(postData));
+                        renderPost(postData, searchPostList); // Render into searchPostList
                     }
                 });
             } catch (error) {
@@ -4093,7 +4442,7 @@
 
         async function handleCopyPostLink(postId) {
             // In a real app, this would generate a unique shareable link
-            const dummyLink = `https://addmint.com/post/${postId}`;
+            const dummyLink = `https://n-phi-ten.vercel.app/post/${postId}`; // Use your deployed URL
             try {
                 await navigator.clipboard.writeText(dummyLink);
                 showToast("Post link copied to clipboard!", 'success');
@@ -4102,6 +4451,145 @@
                 showToast("Failed to copy link.", 'error');
             }
         }
+
+        // NEW: Remix Post Functionality
+        function handleRemixPost(originalPostElement, originalPostId, originalContent) {
+            if (!currentUser) {
+                showToast("Please log in to remix posts.", 'info');
+                return;
+            }
+
+            // Visually highlight the post being remixed
+            originalPostElement.classList.add('remixed');
+            originalPostElement.style.animation = 'shake 0.5s'; // Simple animation
+
+            showToast("Remix mode activated! Your next post will be a remix.", 'info', 3000);
+
+            // Navigate to upload screen
+            showScreen('upload-screen');
+            // Pre-fill content input with original content and indicate remix
+            postContentInput.value = `"${originalContent}" (Remix of post ${originalPostId})\nMy thoughts: `;
+            // You might want to store originalPostId temporarily for the next upload.
+            sessionStorage.setItem('remixOriginalPostId', originalPostId);
+            sessionStorage.setItem('remixOriginalContent', originalContent);
+
+            // Scroll to the top of the upload screen if necessary
+            uploadScreen.scrollTop = 0;
+
+            // Remove shake animation after it finishes
+            originalPostElement.addEventListener('animationend', () => {
+                originalPostElement.style.animation = '';
+            }, { once: true });
+        }
+
+        // Adjust publishPostBtn to handle remix logic
+        publishPostBtn.removeEventListener('click', publishPostBtn.onclick); // Remove old listener if any
+        publishPostBtn.addEventListener('click', async () => {
+            if (!currentUser) {
+                showToast("Please log in to upload posts.", 'error');
+                return;
+            }
+
+            const content = postContentInput.value.trim();
+            const boostHours = parseInt(postBoostSelect.value);
+            const remixOriginalPostId = sessionStorage.getItem('remixOriginalPostId');
+            const remixOriginalContent = sessionStorage.getItem('remixOriginalContent');
+
+            if (!content) {
+                showToast("Please enter some content for your post.", 'error');
+                return;
+            }
+
+            const userDocRef = db.collection('users').doc(currentUser.uid);
+            const userDoc = await userDocRef.get();
+            const userData = userDoc.data();
+
+            const currentLimit = userData.postLimit || 0;
+            const currentCoins = userData.coins || 0;
+            const requiredLimit = 1;
+
+            let coinCost = 0;
+            switch(boostHours) {
+                case 18: coinCost = 10; break;
+                case 24: coinCost = 20; break;
+                case 30: coinCost = 30; break;
+                default: coinCost = 0;
+            }
+
+            if (currentLimit < requiredLimit) {
+                showToast("You need 1 post limit to upload. Watch an ad to earn.", 'error', 5000);
+                showAdModal('limit', { limit: 1 });
+                return;
+            }
+
+            if (currentCoins < coinCost) {
+                showToast(`You need ${coinCost} coins for ${boostHours} hours boost. You have ${formatNumber(currentCoins)} C.`, 'error', 5000);
+                showAdModal('coins', { coins: coinCost - currentCoins });
+                return;
+            }
+
+            try {
+                await userDocRef.update({
+                    postLimit: firebase.firestore.FieldValue.increment(-requiredLimit),
+                    coins: firebase.firestore.FieldValue.increment(-coinCost)
+                });
+            } catch (error) {
+                console.error("Error deducting resources for post:", error);
+                showToast("Failed to deduct resources. Please try again.", 'error');
+                return;
+            }
+
+            uploadStatus.textContent = "Uploading post...";
+            publishPostBtn.disabled = true;
+
+            try {
+                const newPostRef = db.collection('posts').doc();
+                await newPostRef.set({
+                    userId: currentUser.uid,
+                    username: userData.username,
+                    userProfileLogo: userData.profileLogo || getRandomLogoClass(),
+                    content: content,
+                    imageUrl: '', // Image upload is disabled
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    likes: 0,
+                    views: 0,
+                    reactions: {},
+                    userReactions: {},
+                    boostHours: boostHours,
+                    expiryTime: firebase.firestore.Timestamp.fromMillis(Date.now() + (boostHours * 60 * 60 * 1000)),
+                    isRemix: !!remixOriginalPostId, // Convert to boolean
+                    remixOf: remixOriginalPostId || null,
+                    remixOfContent: remixOriginalContent || null
+                });
+
+                await userDocRef.update({
+                    postCount: firebase.firestore.FieldValue.increment(1)
+                });
+
+                uploadStatus.textContent = "Post uploaded successfully!";
+                showToast("Post uploaded successfully!", 'success');
+                postContentInput.value = '';
+                postBoostSelect.value = '12';
+                sessionStorage.removeItem('remixOriginalPostId'); // Clear remix state
+                sessionStorage.removeItem('remixOriginalContent');
+                showScreen('home-screen');
+                postsFeed.innerHTML = '';
+                lastVisiblePost = null;
+                loadPosts();
+
+            } catch (error) {
+                console.error("Error publishing post:", error);
+                uploadStatus.textContent = `Error: ${error.message}`;
+                showToast("Failed to upload post. Try again.", 'error');
+                await userDocRef.update({ // Revert resources
+                    postLimit: firebase.firestore.FieldValue.increment(requiredLimit),
+                    coins: firebase.firestore.FieldValue.increment(coinCost)
+                });
+            } finally {
+                publishPostBtn.disabled = false;
+            }
+        });
+
 
         async function handleDeletePost(postId, postElement) {
             if (!currentUser) return;
@@ -4133,26 +4621,82 @@
             }
         }
 
-        // --- Translate Post (Simulated) ---
-        function handleTranslatePost(postContentPElement) {
+        // --- Translate Post (Simulated with Language Selection) ---
+        function showLanguageSelectModal() {
+            languageOptionsContainer.innerHTML = '';
+            const languages = [
+                { code: 'en', name: 'English', simText: 'This is a simulated English translation.' },
+                { code: 'hi', name: 'हिन्दी', simText: 'यह एक सिमुलेटेड हिंदी अनुवाद है!' },
+                { code: 'es', name: 'Español', simText: '¡Esta es una traducción simulada al español!' },
+                { code: 'fr', name: 'Français', simText: 'Ceci est une traduction française simulée !' },
+                { code: 'de', name: 'Deutsch', simText: 'Dies ist eine simulierte deutsche Übersetzung!' },
+                { code: 'ja', name: '日本語', simText: 'これはシミュレートされた日本語の翻訳です！' }
+            ];
+
+            languages.forEach(lang => {
+                const option = document.createElement('div');
+                option.className = 'language-option';
+                option.textContent = lang.name;
+                option.dataset.lang = lang.code;
+                option.dataset.simText = lang.simText; // Store simulated text
+                if (lang.code === userSelectedTranslationLanguage) {
+                    option.classList.add('selected');
+                }
+                option.addEventListener('click', () => {
+                    languageOptionsContainer.querySelectorAll('.language-option').forEach(item => item.classList.remove('selected'));
+                    option.classList.add('selected');
+                });
+                languageOptionsContainer.appendChild(option);
+            });
+
+            languageSelectModal.classList.remove('hidden');
+        }
+
+        saveLanguageBtn.addEventListener('click', () => {
+            const selectedOption = languageOptionsContainer.querySelector('.language-option.selected');
+            if (selectedOption) {
+                userSelectedTranslationLanguage = selectedOption.dataset.lang;
+                showToast(`Translation language set to ${selectedOption.textContent}`, 'success');
+            }
+            languageSelectModal.classList.add('hidden');
+        });
+
+        cancelLanguageBtn.addEventListener('click', () => {
+            languageSelectModal.classList.add('hidden');
+        });
+
+
+        // Global mapping for simulated translations
+        const simulatedTranslations = {
+            'en': 'This is a simulated English translation.',
+            'hi': 'यह एक सिमुलेटेड हिंदी अनुवाद है!',
+            'es': '¡Esta es una traducción simulada al español!',
+            'fr': 'Ceci est une traduction française simulée !',
+            'de': 'Dies ist eine simulierte deutsche Übersetzung!',
+            'ja': 'これはシミュレートされた日本語の翻訳です！'
+        };
+
+        function handleTranslatePost(postContentPElement, targetLang) {
             const originalContent = postContentPElement.dataset.originalContent;
             const currentText = postContentPElement.textContent;
 
             // Simple toggle between original and simulated translated text
             if (currentText === originalContent) {
-                postContentPElement.textContent = "¡Este es un post traducido de demostración! (Spanish)"; // Simulate translation
-                showToast("Simulating translation to Spanish...", 'info');
+                const simulatedTranslatedText = simulatedTranslations[targetLang] || simulatedTranslations['en']; // Fallback to English
+                postContentPElement.textContent = simulatedTranslatedText;
+                showToast(`Simulating translation to ${targetLang.toUpperCase()}...`, 'info');
             } else {
                 postContentPElement.textContent = originalContent; // Revert to original
                 showToast("Reverting to original text...", 'info');
             }
-            showToast("Actual translation requires a backend API integration (e.g., Google Cloud Translation).", 'info', 5000);
+            showToast("Note: Actual translation requires a backend API integration.", 'info', 5000);
         }
+
 
         // --- Speak Post (Text-to-Speech) ---
         function handleSpeakPost(textToSpeak, speakButtonElement) {
             if (!'speechSynthesis' in window) {
-                showToast("Your browser does not support text-to-speech.", 'error');
+                showToast("Your device does not support text-to-speech.", 'error');
                 return;
             }
 
@@ -4180,11 +4724,28 @@
             utterance.pitch = 1; // Pitch of speech
 
             // Optional: Choose a voice if available
-            // const voices = window.speechSynthesis.getVoices();
-            // const englishVoice = voices.find(voice => voice.lang === 'en-US'); // Or 'en-GB'
-            // if (englishVoice) {
-            //     utterance.voice = englishVoice;
-            // }
+            // This might take a moment to load voices, so it's often best to set this after voices are loaded.
+            window.speechSynthesis.onvoiceschanged = () => {
+                const voices = window.speechSynthesis.getVoices();
+                // Try to find a voice that matches the user's selected language, or a general English one
+                const targetVoice = voices.find(voice => voice.lang.startsWith(userSelectedTranslationLanguage)) ||
+                                   voices.find(voice => voice.lang.startsWith('en')) ||
+                                   voices[0]; // Fallback to first available voice
+                if (targetVoice) {
+                    utterance.voice = targetVoice;
+                }
+            };
+            // If voices are already loaded, set it immediately
+            if (window.speechSynthesis.getVoices().length > 0) {
+                 const voices = window.speechSynthesis.getVoices();
+                 const targetVoice = voices.find(voice => voice.lang.startsWith(userSelectedTranslationLanguage)) ||
+                                     voices.find(voice => voice.lang.startsWith('en')) ||
+                                     voices[0];
+                 if (targetVoice) {
+                    utterance.voice = targetVoice;
+                 }
+            }
+
 
             utterance.onstart = () => {
                 currentSpeaker = utterance;
@@ -4224,9 +4785,6 @@
             appContainer.classList.add('hidden'); // Hide app container initially
         });
 
-        // Initialize Firebase for older browsers that don't support modern module imports
-        // This is typically handled by firebase.initializeApp already.
     </script>
 </body>
 </html>
-
