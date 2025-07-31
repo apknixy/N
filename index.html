@@ -2439,13 +2439,16 @@
         });
 
         // --- Splash Screen Transition ---
-                function hideSplashScreen() {
+                        function hideSplashScreen() {
+            // Reduce the initial delay significantly.
+            // It will now wait 500ms before starting to fade out for 500ms.
+            // This provides a brief splash but ensures it disappears promptly.
             setTimeout(() => {
                 splashScreen.style.opacity = '0';
                 setTimeout(() => {
                     splashScreen.classList.add('hidden');
                 }, 500); // Wait for fade out to complete
-            }, 3000); // Change this value to make the splash screen last longer (e.g., 3000 for 3 seconds)
+            }, 500); // Changed from 3000 to 500
         }
 
         // --- Header Coins/Credits/Limits/Mint Display ---
