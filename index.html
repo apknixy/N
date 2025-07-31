@@ -2439,13 +2439,13 @@
         });
 
         // --- Splash Screen Transition ---
-        function hideSplashScreen() {
+                function hideSplashScreen() {
             setTimeout(() => {
                 splashScreen.style.opacity = '0';
                 setTimeout(() => {
                     splashScreen.classList.add('hidden');
                 }, 500); // Wait for fade out to complete
-            }, 1000); // Show splash for at least 1 second
+            }, 3000); // Change this value to make the splash screen last longer (e.g., 3000 for 3 seconds)
         }
 
         // --- Header Coins/Credits/Limits/Mint Display ---
