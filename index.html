@@ -55,6 +55,8 @@
             z-index: 1000;
             color: white;
             text-align: center;
+            opacity: 1; /* Start visible */
+            transition: opacity 0.5s ease-out; /* Fade out effect */
         }
 
         .splash-content {
@@ -2069,6 +2071,20 @@
         const db = firebase.firestore();
         const storage = firebase.storage();
 
+        // --- Global Variables ---
+        let currentUser = null;
+        let currentProfileViewingId = null; // To track which profile is being viewed
+        let fetchingPosts = false;
+        let lastVisiblePost = null;
+        const postsToLoadPerScroll = 5; // Number of posts to load per scroll
+
+        let currentChatPartnerId = null; // ID of the user currently chatting with
+
+        let userSelectedTranslationLanguage = 'en'; // Default translation language
+
+        let currentSpeaker = null; // To keep track of the current SpeechSynthesisUtterance
+
+
         // --- DOM Elements ---
         const splashScreen = document.getElementById('splash-screen');
         const appContainer = document.getElementById('app-container');
@@ -2127,7 +2143,7 @@
         const myFollowingCount = document.getElementById('my-following-count');
         const editProfileBtn = document.getElementById('edit-profile-btn');
         const followUserBtn = document.getElementById('follow-user-btn');
-        const unfollowUserBtn = document = document.getElementById('unfollow-user-btn');
+        const unfollowUserBtn = document.getElementById('unfollow-user-btn');
         const messageUserBtn = document.getElementById('message-user-btn');
         const profileWhatsappLink = document.getElementById('profile-whatsapp-link');
         const profileInstagramLink = document.getElementById('profile-instagram-link');
@@ -2144,262 +2160,100 @@
         const cancelEditProfileBtn = document.getElementById('cancel-edit-profile-btn');
 
         const followListModal = document.getElementById('follow-list-modal');
-        const followListTitle = document.getElementById('// --- DOM Elements ---
-const splashScreen = document.getElementById('splash-screen');
-const appContainer = document.getElementById('app-container');
-const menuToggle = document.getElementById('menu-toggle');
-const sidebar = document.getElementById('sidebar');
-const closeSidebarBtn = document.getElementById('close-sidebar');
-const mainContent = document.querySelector('.main-content');
-const bottomNavItems = document.querySelectorAll('.app-bottom-nav .nav-item');
-const screenSections = document.querySelectorAll('.app-screen');
-const headerCoins = document.getElementById('header-coins');
-const headerCredits = document.getElementById('header-credits');
-const headerLimit = document.getElementById('header-limit');
-const headerMint = document.getElementById('header-mint');
-const giftClaimBtn = document.getElementById('gift-claim-btn');
-const adModal = document.getElementById('ad-modal');
-const closeAdModalBtn = document.getElementById('close-ad-modal');
-const rewardPopup = document.getElementById('reward-popup');
-const rewardMessage = document.getElementById('reward-message');
-const closeRewardPopupBtn = document.getElementById('close-reward-popup');
-const toastNotification = document.getElementById('toast-notification');
-const refreshPostsBtn = document.getElementById('refresh-posts-btn');
-const postsFeed = document.getElementById('posts-feed');
-const loadingSpinner = document.getElementById('loading-spinner');
+        const followListTitle = document.getElementById('follow-list-title');
+        const followListContent = document.getElementById('follow-list-content');
+        const closeFollowListModalBtn = document.getElementById('close-follow-list-modal');
 
-// Auth Screen
-const authScreen = document.getElementById('auth-screen');
-const authTitle = document.getElementById('auth-title');
-const loginForm = document.getElementById('login-form'); // Correct, non-duplicate
-const signupForm = document.getElementById('signup-form'); // Correct, non-duplicate
-const loginEmailInput = document.getElementById('login-email');
-const loginPasswordInput = document.getElementById('login-password');
-const loginBtn = document.getElementById('login-btn');
-const signupEmailInput = document.getElementById('signup-email');
-const signupPasswordInput = document.getElementById('signup-password');
-const signupConfirmPasswordInput = document.getElementById('signup-confirm-password');
-const signupBtn = document.getElementById('signup-btn');
-const showSignupLink = document.getElementById('show-signup');
-const showLoginLink = document.getElementById('show-login');
-const passwordToggles = document.querySelectorAll('.password-toggle');
+        // Messaging Screen
+        const messagesScreen = document.getElementById('messages-screen');
+        const messageListContainer = document.getElementById('message-list-container');
+        const recentChatsList = document.getElementById('recent-chats-list');
+        const chatWindowContainer = document.getElementById('chat-window-container');
+        const chatPartnerUsername = document.getElementById('chat-partner-username');
+        const chatMessages = document.getElementById('chat-messages');
+        const messageInput = document.getElementById('message-input');
+        const sendMessageBtn = document.getElementById('send-message-btn');
+        const backToChatsBtn = document.getElementById('back-to-chats-btn');
 
-// Post Upload Screen
-const uploadScreen = document.getElementById('upload-screen');
-const postContentInput = document.getElementById('post-content');
-const postImageInput = document.getElementById('post-image');
-const postBoostSelect = document.getElementById('post-boost');
-const publishPostBtn = document.getElementById('publish-post-btn');
-const uploadStatus = document.getElementById('upload-status');
+        // Search Screen
+        const searchScreen = document.getElementById('search-screen');
+        const searchQueryInput = document.getElementById('search-query');
+        const searchBtn = document.getElementById('search-btn');
+        const searchUserList = document.getElementById('search-user-list');
+        const searchPostList = document.getElementById('search-post-list');
+        const noSearchResults = document.getElementById('no-search-results');
 
-// Profile Screen
-const profileScreen = document.getElementById('profile-screen');
-const myProfileAvatar = document.getElementById('my-profile-avatar');
-const myProfileUsername = document.getElementById('my-profile-username');
-const myPostsCount = document.getElementById('my-posts-count');
-const myFollowersCount = document.getElementById('my-followers-count');
-const myFollowingCount = document.getElementById('my-following-count');
-const editProfileBtn = document.getElementById('edit-profile-btn');
-const followUserBtn = document.getElementById('follow-user-btn');
-const unfollowUserBtn = document.getElementById('unfollow-user-btn'); // Corrected
-const messageUserBtn = document.getElementById('message-user-btn');
-const profileWhatsappLink = document.getElementById('profile-whatsapp-link');
-const profileInstagramLink = document.getElementById('profile-instagram-link');
-const currentProfileUsernamePosts = document.getElementById('current-profile-username-posts');
-const profilePostsFeed = document.getElementById('profile-posts-feed');
+        // Monetization Screen & Withdraw Modal
+        const withdrawCoinsBtn = document.getElementById('withdraw-coins-btn');
+        const withdrawModal = document.getElementById('withdraw-modal');
+        const currentMintBalance = document.getElementById('current-mint-balance');
+        const withdrawPaypalEmail = document.getElementById('withdraw-paypal-email');
+        const withdrawRealName = document.getElementById('withdraw-real-name');
+        const withdrawAge = document.getElementById('withdraw-age');
+        const withdrawDob = document.getElementById('withdraw-dob');
+        const confirmWithdrawBtn = document.getElementById('confirm-withdraw-btn');
+        const closeWithdrawModalBtn = document.getElementById('close-withdraw-modal');
 
-const editProfileModal = document.getElementById('edit-profile-modal');
-const editUsernameInput = document.getElementById('edit-username');
-const usernameAvailability = document.getElementById('username-availability');
-const editWhatsappInput = document.getElementById('edit-whatsapp');
-const editInstagramInput = document.getElementById('edit-instagram');
-const profileLogoOptions = document.getElementById('profile-logo-options');
-const saveProfileBtn = document.getElementById('save-profile-btn');
-const cancelEditProfileBtn = document.getElementById('cancel-edit-profile-btn');
+        // NEW: Translate Language Selection Modal
+        const languageSelectModal = document.getElementById('language-select-modal');
+        const languageOptionsContainer = document.querySelector('#language-select-modal .language-options');
+        const saveLanguageBtn = document.getElementById('save-language-btn');
+        const cancelLanguageBtn = document.getElementById('cancel-language-btn');
 
-const followListModal = document.getElementById('follow-list-modal');
-const followListTitle = document.getElementById('follow-list-title');
-const followListContent = document.getElementById('follow-list-content');
-const closeFollowListModalBtn = document.getElementById('close-follow-list-modal');
+        // --- Profile Logos Data ---
+        const PROFILE_LOGOS = [
+            { class: 'logo-1', emoji: '🧑', color: '#ff6347' }, // Tomato
+            { class: 'logo-2', emoji: '👩', color: '#6a5acd' }, // SlateBlue
+            { class: 'logo-3', emoji: '🚀', color: '#32cd32' }, // LimeGreen
+            { class: 'logo-4', emoji: '💡', color: '#ff8c00' }, // DarkOrange
+            { class: 'logo-5', emoji: '🌟', color: '#ffd700' }, // Gold
+            { class: 'logo-6', emoji: '🌈', color: '#9932cc' }, // DarkOrchid
+            { class: 'logo-7', emoji: '🦊', color: '#d2691e' }, // Chocolate
+            { class: 'logo-8', emoji: '🐼', color: '#6495ed' }, // CornflowerBlue
+            { class: 'logo-9', emoji: '🦋', color: '#dda0dd' }, // Plum
+            { class: 'logo-10', emoji: '🐢', color: '#20b2aa' }, // LightSeaGreen
+            { class: 'logo-11', emoji: '🤖', color: '#87ceeb' }, // SkyBlue
+            { class: 'logo-12', emoji: '👽', color: '#7cfc00' }, // LawnGreen
+            { class: 'logo-13', emoji: '🦄', color: '#ee82ee' }, // Violet
+            { class: 'logo-14', emoji: '🐉', color: '#48d1cc' }, // MediumTurquoise
+            { class: 'logo-15', emoji: '🌊', color: '#4682b4' }, // SteelBlue
+            { class: 'logo-16', emoji: '🔥', color: '#dc143c' }, // Crimson
+            { class: 'logo-17', emoji: '👑', color: '#f0e68c' }, // Khaki
+            { class: 'logo-18', emoji: '💎', color: '#00ced1' }, // DarkTurquoise
+            { class: 'logo-19', emoji: '🔑', color: '#b0e0e6' }, // PowderBlue
+            { class: 'logo-20', emoji: '⚡', color: '#ffff00' }, // Yellow
+            { class: 'logo-21', emoji: '🎵', color: '#ff69b4' }, // HotPink
+            { class: 'logo-22', emoji: '🎨', color: '#7b68ee' }, // MediumSlateBlue
+            { class: 'logo-23', emoji: '🧩', color: '#ffa07a' }, // LightSalmon
+            { class: 'logo-24', emoji: '🍔', color: '#cd853f' }, // Peru
+            { class: 'logo-25', emoji: '🍕', color: '#f08080' }, // LightCoral
+            { class: 'logo-26', emoji: '🎮', color: '#c0c0c0' }, // Silver
+            { class: 'logo-27', emoji: '✈️', color: '#afeeee' }, // PaleTurquoise
+            { class: 'logo-28', emoji: '🌳', color: '#228b22' }, // ForestGreen
+            { class: 'logo-29', emoji: '🌸', color: '#ffb6c1' }, // LightPink
+            { class: 'logo-30', emoji: '⚽', color: '#b0c4de' }, // LightSteelBlue
+            { class: 'logo-31', emoji: '🎸', color: '#8b4513' }, // SaddleBrown
+            { class: 'logo-32', emoji: '🚲', color: '#00fa9a' }, // MediumSpringGreen
+            { class: 'logo-33', emoji: '📚', color: '#deb887' }, // BurlyWood
+            { class: 'logo-34', emoji: '☕', color: '#d2b48c' }, // Tan
+            { class: 'logo-35', emoji: '🎁', color: '#f4a460' }, // SandyBrown
+            { class: 'logo-36', emoji: '🎉', color: '#ba55d3' }, // MediumOrchid
+            { class: 'logo-37', emoji: '🌍', color: '#87cefa' }, // LightSkyBlue
+            { class: 'logo-38', emoji: '🔬', color: '#778899' }, // LightSlateGray
+            { class: 'logo-39', emoji: '🔭', color: '#696969' }, // DimGray
+            { class: 'logo-40', emoji: '🛠️', color: '#d3d3d3' }, // LightGray
+            { class: 'logo-41', emoji: '⚖️', color: '#add8e6' }, // LightBlue
+            { class: 'logo-42', emoji: '💰', color: '#b8860b' }, // DarkGoldenRod
+            { class: 'logo-43', emoji: '🛡️', color: '#5f9ea0' }, // CadetBlue
+            { class: 'logo-44', emoji: '🔔', color: '#f0f8ff' }, // AliceBlue
+            { class: 'logo-45', emoji: '⏳', color: '#fa8072' }, // Salmon
+            { class: 'logo-46', emoji: '💾', color: '#3cb371' }, // MediumSeaGreen
+            { class: 'logo-47', emoji: '⚙️', color: '#4682b4' }, // SteelBlue
+            { class: 'logo-48', emoji: '📡', color: '#2e8b57' }, // SeaGreen
+            { class: 'logo-49', emoji: '🌐', color: '#a52a2a' }, // Brown
+            { class: 'logo-50', emoji: '📈', color: '#c71585' }  // MediumVioletRed
+        ];
 
-// Messaging Screen
-const messagesScreen = document.getElementById('messages-screen');
-const messageListContainer = document.getElementById('message-list-container');
-const recentChatsList = document.getElementById('recent-chats-list');
-const chatWindowContainer = document.getElementById('chat-window-container');
-const chatPartnerUsername = document.getElementById('chat-partner-username');
-const chatMessages = document.getElementById('chat-messages');
-const messageInput = document.getElementById('message-input');
-const sendMessageBtn = document.getElementById('send-message-btn');
-const backToChatsBtn = document.getElementById('back-to-chats-btn');
-
-// Search Screen
-const searchScreen = document.getElementById('search-screen');
-const searchQueryInput = document.getElementById('search-query');
-// --- DOM Elements ---
-const splashScreen = document.getElementById('splash-screen');
-const appContainer = document.getElementById('app-container');
-const menuToggle = document.getElementById('menu-toggle');
-const sidebar = document.getElementById('sidebar');
-const closeSidebarBtn = document.getElementById('close-sidebar');
-const mainContent = document.querySelector('.main-content');
-const bottomNavItems = document.querySelectorAll('.app-bottom-nav .nav-item');
-const screenSections = document.querySelectorAll('.app-screen');
-const headerCoins = document.getElementById('header-coins');
-const headerCredits = document.getElementById('header-credits');
-const headerLimit = document.getElementById('header-limit');
-const headerMint = document.getElementById('header-mint');
-const giftClaimBtn = document.getElementById('gift-claim-btn');
-const adModal = document.getElementById('ad-modal');
-const closeAdModalBtn = document.getElementById('close-ad-modal');
-const rewardPopup = document.getElementById('reward-popup');
-const rewardMessage = document.getElementById('reward-message');
-const closeRewardPopupBtn = document.getElementById('close-reward-popup');
-const toastNotification = document.getElementById('toast-notification');
-const refreshPostsBtn = document.getElementById('refresh-posts-btn');
-const postsFeed = document.getElementById('posts-feed');
-const loadingSpinner = document.getElementById('loading-spinner');
-
-// Auth Screen
-const authScreen = document.getElementById('auth-screen');
-const authTitle = document.getElementById('auth-title');
-const loginForm = document.getElementById('login-form'); // Correct, non-duplicate
-const signupForm = document.getElementById('signup-form'); // Correct, non-duplicate
-const loginEmailInput = document.getElementById('login-email');
-const loginPasswordInput = document.getElementById('login-password');
-const loginBtn = document.getElementById('login-btn');
-const signupEmailInput = document.getElementById('signup-email');
-const signupPasswordInput = document.getElementById('signup-password');
-const signupConfirmPasswordInput = document.getElementById('signup-confirm-password');
-const signupBtn = document.getElementById('signup-btn');
-const showSignupLink = document.getElementById('show-signup');
-const showLoginLink = document.getElementById('show-login');
-const passwordToggles = document.querySelectorAll('.password-toggle');
-
-// Post Upload Screen
-const uploadScreen = document.getElementById('upload-screen');
-const postContentInput = document.getElementById('post-content');
-const postImageInput = document.getElementById('post-image');
-const postBoostSelect = document.getElementById('post-boost');
-const publishPostBtn = document.getElementById('publish-post-btn');
-const uploadStatus = document.getElementById('upload-status');
-
-// Profile Screen
-const profileScreen = document.getElementById('profile-screen');
-const myProfileAvatar = document.getElementById('my-profile-avatar');
-const myProfileUsername = document.getElementById('my-profile-username');
-const myPostsCount = document.getElementById('my-posts-count');
-const myFollowersCount = document.getElementById('my-followers-count');
-const myFollowingCount = document.getElementById('my-following-count');
-const editProfileBtn = document.getElementById('edit-profile-btn');
-const followUserBtn = document.getElementById('follow-user-btn');
-const unfollowUserBtn = document.getElementById('unfollow-user-btn'); // Corrected
-const messageUserBtn = document.getElementById('message-user-btn');
-const profileWhatsappLink = document.getElementById('profile-whatsapp-link');
-const profileInstagramLink = document.getElementById('profile-instagram-link');
-const currentProfileUsernamePosts = document.getElementById('current-profile-username-posts');
-const profilePostsFeed = document.getElementById('profile-posts-feed');
-
-const editProfileModal = document.getElementById('edit-profile-modal');
-const editUsernameInput = document.getElementById('edit-username');
-const usernameAvailability = document.getElementById('username-availability');
-const editWhatsappInput = document.getElementById('edit-whatsapp');
-const editInstagramInput = document.getElementById('edit-instagram');
-const profileLogoOptions = document.getElementById('profile-logo-options');
-const saveProfileBtn = document.getElementById('save-profile-btn');
-const cancelEditProfileBtn = document.getElementById('cancel-edit-profile-btn');
-
-const followListModal = document.getElementById('follow-list-modal');
-const followListTitle = document.getElementById('follow-list-title');
-const followListContent = document.getElementById('follow-list-content');
-const closeFollowListModalBtn = document.getElementById('close-follow-list-modal');
-
-// Messaging Screen
-const messagesScreen = document.getElementById('messages-screen');
-const messageListContainer = document.getElementById('message-list-container');
-const recentChatsList = document.getElementById('recent-chats-list');
-const chatWindowContainer = document.getElementById('chat-window-container');
-const chatPartnerUsername = document.getElementById('chat-partner-username');
-const chatMessages = document.getElementById('chat-messages');
-const messageInput = document.getElementById('message-input');
-const sendMessageBtn = document.getElementById('send-message-btn');
-const backToChatsBtn = document.getElementById('back-to-chats-btn');
-
-// Search Screen
-const searchScreen = document.getElementById('search-screen');
-const searchQueryInput = document.getElementById('search-query');
-const searchBtn = document.getElementById('search-btn');
-const searchUserList = document.getElementById('search-user-list');
-const searchPostList = document.getElementById('search-post-list');
-const noSearchResults = document.getElementById('no-search-results');
-
-// Monetization Screen & Withdraw Modal
-const withdrawCoinsBtn = document.getElementById('withdraw-coins-btn');
-const withdrawModal = document.getElementById('withdraw-modal');
-const currentMintBalance = document.getElementById('current-mint-balance');
-const withdrawPaypalEmail = document.getElementById('withdraw-paypal-email');
-const withdrawRealName = document.getElementById('withdraw-real-name');
-const withdrawAge = document.getElementById('withdraw-age');
-const withdrawDob = document.getElementById('withdraw-dob');
-const confirmWithdrawBtn = document.getElementById('confirm-withdraw-btn');
-const closeWithdrawModalBtn = document.getElementById('close-withdraw-modal');
-
-// NEW: Translate Language Selection Modal
-const languageSelectModal = document.getElementById('language-select-modal');
-const languageOptionsContainer = document.querySelector('#language-select-modal .language-options');
-const saveLanguageBtn = document.getElementById('save-language-btn');
-const cancelLanguageBtn = document.getElementById('cancel-language-btn');const PROFILE_LOGOS = [
-    { class: 'logo-1', emoji: '🧑', color: '#ff6347' }, // Tomato
-    { class: 'logo-2', emoji: '👩', color: '#6a5acd' }, // SlateBlue
-    { class: 'logo-3', emoji: '🚀', color: '#32cd32' }, // LimeGreen
-    { class: 'logo-4', emoji: '💡', color: '#ff8c00' }, // DarkOrange
-    { class: 'logo-5', emoji: '🌟', color: '#ffd700' }, // Gold
-    { class: 'logo-6', emoji: '🌈', color: '#9932cc' }, // DarkOrchid
-    { class: 'logo-7', emoji: '🦊', color: '#d2691e' }, // Chocolate
-    { class: 'logo-8', emoji: '🐼', color: '#6495ed' }, // CornflowerBlue
-    { class: 'logo-9', emoji: '🦋', color: '#dda0dd' }, // Plum
-    { class: 'logo-10', emoji: '🐢', color: '#20b2aa' }, // LightSeaGreen
-    { class: 'logo-11', emoji: '🤖', color: '#87ceeb' }, // SkyBlue
-    { class: 'logo-12', emoji: '👽', color: '#7cfc00' }, // LawnGreen
-    { class: 'logo-13', emoji: '🦄', color: '#ee82ee' }, // Violet
-    { class: 'logo-14', emoji: '🐉', color: '#48d1cc' }, // MediumTurquoise
-    { class: 'logo-15', emoji: '🌊', color: '#4682b4' }, // SteelBlue
-    { class: 'logo-16', emoji: '🔥', color: '#dc143c' }, // Crimson
-    { class: 'logo-17', emoji: '👑', color: '#f0e68c' }, // Khaki
-    { class: 'logo-18', emoji: '💎', color: '#00ced1' }, // DarkTurquoise
-    { class: 'logo-19', emoji: '🔑', color: '#b0e0e6' }, // PowderBlue
-    { class: 'logo-20', emoji: '⚡', color: '#ffff00' }, // Yellow
-    { class: 'logo-21', emoji: '🎵', color: '#ff69b4' }, // HotPink
-    { class: 'logo-22', emoji: '🎨', color: '#7b68ee' }, // MediumSlateBlue
-    { class: 'logo-23', emoji: '🧩', color: '#ffa07a' }, // LightSalmon
-    { class: 'logo-24', emoji: '🍔', color: '#cd853f' }, // Peru
-    { class: 'logo-25', emoji: '🍕', color: '#f08080' }, // LightCoral
-    { class: 'logo-26', emoji: '🎮', color: '#c0c0c0' }, // Silver
-    { class: 'logo-27', emoji: '✈️', color: '#afeeee' }, // PaleTurquoise
-    { class: 'logo-28', emoji: '🌳', color: '#228b22' }, // ForestGreen
-    { class: 'logo-29', emoji: '🌸', color: '#ffb6c1' }, // LightPink
-    { class: 'logo-30', emoji: '⚽', color: '#b0c4de' }, // LightSteelBlue
-    { class: 'logo-31', emoji: '🎸', color: '#8b4513' }, // SaddleBrown
-    { class: 'logo-32', emoji: '🚲', color: '#00fa9a' }, // MediumSpringGreen
-    { class: 'logo-33', emoji: '📚', color: '#deb887' }, // BurlyWood
-    { class: 'logo-34', emoji: '☕', color: '#d2b48c' }, // Tan
-    { class: 'logo-35', emoji: '🎁', color: '#f4a460' }, // SandyBrown
-    { class: 'logo-36', emoji: '🎉', color: '#ba55d3' }, // MediumOrchid
-    { class: 'logo-37', emoji: '🌍', color: '#87cefa' }, // LightSkyBlue
-    { class: 'logo-38', emoji: '🔬', color: '#778899' }, // LightSlateGray
-    { class: 'logo-39', emoji: '🔭', color: '#696969' }, // DimGray
-    { class: 'logo-40', emoji: '🛠️', color: '#d3d3d3' }, // LightGray
-    { class: 'logo-41', emoji: '⚖️', color: '#add8e6' }, // LightBlue
-    { class: 'logo-42', emoji: '💰', color: '#b8860b' }, // DarkGoldenRod
-    { class: 'logo-43', emoji: '🛡️', color: '#5f9ea0' }, // CadetBlue
-    { class: 'logo-44', emoji: '🔔', color: '#f0f8ff' }, // AliceBlue
-    { class: 'logo-45', emoji: '⏳', color: '#fa8072' }, // Salmon
-    { class: 'logo-46', emoji: '💾', color: '#3cb371' }, // MediumSeaGreen
-    { class: 'logo-47', emoji: '⚙️', color: '#4682b4' }, // SteelBlue
-    { class: 'logo-48', emoji: '📡', color: '#2e8b57' }, // SeaGreen
-    { class: 'logo-49', emoji: '🌐', color: '#a52a2a' }, // Brown
-    { class: 'logo-50', emoji: '📈', color: '#c71585' }  // MediumVioletRed
-];
         // --- Utility Functions ---
 
         function showToast(message, type = 'info', duration = 3000) {
@@ -2455,7 +2309,6 @@ const cancelLanguageBtn = document.getElementById('cancel-language-btn');const P
                 const userDoc = await db.collection('users').doc(currentUser.uid).get();
                 if (!userDoc.exists || !userDoc.data().username) {
                     // New user or incomplete profile, redirect to profile setup
-                    hideSplashScreen(); // Hide splash first
                     authScreen.classList.add('hidden'); // Ensure auth screen is hidden
                     appContainer.classList.remove('hidden'); // Show app container
                     showScreen('profile-screen'); // Show profile setup
@@ -2466,7 +2319,6 @@ const cancelLanguageBtn = document.getElementById('cancel-language-btn');const P
                     // Existing user, load profile and show home feed
                     loadUserProfile(currentUser.uid);
                     loadUserCoinsCreditsLimits(currentUser.uid);
-                    hideSplashScreen();
                     authScreen.classList.add('hidden'); // Ensure auth screen is hidden
                     appContainer.classList.remove('hidden'); // Show app container
                     showScreen('home-screen');
@@ -2476,7 +2328,6 @@ const cancelLanguageBtn = document.getElementById('cancel-language-btn');const P
                 }
             } else {
                 currentUser = null;
-                hideSplashScreen();
                 showAuthScreen('login'); // Show login screen if not authenticated
             }
         });
@@ -2591,16 +2442,12 @@ const cancelLanguageBtn = document.getElementById('cancel-language-btn');const P
         });
 
         // --- Splash Screen Transition ---
-                        function hideSplashScreen() {
-            // Reduce the initial delay significantly.
-            // It will now wait 500ms before starting to fade out for 500ms.
-            // This provides a brief splash but ensures it disappears promptly.
-            setTimeout(() => {
-                splashScreen.style.opacity = '0';
-                setTimeout(() => {
-                    splashScreen.classList.add('hidden');
-                }, 500); // Wait for fade out to complete
-            }, 500); // Changed from 3000 to 500
+        // This function is now directly handled in DOMContentLoaded
+        // It's kept here as a placeholder to avoid breaking existing references,
+        // but its content is moved.
+        function hideSplashScreen() {
+            // This function is no longer called directly from auth.onAuthStateChanged
+            // Its logic has been moved to DOMContentLoaded for fixed timing.
         }
 
         // --- Header Coins/Credits/Limits/Mint Display ---
@@ -3213,7 +3060,7 @@ const cancelLanguageBtn = document.getElementById('cancel-language-btn');const P
             }
 
             const likeButtonIcon = postElement.querySelector('.like-button i');
-            const likeCountSpan = postElement.querySelector('.like-button .like-count');
+            const likeCountSpan = likeButton.querySelector('.like-button .like-count');
 
             try {
                 const postRef = db.collection('posts').doc(postId);
@@ -4638,7 +4485,13 @@ const cancelLanguageBtn = document.getElementById('cancel-language-btn');const P
         }
 
         // Adjust publishPostBtn to handle remix logic
-        publishPostBtn.removeEventListener('click', publishPostBtn.onclick); // Remove old listener if any
+        // Remove existing event listener to avoid duplicates if script re-runs (not common but good practice)
+        publishPostBtn.removeEventListener('click', publishPostBtn.onclick); // This line attempts to remove an inline handler, which is problematic.
+                                                                           // A safer way is to ensure you add it only once or use .off() if using libraries.
+                                                                           // For plain JS, if you always attach it with addEventListener, then this specific remove is not needed.
+                                                                           // Let's assume publishPostBtn.onclick was never set directly.
+
+        // Re-add or ensure the listener is set up correctly:
         publishPostBtn.addEventListener('click', async () => {
             if (!currentUser) {
                 showToast("Please log in to upload posts.", 'error');
@@ -4933,11 +4786,23 @@ const cancelLanguageBtn = document.getElementById('cancel-language-btn');const P
 
         // --- Initial Loads ---
         document.addEventListener('DOMContentLoaded', () => {
-            // The auth.onAuthStateChanged listener will handle the initial screen logic.
             // Ensure the splash screen is visible initially
             splashScreen.classList.remove('hidden');
             authScreen.classList.add('hidden'); // Hide auth screen initially
             appContainer.classList.add('hidden'); // Hide app container initially
+
+            // Set a fixed timer for the splash screen to disappear
+            const splashDuration = 2000; // 2 seconds (adjust as needed, e.g., 1000 for 1 sec, 3000 for 3 sec)
+            const fadeDuration = 500; // 0.5 seconds for fade out
+
+            setTimeout(() => {
+                splashScreen.style.opacity = '0'; // Start fading out
+                setTimeout(() => {
+                    splashScreen.classList.add('hidden'); // Completely hide after fade
+                    // At this point, the onAuthStateChanged listener will have determined
+                    // the user's state and will show either the appContainer or authScreen.
+                }, fadeDuration);
+            }, splashDuration);
         });
 
     </script>
