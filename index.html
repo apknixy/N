@@ -2144,57 +2144,119 @@
         const cancelEditProfileBtn = document.getElementById('cancel-edit-profile-btn');
 
         const followListModal = document.getElementById('follow-list-modal');
-        const followListTitle = document.getElementById('follow-list-title');
-        const followListContent = document.getElementById('follow-list-content');
-        const closeFollowListModalBtn = document.getElementById('close-follow-list-modal');
+        const followListTitle = document.getElementById('// --- DOM Elements ---
+const splashScreen = document.getElementById('splash-screen');
+const appContainer = document.getElementById('app-container');
+const menuToggle = document.getElementById('menu-toggle');
+const sidebar = document.getElementById('sidebar');
+const closeSidebarBtn = document.getElementById('close-sidebar');
+const mainContent = document.querySelector('.main-content');
+const bottomNavItems = document.querySelectorAll('.app-bottom-nav .nav-item');
+const screenSections = document.querySelectorAll('.app-screen');
+const headerCoins = document.getElementById('header-coins');
+const headerCredits = document.getElementById('header-credits');
+const headerLimit = document.getElementById('header-limit');
+const headerMint = document.getElementById('header-mint');
+const giftClaimBtn = document.getElementById('gift-claim-btn');
+const adModal = document.getElementById('ad-modal');
+const closeAdModalBtn = document.getElementById('close-ad-modal');
+const rewardPopup = document.getElementById('reward-popup');
+const rewardMessage = document.getElementById('reward-message');
+const closeRewardPopupBtn = document.getElementById('close-reward-popup');
+const toastNotification = document.getElementById('toast-notification');
+const refreshPostsBtn = document.getElementById('refresh-posts-btn');
+const postsFeed = document.getElementById('posts-feed');
+const loadingSpinner = document.getElementById('loading-spinner');
 
-        // Messaging Screen
-        const messagesScreen = document.getElementById('messages-screen');
-        const messageListContainer = document.getElementById('message-list-container');
-        const recentChatsList = document.getElementById('recent-chats-list');
-        const chatWindowContainer = document.getElementById('chat-window-container');
-        const chatPartnerUsername = document.getElementById('chat-partner-username');
-        const chatMessages = document.getElementById('chat-messages');
-        const messageInput = document.getElementById('message-input');
-        const sendMessageBtn = document.getElementById('send-message-btn');
-        const backToChatsBtn = document.getElementById('back-to-chats-btn');
+// Auth Screen
+const authScreen = document.getElementById('auth-screen');
+const authTitle = document.getElementById('auth-title');
+const loginForm = document.getElementById('login-form'); // Correct, non-duplicate
+const signupForm = document.getElementById('signup-form'); // Correct, non-duplicate
+const loginEmailInput = document.getElementById('login-email');
+const loginPasswordInput = document.getElementById('login-password');
+const loginBtn = document.getElementById('login-btn');
+const signupEmailInput = document.getElementById('signup-email');
+const signupPasswordInput = document.getElementById('signup-password');
+const signupConfirmPasswordInput = document.getElementById('signup-confirm-password');
+const signupBtn = document.getElementById('signup-btn');
+const showSignupLink = document.getElementById('show-signup');
+const showLoginLink = document.getElementById('show-login');
+const passwordToggles = document.querySelectorAll('.password-toggle');
 
-        // Search Screen
-        const searchScreen = document.getElementById('search-screen');
-        const searchQueryInput = document.getElementById('search-query');
-        const searchBtn = document.getElementById('search-btn');
-        const searchUserList = document.getElementById('search-user-list');
-        const searchPostList = document.getElementById('search-post-list');
-        const noSearchResults = document.getElementById('no-search-results');
+// Post Upload Screen
+const uploadScreen = document.getElementById('upload-screen');
+const postContentInput = document.getElementById('post-content');
+const postImageInput = document.getElementById('post-image');
+const postBoostSelect = document.getElementById('post-boost');
+const publishPostBtn = document.getElementById('publish-post-btn');
+const uploadStatus = document.getElementById('upload-status');
 
-        // Monetization Screen & Withdraw Modal
-        const withdrawCoinsBtn = document.getElementById('withdraw-coins-btn');
-        const withdrawModal = document.getElementById('withdraw-modal');
-        const currentMintBalance = document.getElementById('current-mint-balance');
-        const withdrawPaypalEmail = document.getElementById('withdraw-paypal-email');
-        const withdrawRealName = document.getElementById('withdraw-real-name');
-        const withdrawAge = document.getElementById('withdraw-age');
-        const withdrawDob = document.getElementById('withdraw-dob');
-        const confirmWithdrawBtn = document.getElementById('confirm-withdraw-btn');
-        const closeWithdrawModalBtn = document.getElementById('close-withdraw-modal');
+// Profile Screen
+const profileScreen = document.getElementById('profile-screen');
+const myProfileAvatar = document.getElementById('my-profile-avatar');
+const myProfileUsername = document.getElementById('my-profile-username');
+const myPostsCount = document.getElementById('my-posts-count');
+const myFollowersCount = document.getElementById('my-followers-count');
+const myFollowingCount = document.getElementById('my-following-count');
+const editProfileBtn = document.getElementById('edit-profile-btn');
+const followUserBtn = document.getElementById('follow-user-btn');
+const unfollowUserBtn = document.getElementById('unfollow-user-btn'); // Corrected
+const messageUserBtn = document.getElementById('message-user-btn');
+const profileWhatsappLink = document.getElementById('profile-whatsapp-link');
+const profileInstagramLink = document.getElementById('profile-instagram-link');
+const currentProfileUsernamePosts = document.getElementById('current-profile-username-posts');
+const profilePostsFeed = document.getElementById('profile-posts-feed');
 
-        // NEW: Translate Language Selection Modal
-        const languageSelectModal = document.getElementById('language-select-modal');
-        const languageOptionsContainer = document.querySelector('#language-select-modal .language-options');
-        const saveLanguageBtn = document.getElementById('save-language-btn');
-        const cancelLanguageBtn = document.getElementById('cancel-language-btn');
+const editProfileModal = document.getElementById('edit-profile-modal');
+const editUsernameInput = document.getElementById('edit-username');
+const usernameAvailability = document.getElementById('username-availability');
+const editWhatsappInput = document.getElementById('edit-whatsapp');
+const editInstagramInput = document.getElementById('edit-instagram');
+const profileLogoOptions = document.getElementById('profile-logo-options');
+const saveProfileBtn = document.getElementById('save-profile-btn');
+const cancelEditProfileBtn = document.getElementById('cancel-edit-profile-btn');
 
+const followListModal = document.getElementById('follow-list-modal');
+const followListTitle = document.getElementById('follow-list-title');
+const followListContent = document.getElementById('follow-list-content');
+const closeFollowListModalBtn = document.getElementById('close-follow-list-modal');
 
-        // --- Global Variables ---
-        let currentUser = null;
-        let currentProfileViewingId = null; // To differentiate between viewing own profile vs. other's
-        let currentChatPartnerId = null;
-        let lastVisiblePost = null; // For infinite scrolling pagination
-        let fetchingPosts = false;
-        const postsToLoadPerScroll = 10;
-        let currentSpeaker = null; // For text-to-speech
-        let userSelectedTranslationLanguage = 'en'; // Default translation language
+// Messaging Screen
+const messagesScreen = document.getElementById('messages-screen');
+const messageListContainer = document.getElementById('message-list-container');
+const recentChatsList = document.getElementById('recent-chats-list');
+const chatWindowContainer = document.getElementById('chat-window-container');
+const chatPartnerUsername = document.getElementById('chat-partner-username');
+const chatMessages = document.getElementById('chat-messages');
+const messageInput = document.getElementById('message-input');
+const sendMessageBtn = document.getElementById('send-message-btn');
+const backToChatsBtn = document.getElementById('back-to-chats-btn');
 
+// Search Screen
+const searchScreen = document.getElementById('search-screen');
+const searchQueryInput = document.getElementById('search-query');
+const searchBtn = document.getElementById('search-btn');
+const searchUserList = document.getElementById('search-user-list');
+const searchPostList = document.getElementById('search-post-list');
+const noSearchResults = document.getElementById('no-search-results');
+
+// Monetization Screen & Withdraw Modal
+const withdrawCoinsBtn = document.getElementById('withdraw-coins-btn');
+const withdrawModal = document.getElementById('withdraw-modal');
+const currentMintBalance = document.getElementById('current-mint-balance');
+const withdrawPaypalEmail = document.getElementById('withdraw-paypal-email');
+const withdrawRealName = document.getElementById('withdraw-real-name');
+const withdrawAge = document.getElementById('withdraw-age');
+const withdrawDob = document.getElementById('withdraw-dob');
+const confirmWithdrawBtn = document.getElementById('confirm-withdraw-btn');
+const closeWithdrawModalBtn = document.getElementById('close-withdraw-modal');
+
+// NEW: Translate Language Selection Modal
+const languageSelectModal = document.getElementById('language-select-modal');
+const languageOptionsContainer = document.querySelector('#language-select-modal .language-options');
+const saveLanguageBtn = document.getElementById('save-language-btn');
+const cancelLanguageBtn = document.getElementById('cancel-language-btn');
   const PROFILE_LOGOS = [
     { class: 'logo-1', emoji: '🧑', color: '#ff6347' }, // Tomato
     { class: 'logo-2', emoji: '👩', color: '#6a5acd' }, // SlateBlue
