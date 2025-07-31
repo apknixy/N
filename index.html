@@ -2238,8 +2238,8 @@
                 const userDoc = await db.collection('users').doc(currentUser.uid).get();
                 if (!userDoc.exists || !userDoc.data().username) {
                     // New user or incomplete profile, redirect to profile setup
-                    authScreen.classList.add('hidden'); // Ensure auth screen is hidden
-                    appContainer.classList.remove('hidden'); // Show app container
+                    authScreen.classList.add('hidden'); // This hides auth screen
+                    appContainer.classList.remove('hidden'); // This shows app container
                     showScreen('profile-screen'); // Show profile setup
                     editProfileModal.classList.remove('hidden'); // Automatically open edit profile
                     showToast("Welcome! Please complete your profile.", 'info', 5000);
@@ -2248,8 +2248,8 @@
                     // Existing user, load profile and show home feed
                     loadUserProfile(currentUser.uid);
                     loadUserCoinsCreditsLimits(currentUser.uid);
-                    authScreen.classList.add('hidden'); // Ensure auth screen is hidden
-                    appContainer.classList.remove('hidden'); // Show app container
+                    authScreen.classList.add('hidden'); // This hides auth screen
+                    appContainer.classList.remove('hidden'); // This shows app container
                     showScreen('home-screen');
                     postsFeed.innerHTML = ''; // Clear existing posts before loading fresh
                     lastVisiblePost = null; // Reset pagination
@@ -3890,7 +3890,7 @@
                 });
 
                 followListContent.innerHTML = '';
-                // Get current user's following list once outside the loop for efficiency
+                // Get current user's following list once for efficiency
                 const currentUserFollowingList = currentUser ? (await db.collection('users').doc(currentUser.uid).get()).data().following || [] : [];
 
 
@@ -4703,10 +4703,13 @@
 
         // --- Initial Loads ---
         document.addEventListener('DOMContentLoaded', () => {
-            // Initially, the auth-screen is shown by default HTML structure.
-            // Firebase's auth.onAuthStateChanged will then decide to hide it
-            // and show app-container if a user is logged in, or keep it visible.
-            // No splash screen related logic needed here anymore.
+            // Ensure the auth-screen is initially visible, and app-container is hidden
+            // This explicitly sets the state to guarantee the login/signup form shows up.
+            authScreen.classList.remove('hidden');
+            appContainer.classList.add('hidden');
+
+            // The onAuthStateChanged listener will then correctly take over
+            // and hide authScreen/show appContainer if a user is already logged in.
         });
 
     </script>
