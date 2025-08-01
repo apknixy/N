@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AddMint - Ultra Professional</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Roboto:wght[400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         /* General Body and Container Styles */
@@ -40,6 +40,64 @@
             display: none !important;
         }
 
+        /* Splash Screen */
+        .splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0f3460, #16213e); /* Gradient background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 1000;
+            color: white;
+            text-align: center;
+            opacity: 1;
+            transition: opacity 0.5s ease-out;
+        }
+
+        .splash-content {
+            animation: fadeIn 1s ease-out forwards;
+        }
+
+        .app-logo-splash {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(45deg, #00ffff, #ff00ff); /* Neon gradient */
+            border-radius: 50%;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.6), 0 0 40px rgba(255, 0, 255, 0.4);
+            animation: pulse 2s infinite alternate;
+        }
+        .app-logo-splash::before {
+            content: 'A'; /* Simple 'A' for AddMint */
+            font-family: 'Montserrat', sans-serif;
+            font-size: 60px;
+            font-weight: bold;
+            color: #1a1a2e;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .splash-screen h1 {
+            font-size: 2.8em;
+            margin-bottom: 10px;
+            color: #00ffff;
+            text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff;
+        }
+
+        .splash-screen p {
+            font-size: 1.2em;
+            color: #88d4d4;
+        }
+        
         /* Auth Screen (Login/Signup) */
         .auth-screen-wrapper {
             background: linear-gradient(135deg, #0f3460, #16213e);
@@ -85,10 +143,6 @@
             color: #00ffff;
             margin-bottom: 25px;
             text-shadow: 0 0 5px #00ffff;
-        }
-
-        .auth-screen-wrapper .form-group {
-            margin-bottom: 20px;
         }
 
         .password-input-group {
@@ -176,7 +230,6 @@
             color: #ff00ff; /* Pink hover effect */
             transform: scale(1.05);
         }
-
 
         .icon-button {
             background: none;
@@ -404,13 +457,13 @@
         }
         .remix-content-wrapper {
             display: flex;
-            gap: 15px;
+            flex-direction: column; /* Stack them for better mobile view */
+            gap: 10px;
             margin-top: 10px;
             border-top: 1px dashed #0d2a4a;
             padding-top: 15px;
         }
         .remix-original, .remix-reply {
-            flex: 1;
             padding: 10px;
             border-radius: 8px;
             background-color: #1a1a2e; /* Darker background for remix sections */
@@ -740,7 +793,9 @@
         input[type="password"],
         input[type="file"],
         textarea,
-        select {
+        select,
+        input[type="number"],
+        input[type="date"] {
             width: 100%;
             padding: 12px;
             border: 1px solid #00ffff; /* Neon border */
@@ -757,7 +812,9 @@
         input[type="email"]:focus,
         input[type="password"]:focus,
         textarea:focus,
-        select:focus {
+        select:focus,
+        input[type="number"]:focus,
+        input[type="date"]:focus {
             border-color: #ff00ff; /* Pink focus */
             box-shadow: 0 0 15px rgba(255, 0, 255, 0.4);
             outline: none;
@@ -1570,7 +1627,15 @@
 </head>
 <body>
 
-    <div id="auth-screen" class="auth-screen-wrapper">
+    <div id="splash-screen" class="splash-screen">
+        <div class="splash-content">
+            <div class="app-logo-splash"></div> <h1>AddMint</h1>
+            <p>Connecting the World, One Post at a Time</p>
+            <div class="loader"></div>
+        </div>
+    </div>
+
+    <div id="auth-screen" class="auth-screen-wrapper hidden">
         <div class="auth-content">
             <div class="auth-logo"></div>
             <h2 id="auth-title">Login</h2>
@@ -1642,7 +1707,7 @@
                 <div class="icon-button" id="gift-claim-btn" title="Claim Daily Reward">
                     <i class="fas fa-gift"></i>
                 </div>
-                </div>
+            </div>
         </header>
 
         <nav id="sidebar" class="sidebar">
@@ -1670,7 +1735,7 @@
             <section id="home-screen" class="app-screen active">
                 <h2>Recent Posts</h2>
                 <div id="posts-feed" class="posts-feed">
-                    </div>
+                </div>
                 <div id="loading-spinner" class="loader hidden"></div>
             </section>
 
@@ -1713,7 +1778,7 @@
                             <div class="form-group">
                                 <label>Profile Logo:</label>
                                 <div id="profile-logo-options" class="logo-options-grid">
-                                    </div>
+                                </div>
                             </div>
                             <button class="btn primary-btn" id="save-profile-btn">Save Changes</button>
                             <button class="btn secondary-btn" id="cancel-edit-profile-btn">Cancel</button>
@@ -1724,7 +1789,7 @@
                         <div class="modal-content">
                             <h3 id="follow-list-title"></h3>
                             <div id="follow-list-content">
-                                </div>
+                            </div>
                             <button class="btn secondary-btn" id="close-follow-list-modal">Close</button>
                         </div>
                     </div>
@@ -1732,7 +1797,7 @@
                     <div class="profile-posts-area">
                         <h3>Posts by <span id="current-profile-username-posts">Me</span></h3>
                         <div id="profile-posts-feed" class="posts-feed">
-                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -1751,9 +1816,9 @@
                     <label for="post-boost">Post Boost Hours:</label>
                     <select id="post-boost">
                         <option value="12">12 Hours (Free)</option>
-                        <option value="18">18 Hours (1 Ad)</option>
-                        <option value="24">24 Hours (2 Ads)</option>
-                        <option value="30">30 Hours (3 Ads)</option>
+                        <option value="18">18 Hours (10 Coins)</option>
+                        <option value="24">24 Hours (20 Coins)</option>
+                        <option value="30">30 Hours (30 Coins)</option>
                     </select>
                 </div>
                 <button class="btn primary-btn" id="publish-post-btn">Publish Post</button>
@@ -1765,7 +1830,7 @@
                 <div id="message-list-container">
                     <h3>Recent Chats</h3>
                     <ul id="recent-chats-list" class="recent-chats-list">
-                        </ul>
+                    </ul>
                 </div>
 
                 <div id="chat-window-container" class="chat-window-container hidden">
@@ -1775,7 +1840,7 @@
                         <span id="chat-partner-username">@ChatUser</span>
                     </div>
                     <div id="chat-messages" class="chat-messages">
-                        </div>
+                    </div>
                     <div class="chat-input-area">
                         <textarea id="message-input" placeholder="Type your message..."></textarea>
                         <button id="send-message-btn" class="btn primary-btn"><i class="fas fa-paper-plane"></i></button>
@@ -1799,15 +1864,15 @@
                 <div id="search-results" class="search-results-container">
                     <h3>Users</h3>
                     <ul id="search-user-list" class="search-list">
-                        </ul>
+                    </ul>
                     <h3>Posts</h3>
                     <div id="search-post-list" class="posts-feed">
-                        </div>
+                    </div>
                     <div id="no-search-results" class="hidden">No results found.</div>
                 </div>
             </section>
 
-            <!-- NEW: Monetization Screen -->
+            <!-- Monetization Screen -->
             <section id="monetization-screen" class="app-screen">
                 <h2>Earn & Boost</h2>
                 <p>Welcome to the Earn & Boost section! Here you can gain valuable resources (Coins, Credits, Post Limits) to enhance your AddMint experience and boost your content visibility.</p>
@@ -1834,7 +1899,7 @@
                     <h4><i class="fas fa-chart-line"></i> Post Limits</h4>
                     <p>Each post you upload consumes one post limit. Earn more limits to share more content with the community.</p>
                 </div>
-                 <div class="info-card">
+                <div class="info-card">
                     <h4><i class="fas fa-gem"></i> Mint <small>(New Currency)</small></h4>
                     <p>Mint is our premium currency earned from every ad watched. You can withdraw Mint to real money.</p>
                 </div>
@@ -1957,17 +2022,12 @@
             </div>
         </div>
 
-        <!-- NEW: Language Selection Modal for Translate -->
+        <!-- Language Selection Modal for Translate -->
         <div id="language-select-modal" class="modal hidden">
             <div class="modal-content">
                 <h3>Select Translation Language</h3>
                 <div class="language-options">
-                    <div class="language-option" data-lang="en">English</div>
-                    <div class="language-option" data-lang="hi">हिन्दी (Hindi)</div>
-                    <div class="language-option" data-lang="es">Español (Spanish)</div>
-                    <div class="language-option" data-lang="fr">Français (French)</div>
-                    <div class="language-option" data-lang="de">Deutsch (German)</div>
-                    <div class="language-option" data-lang="ja">日本語 (Japanese)</div>
+                    <!-- Options will be dynamically added by JavaScript -->
                 </div>
                 <button class="btn primary-btn" id="save-language-btn">Save Language</button>
                 <button class="btn secondary-btn" id="cancel-language-btn">Cancel</button>
@@ -1979,11 +2039,11 @@
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
     <script>
-        // Firebase Configuration (from your input)
+        // Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyDlZA4grzF3fx95-11E4s7ASXwkIij1k1w",
             authDomain: "addmint-7ab6b.firebaseapp.com",
@@ -2014,8 +2074,15 @@
 
         let currentSpeaker = null; // To keep track of the current SpeechSynthesisUtterance
 
+        let dataSaverEnabled = false; // For data saver feature
+
+        let currentAdPurpose = ''; // 'daily-reward', 'message-credit', 'limit', 'coins'
+        let adRewardDetails = {};
+
+        let unsubscribeFromChat = null; // To store the Firestore listener unsubscribe function
 
         // --- DOM Elements ---
+        const splashScreen = document.getElementById('splash-screen'); // Re-added splash screen
         const appContainer = document.getElementById('app-container');
         const menuToggle = document.getElementById('menu-toggle');
         const sidebar = document.getElementById('sidebar');
@@ -2037,7 +2104,6 @@
         const refreshPostsBtn = document.getElementById('refresh-posts-btn');
         const postsFeed = document.getElementById('posts-feed');
         const loadingSpinner = document.getElementById('loading-spinner');
-        // const endOfFeedMessage = document.getElementById('end-of-feed-message'); // Removed as per request
 
         // Auth Screen
         const authScreen = document.getElementById('auth-screen');
@@ -2123,11 +2189,12 @@
         const confirmWithdrawBtn = document.getElementById('confirm-withdraw-btn');
         const closeWithdrawModalBtn = document.getElementById('close-withdraw-modal');
 
-        // NEW: Translate Language Selection Modal
+        // Language Selection Modal for Translate
         const languageSelectModal = document.getElementById('language-select-modal');
         const languageOptionsContainer = document.querySelector('#language-select-modal .language-options');
         const saveLanguageBtn = document.getElementById('save-language-btn');
         const cancelLanguageBtn = document.getElementById('cancel-language-btn');
+
 
         // --- Profile Logos Data ---
         const PROFILE_LOGOS = [
@@ -2156,31 +2223,31 @@
             { class: 'logo-23', emoji: '🧩', color: '#ffa07a' }, // LightSalmon
             { class: 'logo-24', emoji: '🍔', color: '#cd853f' }, // Peru
             { class: 'logo-25', emoji: '🍕', color: '#f08080' }, // LightCoral
-            { class: 'logo-26', emoji: '🎮', color: '#c0c0c0; } .profile-avatar.user-logo-26::before { content: '🎮'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
-            { class: 'logo-27', emoji: '✈️', color: '#afeeee; } .profile-avatar.user-logo-27::before { content: '✈️'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
-            { class: 'logo-28', emoji: '🌳', color: '#228b22; } .profile-avatar.user-logo-28::before { content: '🌳'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
-            { class: 'logo-29', emoji: '🌸', color: '#ffb6c1; } .profile-avatar.user-logo-29::before { content: '🌸'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
-            { class: 'logo-30', emoji: '⚽', color: '#b0c4de; } .profile-avatar.user-logo-30::before { content: '⚽'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
-            { class: 'logo-31', emoji: '🎸', color: '#8b4513; } .profile-avatar.user-logo-31::before { content: '🎸'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
-            { class: 'logo-32', emoji: '🚲', color: '#00fa9a; } .profile-avatar.user-logo-32::before { content: '🚲'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
-            { class: 'logo-33', emoji: '📚', color: '#deb887; } .profile-avatar.user-logo-33::before { content: '📚'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
-            { class: 'logo-34', emoji: '☕', color: '#d2b48c; } .profile-avatar.user-logo-34::before { content: '☕'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
-            { class: 'logo-35', emoji: '🎁', color: '#f4a460; } .profile-avatar.user-logo-35::before { content: '🎁'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
-            { class: 'logo-36', emoji: '🎉', color: '#ba55d3; } .profile-avatar.user-logo-36::before { content: '🎉'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
-            { class: 'logo-37', emoji: '🌍', color: '#87cefa; } .profile-avatar.user-logo-37::before { content: '🌍'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
-            { class: 'logo-38', emoji: '🔬', color: '#778899; } .profile-avatar.user-logo-38::before { content: '🔬'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
-            { class: 'logo-39', emoji: '🔭', color: '#696969; } .profile-avatar.user-logo-39::before { content: '🔭'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
-            { class: 'logo-40', emoji: '🛠️', color: '#d3d3d3; } .profile-avatar.user-logo-40::before { content: '🛠️'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
-            { class: 'logo-41', emoji: '⚖️', color: '#add8e6; } .profile-avatar.user-logo-41::before { content: '⚖️'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
-            { class: 'logo-42', emoji: '💰', color: '#b8860b; } .profile-avatar.user-logo-42::before { content: '💰'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
-            { class: 'logo-43', emoji: '🛡️', color: '#5f9ea0; } .profile-avatar.user-logo-43::before { content: '🛡️'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
-            { class: 'logo-44', emoji: '🔔', color: '#f0f8ff; } .profile-avatar.user-logo-44::before { content: '🔔'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
-            { class: 'logo-45', emoji: '⏳', color: '#fa8072; } .profile-avatar.user-logo-45::before { content: '⏳'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
-            { class: 'logo-46', emoji: '💾', color: '#3cb371; } .profile-avatar.user-logo-46::before { content: '💾'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
-            { class: 'logo-47', emoji: '⚙️', color: '#4682b4; } .profile-avatar.user-logo-47::before { content: '⚙️'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
-            { class: 'logo-48', emoji: '📡', color: '#2e8b57; } .profile-avatar.user-logo-48::before { content: '📡'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
-            { class: 'logo-49', emoji: '🌐', color: '#a52a2a; } .profile-avatar.user-logo-49::before { content: '🌐'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
-            { class: 'logo-50', emoji: '📈', color: '#c71585' }  // MediumVioletRed
+            { class: 'logo-26', emoji: '🎮', color: '#c0c0c0' },
+            { class: 'logo-27', emoji: '✈️', color: '#afeeee' },
+            { class: 'logo-28', emoji: '🌳', color: '#228b22' },
+            { class: 'logo-29', emoji: '🌸', color: '#ffb6c1' },
+            { class: 'logo-30', emoji: '⚽', color: '#b0c4de' },
+            { class: 'logo-31', emoji: '🎸', color: '#8b4513' },
+            { class: 'logo-32', emoji: '🚲', color: '#00fa9a' },
+            { class: 'logo-33', emoji: '📚', color: '#deb887' },
+            { class: 'logo-34', emoji: '☕', color: '#d2b48c' },
+            { class: 'logo-35', emoji: '🎁', color: '#f4a460' },
+            { class: 'logo-36', emoji: '🎉', color: '#ba55d3' },
+            { class: 'logo-37', emoji: '🌍', color: '#87cefa' },
+            { class: 'logo-38', emoji: '🔬', color: '#778899' },
+            { class: 'logo-39', emoji: '🔭', color: '#696969' },
+            { class: 'logo-40', emoji: '🛠️', color: '#d3d3d3' },
+            { class: 'logo-41', emoji: '⚖️', color: '#add8e6' },
+            { class: 'logo-42', emoji: '💰', color: '#b8860b' },
+            { class: 'logo-43', emoji: '🛡️', color: '#5f9ea0' },
+            { class: 'logo-44', emoji: '🔔', color: '#f0f8ff' },
+            { class: 'logo-45', emoji: '⏳', color: '#fa8072' },
+            { class: 'logo-46', emoji: '💾', color: '#3cb371' },
+            { class: 'logo-47', emoji: '⚙️', color: '#4682b4' },
+            { class: 'logo-48', emoji: '📡', color: '#2e8b57' },
+            { class: 'logo-49', emoji: '🌐', color: '#a52a2a' },
+            { class: 'logo-50', emoji: '📈', color: '#c71585' }
         ];
 
         // --- Utility Functions ---
@@ -2219,7 +2286,6 @@
             sidebar.classList.remove('open');
         }
 
-        // Function to generate a random logo class (e.g., for new users, search results)
         function getRandomLogoClass() {
             const randomIndex = Math.floor(Math.random() * PROFILE_LOGOS.length);
             return PROFILE_LOGOS[randomIndex].class;
@@ -2230,40 +2296,59 @@
             return logo ? `user-${logo.class}` : 'user-logo-1'; // Default to logo-1 if not found
         }
 
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.appendChild(document.createTextNode(text));
+            return div.innerHTML;
+        }
+
         // --- Firebase Authentication ---
         auth.onAuthStateChanged(async (user) => {
             if (user) {
                 currentUser = user;
-                // Check if user's profile exists in Firestore
                 const userDoc = await db.collection('users').doc(currentUser.uid).get();
                 if (!userDoc.exists || !userDoc.data().username) {
-                    // New user or incomplete profile, redirect to profile setup
-                    authScreen.classList.add('hidden'); // This hides auth screen
-                    appContainer.classList.remove('hidden'); // This shows app container
-                    showScreen('profile-screen'); // Show profile setup
-                    editProfileModal.classList.remove('hidden'); // Automatically open edit profile
+                    // New user or incomplete profile
+                    hideSplashScreen();
+                    appContainer.classList.remove('hidden');
+                    authScreen.classList.add('hidden');
+                    showScreen('profile-screen');
+                    editProfileModal.classList.remove('hidden');
                     showToast("Welcome! Please complete your profile.", 'info', 5000);
-                    myProfileUsername.textContent = "@NewUser"; // Placeholder
+                    myProfileUsername.textContent = "@NewUser";
                 } else {
-                    // Existing user, load profile and show home feed
+                    // Existing user
                     loadUserProfile(currentUser.uid);
                     loadUserCoinsCreditsLimits(currentUser.uid);
-                    authScreen.classList.add('hidden'); // This hides auth screen
-                    appContainer.classList.remove('hidden'); // This shows app container
+                    hideSplashScreen();
+                    appContainer.classList.remove('hidden');
+                    authScreen.classList.add('hidden');
                     showScreen('home-screen');
-                    postsFeed.innerHTML = ''; // Clear existing posts before loading fresh
-                    lastVisiblePost = null; // Reset pagination
-                    loadPosts(); // Start loading posts for existing users
+                    postsFeed.innerHTML = '';
+                    lastVisiblePost = null;
+                    loadPosts();
                 }
             } else {
                 currentUser = null;
-                showAuthScreen('login'); // Show login screen if not authenticated
+                hideSplashScreen(); // Hide splash screen regardless
+                showAuthScreen('login');
             }
         });
+
+        // --- Splash Screen Transition ---
+        function hideSplashScreen() {
+            setTimeout(() => {
+                splashScreen.style.opacity = '0';
+                setTimeout(() => {
+                    splashScreen.classList.add('hidden');
+                }, 500); // Wait for fade out to complete
+            }, 1000); // Show splash for at least 1-3 seconds
+        }
 
         // --- Auth Screen Functions ---
         function showAuthScreen(type = 'login') {
             appContainer.classList.add('hidden');
+            splashScreen.classList.add('hidden'); // Ensure splash is hidden
             authScreen.classList.remove('hidden');
             if (type === 'login') {
                 authTitle.textContent = 'Login';
@@ -2300,7 +2385,6 @@
             });
         });
 
-
         loginBtn.addEventListener('click', async () => {
             const email = loginEmailInput.value.trim();
             const password = loginPasswordInput.value.trim();
@@ -2313,7 +2397,6 @@
             try {
                 await auth.signInWithEmailAndPassword(email, password);
                 showToast("Logged in successfully!", 'success');
-                // The onAuthStateChanged listener will handle redirection
             } catch (error) {
                 console.error("Login error:", error);
                 showToast(`Login failed: ${error.message}`, 'error');
@@ -2342,20 +2425,19 @@
                 const userCredential = await auth.createUserWithEmailAndPassword(email, password);
                 const user = userCredential.user;
 
-                // Initialize user profile in Firestore
                 const defaultLogo = getRandomLogoClass();
                 await db.collection('users').doc(user.uid).set({
-                    username: `user${Date.now().toString().slice(-6)}`, // Temporary username
-                    username_lowercase: `user${Date.now().toString().slice(-6)}`.toLowerCase(), // For search
+                    username: `user${Date.now().toString().slice(-6)}`,
+                    username_lowercase: `user${Date.now().toString().slice(-6)}`.toLowerCase(),
                     email: email,
                     profileLogo: defaultLogo,
                     postCount: 0,
                     followersCount: 0,
                     followingCount: 0,
-                    coins: 10, // Starting bonus
-                    credits: 5, // Starting bonus
-                    postLimit: 2, // Starting bonus
-                    mint: 0, // NEW: Starting mint
+                    coins: 10,
+                    credits: 5,
+                    postLimit: 2,
+                    mint: 0,
                     lastRewardClaim: 0,
                     whatsapp: '',
                     instagram: '',
@@ -2363,7 +2445,6 @@
                 });
 
                 showToast("Account created successfully! Please complete your profile.", 'success');
-                // The onAuthStateChanged listener will handle redirection and modal opening
             } catch (error) {
                 console.error("Signup error:", error);
                 showToast(`Signup failed: ${error.message}`, 'error');
@@ -2375,15 +2456,14 @@
             if (!userId) return;
             try {
                 const userDocRef = db.collection('users').doc(userId);
-                // Use onSnapshot for real-time updates to header values
                 userDocRef.onSnapshot(doc => {
                     if (doc.exists) {
                         const data = doc.data();
                         headerCoins.textContent = `${formatNumber(data.coins || 0)} C`;
                         headerCredits.textContent = `${formatNumber(data.credits || 0)} Cr`;
                         headerLimit.textContent = `${formatNumber(data.postLimit || 0)} L`;
-                        headerMint.textContent = `${formatNumber(data.mint || 0)} M`; // NEW: Update Mint
-                        checkDailyRewardStatus(data.lastRewardClaim || 0); // Check for reward
+                        headerMint.textContent = `${formatNumber(data.mint || 0)} M`;
+                        checkDailyRewardStatus(data.lastRewardClaim || 0);
                     }
                 }, error => {
                     console.error("Error fetching user stats in real-time:", error);
@@ -2409,28 +2489,26 @@
                 else if (resourceType === 'limit') adDetails = { limit: 1 };
                 else if (resourceType === 'mint') {
                     showToast("Mint is earned automatically from any ad watch.", 'info');
-                    return;
+                    return; // Mint cannot be earned directly by watching a specific ad for it.
                 }
                 showAdModal(resourceType, adDetails);
             });
         });
 
-
         // --- Daily Reward Logic ---
         const DAILY_REWARD_INTERVAL = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
-        const DAILY_REWARD = { limit: 2, coins: 10, credits: 10, mint: 5 }; // NEW: Mint in daily reward
+        const DAILY_REWARD = { limit: 2, coins: 10, credits: 10, mint: 5 };
 
         async function checkDailyRewardStatus(lastClaimTimestamp) {
             if (!currentUser) return;
             const now = Date.now();
-            const lastClaimTime = lastClaimTimestamp; // Firestore timestamp to milliseconds
+            const lastClaimTime = lastClaimTimestamp;
 
             if (now - lastClaimTime >= DAILY_REWARD_INTERVAL) {
-                giftClaimBtn.classList.add('neon-glow'); // Visually indicate available reward
+                giftClaimBtn.classList.add('neon-glow');
             } else {
                 giftClaimBtn.classList.remove('neon-glow');
                 const timeRemaining = DAILY_REWARD_INTERVAL - (now - lastClaimTime);
-                // console.log(`Next reward in: ${new Date(timeRemaining).toISOString().substr(11, 8)}`);
             }
         }
 
@@ -2448,7 +2526,7 @@
                 const now = Date.now();
 
                 if (now - lastClaimTime >= DAILY_REWARD_INTERVAL) {
-                    showAdModal('daily-reward', DAILY_REWARD); // Show ad for daily reward
+                    showAdModal('daily-reward', DAILY_REWARD);
                 } else {
                     const timeRemaining = DAILY_REWARD_INTERVAL - (now - lastClaimTime);
                     const hours = Math.floor(timeRemaining / (1000 * 60 * 60));
@@ -2473,10 +2551,8 @@
 
         // --- Data Saver Toggle ---
         document.getElementById('data-saver-checkbox').addEventListener('change', (e) => {
-            const dataSaverEnabled = e.target.checked;
+            dataSaverEnabled = e.target.checked;
             showToast(`Data Saver ${dataSaverEnabled ? 'Enabled' : 'Disabled'}`, 'info');
-            // This is just a flag. You'd implement logic to reduce image quality or lazy load more aggressively
-            // when dataSaverEnabled is true during post loading/display.
         });
 
 
@@ -2495,20 +2571,18 @@
                 const screenId = e.currentTarget.dataset.screen;
                 if (screenId) {
                     showScreen(`${screenId}-screen`);
-                    // Specific actions for screens
                     if (screenId === 'profile') {
-                        loadUserProfile(currentUser.uid); // Load own profile
+                        loadUserProfile(currentUser.uid);
                         currentProfileViewingId = currentUser.uid;
-                        updateProfileDisplay(currentUser.uid); // Ensure this is called with current user data to set editing state
+                        updateProfileDisplay(currentUser.uid);
                     } else if (screenId === 'messages') {
                         loadRecentChats();
                         messageListContainer.classList.remove('hidden');
                         chatWindowContainer.classList.add('hidden');
                     } else if (screenId === 'home') {
-                        // Reset feed if navigating back to home
-                        postsFeed.innerHTML = ''; // Clear current posts
-                        lastVisiblePost = null; // Reset pagination
-                        loadPosts(); // Reload posts from start
+                        postsFeed.innerHTML = '';
+                        lastVisiblePost = null;
+                        loadPosts();
                     }
                 }
                 sidebar.classList.remove('open');
@@ -2520,8 +2594,7 @@
             try {
                 await auth.signOut();
                 showToast("Logged out successfully.", 'info');
-                // Redirect to login page or show login UI
-                showAuthScreen('login'); // Back to login screen
+                showAuthScreen('login');
             } catch (error) {
                 console.error("Error logging out:", error);
                 showToast("Failed to log out.", 'error');
@@ -2534,19 +2607,18 @@
                 e.preventDefault();
                 const screenId = e.currentTarget.dataset.screen;
                 showScreen(`${screenId}-screen`);
-                // Specific actions for screens
                 if (screenId === 'profile') {
-                    loadUserProfile(currentUser.uid); // Load own profile
+                    loadUserProfile(currentUser.uid);
                     currentProfileViewingId = currentUser.uid;
-                    updateProfileDisplay(currentUser.uid); // Ensure this is called with current user data to set editing state
+                    updateProfileDisplay(currentUser.uid);
                 } else if (screenId === 'messages') {
                     loadRecentChats();
                     messageListContainer.classList.remove('hidden');
                     chatWindowContainer.classList.add('hidden');
                 } else if (screenId === 'home') {
-                    postsFeed.innerHTML = ''; // Clear existing posts
-                    lastVisiblePost = null; // Reset pagination
-                    loadPosts(); // Reload posts
+                    postsFeed.innerHTML = '';
+                    lastVisiblePost = null;
+                    loadPosts();
                 } else if (screenId === 'search') {
                     searchUserList.innerHTML = '';
                     searchPostList.innerHTML = '';
@@ -2566,12 +2638,11 @@
 
             try {
                 let postsRef = db.collection('posts')
-                                .where('expiryTime', '>', firebase.firestore.Timestamp.now()) // Only show unexpired posts
-                                .orderBy('expiryTime', 'desc') // Order by expiry to prioritize newer/more boosted posts
-                                .orderBy('timestamp', 'desc') // Secondary order by creation time
+                                .where('expiryTime', '>', firebase.firestore.Timestamp.now())
+                                .orderBy('expiryTime', 'desc')
+                                .orderBy('timestamp', 'desc')
                                 .limit(postsToLoadPerScroll);
 
-                // If lastVisiblePost is set, use it for pagination
                 if (lastVisiblePost) {
                     postsRef = postsRef.startAfter(lastVisiblePost);
                 }
@@ -2580,15 +2651,11 @@
 
                 if (snapshot.empty) {
                     if (postsFeed.children.length > 0) {
-                        // If we reached the end of the current feed, try loading from the beginning again
-                        // This creates a "never-ending" feel by looping through available posts.
-                        lastVisiblePost = null; // Reset to start from the beginning
-                        // Show a temporary toast for better UX
+                        lastVisiblePost = null;
                         showToast("Cycling through posts...", 'info', 2000);
-                        setTimeout(() => loadPosts(), 500); // Small delay before re-fetching
-                        return; // Exit this function call
+                        setTimeout(() => loadPosts(), 500);
+                        return;
                     } else {
-                        // No posts available at all, or all posts expired
                         postsFeed.innerHTML = '<p style="text-align: center; color: #ccc;">No posts available right now. Be the first to post!</p>';
                         loadingSpinner.classList.add('hidden');
                         fetchingPosts = false;
@@ -2601,23 +2668,21 @@
                 let currentBatch = [];
                 snapshot.docs.forEach(doc => {
                     const postData = doc.data();
-                    // Client-side filtering for expired posts (redundant with Firestore query but good fallback)
                     if (postData.expiryTime && postData.expiryTime.toMillis() > Date.now()) {
                          currentBatch.push({ id: doc.id, ...postData });
                     }
                 });
 
-                // Apply random layout logic
                 let tempPosts = [...currentBatch];
                 while (tempPosts.length > 0) {
                     const remainingPosts = tempPosts.length;
                     let layoutChoice;
 
-                    if (remainingPosts >= 4 && Math.random() < 0.4) { // Roughly 40% chance for table if enough posts
+                    if (remainingPosts >= 4 && Math.random() < 0.4) {
                         layoutChoice = 'table';
-                    } else if (remainingPosts >= 2 && Math.random() < 0.6) { // Roughly 60% chance for horizontal if enough for at least 2
+                    } else if (remainingPosts >= 2 && Math.random() < 0.6) {
                         layoutChoice = 'horizontal';
-                    } else { // Default to vertical or if not enough for other layouts
+                    } else {
                         layoutChoice = 'vertical';
                     }
 
@@ -2625,7 +2690,7 @@
                         const post = tempPosts.shift();
                         renderPost(post, postsFeed, 'vertical-post');
                     } else if (layoutChoice === 'horizontal') {
-                        const numHorizontal = Math.min(remainingPosts, Math.floor(Math.random() * 2) + 2); // 2 or 3 posts
+                        const numHorizontal = Math.min(remainingPosts, Math.floor(Math.random() * 2) + 2);
                         const horizontalContainer = document.createElement('div');
                         horizontalContainer.className = 'horizontal-post-container';
                         for (let i = 0; i < numHorizontal; i++) {
@@ -2634,7 +2699,7 @@
                         }
                         postsFeed.appendChild(horizontalContainer);
                     } else if (layoutChoice === 'table') {
-                        const numTable = Math.min(remainingPosts, Math.floor(Math.random() * 3) + 4); // 4, 5, or 6 posts
+                        const numTable = Math.min(remainingPosts, Math.floor(Math.random() * 3) + 4);
                         const tableContainer = document.createElement('div');
                         tableContainer.className = 'table-post-container';
                         for (let i = 0; i < numTable; i++) {
@@ -2653,13 +2718,11 @@
             }
         }
 
-        // Renamed to renderPostElement to create the HTML element, and renderPost to append it.
         function createPostElement(postData, layoutClass = 'vertical-post') {
             const postCard = document.createElement('div');
-            postCard.className = `post-card ${layoutClass} ${postData.isRemix ? 'remixed' : ''}`; // Add remixed class
+            postCard.className = `post-card ${layoutClass} ${postData.isRemix ? 'remixed' : ''}`;
             postCard.dataset.postId = postData.id;
 
-            // Determine if the current user has liked this post
             const hasLiked = postData.likedBy && currentUser && postData.likedBy.includes(currentUser.uid);
             const likeIconClass = hasLiked ? 'fas fa-heart' : 'far fa-heart';
 
@@ -2681,7 +2744,7 @@
                         <p>${formatPostContent(postData.content)}</p>
                     </div>
                 </div>
-            ` : postContentHtml; // If not a remix, just show normal content
+            ` : postContentHtml;
 
             postCard.innerHTML = `
                 <div class="post-header">
@@ -2693,7 +2756,7 @@
                             <span class="report-btn">Report</span>
                             <span class="copy-link-btn">Copy Post Link</span>
                             <span class="remix-btn" data-original-post-id="${postData.isRemix ? postData.remixOf : postData.id}" data-original-content="${escapeHtml(postData.isRemix ? postData.remixOfContent : postData.content)}">Remix Post</span>
-                            <span class="change-lang-btn">Change Translation Language</span> <!-- NEW -->
+                            <span class="change-lang-btn">Change Translation Language</span>
                             ${currentUser && postData.userId === currentUser.uid ? `<span class="delete-btn">Delete</span>` : ''}
                         </div>
                     </div>
@@ -2726,20 +2789,12 @@
             return postCard;
         }
 
-        // Helper to prevent XSS if content has raw HTML
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.appendChild(document.createTextNode(text));
-            return div.innerHTML;
-        }
-
         function renderPost(postData, parentElement, layoutClass = 'vertical-post') {
             const postElement = createPostElement(postData, layoutClass);
             parentElement.appendChild(postElement);
         }
 
         function formatPostContent(content) {
-            // Convert URLs to clickable links
             const urlRegex = /(https?:\/\/[^\s]+)/g;
             return content.replace(urlRegex, (url) => `<a href="${url}" target="_blank" style="color: #00ffff; text-decoration: underline;">${url}</a>`);
         }
@@ -2747,9 +2802,9 @@
         function renderEmojiReactions(reactions) {
             if (!reactions) return '';
             const topEmojis = Object.entries(reactions)
-                .filter(([, count]) => count > 0) // Only show emojis with counts > 0
+                .filter(([, count]) => count > 0)
                 .sort(([, a], [, b]) => b - a)
-                .slice(0, 3); // Get top 3
+                .slice(0, 3);
             
             let html = '<span class="emoji-reaction-display">';
             topEmojis.forEach(([emoji, count]) => {
@@ -2759,7 +2814,6 @@
             return html;
         }
 
-        // Add event listeners for post elements
         let lastClickTime = 0;
         let clickTimer;
         let longPressTimer;
@@ -2768,8 +2822,6 @@
         function addPostEventListeners(postElement, postData) {
             const postId = postData.id;
             const likeButton = postElement.querySelector('.like-button');
-            const likeButtonIcon = likeButton.querySelector('i');
-            const likeCountSpan = likeButton.querySelector('.like-count');
             const postOptionsBtn = postElement.querySelector('.post-options .fa-ellipsis-v');
             const optionsDropdown = postElement.querySelector('.options-dropdown');
             const reportBtn = postElement.querySelector('.report-btn');
@@ -2781,81 +2833,69 @@
             const profileAvatar = postElement.querySelector('.profile-avatar');
             const usernameSpan = postElement.querySelector('.username');
             const emojiPicker = postElement.querySelector('.emoji-picker');
-            const postContentP = postElement.querySelector('.post-content p[data-original-content]'); // Ensure we get the main content P
-            const changeLangBtn = postElement.querySelector('.change-lang-btn'); // NEW
+            const postContentP = postElement.querySelector('.post-content p[data-original-content]');
+            const changeLangBtn = postElement.querySelector('.change-lang-btn');
 
-            // Profile Click
             if (profileAvatar) {
                 profileAvatar.addEventListener('click', (e) => {
-                    e.stopPropagation(); // Prevent triggering post's click/long-press
+                    e.stopPropagation();
                     openUserProfile(postData.userId);
                 });
             }
             if (usernameSpan) {
                 usernameSpan.addEventListener('click', (e) => {
-                    e.stopPropagation(); // Prevent triggering post's click/long-press
+                    e.stopPropagation();
                     openUserProfile(postData.userId);
                 });
             }
 
-            // Double-click for Like & Single click for Neon
             postElement.addEventListener('click', (e) => {
-                // Exclude clicks on specific interactive elements inside the post
                 if (e.target.closest('.like-button') || e.target.closest('.post-options') || e.target.closest('.translate-button') || e.target.closest('.speak-button') || e.target.closest('.emoji-picker') || e.target.closest('.profile-avatar') || e.target.closest('.username')) {
-                    return; // Don't trigger post's click/double-click if these are clicked
+                    return;
                 }
 
                 const currentTime = new Date().getTime();
                 const timeDiff = currentTime - lastClickTime;
 
-                if (timeDiff < 300 && timeDiff > 0) { // Double click detected (within 300ms)
+                if (timeDiff < 300 && timeDiff > 0) {
                     clearTimeout(clickTimer);
                     handleLike(postId, postElement);
-                    lastClickTime = 0; // Reset for next double click
+                    lastClickTime = 0;
                 } else {
-                    // Single click for neon effect
                     clearTimeout(clickTimer);
                     clickTimer = setTimeout(() => {
                         handleNeonEffect(postElement);
-                    }, 300); // Wait to see if it's a double click
+                    }, 300);
                 }
                 lastClickTime = currentTime;
             });
 
-            // Long press for emoji reactions
-            // Use touch events for mobile, mouse events for desktop for long press simulation
             postElement.addEventListener('touchstart', (e) => {
                 if (e.target.closest('.like-button') || e.target.closest('.post-options') || e.target.closest('.translate-button') || e.target.closest('.speak-button') || e.target.closest('.emoji-picker') || e.target.closest('.profile-avatar') || e.target.closest('.username')) {
-                    return; // Don't trigger long press if these are clicked
+                    return;
                 }
-                // Only prevent default if it's not a scroll event
-                if (e.touches.length === 1) { // Single touch for interaction
+                if (e.touches.length === 1) {
                     longPressTimer = setTimeout(() => {
                         emojiPicker.classList.remove('hidden');
-                    }, 800); // 800ms for long press (adjust as needed)
+                    }, 800);
                 }
-            }, { passive: true }); // Use passive: true if you only need to read touch events, false if you need to preventDefault (might impact scroll performance)
+            }, { passive: true });
 
             postElement.addEventListener('touchend', () => {
                 clearTimeout(longPressTimer);
             });
 
-            // For desktop long press (optional, usually right-click is enough)
-            // You could also detect mousedown/mouseup for a longer press
             postElement.addEventListener('contextmenu', (e) => {
-                e.preventDefault(); // Prevent default right-click context menu
+                e.preventDefault();
                 emojiPicker.classList.remove('hidden');
             });
 
-            // Hide emoji picker if clicking outside
             document.addEventListener('click', (e) => {
                 if (emojiPicker && !emojiPicker.contains(e.target) && !postElement.contains(e.target)) {
                     emojiPicker.classList.add('hidden');
                 }
             });
 
-
-            // Emoji selection
             emojiPicker.querySelectorAll('.emoji-option').forEach(emojiOption => {
                 emojiOption.addEventListener('click', async (e) => {
                     const selectedEmoji = e.target.dataset.emoji;
@@ -2864,22 +2904,18 @@
                 });
             });
 
-            // Like button explicit click (for consistency, even with double-click)
             if (likeButton) {
                 likeButton.addEventListener('click', (e) => {
-                    e.stopPropagation(); // Prevent post's double click/neon effect
+                    e.stopPropagation();
                     handleLike(postId, postElement);
                 });
             }
 
-            // Post Options (Report/Delete/Copy Link/Remix/Change Language)
             if (postOptionsBtn) {
                 postOptionsBtn.addEventListener('click', (e) => {
-                    e.stopPropagation(); // Prevent post click/neon effect
+                    e.stopPropagation();
                     optionsDropdown.classList.toggle('hidden');
                 });
-
-                // Close dropdown if clicking outside
                 document.addEventListener('click', (e) => {
                     if (optionsDropdown && !postOptionsBtn.contains(e.target) && !optionsDropdown.contains(e.target)) {
                         optionsDropdown.classList.add('hidden');
@@ -2905,18 +2941,17 @@
                 remixBtn.addEventListener('click', (e) => {
                     const originalPostId = e.target.dataset.originalPostId;
                     const originalContent = e.target.dataset.originalContent;
-                    handleRemixPost(postElement, originalPostId, originalContent); // Pass original post content
+                    handleRemixPost(postElement, originalPostId, originalContent);
                     optionsDropdown.classList.add('hidden');
                 });
             }
 
-            if (changeLangBtn) { // NEW: Add listener for change translation language
+            if (changeLangBtn) {
                 changeLangBtn.addEventListener('click', () => {
                     showLanguageSelectModal();
                     optionsDropdown.classList.add('hidden');
                 });
             }
-
 
             if (deleteBtn) {
                 deleteBtn.addEventListener('click', () => {
@@ -2928,7 +2963,7 @@
             if (translateBtn) {
                 translateBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    if (postContentP) { // Ensure element exists
+                    if (postContentP) {
                         handleTranslatePost(postContentP, userSelectedTranslationLanguage);
                     } else {
                         showToast("Content for translation not found.", 'error');
@@ -2947,32 +2982,26 @@
                 });
             }
 
-            // Views count - increment on first unique view per user (simplified client-side)
             incrementViewCount(postId);
         }
 
-        // Function to handle the neon effect
         function handleNeonEffect(postElement) {
-            // Remove neon from previously highlighted post
             if (currentNeonPost && currentNeonPost !== postElement) {
                 currentNeonPost.classList.remove('neon-glow');
             }
-            // Add neon to current post
             postElement.classList.add('neon-glow');
             currentNeonPost = postElement;
 
-            // Remove neon after 3-4 seconds
             setTimeout(() => {
-                if (postElement) { // Check if element still exists (e.g., if deleted)
+                if (postElement) {
                     postElement.classList.remove('neon-glow');
                     if (currentNeonPost === postElement) {
                         currentNeonPost = null;
                     }
                 }
-            }, 3500); // 3.5 seconds
+            }, 3500);
         }
 
-        // Like functionality
         async function handleLike(postId, postElement) {
             if (!currentUser) {
                 showToast("Please log in to like posts.", 'info');
@@ -2980,11 +3009,10 @@
             }
 
             const likeButtonIcon = postElement.querySelector('.like-button i');
-            const likeCountSpan = postElement.querySelector('.like-button .like-count'); // Corrected selector
+            const likeCountSpan = postElement.querySelector('.like-button .like-count');
 
             try {
                 const postRef = db.collection('posts').doc(postId);
-                
                 const postDoc = await postRef.get();
                 if (!postDoc.exists) {
                     showToast("Post not found.", 'error');
@@ -2998,13 +3026,11 @@
                 let action = '';
 
                 if (likedBy.includes(currentUser.uid)) {
-                    // Unlike
-                    newLikes = Math.max(0, newLikes - 1); // Ensure likes don't go negative
+                    newLikes = Math.max(0, newLikes - 1);
                     likeButtonIcon.classList.remove('fas');
                     likeButtonIcon.classList.add('far');
                     action = 'remove';
                 } else {
-                    // Like
                     newLikes++;
                     likeButtonIcon.classList.remove('far');
                     likeButtonIcon.classList.add('fas');
@@ -3031,7 +3057,6 @@
             }
         }
 
-        // Emoji Reaction functionality
         async function handleEmojiReaction(postId, emoji, postElement) {
             if (!currentUser) {
                 showToast("Please log in to react to posts.", 'info');
@@ -3040,7 +3065,6 @@
 
             try {
                 const postRef = db.collection('posts').doc(postId);
-
                 const postDoc = await postRef.get();
                 if (!postDoc.exists) {
                     showToast("Post not found.", 'error');
@@ -3049,7 +3073,7 @@
 
                 const postData = postDoc.data();
                 const currentReactions = postData.reactions || {};
-                const userReactions = postData.userReactions || {}; // Tracks what each user reacted with
+                const userReactions = postData.userReactions || {};
 
                 const existingReaction = userReactions[currentUser.uid];
 
@@ -3058,7 +3082,6 @@
                     let updatedReactionsCount = { ...currentReactions };
 
                     if (existingReaction) {
-                        // If user already reacted, decrement count of old emoji
                         updatedReactionsCount[existingReaction] = (updatedReactionsCount[existingReaction] || 1) - 1;
                         if (updatedReactionsCount[existingReaction] <= 0) {
                             delete updatedReactionsCount[existingReaction];
@@ -3066,22 +3089,19 @@
                     }
 
                     if (existingReaction === emoji) {
-                        // User clicked the same emoji again, un-react
                         delete updatedUserReactions[currentUser.uid];
                     } else {
-                        // New reaction, or changing reaction
                         updatedReactionsCount[emoji] = (updatedReactionsCount[emoji] || 0) + 1;
                         updatedUserReactions[currentUser.uid] = emoji;
                     }
 
                     transaction.update(postRef, {
                         reactions: updatedReactionsCount,
-                        userReactions: updatedUserReactions // Store user specific reaction
+                        userReactions: updatedUserReactions
                     });
                 });
 
-                // Update UI immediately (optimistic update)
-                const updatedPostDoc = await postRef.get(); // Re-fetch to get latest counts for rendering
+                const updatedPostDoc = await postRef.get();
                 const updatedPostData = updatedPostDoc.data();
 
                 const emojiReactionDisplayElement = postElement.querySelector('.emoji-reaction-display');
@@ -3098,10 +3118,8 @@
             }
         }
 
-
-        // View Count functionality
         async function incrementViewCount(postId) {
-            if (!currentUser) return; // Only count views from logged-in users
+            if (!currentUser) return;
 
             const viewsRef = db.collection('postViews').doc(postId);
             const postRef = db.collection('posts').doc(postId);
@@ -3115,22 +3133,21 @@
 
                     let userViewCount = viewedBy[currentUser.uid] || 0;
 
-                    if (userViewCount < 1) { // Count as 1 unique view per user (simplified)
+                    if (userViewCount < 1) {
                         viewsData.totalViews = (viewsData.totalViews || 0) + 1;
-                        viewedBy[currentUser.uid] = (viewedBy[currentUser.uid] || 0) + 1; // Mark user as having viewed
+                        viewedBy[currentUser.uid] = (viewedBy[currentUser.uid] || 0) + 1;
 
                         transaction.set(viewsRef, {
                             totalViews: viewsData.totalViews,
                             viewedBy: viewedBy
                         }, { merge: true });
 
-                        // Atomically update the post's main view count
                         transaction.update(postRef, {
                             views: firebase.firestore.FieldValue.increment(1)
                         });
 
                         if (viewCountSpan) {
-                            viewCountSpan.textContent = formatNumber(viewsData.totalViews); // Optimistic update
+                            viewCountSpan.textContent = formatNumber(viewsData.totalViews);
                         }
                     }
                 });
@@ -3139,18 +3156,14 @@
             }
         }
 
-        // Refresh Posts Button
         refreshPostsBtn.addEventListener('click', () => {
-            postsFeed.innerHTML = ''; // Clear current posts
-            lastVisiblePost = null; // Reset pagination
-            loadPosts(); // Reload posts from the beginning
+            postsFeed.innerHTML = '';
+            lastVisiblePost = null;
+            loadPosts();
             showToast("Feed refreshed!", 'info');
         });
 
-        // Infinite Scroll Listener
         mainContent.addEventListener('scroll', () => {
-            // Check if user is near the bottom of the scrollable content
-            // and if the home screen is active (to avoid loading posts on other screens)
             if (mainContent.scrollTop + mainContent.clientHeight >= mainContent.scrollHeight - 100 &&
                 document.getElementById('home-screen').classList.contains('active')) {
                 loadPosts();
@@ -3160,1256 +3173,6 @@
 
         // --- Post Upload Functionality ---
         publishPostBtn.addEventListener('click', async () => {
-            if (!currentUser) {
-                showToast("Please log in to upload posts.", 'error');
-                return;
-            }
-
-            const content = postContentInput.value.trim();
-            const imageFile = postImageInput.files[0]; // This is now disabled
-            const boostHours = parseInt(postBoostSelect.value);
-
-            if (!content) { // Removed imageFile check as it's disabled
-                showToast("Please enter some content for your post.", 'error');
-                return;
-            }
-
-            // Check coins and limits
-            const userDocRef = db.collection('users').doc(currentUser.uid);
-            const userDoc = await userDocRef.get();
-            const userData = userDoc.data();
-
-            const currentLimit = userData.postLimit || 0;
-            const currentCoins = userData.coins || 0;
-            const requiredLimit = 1; // Always costs 1 limit
-
-            // Calculate coin cost based on boost hours
-            let coinCost = 0;
-            switch(boostHours) {
-                case 18: coinCost = 10; break; // Example cost, adjust as needed
-                case 24: coinCost = 20; break;
-                case 30: coinCost = 30; break;
-                default: coinCost = 0; // 12 hours is free
-            }
-
-            if (currentLimit < requiredLimit) {
-                showToast("You need 1 post limit to upload. Watch an ad to earn.", 'error', 5000);
-                // Optionally auto-open ad modal
-                showAdModal('limit', { limit: 1 });
-                return;
-            }
-
-            if (currentCoins < coinCost) {
-                showToast(`You need ${coinCost} coins for ${boostHours} hours boost. You have ${formatNumber(currentCoins)} C.`, 'error', 5000);
-                // Optionally auto-open ad modal
-                showAdModal('coins', { coins: coinCost - currentCoins }); // Offer to earn missing coins
-                return;
-            }
-
-            // Deduct limit and coins
-            try {
-                await userDocRef.update({
-                    postLimit: firebase.firestore.FieldValue.increment(-requiredLimit),
-                    coins: firebase.firestore.FieldValue.increment(-coinCost)
-                });
-            } catch (error) {
-                console.error("Error deducting resources for post:", error);
-                showToast("Failed to deduct resources. Please try again.", 'error');
-                return;
-            }
-
-            uploadStatus.textContent = "Uploading post...";
-            publishPostBtn.disabled = true;
-
-            try {
-                // Image upload is disabled for now, so imageUrl will always be empty
-                const imageUrl = ''; // imageFile ? await uploadImage(imageFile) : '';
-
-                const newPostRef = db.collection('posts').doc(); // Auto-generated ID
-                await newPostRef.set({
-                    userId: currentUser.uid,
-                    username: userData.username, // Use user's current username
-                    userProfileLogo: userData.profileLogo || getRandomLogoClass(), // User's chosen logo
-                    content: content,
-                    imageUrl: imageUrl, // Will be empty string now
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                    likes: 0,
-                    views: 0,
-                    reactions: {},
-                    userReactions: {},
-                    boostHours: boostHours,
-                    expiryTime: firebase.firestore.Timestamp.fromMillis(Date.now() + (boostHours * 60 * 60 * 1000)),
-                    isRemix: false, // NEW: Not a remix by default
-                    remixOf: null, // NEW: No original post ID
-                    remixOfContent: null // NEW: No original content
-                });
-
-                // Increment user's post count
-                await userDocRef.update({
-                    postCount: firebase.firestore.FieldValue.increment(1)
-                });
-
-                uploadStatus.textContent = "Post uploaded successfully!";
-                showToast("Post uploaded successfully!", 'success');
-                postContentInput.value = '';
-                // postImageInput.value = ''; // Not needed as it's disabled
-                postBoostSelect.value = '12';
-                showScreen('home-screen'); // Navigate back to home feed
-                postsFeed.innerHTML = ''; // Clear and reload posts
-                lastVisiblePost = null;
-                loadPosts();
-
-            } catch (error) {
-                console.error("Error publishing post:", error);
-                if (error.code === 'permission-denied' || error.message.includes('Missing or insufficient permissions')) {
-                    uploadStatus.textContent = "Error: Permission denied. Contact admin.";
-                    showToast("Error publishing post: Missing or insufficient permissions. Contact admin.", 'error', 5000);
-                } else {
-                    uploadStatus.textContent = `Error: ${error.message}`;
-                    showToast("Failed to upload post. Try again.", 'error');
-                }
-                // Revert resources if upload failed after deduction
-                await userDocRef.update({
-                    postLimit: firebase.firestore.FieldValue.increment(requiredLimit),
-                    coins: firebase.firestore.FieldValue.increment(coinCost)
-                });
-            } finally {
-                publishPostBtn.disabled = false;
-            }
-        });
-
-        // Ad Modal Logic
-        let currentAdPurpose = ''; // 'daily-reward', 'message-credit', 'limit', 'coins'
-        let adRewardDetails = {};
-
-        function showAdModal(purpose, details = {}) {
-            currentAdPurpose = purpose;
-            adRewardDetails = details;
-            adModal.classList.remove('hidden');
-            closeAdModalBtn.disabled = true; // Disable close until ad "finishes"
-
-            // Simulate ad playback
-            const adPlaceholder = document.getElementById('ad-placeholder');
-            adPlaceholder.innerHTML = '<p>Simulating Ad (5 seconds)...</p><div class="loader"></div>';
-            
-            setTimeout(() => {
-                adPlaceholder.innerHTML = '<p>Ad Completed! Click "Close Ad" to claim reward.</p>';
-                closeAdModalBtn.disabled = false;
-                // In a real app, *this* is where your MIT App Inventor app would signal the web app
-                // via a secure backend call that the ad is complete.
-                // For this demo, we auto-enable the close button and let it trigger the reward.
-            }, 5000); // Simulate 5-second ad
-        }
-
-        closeAdModalBtn.addEventListener('click', async () => {
-            adModal.classList.add('hidden');
-            // Reward logic based on currentAdPurpose and adRewardDetails
-            // In a real scenario, this 'processAdReward' would only be called after a secure
-            // signal from your ad provider/backend that the ad was truly watched.
-            await processAdReward();
-        });
-
-        async function processAdReward() {
-            if (!currentUser) return;
-
-            try {
-                const userDocRef = db.collection('users').doc(currentUser.uid);
-                let rewardMessageText = "Reward Claimed: ";
-                let updateData = {};
-
-                // All ads give 1 Mint
-                updateData.mint = firebase.firestore.FieldValue.increment(1);
-                rewardMessageText += `+1 Mint`;
-
-                if (currentAdPurpose === 'coins') {
-                    const coinsToAward = adRewardDetails.coins || 10;
-                    updateData.coins = firebase.firestore.FieldValue.increment(coinsToAward);
-                    rewardMessageText += `, +${coinsToAward} Coins`;
-                } else if (currentAdPurpose === 'credits') {
-                    const creditsToAward = adRewardDetails.credits || 5;
-                    updateData.credits = firebase.firestore.FieldValue.increment(creditsToAward);
-                    rewardMessageText += `, +${creditsToAward} Credits`;
-                } else if (currentAdPurpose === 'limit') {
-                    const limitsToAward = adRewardDetails.limit || 1;
-                    updateData.postLimit = firebase.firestore.FieldValue.increment(limitsToAward);
-                    rewardMessageText += `, +${limitsToAward} Post Limit`;
-                } else if (currentAdPurpose === 'message-credit') {
-                    const creditsToAward = adRewardDetails.credits || 1; // For messaging, usually 1 credit
-                    updateData.credits = firebase.firestore.FieldValue.increment(creditsToAward);
-                    rewardMessageText += `, +${creditsToAward} Credits for Messaging`;
-                } else if (currentAdPurpose === 'daily-reward') {
-                    // This is for the daily gift box claim
-                    updateData.coins = firebase.firestore.FieldValue.increment(adRewardDetails.coins);
-                    updateData.credits = firebase.firestore.FieldValue.increment(adRewardDetails.credits);
-                    updateData.postLimit = firebase.firestore.FieldValue.increment(adRewardDetails.limit);
-                    updateData.lastRewardClaim = Date.now(); // Update last claim time
-                    // For daily reward, mint is awarded separately at the start of this function
-                    rewardMessageText = `You claimed your daily reward!\n+${adRewardDetails.coins} Coins, +${adRewardDetails.credits} Credits, +${adRewardDetails.limit} Limits, +1 Mint.`;
-                }
-
-                if (Object.keys(updateData).length > 0) {
-                    await userDocRef.update(updateData);
-                    showRewardPopup(rewardMessageText);
-                    showToast("Reward processed!", 'success');
-                } else {
-                    showToast("No specific reward defined for this ad purpose.", 'info');
-                }
-
-
-            } catch (error) {
-                console.error("Error processing ad reward:", error);
-                showToast("Failed to process ad reward. Try again.", 'error');
-            } finally {
-                currentAdPurpose = ''; // Reset
-                adRewardDetails = {}; // Reset
-            }
-        }
-
-        // Withdraw Mint Modal
-        withdrawCoinsBtn.addEventListener('click', async () => {
-            if (!currentUser) {
-                showToast("Please log in to withdraw Mint.", 'info');
-                return;
-            }
-            try {
-                const userDoc = await db.collection('users').doc(currentUser.uid).get();
-                const currentMint = userDoc.data().mint || 0;
-                currentMintBalance.textContent = `${formatNumber(currentMint)} M`;
-
-                if (currentMint < 1000) {
-                    showToast(`You need at least 1,000 Mint to withdraw. You have ${formatNumber(currentMint)} M.`, 'error', 5000);
-                    return;
-                }
-                withdrawModal.classList.remove('hidden');
-            } catch (error) {
-                console.error("Error checking mint balance:", error);
-                showToast("Could not retrieve Mint balance.", 'error');
-            }
-        });
-
-        closeWithdrawModalBtn.addEventListener('click', () => {
-            withdrawModal.classList.add('hidden');
-        });
-
-        confirmWithdrawBtn.addEventListener('click', async () => {
-            if (!currentUser) return;
-
-            const paypalEmail = withdrawPaypalEmail.value.trim();
-            const realName = withdrawRealName.value.trim();
-            const age = parseInt(withdrawAge.value.trim());
-            const dob = withdrawDob.value.trim();
-
-            if (!paypalEmail || !realName || isNaN(age) || !dob) {
-                showToast("Please fill all withdrawal details.", 'error');
-                return;
-            }
-            if (age < 13) {
-                showToast("You must be at least 13 years old to withdraw.", 'error');
-                return;
-            }
-
-            try {
-                const userDocRef = db.collection('users').doc(currentUser.uid);
-                const userDoc = await userDocRef.get();
-                const userData = userDoc.data();
-                const currentMint = userData.mint || 0;
-
-                if (currentMint < 1000) {
-                    showToast(`You need at least 1,000 Mint to withdraw. You have ${formatNumber(currentMint)} M.`, 'error', 5000);
-                    return;
-                }
-
-                // Simulate sending withdrawal request to backend
-                showToast("Processing withdrawal request...", 'info', 5000);
-                
-                // --- Backend Integration Point ---
-                // In a real application, you would make an API call to your Firebase Cloud Function here.
-                // Example:
-                /*
-                await firebase.functions().httpsCallable('requestWithdrawal')({
-                    amountMint: currentMint,
-                    paypalEmail: paypalEmail,
-                    realName: realName,
-                    age: age,
-                    dob: dob,
-                    userEmail: currentUser.email, // User's registered email
-                    userId: currentUser.uid,
-                    username: userData.username // User's username
-                });
-                */
-                // For this demo, we'll just simulate success and deduct mint.
-
-                // Deduct all mint from user's balance
-                await userDocRef.update({
-                    mint: 0 // Reset mint balance after withdrawal
-                });
-
-                showToast("Withdrawal request submitted! You will receive an email shortly regarding your payment within 1-15 business days.", 'success', 8000);
-                console.log("Withdrawal details (simulated):", {
-                    userId: currentUser.uid,
-                    username: userData.username,
-                    userEmail: currentUser.email,
-                    amountMint: currentMint,
-                    paypalEmail: paypalEmail,
-                    realName: realName,
-                    age: age,
-                    dob: dob,
-                    timestamp: new Date().toISOString()
-                });
-
-                withdrawModal.classList.add('hidden');
-                withdrawPaypalEmail.value = '';
-                withdrawRealName.value = '';
-                withdrawAge.value = '';
-                withdrawDob.value = '';
-
-            } catch (error) {
-                console.error("Error initiating withdrawal:", error);
-                showToast("Failed to submit withdrawal request. Please try again.", 'error');
-            }
-        });
-
-
-        // --- Profile Management ---
-        async function loadUserProfile(userId) {
-            if (!userId) {
-                showToast("User ID is missing to load profile.", 'error');
-                return;
-            }
-            currentProfileViewingId = userId; // Set the ID of the profile currently being viewed
-
-            try {
-                const userDoc = await db.collection('users').doc(userId).get();
-                if (userDoc.exists) {
-                    const userData = userDoc.data();
-                    updateProfileDisplay(userData);
-                    loadProfilePosts(userId);
-
-                    // Show/hide follow/message buttons based on whose profile it is
-                    if (userId === currentUser.uid) {
-                        editProfileBtn.classList.remove('hidden');
-                        followUserBtn.classList.add('hidden');
-                        unfollowUserBtn.classList.add('hidden');
-                        messageUserBtn.classList.add('hidden');
-                        profileWhatsappLink.classList.add('hidden');
-                        profileInstagramLink.classList.add('hidden');
-                    } else {
-                        editProfileBtn.classList.add('hidden');
-                        messageUserBtn.classList.remove('hidden'); // Always allow messaging
-                        // Check follow status
-                        const currentUserDoc = await db.collection('users').doc(currentUser.uid).get();
-                        const currentUserData = currentUserDoc.data();
-                        if (currentUserData.following && currentUserData.following.includes(userId)) {
-                            followUserBtn.classList.add('hidden');
-                            unfollowUserBtn.classList.remove('hidden');
-                        } else {
-                            followUserBtn.classList.remove('hidden');
-                            unfollowUserBtn.classList.add('hidden');
-                        }
-
-                        // Show social links if available
-                        if (userData.whatsapp) {
-                            profileWhatsappLink.classList.remove('hidden');
-                            profileWhatsappLink.href = `https://wa.me/${userData.whatsapp.replace(/\D/g, '')}`;
-                        } else {
-                            profileWhatsappLink.classList.add('hidden');
-                            profileWhatsappLink.removeAttribute('href');
-                        }
-                        if (userData.instagram) {
-                            profileInstagramLink.classList.remove('hidden');
-                            profileInstagramLink.href = `https://www.instagram.com/${userData.instagram}`;
-                        } else {
-                            profileInstagramLink.classList.add('hidden');
-                            profileInstagramLink.removeAttribute('href');
-                        }
-                    }
-                } else {
-                    showToast("User profile not found.", 'error');
-                    // If user not found and it's not the current user trying to set up profile, revert to home
-                    if (userId !== currentUser.uid) {
-                        showScreen('home-screen');
-                    }
-                }
-            } catch (error) {
-                console.error("Error loading user profile:", error);
-                showToast("Error loading profile. Try again.", 'error');
-            }
-        }
-
-        function updateProfileDisplay(userData) {
-            // Determine which user's profile is being displayed
-            const isCurrentUserProfile = (currentUser && userData.uid === currentUser.uid);
-
-            myProfileUsername.textContent = `@${userData.username || 'NewUser'}`;
-            currentProfileUsernamePosts.textContent = userData.username || 'Me';
-
-            // Set dynamic profile logo
-            const profileLogoClass = getLogoCssClass(userData.profileLogo || getRandomLogoClass());
-            myProfileAvatar.className = `profile-avatar-large ${profileLogoClass}`; // Correctly apply class
-
-            myPostsCount.textContent = formatNumber(userData.postCount || 0);
-            myFollowersCount.textContent = formatNumber(userData.followersCount || 0);
-            myFollowingCount.textContent = formatNumber(userData.followingCount || 0);
-
-            // Set edit profile modal inputs if it's the current user's profile
-            if (isCurrentUserProfile) {
-                editUsernameInput.value = userData.username || '';
-                editWhatsappInput.value = userData.whatsapp || '';
-                editInstagramInput.value = userData.instagram || '';
-                populateProfileLogoOptions(userData.profileLogo);
-            }
-        }
-
-        async function loadProfilePosts(userId) {
-            profilePostsFeed.innerHTML = '<div class="loader" style="margin: 20px auto;"></div>'; // Show loader
-            try {
-                const querySnapshot = await db.collection('posts')
-                    .where('userId', '==', userId)
-                    .where('expiryTime', '>', firebase.firestore.Timestamp.now()) // Only show unexpired posts
-                    .orderBy('expiryTime', 'desc')
-                    .orderBy('timestamp', 'desc')
-                    .limit(10) // Initial load limit for profile posts
-                    .get();
-
-                profilePostsFeed.innerHTML = ''; // Clear loader once data is fetched
-
-                if (querySnapshot.empty) {
-                    profilePostsFeed.innerHTML = '<p style="text-align: center; color: #ccc;">No posts yet.</p>';
-                    return;
-                }
-
-                querySnapshot.docs.forEach(doc => {
-                    renderPost({ id: doc.id, ...doc.data() }, profilePostsFeed); // Render into profilePostsFeed
-                });
-                // Implement infinite scroll for profile posts similarly if needed
-            } catch (error) {
-                console.error("Error loading profile posts:", error);
-                profilePostsFeed.innerHTML = '<p style="text-align: center; color: red;">Error loading posts.</p>';
-            }
-        }
-
-        // Edit Profile Modal
-        editProfileBtn.addEventListener('click', () => {
-            editProfileModal.classList.remove('hidden');
-            // Pre-populate fields from current user data (already done by updateProfileDisplay)
-        });
-
-        cancelEditProfileBtn.addEventListener('click', () => {
-            editProfileModal.classList.add('hidden');
-        });
-
-        // Username Availability Check
-        let usernameCheckTimeout;
-        editUsernameInput.addEventListener('input', async () => {
-            clearTimeout(usernameCheckTimeout);
-            usernameAvailability.textContent = ''; // Clear previous status
-            usernameAvailability.className = '';
-
-            const newUsername = editUsernameInput.value.trim();
-            if (newUsername === '') {
-                usernameAvailability.textContent = 'Username cannot be empty.';
-                usernameAvailability.classList.add('error-text');
-                return;
-            }
-
-            const userDoc = await db.collection('users').doc(currentUser.uid).get();
-            const currentUsername = userDoc.data().username;
-
-            if (newUsername.toLowerCase() === currentUsername.toLowerCase()) { // If username hasn't changed (case-insensitive)
-                usernameAvailability.textContent = 'Username is available.';
-                usernameAvailability.classList.add('success-text');
-                return;
-            }
-
-            usernameCheckTimeout = setTimeout(async () => {
-                try {
-                    const usersRef = db.collection('users');
-                    // Query for username in lowercase to ensure uniqueness across cases
-                    const snapshot = await usersRef.where('username_lowercase', '==', newUsername.toLowerCase()).get();
-
-                    if (snapshot.empty) {
-                        usernameAvailability.textContent = 'Username is available.';
-                        usernameAvailability.classList.add('success-text');
-                    } else {
-                        usernameAvailability.textContent = 'Username already taken.';
-                        usernameAvailability.classList.add('error-text');
-                    }
-                } catch (error) {
-                    console.error("Error checking username availability:", error);
-                    usernameAvailability.textContent = 'Error checking username.';
-                    usernameAvailability.classList.add('error-text');
-                }
-            }, 500); // Debounce
-        });
-
-        // Populate Profile Logo Options
-        function populateProfileLogoOptions(currentLogoClass) {
-            profileLogoOptions.innerHTML = '';
-            PROFILE_LOGOS.forEach(logo => {
-                const logoItem = document.createElement('div');
-                logoItem.className = `logo-option-item profile-avatar user-${logo.class}`; // Apply correct class
-                logoItem.dataset.logoClass = logo.class;
-                
-                // Add the emoji content dynamically
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = `<style>.logo-option-item.user-${logo.class}::before { content: '${logo.emoji}'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #1a1a2e; }</style>`;
-                document.head.appendChild(tempDiv); // Append dynamic style
-
-                if (currentLogoClass === logo.class) {
-                    logoItem.classList.add('selected');
-                }
-
-                logoItem.addEventListener('click', () => {
-                    profileLogoOptions.querySelectorAll('.logo-option-item').forEach(item => item.classList.remove('selected'));
-                    logoItem.classList.add('selected');
-                });
-                profileLogoOptions.appendChild(logoItem);
-            });
-        }
-
-        // Save Profile Changes
-        saveProfileBtn.addEventListener('click', async () => {
-            if (!currentUser) return;
-
-            const newUsername = editUsernameInput.value.trim();
-            const newWhatsapp = editWhatsappInput.value.trim();
-            const newInstagram = editInstagramInput.value.trim();
-            const selectedLogoElement = profileLogoOptions.querySelector('.logo-option-item.selected');
-            const newProfileLogo = selectedLogoElement ? selectedLogoElement.dataset.logoClass : null;
-
-            if (newUsername === '') {
-                showToast("Username cannot be empty.", 'error');
-                return;
-            }
-
-            try {
-                const userDocRef = db.collection('users').doc(currentUser.uid);
-                const userDoc = await userDocRef.get();
-                const currentData = userDoc.data();
-
-                // Check username uniqueness again before saving (case-insensitive)
-                if (newUsername.toLowerCase() !== (currentData.username ? currentData.username.toLowerCase() : '')) {
-                    const usernameSnapshot = await db.collection('users').where('username_lowercase', '==', newUsername.toLowerCase()).get();
-                    if (!usernameSnapshot.empty) {
-                        showToast("Username already taken. Please choose another.", 'error');
-                        return;
-                    }
-                }
-
-                await userDocRef.update({
-                    username: newUsername,
-                    username_lowercase: newUsername.toLowerCase(), // Store lowercase for efficient search
-                    whatsapp: newWhatsapp,
-                    instagram: newInstagram,
-                    profileLogo: newProfileLogo,
-                    // Ensure default values are set if profile is being updated for a very old user
-                    followersCount: currentData.followersCount || 0,
-                    followingCount: currentData.followingCount || 0,
-                    postCount: currentData.postCount || 0,
-                    coins: currentData.coins !== undefined ? currentData.coins : 100,
-                    credits: currentData.credits !== undefined ? currentData.credits : 50,
-                    postLimit: currentData.postLimit !== undefined ? currentData.postLimit : 5,
-                    mint: currentData.mint !== undefined ? currentData.mint : 0, // NEW: Ensure mint is there
-                    lastRewardClaim: currentData.lastRewardClaim !== undefined ? currentData.lastRewardClaim : 0
-                });
-
-                // Update username and profile logo in existing posts if they changed
-                if (newUsername.toLowerCase() !== (currentData.username ? currentData.username.toLowerCase() : '') || newProfileLogo !== currentData.profileLogo) {
-                    const postsSnapshot = await db.collection('posts').where('userId', '==', currentUser.uid).get();
-                    const batch = db.batch();
-                    postsSnapshot.docs.forEach(doc => {
-                        const postRef = db.collection('posts').doc(doc.id);
-                        batch.update(postRef, {
-                            username: newUsername,
-                            userProfileLogo: newProfileLogo
-                        });
-                    });
-                    await batch.commit();
-                }
-
-                editProfileModal.classList.add('hidden');
-                showToast("Profile updated successfully!", 'success');
-                loadUserProfile(currentUser.uid); // Reload profile display
-            } catch (error) {
-                console.error("Error saving profile:", error);
-                showToast("Failed to save profile. Please try again.", 'error');
-            }
-        });
-
-        // Follow/Unfollow Logic
-        followUserBtn.addEventListener('click', () => handleFollow(currentProfileViewingId));
-        unfollowUserBtn.addEventListener('click', () => handleUnfollow(currentProfileViewingId));
-
-        async function handleFollow(targetUserId) {
-            if (!currentUser || currentUser.uid === targetUserId) {
-                showToast("Cannot follow yourself or not logged in.", 'info');
-                return;
-            }
-
-            try {
-                const currentUserRef = db.collection('users').doc(currentUser.uid);
-                const targetUserRef = db.collection('users').doc(targetUserId);
-
-                const result = await db.runTransaction(async (transaction) => {
-                    const currentUserDoc = await transaction.get(currentUserRef);
-                    const targetUserDoc = await transaction.get(targetUserRef);
-
-                    if (!currentUserDoc.exists || !targetUserDoc.exists) {
-                        throw new Error("User not found.");
-                    }
-
-                    const currentUserData = currentUserDoc.data();
-                    
-                    // Check if already following
-                    if (currentUserData.following && currentUserData.following.includes(targetUserId)) {
-                        return { status: 'already-following' };
-                    }
-
-                    // Update current user's following list and count
-                    transaction.update(currentUserRef, {
-                        following: firebase.firestore.FieldValue.arrayUnion(targetUserId),
-                        followingCount: firebase.firestore.FieldValue.increment(1)
-                    });
-
-                    // Update target user's followers list and count
-                    transaction.update(targetUserRef, {
-                        followers: firebase.firestore.FieldValue.arrayUnion(currentUser.uid),
-                        followersCount: firebase.firestore.FieldValue.increment(1)
-                    });
-                    return { status: 'followed' };
-                });
-
-                if (result.status === 'followed') {
-                    showToast("Followed user!", 'success');
-                    followUserBtn.classList.add('hidden');
-                    unfollowUserBtn.classList.remove('hidden');
-                    loadUserProfile(currentProfileViewingId); // Refresh counts
-                } else if (result.status === 'already-following') {
-                    showToast("Already following this user.", 'info');
-                }
-
-            } catch (error) {
-                console.error("Error following user:", error);
-                showToast(`Failed to follow: ${error.message}`, 'error');
-            }
-        }
-
-        async function handleUnfollow(targetUserId) {
-            if (!currentUser || currentUser.uid === targetUserId) {
-                showToast("Cannot unfollow yourself or not logged in.", 'info');
-                return;
-            }
-
-            try {
-                const currentUserRef = db.collection('users').doc(currentUser.uid);
-                const targetUserRef = db.collection('users').doc(targetUserId);
-
-                const result = await db.runTransaction(async (transaction) => {
-                    const currentUserDoc = await transaction.get(currentUserRef);
-                    const targetUserDoc = await transaction.get(targetUserRef);
-
-                    if (!currentUserDoc.exists || !targetUserDoc.exists) {
-                        throw new Error("User not found.");
-                    }
-
-                    const currentUserData = currentUserDoc.data();
-                    
-                    // Check if currently following
-                    if (!currentUserData.following || !currentUserData.following.includes(targetUserId)) {
-                        return { status: 'not-following' };
-                    }
-
-                    // Update current user's following list and count
-                    transaction.update(currentUserRef, {
-                        following: firebase.firestore.FieldValue.arrayRemove(targetUserId),
-                        followingCount: firebase.firestore.FieldValue.increment(-1)
-                    });
-
-                    // Update target user's followers list and count
-                    transaction.update(targetUserRef, {
-                        followers: firebase.firestore.FieldValue.arrayRemove(currentUser.uid),
-                        followersCount: firebase.firestore.FieldValue.increment(-1)
-                    });
-                    return { status: 'unfollowed' };
-                });
-
-                if (result.status === 'unfollowed') {
-                    showToast("Unfollowed user.", 'info');
-                    followUserBtn.classList.remove('hidden');
-                    unfollowUserBtn.classList.add('hidden');
-                    loadUserProfile(currentProfileViewingId); // Refresh counts
-                } else if (result.status === 'not-following') {
-                    showToast("Not currently following this user.", 'info');
-                }
-
-            } catch (error) {
-                console.error("Error unfollowing user:", error);
-                showToast(`Failed to unfollow: ${error.message}`, 'error');
-            }
-        }
-
-        // View Followers/Following Lists
-        document.querySelectorAll('.clickable-stat').forEach(stat => {
-            stat.addEventListener('click', (e) => {
-                const statType = e.currentTarget.dataset.stat; // 'followers' or 'following'
-                const userId = currentProfileViewingId; // The user whose profile is currently open
-                if (userId && (statType === 'followers' || statType === 'following')) { // Ensure valid stat type
-                    showFollowList(userId, statType);
-                }
-            });
-        });
-
-        async function showFollowList(userId, type) {
-            followListContent.innerHTML = '<div class="loader" style="margin: 20px auto;"></div>';
-            followListTitle.textContent = type === 'followers' ? 'Followers' : 'Following';
-            followListModal.classList.remove('hidden');
-
-            try {
-                const userDoc = await db.collection('users').doc(userId).get();
-                if (!userDoc.exists) {
-                    followListContent.innerHTML = '<p style="text-align: center;">User not found.</p>';
-                    return;
-                }
-
-                const userRefs = userDoc.data()[type] || []; // Array of UIDs
-                if (userRefs.length === 0) {
-                    followListContent.innerHTML = `<p style="text-align: center;">No ${type} found.</p>`;
-                    return;
-                }
-
-                const usersData = [];
-                // Fetch details for each user in the list (can be slow for many users, consider pagination for large lists)
-                // Use Promise.all to fetch user data concurrently for better performance
-                const userPromises = userRefs.map(uid => db.collection('users').doc(uid).get());
-                const userDocs = await Promise.all(userPromises);
-
-                userDocs.forEach(refDoc => {
-                    if (refDoc.exists) {
-                        usersData.push({ id: refDoc.id, ...refDoc.data() });
-                    }
-                });
-
-                followListContent.innerHTML = '';
-                // Get current user's following list once for efficiency
-                const currentUserFollowingList = currentUser ? (await db.collection('users').doc(currentUser.uid).get()).data().following || [] : [];
-
-
-                usersData.forEach(user => { // Use forEach as data is already fetched
-                    const userItem = document.createElement('li');
-                    userItem.className = 'search-user-item';
-                    userItem.dataset.userId = user.id; // Store user ID
-
-                    const userLogoClass = getLogoCssClass(user.profileLogo || getRandomLogoClass());
-
-                    let followBtnHtml = '';
-                    if (currentUser && currentUser.uid !== user.id) { // Don't show follow button for self
-                        const isFollowing = currentUserFollowingList.includes(user.id);
-                        const btnClass = isFollowing ? 'secondary-btn' : 'primary-btn';
-                        const btnText = isFollowing ? 'Following' : 'Follow';
-                        followBtnHtml = `<button class="btn small ${btnClass} follow-btn" data-target-id="${user.id}">${btnText}</button>`;
-                    }
-
-                    userItem.innerHTML = `
-                        <div class="profile-avatar small ${userLogoClass}"></div>
-                        <span class="search-username">@${user.username}</span>
-                        ${followBtnHtml}
-                    `;
-                    followListContent.appendChild(userItem);
-
-                    const followBtn = userItem.querySelector('.follow-btn');
-                    if (followBtn) {
-                        followBtn.addEventListener('click', async (e) => {
-                            e.stopPropagation(); // Prevent opening profile
-                            const targetId = e.target.dataset.targetId;
-                            if (e.target.textContent === 'Follow') {
-                                await handleFollow(targetId);
-                                e.target.textContent = 'Following';
-                                e.target.classList.add('secondary-btn');
-                                e.target.classList.remove('primary-btn');
-                            } else {
-                                await handleUnfollow(targetId);
-                                e.target.textContent = 'Follow';
-                                e.target.classList.add('primary-btn');
-                                e.target.classList.remove('secondary-btn');
-                            }
-                            // Re-fetch current user's profile to update the counts in the header, etc.
-                            loadUserProfile(currentUser.uid);
-                            // Refresh the current follow list modal content to show updated state
-                            showFollowList(userId, type);
-                        });
-                    }
-
-                    // Make the entire list item clickable to open profile
-                    userItem.addEventListener('click', () => {
-                        followListModal.classList.add('hidden'); // Close modal
-                        openUserProfile(user.id); // Open clicked user's profile
-                    });
-                }
-            } catch (error) {
-                console.error("Error loading follow list:", error);
-                followListContent.innerHTML = '<p style="text-align: center; color: red;">Error loading list.</p>';
-                showToast("Error loading follow list.", 'error');
-            }
-        }
-
-        closeFollowListModalBtn.addEventListener('click', () => {
-            followListModal.classList.add('hidden');
-        });
-
-        // Navigate to another user's profile
-        function openUserProfile(userId) {
-            if (currentUser && userId === currentUser.uid) {
-                showScreen('profile-screen'); // If clicking on own profile, just navigate
-                loadUserProfile(currentUser.uid); // Ensure own profile is loaded
-            } else {
-                showScreen('profile-screen');
-                loadUserProfile(userId); // Load specific user's profile
-            }
-        }
-
-        // --- Messaging ---
-        messageUserBtn.addEventListener('click', () => {
-            if (!currentProfileViewingId) {
-                showToast("Select a user to message.", 'error');
-                return;
-            }
-            openChatWindow(currentProfileViewingId);
-        });
-
-        async function loadRecentChats() {
-            if (!currentUser) return;
-            recentChatsList.innerHTML = '<div class="loader" style="margin: 20px auto;"></div>';
-
-            try {
-                const chats = {};
-
-                // Get all messages where current user is a participant
-                // This will effectively group by chat partners
-                // We need an OR query here, which is not directly supported by Firestore compound queries on `where`.
-                // A common workaround is to query for `participants` array containing [user1, user2] sorted.
-                // However, `participants` array can have the user's ID as `sender` or `receiver`.
-                // A more robust approach for recent chats is to have a `userChats` subcollection or a denormalized field.
-                // For simplicity here, we fetch messages where `currentUser.uid` is *either* sender or receiver,
-                // then filter and group client-side. This might be inefficient for very many messages.
-
-                const sentMessagesSnapshot = await db.collection('messages')
-                    .where('senderId', '==', currentUser.uid)
-                    .orderBy('timestamp', 'desc')
-                    .limit(50)
-                    .get();
-
-                sentMessagesSnapshot.docs.forEach(doc => {
-                    const data = doc.data();
-                    const otherParticipantId = data.receiverId;
-                    if (!chats[otherParticipantId] || data.timestamp.toMillis() > chats[otherParticipantId].timestamp) {
-                        chats[otherParticipantId] = {
-                            partnerId: otherParticipantId,
-                            lastMessage: data.content,
-                            timestamp: data.timestamp.toMillis(),
-                            isSender: true
-                        };
-                    }
-                });
-
-                const receivedMessagesSnapshot = await db.collection('messages')
-                    .where('receiverId', '==', currentUser.uid)
-                    .orderBy('timestamp', 'desc')
-                    .limit(50)
-                    .get();
-                
-                receivedMessagesSnapshot.docs.forEach(doc => {
-                    const data = doc.data();
-                    const otherParticipantId = data.senderId;
-                    if (!chats[otherParticipantId] || data.timestamp.toMillis() > chats[otherParticipantId].timestamp) {
-                        chats[otherParticipantId] = {
-                            partnerId: otherParticipantId,
-                            lastMessage: data.content,
-                            timestamp: data.timestamp.toMillis(),
-                            isSender: false
-                        };
-                    }
-                });
-
-
-                const chatPartners = Object.values(chats).sort((a, b) => b.timestamp - a.timestamp);
-
-                if (chatPartners.length === 0) {
-                    recentChatsList.innerHTML = '<p style="text-align: center; color: #ccc;">No recent chats. Start a conversation from a user\'s profile!</p>';
-                    return;
-                }
-
-                recentChatsList.innerHTML = '';
-                // Fetch partner details concurrently
-                const partnerPromises = chatPartners.map(chat => db.collection('users').doc(chat.partnerId).get());
-                const partnerDocs = await Promise.all(partnerPromises);
-
-                partnerDocs.forEach((partnerDoc, index) => {
-                    if (partnerDoc.exists) {
-                        const partnerData = partnerDoc.data();
-                        const chat = chatPartners[index]; // Get corresponding chat object
-                        const chatItem = document.createElement('li');
-                        chatItem.className = 'chat-item';
-                        chatItem.dataset.userId = partnerData.uid;
-
-                        const partnerLogoClass = getLogoCssClass(partnerData.profileLogo || getRandomLogoClass());
-
-                        chatItem.innerHTML = `
-                            <div class="profile-avatar small ${partnerLogoClass}"></div>
-                            <div class="chat-info">
-                                <span class="chat-username">@${partnerData.username}</span>
-                                <span class="last-message">${chat.isSender ? 'You: ' : ''}${chat.lastMessage}</span>
-                            </div>
-                        `;
-                        chatItem.addEventListener('click', () => openChatWindow(partnerData.uid));
-                        recentChatsList.appendChild(chatItem);
-                    }
-                });
-            } catch (error) {
-                console.error("Error loading recent chats:", error);
-                showToast("Error loading chats.", 'error');
-                recentChatsList.innerHTML = '<p style="text-align: center; color: red;">Error loading chats.</p>';
-            }
-        }
-
-        let unsubscribeFromChat = null; // To store the Firestore listener unsubscribe function
-
-        async function openChatWindow(partnerId) {
-            if (!currentUser) return;
-            currentChatPartnerId = partnerId;
-            messageListContainer.classList.add('hidden');
-            chatWindowContainer.classList.remove('hidden');
-            chatMessages.innerHTML = '<div class="loader" style="margin: 20px auto;"></div>';
-
-            // Unsubscribe from previous chat listener if any
-            if (unsubscribeFromChat) {
-                unsubscribeFromChat();
-                unsubscribeFromChat = null;
-            }
-
-            try {
-                const partnerDoc = await db.collection('users').doc(partnerId).get();
-                if (partnerDoc.exists) {
-                    chatPartnerUsername.textContent = `@${partnerDoc.data().username}`;
-                    // Set partner avatar
-                    const partnerAvatar = chatWindowContainer.querySelector('.profile-avatar.small');
-                    const partnerLogoClass = getLogoCssClass(partnerDoc.data().profileLogo || getRandomLogoClass());
-                    partnerAvatar.className = `profile-avatar small ${partnerLogoClass}`;
-                } else {
-                    chatPartnerUsername.textContent = "@UnknownUser";
-                }
-
-                // Real-time listener for messages in the specific chat
-                // The `participants` array should contain both user IDs sorted lexicographically
-                const participantsArray = [currentUser.uid, partnerId].sort();
-
-                unsubscribeFromChat = db.collection('messages')
-                    .where('participants', '==', participantsArray) // Use exact match for sorted array
-                    .orderBy('timestamp', 'asc')
-                    .limit(100) // Limit chat history
-                    .onSnapshot(snapshot => {
-                        chatMessages.innerHTML = ''; // Clear existing messages
-                        snapshot.docs.forEach(doc => {
-                            const message = doc.data();
-                            const messageBubble = document.createElement('div');
-                            messageBubble.className = `message-bubble ${message.senderId === currentUser.uid ? 'right' : 'left'}`;
-                            messageBubble.textContent = message.content;
-                            chatMessages.appendChild(messageBubble);
-                        });
-                        chatMessages.scrollTop = chatMessages.scrollHeight; // Scroll to bottom
-                    }, error => {
-                        console.error("Error getting messages:", error);
-                        chatMessages.innerHTML = '<p style="text-align: center; color: red;">Error loading messages.</p>';
-                        showToast("Error loading messages.", 'error');
-                    });
-
-                // Long press emoji picker for chat messages (similar to posts)
-                const emojiPickerChat = chatWindowContainer.querySelector('.emoji-picker-chat');
-                if (emojiPickerChat) { // Ensure element exists
-                    messageInput.addEventListener('touchstart', (e) => {
-                        clearTimeout(longPressTimer);
-                        longPressTimer = setTimeout(() => {
-                            emojiPickerChat.classList.remove('hidden');
-                        }, 800);
-                    }, { passive: true }); // passive:true for better scroll performance
-
-                    messageInput.addEventListener('touchend', () => {
-                        clearTimeout(longPressTimer);
-                    });
-
-                    // For desktop, right-click to open emoji picker in chat
-                    messageInput.addEventListener('contextmenu', (e) => {
-                        e.preventDefault();
-                        emojiPickerChat.classList.remove('hidden');
-                    });
-
-                    document.addEventListener('click', (e) => {
-                        if (emojiPickerChat && !emojiPickerChat.contains(e.target) && !messageInput.contains(e.target)) {
-                            emojiPickerChat.classList.add('hidden');
-                        }
-                    });
-
-                    emojiPickerChat.querySelectorAll('.emoji-option').forEach(emojiOption => {
-                        emojiOption.addEventListener('click', (e) => {
-                            const selectedEmoji = e.target.dataset.emoji;
-                            messageInput.value += ` ${selectedEmoji} `; // Append emoji to input
-                            emojiPickerChat.classList.add('hidden');
-                        });
-                    });
-                }
-
-
-            } catch (error) {
-                console.error("Error opening chat window:", error);
-                showToast("Failed to open chat. Try again.", 'error');
-            }
-        }
-
-        backToChatsBtn.addEventListener('click', () => {
-            messageListContainer.classList.remove('hidden');
-            chatWindowContainer.classList.add('hidden');
-            currentChatPartnerId = null;
-            // Detach Firestore listener when leaving chat window
-            if (unsubscribeFromChat) {
-                unsubscribeFromChat();
-                unsubscribeFromChat = null;
-            }
-        });
-
-        sendMessageBtn.addEventListener('click', async () => {
-            if (!currentUser || !currentChatPartnerId) return;
-
-            const messageContent = messageInput.value.trim();
-            if (messageContent === '') return;
-
-            // Check credits
-            const userDocRef = db.collection('users').doc(currentUser.uid);
-            const userDoc = await userDocRef.get();
-            const userData = userDoc.data();
-            const currentCredits = userData.credits || 0;
-
-            if (currentCredits < 1) {
-                showToast("You need 1 credit to send a message. Watch an ad to earn.", 'error', 5000);
-                showAdModal('message-credit', { credits: 1 });
-                return;
-            }
-
-            try {
-                await userDocRef.update({
-                    credits: firebase.firestore.FieldValue.increment(-1)
-                });
-
-                const participantsArray = [currentUser.uid, currentChatPartnerId].sort(); // Store sorted for easy query
-
-                await db.collection('messages').add({
-                    senderId: currentUser.uid,
-                    receiverId: currentChatPartnerId,
-                    content: messageContent,
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                    participants: participantsArray, // For easier querying (needs composite index)
-                    read: false // Can be used for read receipts
-                });
-
-                messageInput.value = ''; // Clear input
-                chatMessages.scrollTop = chatMessages.scrollHeight; // Scroll to bottom
-                showToast("Message sent!", 'success');
-
-            } catch (error) {
-                console.error("Error sending message:", error);
-                if (error.code === 'permission-denied' || error.message.includes('Missing or insufficient permissions')) {
-                    showToast("Error sending message: Missing or insufficient permissions. Contact admin.", 'error', 5000);
-                } else {
-                    showToast("Failed to send message. Try again.", 'error');
-                }
-                // Revert credit if failed
-                await userDocRef.update({
-                    credits: firebase.firestore.FieldValue.increment(1)
-                });
-            }
-        });
-
-
-        // --- Search Functionality ---
-        searchBtn.addEventListener('click', () => performSearch());
-        searchQueryInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                performSearch();
-            }
-        });
-
-        async function performSearch() {
-            const query = searchQueryInput.value.trim().toLowerCase();
-            searchUserList.innerHTML = '';
-            searchPostList.innerHTML = '';
-            noSearchResults.classList.add('hidden');
-
-            if (query === '') {
-                showToast("Please enter a search query.", 'info');
-                return;
-            }
-
-            let foundResults = false;
-
-            // Search Users by username_lowercase
-            try {
-                const userSnapshot = await db.collection('users')
-                    .where('username_lowercase', '>=', query)
-                    .where('username_lowercase', '<=', query + '\uf8ff')
-                    .limit(10) // Limit search results
-                    .get();
-
-                if (!userSnapshot.empty) {
-                    foundResults = true;
-                    // Get current user's following list once for efficiency
-                    const currentUserFollowingList = currentUser ? (await db.collection('users').doc(currentUser.uid).get()).data().following || [] : [];
-
-                    userSnapshot.docs.forEach(doc => {
-                        const userData = { id: doc.id, ...doc.data() };
-                        const userItem = document.createElement('li');
-                        userItem.className = 'search-user-item';
-                        userItem.dataset.userId = userData.id;
-
-                        const userLogoClass = getLogoCssClass(userData.profileLogo || getRandomLogoClass());
-
-                        let followBtnHtml = '';
-                        if (currentUser && currentUser.uid !== userData.id) { // Don't show follow button for self
-                            const isFollowing = currentUserFollowingList.includes(userData.id);
-                            const btnClass = isFollowing ? 'secondary-btn' : 'primary-btn';
-                            const btnText = isFollowing ? 'Following' : 'Follow';
-                            followBtnHtml = `<button class="btn small ${btnClass} follow-btn" data-target-id="${userData.id}">${btnText}</button>`;
-                        }
-
-                        userItem.innerHTML = `
-                            <div class="profile-avatar small ${userLogoClass}"></div>
-                            <span class="search-username">@${userData.username}</span>
-                            ${followBtnHtml}
-                        `;
-                        searchUserList.appendChild(userItem);
-
-                        const followBtn = userItem.querySelector('.follow-btn');
-                        if (followBtn) {
-                            followBtn.addEventListener('click', async (e) => {
-                                e.stopPropagation(); // Prevent opening profile
-                                const targetId = e.target.dataset.targetId;
-                                if (e.target.textContent === 'Follow') {
-                                    await handleFollow(targetId);
-                                    e.target.textContent = 'Following';
-                                    e.target.classList.add('secondary-btn');
-                                    e.target.classList.remove('primary-btn');
-                                } else {
-                                    await handleUnfollow(targetId);
-                                    e.target.textContent = 'Follow';
-                                    e.target.classList.add('primary-btn');
-                                    e.target.classList.remove('secondary-btn');
-                                }
-                                loadUserProfile(currentUser.uid); // Refresh counts
-                            });
-                        }
-                        userItem.addEventListener('click', () => openUserProfile(userData.id));
-                    });
-                }
-            } catch (error) {
-                console.error("Error searching users:", error);
-                showToast("Error searching users.", 'error');
-            }
-
-            // Search Posts (by content, basic matching)
-            try {
-                // This is highly inefficient for large datasets for full-text search.
-                // For production, use Algolia or client-side indexing.
-                const postSnapshot = await db.collection('posts')
-                    .where('expiryTime', '>', firebase.firestore.Timestamp.now()) // Only show unexpired posts
-                    .orderBy('expiryTime', 'desc')
-                    .orderBy('timestamp', 'desc')
-                    .limit(50) // Search more posts to find matches
-                    .get();
-
-                postSnapshot.docs.forEach(doc => {
-                    const postData = { id: doc.id, ...doc.data() };
-                    // Simple client-side check if content includes query (case-insensitive)
-                    if (postData.content && postData.content.toLowerCase().includes(query)) {
-                        foundResults = true;
-                        renderPost(postData, searchPostList); // Render into searchPostList
-                    }
-                });
-            } catch (error) {
-                console.error("Error searching posts:", error);
-                showToast("Error searching posts.", 'error');
-            }
-
-            if (!foundResults) {
-                noSearchResults.classList.remove('hidden');
-            }
-        }
-
-        // --- Post Options (Report/Delete/Copy Link/Remix) ---
-        async function handleReportPost(postId) {
-            if (!currentUser) {
-                showToast("Please log in to report posts.", 'info');
-                return;
-            }
-            // Implement reporting logic (e.g., add to a 'reports' collection)
-            try {
-                await db.collection('reports').add({
-                    postId: postId,
-                    reportedBy: currentUser.uid,
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                    status: 'pending'
-                });
-                showToast("Post reported successfully. We will review it.", 'info');
-            } catch (error) {
-                console.error("Error reporting post:", error);
-                showToast("Failed to report post.", 'error');
-            }
-        }
-
-        async function handleCopyPostLink(postId) {
-            // In a real app, this would generate a unique shareable link
-            const dummyLink = `https://n-phi-ten.vercel.app/post/${postId}`; // Use your deployed URL
-            try {
-                await navigator.clipboard.writeText(dummyLink);
-                showToast("Post link copied to clipboard!", 'success');
-            } catch (err) {
-                console.error('Failed to copy text: ', err);
-                showToast("Failed to copy link.", 'error');
-            }
-        }
-
-        // NEW: Remix Post Functionality
-        function handleRemixPost(originalPostElement, originalPostId, originalContent) {
-            if (!currentUser) {
-                showToast("Please log in to remix posts.", 'info');
-                return;
-            }
-
-            // Visually highlight the post being remixed
-            originalPostElement.classList.add('remixed');
-            originalPostElement.style.animation = 'shake 0.5s'; // Simple animation
-
-            showToast("Remix mode activated! Your next post will be a remix.", 'info', 3000);
-
-            // Navigate to upload screen
-            showScreen('upload-screen');
-            // Pre-fill content input with original content and indicate remix
-            postContentInput.value = `"${originalContent}" (Remix of post ${originalPostId})\nMy thoughts: `;
-            // You might want to store originalPostId temporarily for the next upload.
-            sessionStorage.setItem('remixOriginalPostId', originalPostId);
-            sessionStorage.setItem('remixOriginalContent', originalContent);
-
-            // Scroll to the top of the upload screen if necessary
-            uploadScreen.scrollTop = 0;
-
-            // Remove shake animation after it finishes
-            originalPostElement.addEventListener('animationend', () => {
-                originalPostElement.style.animation = '';
-            }, { once: true });
-        }
-
-        // Adjust publishPostBtn to handle remix logic
-        // Remove existing event listener to avoid duplicates if script re-runs (not common but good practice)
-        // No explicit removal needed if event listener is added only once.
-
-        // Re-add or ensure the listener is set up correctly:
-        publishPostBtn.addEventListener('click', async () => { // This will now correctly attach if it's the first time
             if (!currentUser) {
                 showToast("Please log in to upload posts.", 'error');
                 return;
@@ -4468,13 +3231,14 @@
             publishPostBtn.disabled = true;
 
             try {
+                const imageUrl = ''; // Image upload is disabled
                 const newPostRef = db.collection('posts').doc();
                 await newPostRef.set({
                     userId: currentUser.uid,
                     username: userData.username,
                     userProfileLogo: userData.profileLogo || getRandomLogoClass(),
                     content: content,
-                    imageUrl: '', // Image upload is disabled
+                    imageUrl: imageUrl,
                     timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                     likes: 0,
                     views: 0,
@@ -4482,7 +3246,7 @@
                     userReactions: {},
                     boostHours: boostHours,
                     expiryTime: firebase.firestore.Timestamp.fromMillis(Date.now() + (boostHours * 60 * 60 * 1000)),
-                    isRemix: !!remixOriginalPostId, // Convert to boolean
+                    isRemix: !!remixOriginalPostId,
                     remixOf: remixOriginalPostId || null,
                     remixOfContent: remixOriginalContent || null
                 });
@@ -4495,7 +3259,7 @@
                 showToast("Post uploaded successfully!", 'success');
                 postContentInput.value = '';
                 postBoostSelect.value = '12';
-                sessionStorage.removeItem('remixOriginalPostId'); // Clear remix state
+                sessionStorage.removeItem('remixOriginalPostId');
                 sessionStorage.removeItem('remixOriginalContent');
                 showScreen('home-screen');
                 postsFeed.innerHTML = '';
@@ -4506,7 +3270,7 @@
                 console.error("Error publishing post:", error);
                 uploadStatus.textContent = `Error: ${error.message}`;
                 showToast("Failed to upload post. Try again.", 'error');
-                await userDocRef.update({ // Revert resources
+                await userDocRef.update({
                     postLimit: firebase.firestore.FieldValue.increment(requiredLimit),
                     coins: firebase.firestore.FieldValue.increment(coinCost)
                 });
@@ -4515,11 +3279,1035 @@
             }
         });
 
+        // Ad Modal Logic
+        function showAdModal(purpose, details = {}) {
+            currentAdPurpose = purpose;
+            adRewardDetails = details;
+            adModal.classList.remove('hidden');
+            closeAdModalBtn.disabled = true;
+
+            const adPlaceholder = document.getElementById('ad-placeholder');
+            adPlaceholder.innerHTML = '<p>Simulating Ad (5 seconds)...</p><div class="loader"></div>';
+            
+            setTimeout(() => {
+                adPlaceholder.innerHTML = '<p>Ad Completed! Click "Close Ad" to claim reward.</p>';
+                closeAdModalBtn.disabled = false;
+            }, 5000);
+        }
+
+        closeAdModalBtn.addEventListener('click', async () => {
+            adModal.classList.add('hidden');
+            await processAdReward();
+        });
+
+        async function processAdReward() {
+            if (!currentUser) return;
+
+            try {
+                const userDocRef = db.collection('users').doc(currentUser.uid);
+                let rewardMessageText = "Reward Claimed: ";
+                let updateData = {};
+
+                updateData.mint = firebase.firestore.FieldValue.increment(1);
+                rewardMessageText += `+1 Mint`;
+
+                if (currentAdPurpose === 'coins') {
+                    const coinsToAward = adRewardDetails.coins || 10;
+                    updateData.coins = firebase.firestore.FieldValue.increment(coinsToAward);
+                    rewardMessageText += `, +${coinsToAward} Coins`;
+                } else if (currentAdPurpose === 'credits') {
+                    const creditsToAward = adRewardDetails.credits || 5;
+                    updateData.credits = firebase.firestore.FieldValue.increment(creditsToAward);
+                    rewardMessageText += `, +${creditsToAward} Credits`;
+                } else if (currentAdPurpose === 'limit') {
+                    const limitsToAward = adRewardDetails.limit || 1;
+                    updateData.postLimit = firebase.firestore.FieldValue.increment(limitsToAward);
+                    rewardMessageText += `, +${limitsToAward} Post Limit`;
+                } else if (currentAdPurpose === 'message-credit') {
+                    const creditsToAward = adRewardDetails.credits || 1;
+                    updateData.credits = firebase.firestore.FieldValue.increment(creditsToAward);
+                    rewardMessageText += `, +${creditsToAward} Credits for Messaging`;
+                } else if (currentAdPurpose === 'daily-reward') {
+                    updateData.coins = firebase.firestore.FieldValue.increment(adRewardDetails.coins);
+                    updateData.credits = firebase.firestore.FieldValue.increment(adRewardDetails.credits);
+                    updateData.postLimit = firebase.firestore.FieldValue.increment(adRewardDetails.limit);
+                    updateData.lastRewardClaim = Date.now();
+                    rewardMessageText = `You claimed your daily reward!\n+${adRewardDetails.coins} Coins, +${adRewardDetails.credits} Credits, +${adRewardDetails.limit} Limits, +1 Mint.`;
+                }
+
+                if (Object.keys(updateData).length > 0) {
+                    await userDocRef.update(updateData);
+                    showRewardPopup(rewardMessageText);
+                    showToast("Reward processed!", 'success');
+                } else {
+                    showToast("No specific reward defined for this ad purpose.", 'info');
+                }
+
+            } catch (error) {
+                console.error("Error processing ad reward:", error);
+                showToast("Failed to process ad reward. Try again.", 'error');
+            } finally {
+                currentAdPurpose = '';
+                adRewardDetails = {};
+            }
+        }
+
+        // Withdraw Mint Modal
+        withdrawCoinsBtn.addEventListener('click', async () => {
+            if (!currentUser) {
+                showToast("Please log in to withdraw Mint.", 'info');
+                return;
+            }
+            try {
+                const userDoc = await db.collection('users').doc(currentUser.uid).get();
+                const currentMint = userDoc.data().mint || 0;
+                currentMintBalance.textContent = `${formatNumber(currentMint)} M`;
+
+                if (currentMint < 1000) {
+                    showToast(`You need at least 1,000 Mint to withdraw. You have ${formatNumber(currentMint)} M.`, 'error', 5000);
+                    return;
+                }
+                withdrawModal.classList.remove('hidden');
+            } catch (error) {
+                console.error("Error checking mint balance:", error);
+                showToast("Could not retrieve Mint balance.", 'error');
+            }
+        });
+
+        closeWithdrawModalBtn.addEventListener('click', () => {
+            withdrawModal.classList.add('hidden');
+        });
+
+        confirmWithdrawBtn.addEventListener('click', async () => {
+            if (!currentUser) return;
+
+            const paypalEmail = withdrawPaypalEmail.value.trim();
+            const realName = withdrawRealName.value.trim();
+            const age = parseInt(withdrawAge.value.trim());
+            const dob = withdrawDob.value.trim();
+
+            if (!paypalEmail || !realName || isNaN(age) || !dob) {
+                showToast("Please fill all withdrawal details.", 'error');
+                return;
+            }
+            if (age < 13) {
+                showToast("You must be at least 13 years old to withdraw.", 'error');
+                return;
+            }
+
+            try {
+                const userDocRef = db.collection('users').doc(currentUser.uid);
+                const userDoc = await userDocRef.get();
+                const userData = userDoc.data();
+                const currentMint = userData.mint || 0;
+
+                if (currentMint < 1000) {
+                    showToast(`You need at least 1,000 Mint to withdraw. You have ${formatNumber(currentMint)} M.`, 'error', 5000);
+                    return;
+                }
+
+                showToast("Processing withdrawal request...", 'info', 5000);
+                
+                await userDocRef.update({
+                    mint: 0
+                });
+
+                showToast("Withdrawal request submitted! You will receive an email shortly regarding your payment within 1-15 business days.", 'success', 8000);
+                console.log("Withdrawal details (simulated):", {
+                    userId: currentUser.uid,
+                    username: userData.username,
+                    userEmail: currentUser.email,
+                    amountMint: currentMint,
+                    paypalEmail: paypalEmail,
+                    realName: realName,
+                    age: age,
+                    dob: dob,
+                    timestamp: new Date().toISOString()
+                });
+
+                withdrawModal.classList.add('hidden');
+                withdrawPaypalEmail.value = '';
+                withdrawRealName.value = '';
+                withdrawAge.value = '';
+                withdrawDob.value = '';
+
+            } catch (error) {
+                console.error("Error initiating withdrawal:", error);
+                showToast("Failed to submit withdrawal request. Please try again.", 'error');
+            }
+        });
+
+
+        // --- Profile Management ---
+        async function loadUserProfile(userId) {
+            if (!userId) {
+                showToast("User ID is missing to load profile.", 'error');
+                return;
+            }
+            currentProfileViewingId = userId;
+
+            try {
+                const userDoc = await db.collection('users').doc(userId).get();
+                if (userDoc.exists) {
+                    const userData = userDoc.data();
+                    updateProfileDisplay(userData);
+                    loadProfilePosts(userId);
+
+                    if (userId === currentUser.uid) {
+                        editProfileBtn.classList.remove('hidden');
+                        followUserBtn.classList.add('hidden');
+                        unfollowUserBtn.classList.add('hidden');
+                        messageUserBtn.classList.add('hidden');
+                        profileWhatsappLink.classList.add('hidden');
+                        profileInstagramLink.classList.add('hidden');
+                    } else {
+                        editProfileBtn.classList.add('hidden');
+                        messageUserBtn.classList.remove('hidden');
+                        const currentUserDoc = await db.collection('users').doc(currentUser.uid).get();
+                        const currentUserData = currentUserDoc.data();
+                        if (currentUserData.following && currentUserData.following.includes(userId)) {
+                            followUserBtn.classList.add('hidden');
+                            unfollowUserBtn.classList.remove('hidden');
+                        } else {
+                            followUserBtn.classList.remove('hidden');
+                            unfollowUserBtn.classList.add('hidden');
+                        }
+
+                        if (userData.whatsapp) {
+                            profileWhatsappLink.classList.remove('hidden');
+                            profileWhatsappLink.href = `https://wa.me/${userData.whatsapp.replace(/\D/g, '')}`;
+                        } else {
+                            profileWhatsappLink.classList.add('hidden');
+                            profileWhatsappLink.removeAttribute('href');
+                        }
+                        if (userData.instagram) {
+                            profileInstagramLink.classList.remove('hidden');
+                            profileInstagramLink.href = `https://www.instagram.com/${userData.instagram}`;
+                        } else {
+                            profileInstagramLink.classList.add('hidden');
+                            profileInstagramLink.removeAttribute('href');
+                        }
+                    }
+                } else {
+                    showToast("User profile not found.", 'error');
+                    if (userId !== currentUser.uid) {
+                        showScreen('home-screen');
+                    }
+                }
+            } catch (error) {
+                console.error("Error loading user profile:", error);
+                showToast("Error loading profile. Try again.", 'error');
+            }
+        }
+
+        function updateProfileDisplay(userData) {
+            const isCurrentUserProfile = (currentUser && userData.uid === currentUser.uid);
+
+            myProfileUsername.textContent = `@${userData.username || 'NewUser'}`;
+            currentProfileUsernamePosts.textContent = userData.username || 'Me';
+
+            const profileLogoClass = getLogoCssClass(userData.profileLogo || getRandomLogoClass());
+            myProfileAvatar.className = `profile-avatar-large ${profileLogoClass}`;
+
+            myPostsCount.textContent = formatNumber(userData.postCount || 0);
+            myFollowersCount.textContent = formatNumber(userData.followersCount || 0);
+            myFollowingCount.textContent = formatNumber(userData.followingCount || 0);
+
+            if (isCurrentUserProfile) {
+                editUsernameInput.value = userData.username || '';
+                editWhatsappInput.value = userData.whatsapp || '';
+                editInstagramInput.value = userData.instagram || '';
+                populateProfileLogoOptions(userData.profileLogo);
+            }
+        }
+
+        async function loadProfilePosts(userId) {
+            profilePostsFeed.innerHTML = '<div class="loader" style="margin: 20px auto;"></div>';
+            try {
+                const querySnapshot = await db.collection('posts')
+                    .where('userId', '==', userId)
+                    .where('expiryTime', '>', firebase.firestore.Timestamp.now())
+                    .orderBy('expiryTime', 'desc')
+                    .orderBy('timestamp', 'desc')
+                    .limit(10)
+                    .get();
+
+                profilePostsFeed.innerHTML = '';
+
+                if (querySnapshot.empty) {
+                    profilePostsFeed.innerHTML = '<p style="text-align: center; color: #ccc;">No posts yet.</p>';
+                    return;
+                }
+
+                querySnapshot.docs.forEach(doc => {
+                    renderPost({ id: doc.id, ...doc.data() }, profilePostsFeed);
+                });
+            } catch (error) {
+                console.error("Error loading profile posts:", error);
+                profilePostsFeed.innerHTML = '<p style="text-align: center; color: red;">Error loading posts.</p>';
+            }
+        }
+
+        // Edit Profile Modal
+        editProfileBtn.addEventListener('click', () => {
+            editProfileModal.classList.remove('hidden');
+        });
+
+        cancelEditProfileBtn.addEventListener('click', () => {
+            editProfileModal.classList.add('hidden');
+        });
+
+        // Username Availability Check
+        let usernameCheckTimeout;
+        editUsernameInput.addEventListener('input', async () => {
+            clearTimeout(usernameCheckTimeout);
+            usernameAvailability.textContent = '';
+            usernameAvailability.className = '';
+
+            const newUsername = editUsernameInput.value.trim();
+            if (newUsername === '') {
+                usernameAvailability.textContent = 'Username cannot be empty.';
+                usernameAvailability.classList.add('error-text');
+                return;
+            }
+
+            const userDoc = await db.collection('users').doc(currentUser.uid).get();
+            const currentUsername = userDoc.data().username;
+
+            if (newUsername.toLowerCase() === (currentUsername ? currentUsername.toLowerCase() : '')) {
+                usernameAvailability.textContent = 'Username is available.';
+                usernameAvailability.classList.add('success-text');
+                return;
+            }
+
+            usernameCheckTimeout = setTimeout(async () => {
+                try {
+                    const usersRef = db.collection('users');
+                    const snapshot = await usersRef.where('username_lowercase', '==', newUsername.toLowerCase()).get();
+
+                    if (snapshot.empty) {
+                        usernameAvailability.textContent = 'Username is available.';
+                        usernameAvailability.classList.add('success-text');
+                    } else {
+                        usernameAvailability.textContent = 'Username already taken.';
+                        usernameAvailability.classList.add('error-text');
+                    }
+                } catch (error) {
+                    console.error("Error checking username availability:", error);
+                    usernameAvailability.textContent = 'Error checking username.';
+                    usernameAvailability.classList.add('error-text');
+                }
+            }, 500);
+        });
+
+        // Populate Profile Logo Options
+        function populateProfileLogoOptions(currentLogoClass) {
+            profileLogoOptions.innerHTML = '';
+            PROFILE_LOGOS.forEach(logo => {
+                const logoItem = document.createElement('div');
+                logoItem.className = `logo-option-item profile-avatar user-${logo.class}`;
+                logoItem.dataset.logoClass = logo.class;
+                
+                // Set inline style for emoji and background color
+                logoItem.style.backgroundColor = logo.color;
+                logoItem.innerHTML = `<span style="font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #1a1a2e;">${logo.emoji}</span>`;
+
+                if (currentLogoClass === logo.class) {
+                    logoItem.classList.add('selected');
+                }
+
+                logoItem.addEventListener('click', () => {
+                    profileLogoOptions.querySelectorAll('.logo-option-item').forEach(item => item.classList.remove('selected'));
+                    logoItem.classList.add('selected');
+                });
+                profileLogoOptions.appendChild(logoItem);
+            });
+        }
+
+        // Save Profile Changes
+        saveProfileBtn.addEventListener('click', async () => {
+            if (!currentUser) return;
+
+            const newUsername = editUsernameInput.value.trim();
+            const newWhatsapp = editWhatsappInput.value.trim();
+            const newInstagram = editInstagramInput.value.trim();
+            const selectedLogoElement = profileLogoOptions.querySelector('.logo-option-item.selected');
+            const newProfileLogo = selectedLogoElement ? selectedLogoElement.dataset.logoClass : null;
+
+            if (newUsername === '') {
+                showToast("Username cannot be empty.", 'error');
+                return;
+            }
+
+            try {
+                const userDocRef = db.collection('users').doc(currentUser.uid);
+                const userDoc = await userDocRef.get();
+                const currentData = userDoc.data();
+
+                if (newUsername.toLowerCase() !== (currentData.username ? currentData.username.toLowerCase() : '')) {
+                    const usernameSnapshot = await db.collection('users').where('username_lowercase', '==', newUsername.toLowerCase()).get();
+                    if (!usernameSnapshot.empty) {
+                        showToast("Username already taken. Please choose another.", 'error');
+                        return;
+                    }
+                }
+
+                await userDocRef.update({
+                    username: newUsername,
+                    username_lowercase: newUsername.toLowerCase(),
+                    whatsapp: newWhatsapp,
+                    instagram: newInstagram,
+                    profileLogo: newProfileLogo,
+                    followersCount: currentData.followersCount || 0,
+                    followingCount: currentData.followingCount || 0,
+                    postCount: currentData.postCount || 0,
+                    coins: currentData.coins !== undefined ? currentData.coins : 100,
+                    credits: currentData.credits !== undefined ? currentData.credits : 50,
+                    postLimit: currentData.postLimit !== undefined ? currentData.postLimit : 5,
+                    mint: currentData.mint !== undefined ? currentData.mint : 0,
+                    lastRewardClaim: currentData.lastRewardClaim !== undefined ? currentData.lastRewardClaim : 0
+                });
+
+                if (newUsername.toLowerCase() !== (currentData.username ? currentData.username.toLowerCase() : '') || newProfileLogo !== currentData.profileLogo) {
+                    const postsSnapshot = await db.collection('posts').where('userId', '==', currentUser.uid).get();
+                    const batch = db.batch();
+                    postsSnapshot.docs.forEach(doc => {
+                        const postRef = db.collection('posts').doc(doc.id);
+                        batch.update(postRef, {
+                            username: newUsername,
+                            userProfileLogo: newProfileLogo
+                        });
+                    });
+                    await batch.commit();
+                }
+
+                editProfileModal.classList.add('hidden');
+                showToast("Profile updated successfully!", 'success');
+                loadUserProfile(currentUser.uid);
+            } catch (error) {
+                console.error("Error saving profile:", error);
+                showToast("Failed to save profile. Please try again.", 'error');
+            }
+        });
+
+        // Follow/Unfollow Logic
+        followUserBtn.addEventListener('click', () => handleFollow(currentProfileViewingId));
+        unfollowUserBtn.addEventListener('click', () => handleUnfollow(currentProfileViewingId));
+
+        async function handleFollow(targetUserId) {
+            if (!currentUser || currentUser.uid === targetUserId) {
+                showToast("Cannot follow yourself or not logged in.", 'info');
+                return;
+            }
+
+            try {
+                const currentUserRef = db.collection('users').doc(currentUser.uid);
+                const targetUserRef = db.collection('users').doc(targetUserId);
+
+                const result = await db.runTransaction(async (transaction) => {
+                    const currentUserDoc = await transaction.get(currentUserRef);
+                    const targetUserDoc = await transaction.get(targetUserRef);
+
+                    if (!currentUserDoc.exists || !targetUserDoc.exists) {
+                        throw new Error("User not found.");
+                    }
+
+                    const currentUserData = currentUserDoc.data();
+                    
+                    if (currentUserData.following && currentUserData.following.includes(targetUserId)) {
+                        return { status: 'already-following' };
+                    }
+
+                    transaction.update(currentUserRef, {
+                        following: firebase.firestore.FieldValue.arrayUnion(targetUserId),
+                        followingCount: firebase.firestore.FieldValue.increment(1)
+                    });
+
+                    transaction.update(targetUserRef, {
+                        followers: firebase.firestore.FieldValue.arrayUnion(currentUser.uid),
+                        followersCount: firebase.firestore.FieldValue.increment(1)
+                    });
+                    return { status: 'followed' };
+                });
+
+                if (result.status === 'followed') {
+                    showToast("Followed user!", 'success');
+                    followUserBtn.classList.add('hidden');
+                    unfollowUserBtn.classList.remove('hidden');
+                    loadUserProfile(currentProfileViewingId);
+                } else if (result.status === 'already-following') {
+                    showToast("Already following this user.", 'info');
+                }
+
+            } catch (error) {
+                console.error("Error following user:", error);
+                showToast(`Failed to follow: ${error.message}`, 'error');
+            }
+        }
+
+        async function handleUnfollow(targetUserId) {
+            if (!currentUser || currentUser.uid === targetUserId) {
+                showToast("Cannot unfollow yourself or not logged in.", 'info');
+                return;
+            }
+
+            try {
+                const currentUserRef = db.collection('users').doc(currentUser.uid);
+                const targetUserRef = db.collection('users').doc(targetUserId);
+
+                const result = await db.runTransaction(async (transaction) => {
+                    const currentUserDoc = await transaction.get(currentUserRef);
+                    const targetUserDoc = await transaction.get(targetUserRef);
+
+                    if (!currentUserDoc.exists || !targetUserDoc.exists) {
+                        throw new Error("User not found.");
+                    }
+
+                    const currentUserData = currentUserDoc.data();
+                    
+                    if (!currentUserData.following || !currentUserData.following.includes(targetUserId)) {
+                        return { status: 'not-following' };
+                    }
+
+                    transaction.update(currentUserRef, {
+                        following: firebase.firestore.FieldValue.arrayRemove(targetUserId),
+                        followingCount: firebase.firestore.FieldValue.increment(-1)
+                    });
+
+                    transaction.update(targetUserRef, {
+                        followers: firebase.firestore.FieldValue.arrayRemove(currentUser.uid),
+                        followersCount: firebase.firestore.FieldValue.increment(-1)
+                    });
+                    return { status: 'unfollowed' };
+                });
+
+                if (result.status === 'unfollowed') {
+                    showToast("Unfollowed user.", 'info');
+                    followUserBtn.classList.remove('hidden');
+                    unfollowUserBtn.classList.add('hidden');
+                    loadUserProfile(currentProfileViewingId);
+                } else if (result.status === 'not-following') {
+                    showToast("Not currently following this user.", 'info');
+                }
+
+            } catch (error) {
+                console.error("Error unfollowing user:", error);
+                showToast(`Failed to unfollow: ${error.message}`, 'error');
+            }
+        }
+
+        // View Followers/Following Lists
+        document.querySelectorAll('.clickable-stat').forEach(stat => {
+            stat.addEventListener('click', (e) => {
+                const statType = e.currentTarget.dataset.stat;
+                const userId = currentProfileViewingId;
+                if (userId && (statType === 'followers' || statType === 'following')) {
+                    showFollowList(userId, statType);
+                }
+            });
+        });
+
+        async function showFollowList(userId, type) {
+            followListContent.innerHTML = '<div class="loader" style="margin: 20px auto;"></div>';
+            followListTitle.textContent = type === 'followers' ? 'Followers' : 'Following';
+            followListModal.classList.remove('hidden');
+
+            try {
+                const userDoc = await db.collection('users').doc(userId).get();
+                if (!userDoc.exists) {
+                    followListContent.innerHTML = '<p style="text-align: center;">User not found.</p>';
+                    return;
+                }
+
+                const userRefs = userDoc.data()[type] || [];
+                if (userRefs.length === 0) {
+                    followListContent.innerHTML = `<p style="text-align: center;">No ${type} found.</p>`;
+                    return;
+                }
+
+                const usersData = [];
+                const userPromises = userRefs.map(uid => db.collection('users').doc(uid).get());
+                const userDocs = await Promise.all(userPromises);
+
+                userDocs.forEach(refDoc => {
+                    if (refDoc.exists) {
+                        usersData.push({ id: refDoc.id, ...refDoc.data() });
+                    }
+                });
+
+                followListContent.innerHTML = '';
+                const currentUserFollowingList = currentUser ? (await db.collection('users').doc(currentUser.uid).get()).data().following || [] : [];
+
+                usersData.forEach(user => {
+                    const userItem = document.createElement('li');
+                    userItem.className = 'search-user-item';
+                    userItem.dataset.userId = user.id;
+
+                    const userLogoClass = getLogoCssClass(user.profileLogo || getRandomLogoClass());
+
+                    let followBtnHtml = '';
+                    if (currentUser && currentUser.uid !== user.id) {
+                        const isFollowing = currentUserFollowingList.includes(user.id);
+                        const btnClass = isFollowing ? 'secondary-btn' : 'primary-btn';
+                        const btnText = isFollowing ? 'Following' : 'Follow';
+                        followBtnHtml = `<button class="btn small ${btnClass} follow-btn" data-target-id="${user.id}">${btnText}</button>`;
+                    }
+
+                    userItem.innerHTML = `
+                        <div class="profile-avatar small ${userLogoClass}"></div>
+                        <span class="search-username">@${user.username}</span>
+                        ${followBtnHtml}
+                    `;
+                    followListContent.appendChild(userItem);
+
+                    const followBtn = userItem.querySelector('.follow-btn');
+                    if (followBtn) {
+                        followBtn.addEventListener('click', async (e) => {
+                            e.stopPropagation();
+                            const targetId = e.target.dataset.targetId;
+                            if (e.target.textContent === 'Follow') {
+                                await handleFollow(targetId);
+                                e.target.textContent = 'Following';
+                                e.target.classList.add('secondary-btn');
+                                e.target.classList.remove('primary-btn');
+                            } else {
+                                await handleUnfollow(targetId);
+                                e.target.textContent = 'Follow';
+                                e.target.classList.add('primary-btn');
+                                e.target.classList.remove('secondary-btn');
+                            }
+                            loadUserProfile(currentUser.uid);
+                            showFollowList(userId, type);
+                        });
+                    }
+
+                    userItem.addEventListener('click', () => {
+                        followListModal.classList.add('hidden');
+                        openUserProfile(user.id);
+                    });
+                });
+            } catch (error) {
+                console.error("Error loading follow list:", error);
+                followListContent.innerHTML = '<p style="text-align: center; color: red;">Error loading list.</p>';
+                showToast("Error loading follow list.", 'error');
+            }
+        }
+
+        closeFollowListModalBtn.addEventListener('click', () => {
+            followListModal.classList.add('hidden');
+        });
+
+        function openUserProfile(userId) {
+            if (currentUser && userId === currentUser.uid) {
+                showScreen('profile-screen');
+                loadUserProfile(currentUser.uid);
+            } else {
+                showScreen('profile-screen');
+                loadUserProfile(userId);
+            }
+        }
+
+        // --- Messaging ---
+        messageUserBtn.addEventListener('click', () => {
+            if (!currentProfileViewingId) {
+                showToast("Select a user to message.", 'error');
+                return;
+            }
+            openChatWindow(currentProfileViewingId);
+        });
+
+        async function loadRecentChats() {
+            if (!currentUser) return;
+            recentChatsList.innerHTML = '<div class="loader" style="margin: 20px auto;"></div>';
+
+            try {
+                const chats = {};
+
+                const sentMessagesSnapshot = await db.collection('messages')
+                    .where('senderId', '==', currentUser.uid)
+                    .orderBy('timestamp', 'desc')
+                    .limit(50)
+                    .get();
+
+                sentMessagesSnapshot.docs.forEach(doc => {
+                    const data = doc.data();
+                    const otherParticipantId = data.receiverId;
+                    if (!chats[otherParticipantId] || data.timestamp.toMillis() > chats[otherParticipantId].timestamp) {
+                        chats[otherParticipantId] = {
+                            partnerId: otherParticipantId,
+                            lastMessage: data.content,
+                            timestamp: data.timestamp.toMillis(),
+                            isSender: true
+                        };
+                    }
+                });
+
+                const receivedMessagesSnapshot = await db.collection('messages')
+                    .where('receiverId', '==', currentUser.uid)
+                    .orderBy('timestamp', 'desc')
+                    .limit(50)
+                    .get();
+                
+                receivedMessagesSnapshot.docs.forEach(doc => {
+                    const data = doc.data();
+                    const otherParticipantId = data.senderId;
+                    if (!chats[otherParticipantId] || data.timestamp.toMillis() > chats[otherParticipantId].timestamp) {
+                        chats[otherParticipantId] = {
+                            partnerId: otherParticipantId,
+                            lastMessage: data.content,
+                            timestamp: data.timestamp.toMillis(),
+                            isSender: false
+                        };
+                    }
+                });
+
+                const chatPartners = Object.values(chats).sort((a, b) => b.timestamp - a.timestamp);
+
+                if (chatPartners.length === 0) {
+                    recentChatsList.innerHTML = '<p style="text-align: center; color: #ccc;">No recent chats. Start a conversation from a user\'s profile!</p>';
+                    return;
+                }
+
+                recentChatsList.innerHTML = '';
+                const partnerPromises = chatPartners.map(chat => db.collection('users').doc(chat.partnerId).get());
+                const partnerDocs = await Promise.all(partnerPromises);
+
+                partnerDocs.forEach((partnerDoc, index) => {
+                    if (partnerDoc.exists) {
+                        const partnerData = partnerDoc.data();
+                        const chat = chatPartners[index];
+                        const chatItem = document.createElement('li');
+                        chatItem.className = 'chat-item';
+                        chatItem.dataset.userId = partnerData.uid;
+
+                        const partnerLogoClass = getLogoCssClass(partnerData.profileLogo || getRandomLogoClass());
+
+                        chatItem.innerHTML = `
+                            <div class="profile-avatar small ${partnerLogoClass}"></div>
+                            <div class="chat-info">
+                                <span class="chat-username">@${partnerData.username}</span>
+                                <span class="last-message">${chat.isSender ? 'You: ' : ''}${chat.lastMessage}</span>
+                            </div>
+                        `;
+                        chatItem.addEventListener('click', () => openChatWindow(partnerData.uid));
+                        recentChatsList.appendChild(chatItem);
+                    }
+                });
+            } catch (error) {
+                console.error("Error loading recent chats:", error);
+                showToast("Error loading chats.", 'error');
+                recentChatsList.innerHTML = '<p style="text-align: center; color: red;">Error loading chats.</p>';
+            }
+        }
+
+        async function openChatWindow(partnerId) {
+            if (!currentUser) return;
+            currentChatPartnerId = partnerId;
+            messageListContainer.classList.add('hidden');
+            chatWindowContainer.classList.remove('hidden');
+            chatMessages.innerHTML = '<div class="loader" style="margin: 20px auto;"></div>';
+
+            if (unsubscribeFromChat) {
+                unsubscribeFromChat();
+                unsubscribeFromChat = null;
+            }
+
+            try {
+                const partnerDoc = await db.collection('users').doc(partnerId).get();
+                if (partnerDoc.exists) {
+                    chatPartnerUsername.textContent = `@${partnerDoc.data().username}`;
+                    const partnerAvatar = chatWindowContainer.querySelector('.profile-avatar.small');
+                    const partnerLogoClass = getLogoCssClass(partnerDoc.data().profileLogo || getRandomLogoClass());
+                    partnerAvatar.className = `profile-avatar small ${partnerLogoClass}`;
+                } else {
+                    chatPartnerUsername.textContent = "@UnknownUser";
+                }
+
+                const participantsArray = [currentUser.uid, partnerId].sort();
+
+                unsubscribeFromChat = db.collection('messages')
+                    .where('participants', '==', participantsArray)
+                    .orderBy('timestamp', 'asc')
+                    .limit(100)
+                    .onSnapshot(snapshot => {
+                        chatMessages.innerHTML = '';
+                        snapshot.docs.forEach(doc => {
+                            const message = doc.data();
+                            const messageBubble = document.createElement('div');
+                            messageBubble.className = `message-bubble ${message.senderId === currentUser.uid ? 'right' : 'left'}`;
+                            messageBubble.textContent = message.content;
+                            chatMessages.appendChild(messageBubble);
+                        });
+                        chatMessages.scrollTop = chatMessages.scrollHeight;
+                    }, error => {
+                        console.error("Error getting messages:", error);
+                        chatMessages.innerHTML = '<p style="text-align: center; color: red;">Error loading messages.</p>';
+                        showToast("Error loading messages.", 'error');
+                    });
+
+                const emojiPickerChat = chatWindowContainer.querySelector('.emoji-picker-chat');
+                if (emojiPickerChat) {
+                    messageInput.addEventListener('touchstart', (e) => {
+                        clearTimeout(longPressTimer);
+                        longPressTimer = setTimeout(() => {
+                            emojiPickerChat.classList.remove('hidden');
+                        }, 800);
+                    }, { passive: true });
+
+                    messageInput.addEventListener('touchend', () => {
+                        clearTimeout(longPressTimer);
+                    });
+
+                    messageInput.addEventListener('contextmenu', (e) => {
+                        e.preventDefault();
+                        emojiPickerChat.classList.remove('hidden');
+                    });
+
+                    document.addEventListener('click', (e) => {
+                        if (emojiPickerChat && !emojiPickerChat.contains(e.target) && !messageInput.contains(e.target)) {
+                            emojiPickerChat.classList.add('hidden');
+                        }
+                    });
+
+                    emojiPickerChat.querySelectorAll('.emoji-option').forEach(emojiOption => {
+                        emojiOption.addEventListener('click', (e) => {
+                            const selectedEmoji = e.target.dataset.emoji;
+                            messageInput.value += ` ${selectedEmoji} `;
+                            emojiPickerChat.classList.add('hidden');
+                        });
+                    });
+                }
+            } catch (error) {
+                console.error("Error opening chat window:", error);
+                showToast("Failed to open chat. Try again.", 'error');
+            }
+        }
+
+        backToChatsBtn.addEventListener('click', () => {
+            messageListContainer.classList.remove('hidden');
+            chatWindowContainer.classList.add('hidden');
+            currentChatPartnerId = null;
+            if (unsubscribeFromChat) {
+                unsubscribeFromChat();
+                unsubscribeFromChat = null;
+            }
+        });
+
+        sendMessageBtn.addEventListener('click', async () => {
+            if (!currentUser || !currentChatPartnerId) return;
+
+            const messageContent = messageInput.value.trim();
+            if (messageContent === '') return;
+
+            const userDocRef = db.collection('users').doc(currentUser.uid);
+            const userDoc = await userDocRef.get();
+            const userData = userDoc.data();
+            const currentCredits = userData.credits || 0;
+
+            if (currentCredits < 1) {
+                showToast("You need 1 credit to send a message. Watch an ad to earn.", 'error', 5000);
+                showAdModal('message-credit', { credits: 1 });
+                return;
+            }
+
+            try {
+                await userDocRef.update({
+                    credits: firebase.firestore.FieldValue.increment(-1)
+                });
+
+                const participantsArray = [currentUser.uid, currentChatPartnerId].sort();
+
+                await db.collection('messages').add({
+                    senderId: currentUser.uid,
+                    receiverId: currentChatPartnerId,
+                    content: messageContent,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    participants: participantsArray,
+                    read: false
+                });
+
+                messageInput.value = '';
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+                showToast("Message sent!", 'success');
+
+            } catch (error) {
+                console.error("Error sending message:", error);
+                if (error.code === 'permission-denied' || error.message.includes('Missing or insufficient permissions')) {
+                    showToast("Error sending message: Missing or insufficient permissions. Check Firebase rules.", 'error', 5000);
+                } else {
+                    showToast("Failed to send message. Try again.", 'error');
+                }
+                await userDocRef.update({
+                    credits: firebase.firestore.FieldValue.increment(1)
+                });
+            }
+        });
+
+
+        // --- Search Functionality ---
+        searchBtn.addEventListener('click', () => performSearch());
+        searchQueryInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                performSearch();
+            }
+        });
+
+        async function performSearch() {
+            const query = searchQueryInput.value.trim().toLowerCase();
+            searchUserList.innerHTML = '';
+            searchPostList.innerHTML = '';
+            noSearchResults.classList.add('hidden');
+
+            if (query === '') {
+                showToast("Please enter a search query.", 'info');
+                return;
+            }
+
+            let foundResults = false;
+
+            try {
+                const userSnapshot = await db.collection('users')
+                    .where('username_lowercase', '>=', query)
+                    .where('username_lowercase', '<=', query + '\uf8ff')
+                    .limit(10)
+                    .get();
+
+                if (!userSnapshot.empty) {
+                    foundResults = true;
+                    const currentUserFollowingList = currentUser ? (await db.collection('users').doc(currentUser.uid).get()).data().following || [] : [];
+
+                    userSnapshot.docs.forEach(doc => {
+                        const userData = { id: doc.id, ...doc.data() };
+                        const userItem = document.createElement('li');
+                        userItem.className = 'search-user-item';
+                        userItem.dataset.userId = userData.id;
+
+                        const userLogoClass = getLogoCssClass(userData.profileLogo || getRandomLogoClass());
+
+                        let followBtnHtml = '';
+                        if (currentUser && currentUser.uid !== userData.id) {
+                            const isFollowing = currentUserFollowingList.includes(userData.id);
+                            const btnClass = isFollowing ? 'secondary-btn' : 'primary-btn';
+                            const btnText = isFollowing ? 'Following' : 'Follow';
+                            followBtnHtml = `<button class="btn small ${btnClass} follow-btn" data-target-id="${userData.id}">${btnText}</button>`;
+                        }
+
+                        userItem.innerHTML = `
+                            <div class="profile-avatar small ${userLogoClass}"></div>
+                            <span class="search-username">@${userData.username}</span>
+                            ${followBtnHtml}
+                        `;
+                        searchUserList.appendChild(userItem);
+
+                        const followBtn = userItem.querySelector('.follow-btn');
+                        if (followBtn) {
+                            followBtn.addEventListener('click', async (e) => {
+                                e.stopPropagation();
+                                const targetId = e.target.dataset.targetId;
+                                if (e.target.textContent === 'Follow') {
+                                    await handleFollow(targetId);
+                                    e.target.textContent = 'Following';
+                                    e.target.classList.add('secondary-btn');
+                                    e.target.classList.remove('primary-btn');
+                                } else {
+                                    await handleUnfollow(targetId);
+                                    e.target.textContent = 'Follow';
+                                    e.target.classList.add('primary-btn');
+                                    e.target.classList.remove('secondary-btn');
+                                }
+                                loadUserProfile(currentUser.uid);
+                            });
+                        }
+                        userItem.addEventListener('click', () => openUserProfile(userData.id));
+                    });
+                }
+            } catch (error) {
+                console.error("Error searching users:", error);
+                showToast("Error searching users.", 'error');
+            }
+
+            try {
+                const postSnapshot = await db.collection('posts')
+                    .where('expiryTime', '>', firebase.firestore.Timestamp.now())
+                    .orderBy('expiryTime', 'desc')
+                    .orderBy('timestamp', 'desc')
+                    .limit(50)
+                    .get();
+
+                postSnapshot.docs.forEach(doc => {
+                    const postData = { id: doc.id, ...doc.data() };
+                    if (postData.content && postData.content.toLowerCase().includes(query)) {
+                        foundResults = true;
+                        renderPost(postData, searchPostList);
+                    }
+                });
+            } catch (error) {
+                console.error("Error searching posts:", error);
+                showToast("Error searching posts.", 'error');
+            }
+
+            if (!foundResults) {
+                noSearchResults.classList.remove('hidden');
+            }
+        }
+
+        // --- Post Options (Report/Delete/Copy Link/Remix) ---
+        async function handleReportPost(postId) {
+            if (!currentUser) {
+                showToast("Please log in to report posts.", 'info');
+                return;
+            }
+            try {
+                await db.collection('reports').add({
+                    postId: postId,
+                    reportedBy: currentUser.uid,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    status: 'pending'
+                });
+                showToast("Post reported successfully. We will review it.", 'info');
+            } catch (error) {
+                console.error("Error reporting post:", error);
+                showToast("Failed to report post.", 'error');
+            }
+        }
+
+        async function handleCopyPostLink(postId) {
+            const dummyLink = `https://n-phi-ten.vercel.app/post/${postId}`;
+            try {
+                await navigator.clipboard.writeText(dummyLink);
+                showToast("Post link copied to clipboard!", 'success');
+            } catch (err) {
+                console.error('Failed to copy text: ', err);
+                showToast("Failed to copy link.", 'error');
+            }
+        }
+
+        function handleRemixPost(originalPostElement, originalPostId, originalContent) {
+            if (!currentUser) {
+                showToast("Please log in to remix posts.", 'info');
+                return;
+            }
+
+            originalPostElement.classList.add('remixed');
+            originalPostElement.style.animation = 'shake 0.5s';
+
+            showToast("Remix mode activated! Your next post will be a remix.", 'info', 3000);
+
+            showScreen('upload-screen');
+            postContentInput.value = `"${originalContent}" (Remix of post ${originalPostId})\nMy thoughts: `;
+            sessionStorage.setItem('remixOriginalPostId', originalPostId);
+            sessionStorage.setItem('remixOriginalContent', originalContent);
+
+            uploadScreen.scrollTop = 0;
+
+            originalPostElement.addEventListener('animationend', () => {
+                originalPostElement.style.animation = '';
+            }, { once: true });
+        }
 
         async function handleDeletePost(postId, postElement) {
             if (!currentUser) return;
 
-            // Verify ownership before deleting
             try {
                 const postRef = db.collection('posts').doc(postId);
                 const postDoc = await postRef.get();
@@ -4527,12 +4315,9 @@
                 if (postDoc.exists && postDoc.data().userId === currentUser.uid) {
                     if (confirm("Are you sure you want to delete this post? This action cannot be undone.")) {
                         await postRef.delete();
-                        // Also delete related likes, reactions, views (requires more complex logic, e.g., cloud functions)
-                        // For simplicity, we only delete the post document here.
-                        postElement.remove(); // Remove from UI
+                        postElement.remove();
                         showToast("Post deleted successfully.", 'success');
 
-                        // Decrement user's post count
                         await db.collection('users').doc(currentUser.uid).update({
                             postCount: firebase.firestore.FieldValue.increment(-1)
                         });
@@ -4551,11 +4336,11 @@
             languageOptionsContainer.innerHTML = '';
             const languages = [
                 { code: 'en', name: 'English', simText: 'This is a simulated English translation.' },
-                { code: 'hi', name: 'हिन्दी', simText: 'यह एक सिमुलेटेड हिंदी अनुवाद है!' },
-                { code: 'es', name: 'Español', simText: '¡Esta es una traducción simulada al español!' },
-                { code: 'fr', name: 'Français', simText: 'Ceci est une traduction française simulée !' },
-                { code: 'de', name: 'Deutsch', simText: 'Dies ist eine simulierte deutsche Übersetzung!' },
-                { code: 'ja', name: '日本語', simText: 'これはシミュレートされた日本語の翻訳です！' }
+                { code: 'hi', name: 'हिन्दी (Hindi)', simText: 'यह एक सिमुलेटेड हिंदी अनुवाद है!' },
+                { code: 'es', name: 'Español (Spanish)', simText: '¡Esta es una traducción simulada al español!' },
+                { code: 'fr', name: 'Français (French)', simText: 'Ceci est une traduction française simulée !' },
+                { code: 'de', name: 'Deutsch (German)', simText: 'Dies ist eine simulierte deutsche Übersetzung!' },
+                { code: 'ja', name: '日本語 (Japanese)', simText: 'これはシミュレートされた日本語の翻訳です！' }
             ];
 
             languages.forEach(lang => {
@@ -4563,7 +4348,7 @@
                 option.className = 'language-option';
                 option.textContent = lang.name;
                 option.dataset.lang = lang.code;
-                option.dataset.simText = lang.simText; // Store simulated text
+                option.dataset.simText = lang.simText;
                 if (lang.code === userSelectedTranslationLanguage) {
                     option.classList.add('selected');
                 }
@@ -4590,8 +4375,6 @@
             languageSelectModal.classList.add('hidden');
         });
 
-
-        // Global mapping for simulated translations
         const simulatedTranslations = {
             'en': 'This is a simulated English translation.',
             'hi': 'यह एक सिमुलेटेड हिंदी अनुवाद है!',
@@ -4605,18 +4388,16 @@
             const originalContent = postContentPElement.dataset.originalContent;
             const currentText = postContentPElement.textContent;
 
-            // Simple toggle between original and simulated translated text
-            if (currentText === originalContent) {
-                const simulatedTranslatedText = simulatedTranslations[targetLang] || simulatedTranslations['en']; // Fallback to English
+            if (currentText === originalContent || currentText === (simulatedTranslations[userSelectedTranslationLanguage] || simulatedTranslations['en'])) {
+                const simulatedTranslatedText = simulatedTranslations[targetLang] || simulatedTranslations['en'];
                 postContentPElement.textContent = simulatedTranslatedText;
                 showToast(`Simulating translation to ${targetLang.toUpperCase()}...`, 'info');
             } else {
-                postContentPElement.textContent = originalContent; // Revert to original
+                postContentPElement.textContent = originalContent;
                 showToast("Reverting to original text...", 'info');
             }
             showToast("Note: Actual translation requires a backend API integration.", 'info', 5000);
         }
-
 
         // --- Speak Post (Text-to-Speech) ---
         function handleSpeakPost(textToSpeak, speakButtonElement) {
@@ -4625,17 +4406,13 @@
                 return;
             }
 
-            // If a speech is currently in progress, stop it.
             if (currentSpeaker && window.speechSynthesis.speaking) {
                 window.speechSynthesis.cancel();
-                // Remove 'active' class from previously speaking button
                 document.querySelectorAll('.speak-button').forEach(btn => {
-                    if (btn !== speakButtonElement) { // Don't remove if it's the current one restarting
-                         btn.classList.remove('active');
-                         btn.dataset.speaking = 'false';
-                    }
+                    btn.classList.remove('active');
+                    btn.dataset.speaking = 'false';
                 });
-                if (speakButtonElement.dataset.speaking === 'true') { // If the same button was clicked to stop
+                if (speakButtonElement.dataset.speaking === 'true') {
                     speakButtonElement.classList.remove('active');
                     speakButtonElement.dataset.speaking = 'false';
                     currentSpeaker = null;
@@ -4645,22 +4422,18 @@
             }
 
             const utterance = new SpeechSynthesisUtterance(textToSpeak);
-            utterance.rate = 1; // Speed of speech
-            utterance.pitch = 1; // Pitch of speech
+            utterance.rate = 1;
+            utterance.pitch = 1;
 
-            // Optional: Choose a voice if available
-            // This might take a moment to load voices, so it's often best to set this after voices are loaded.
             window.speechSynthesis.onvoiceschanged = () => {
                 const voices = window.speechSynthesis.getVoices();
-                // Try to find a voice that matches the user's selected language, or a general English one
                 const targetVoice = voices.find(voice => voice.lang.startsWith(userSelectedTranslationLanguage)) ||
                                    voices.find(voice => voice.lang.startsWith('en')) ||
-                                   voices[0]; // Fallback to first available voice
+                                   voices[0];
                 if (targetVoice) {
                     utterance.voice = targetVoice;
                 }
             };
-            // If voices are already loaded, set it immediately
             if (window.speechSynthesis.getVoices().length > 0) {
                  const voices = window.speechSynthesis.getVoices();
                  const targetVoice = voices.find(voice => voice.lang.startsWith(userSelectedTranslationLanguage)) ||
@@ -4670,7 +4443,6 @@
                     utterance.voice = targetVoice;
                  }
             }
-
 
             utterance.onstart = () => {
                 currentSpeaker = utterance;
@@ -4703,15 +4475,10 @@
 
         // --- Initial Loads ---
         document.addEventListener('DOMContentLoaded', () => {
-            // Ensure the auth-screen is initially visible, and app-container is hidden
-            // This explicitly sets the state to guarantee the login/signup form shows up.
-            authScreen.classList.remove('hidden');
+            splashScreen.classList.remove('hidden');
             appContainer.classList.add('hidden');
-
-            // The onAuthStateChanged listener will then correctly take over
-            // and hide authScreen/show appContainer if a user is already logged in.
+            authScreen.classList.add('hidden'); // Initially hide auth screen too
         });
-
     </script>
 </body>
 </html>
