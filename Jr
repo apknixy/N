@@ -1,37 +1,39 @@
-ज़ारी Zar, यह सुनकर मुझे बहुत अफ़सोस है। "ब्लैक-ब्लैक सी स्क्रीन" का मतलब है कि आपके CSS या JavaScript में कुछ गंभीर टूट गया है, या UI layers एक-दूसरे को block कर रही हैं। यह पिछली कुछ समस्याओं से ज़्यादा ख़तरनाक है।
+ज़ारी Zar, अब यह साफ हो गया है कि ऐप एक "ब्लैक स्क्रीन" पर अटक रहा है। आपकी बात सही है, यह एक बहुत ही गंभीर समस्या है और यह इंगित करता है कि HTML, CSS, या JavaScript कोड का प्रारंभिक रेंडरिंग ही पूरी तरह से विफल हो रहा है।
 
-मुझे संदेह है कि समस्या या तो CSS में बहुत कठोर `display: none` नियमों के कारण हो रही है, या फिर JavaScript में जो UI को `hidden` / `visible` बनाता है, वह कहीं अटक गया है।
+"ब्लैक स्क्रीन" आमतौर पर इन समस्याओं के कारण होती है:
 
-मैंने आपकी फ़ीडबैक के आधार पर `script.js` और `style.css` में फिर से एक निर्णायक सुधार किया है:
+1.  **मुख्य UI कंटेनर हमेशा छिपे हुए हैं (CSS त्रुटि):** `app-container` या `auth-container` गलती से `display: none !important;` जैसे नियम के कारण स्थायी रूप से छिपे हो सकते हैं।
+2.  **JavaScript निष्पादन में प्रारंभिक त्रुटि (JS क्रैश):** `script.js` लोड होने या चलने के तुरंत बाद किसी त्रुटि (उदाहरण के लिए, एक undefined variable का उपयोग करना) के कारण क्रैश हो जाता है, और फिर कोई भी UI प्रदर्शन कार्य निष्पादित नहीं होता है।
+3.  **नेटवर्क/फाइल लोडिंग समस्या:** `script.js` या `style.css` फ़ाइलें ही सर्वर से लोड नहीं हो पा रही हैं। (अपने GitHub Pages पर जांचें कि फ़ाइलें मौजूद हैं।)
 
-1.  **CSS Visibility (`style.css`):**
-    *   मैंने `display: none !important;` जैसे बहुत कठोर नियमों को कुछ जगहों पर softer `opacity: 0; visibility: hidden;` और फिर JavaScript के ज़रिए `display: none;` (when truly not needed) से बदला है। इससे अचानक `display` परिवर्तन से होने वाली jarring issues या stacking problems कम होंगी।
-    *   `auth-container`, `app-container`, `splash-screen` की initial `hidden` states को manage किया है।
+मैंने आपके धैर्य की सराहना करते हुए, इस बार **शुरुआती UI प्रदर्शन को सबसे विश्वसनीय बनाने पर केंद्रित एक पूर्ण अपडेट किया है**। मैंने किया है:
 
-2.  **JavaScript UI Display Logic (`script.js`):**
-    *   मैंने `showAuthContainerUI()`, `showAppContainerUI()`, और `hideSplashScreenProperly()` functions के अंदर के logic को further simplified और tightened किया है।
-    *   विशेष रूप से `DOMContentLoaded` और `onAuthStateChanged` block में, initial screen के display order को बिल्कुल atomic (per-step, sequential) बनाया गया है। अब code UI components को `block` से `none` और फिर `flex` में बदल रहा है, साथ ही `opacity` के ट्रांजीशन का उपयोग कर रहा है।
-    *   Auth flow के दौरान बटन को `disabled` करने वाले logic को भी ध्यान से verify किया है।
+*   **Splash Screen हटा दी (पूरी तरह से):** `index.html` से `<div id="splash-screen" ...>` तत्व हटा दिया है, क्योंकि यह आपके लिए एक लगातार समस्या बन गई थी। ऐप अब सीधे Login/Register स्क्रीन (या मुख्य ऐप पर, यदि लॉग इन है) पर लोड होगा।
+*   **UI Initialization Logic में सरलीकरण (`script.js`):**
+    *   अब `DOMContentLoaded` के बाद **सीधे** या तो `auth-container` या `app-container` को दिखाएगा।
+    *   फ़ायरबेस प्रमाणीकरण स्थिति बदलने पर संक्रमण अब सरल और कम उलझा हुआ है।
+    *   मैंने कोड में एक बहुत ही सरल `load-test-message` तत्व जोड़ा है जिसे JavaScript द्वारा प्रदर्शित किया जाना चाहिए। यह एक प्राथमिक डायग्नोस्टिक है। यदि यह भी नहीं दिखता है, तो JavaScript पूरी तरह से क्रैश हो रहा है या लोड नहीं हो रहा है।
+*   **CSS और HTML प्रारंभिक राज्य सत्यापन:** `auth-container` और `app-container` के `display` गुणों को यह सुनिश्चित करने के लिए नियंत्रित किया जाएगा कि वे सही समय पर `flex` या `none` पर सेट हों।
+*   **और अधिक console logs:** यदि आप समस्याओं का सामना करना जारी रखते हैं तो डिबगिंग में सहायता के लिए console logs और भी अधिक विस्तृत होंगे।
 
-**अत्यंत महत्वपूर्ण:** यह शायद सबसे महत्वपूर्ण रीविजन है, क्योंकि यह सीधे ऐप के UI Initialization flow को लक्षित करता है। कृपया, निम्नलिखित चरणों को **बेहद ध्यान से** और **क्रमशः** करें:
+**आपको निम्न कार्य करने की आवश्यकता है (प्रत्येक चरण बहुत महत्वपूर्ण है):**
 
-1.  **Browser Cache Clear करें (सबसे महत्वपूर्ण!):** अपने ब्राउज़र में ऐप को लोड करने से पहले **ब्राउज़र की पूरी Cache और Website Data (Cookies, Local Storage, IndexedDB)** को **पूरी तरह से साफ़ करें**। अगर पुराना कोई state अटक गया है तो वह इससे क्लियर हो जाएगा।
+1.  **ब्राउज़र कैश साफ़ करें (अत्यंत महत्वपूर्ण!):** अपने वेब ब्राउज़र में ऐप को फिर से लोड करने से पहले **पूरी तरह से कैश, कुकीज़ और वेबसाइट डेटा साफ़ करें**। यह पुराने, समस्याग्रस्त कोड को चलाने से रोकेगा।
+2.  **सभी कोड फाइलों को बदलें:**
+    *   **`index.html`:** नीचे दिया गया पूरा कोड कॉपी करके अपनी मौजूदा `index.html` फ़ाइल को **पूरी तरह से बदल दें**।
+    *   **`style.css`:** नीचे दिया गया पूरा कोड कॉपी करके अपनी मौजूदा `style.css` फ़ाइल को **पूरी तरह से बदल दें**।
+    *   **`script.js`:** नीचे दिया गया पूरा कोड कॉपी करके अपनी मौजूदा `script.js` फ़ाइल को **पूरी तरह से बदल दें**।
+3.  **फ़ायरबेस नियम सत्यापित करें:** सुनिश्चित करें कि फ़ायरबेस कंसोल में आपके फ़ायरस्टोर नियम ठीक उसी तरह `Publish` किए गए हैं जैसे मैंने पिछली बार आपको दिए थे (उनमें आपकी UID शामिल थी)।
 
-2.  **Files को Replace करें (पूरी तरह से):**
-    *   अपनी `index.html` file को नीचे दिए गए नए कोड से **replace** करें।
-    *   अपनी `style.css` file को नीचे दिए गए नए कोड से **replace** करें।
-    *   अपनी `script.js` file को नीचे दिए गए नए कोड से **replace** करें।
-
-3.  **Firebase Rules चेक करें:** सुनिश्चित करें कि आपके Firestore Rules Firebase console में Publish किए गए हैं (पिछला दिया गया सबसे नवीनतम Rules ही है)।
-
-4.  **Browser Console Check करें:**
+4.  **ब्राउज़र कंसोल जांचें (हमेशा की तरह महत्वपूर्ण):**
     *   ऐप लोड करें।
-    *   अपने Browser Console को खुला रखें (`F12` दबाकर या Right-Click -> `Inspect` -> `Console` tab पर जाकर)।
-    *   कोई भी `red` error message और `console.log` messages देखें।
+    *   अपने वेब ब्राउज़र कंसोल (`F12` दबाकर या राइट-क्लिक करके और `Inspect` -> `Console` टैब का चयन करके) को खोलें।
+    *   मुझे बताएं कि आपको कौन से **लाल रंग के त्रुटि संदेश** दिख रहे हैं।
+    *   क्या आपको `<p id="load-test-message">JavaScript loaded and running!</p>` टेक्स्ट दिखाई दे रहा है? यह जानने के लिए महत्वपूर्ण है कि आपका `script.js` फ़ाइल ठीक से लोड हो रही है या नहीं।
 
 ---
 
-### **`index.html` (Minor adjustment, for splash visibility transition)**
+### **`index.html` (Final, simplified initial load)**
 
 ```html
 <!DOCTYPE html>
@@ -46,9 +48,11 @@
 </head>
 <body class="dark-mode"> <!-- Added dark-mode class by default -->
 
-    <!-- Splash screen removed entirely -->
+    <!-- Load Test Message - visible only if JavaScript runs -->
+    <p id="load-test-message" style="display:none; position:fixed; top:10px; left:10px; background:yellow; color:black; padding:5px; z-index:9999;">JavaScript loaded and running!</p>
 
-    <!-- Login/Register/Main App will be dynamically shown -->
+
+    <!-- Auth Container for Login/Register -->
     <div id="auth-container" class="auth-container hidden">
         <div class="auth-content">
             <div class="app-logo-splash auth-logo"></div> <h1>AddMint</h1>
@@ -107,6 +111,7 @@
     </div>
 
 
+    <!-- Main Application Container -->
     <div id="app-container" class="app-container hidden">
 
         <header class="app-header">
@@ -132,7 +137,7 @@
         <nav id="sidebar" class="sidebar">
             <div class="sidebar-header">
                 <div class="profile-avatar-small" id="sidebar-profile-avatar"></div>
-                <h3 id="sidebar-username">My User</h3> <!-- Updated to placeholder -->
+                <h3 id="sidebar-username">My User</h3>
                 <div class="close-sidebar" id="close-sidebar">&times;</div>
             </div>
             <ul>
@@ -585,7 +590,9 @@
 </html>
 ```
 
-### **`style.css` (Updated: With button disabled state styling)**
+### **`style.css` (Minor tweaks for container visibility)**
+
+मैंने `auth-container` और `app-container` के लिए `hidden` क्लास का उपयोग सुनिश्चित किया है, जो उन्हें डिफ़ॉल्ट रूप से `display: none` पर सेट करती है, और फिर JavaScript उन्हें `display: flex` में बदल देगा।
 
 ```css
 /* General Body and Container Styles */
@@ -670,10 +677,10 @@ body.light-mode {
 }
 
 .hidden {
-    display: none !important;
+    display: none !important; /* !important to override other display properties */
 }
 
-/* Splash Screen - Adjusted display and opacity for smooth removal by JS */
+/* Splash Screen (removed from HTML, styling is minimal for historical consistency if somehow rendered) */
 .splash-screen {
     position: fixed;
     top: 0;
@@ -681,36 +688,34 @@ body.light-mode {
     width: 100%;
     height: 100%;
     background: linear-gradient(135deg, #0f3460, #16213e); /* Gradient background */
-    display: flex; /* Kept flex here to center contents until removed */
+    display: none; /* Ensure it's not displayed initially */
     justify-content: center;
     align-items: center;
     flex-direction: column;
     z-index: 1000;
     color: white;
     text-align: center;
-    opacity: 1;
+    opacity: 0; /* Starts hidden and JS controls visibility */
     transition: opacity 0.5s ease-out; /* Smooth fade-out */
 }
+/* No more splash-specific content, logo, h1 etc. */
 
-/* Centering the content within splash and auth containers */
-.splash-content, .auth-content { /* Applied to both to center them */
-    display: flex;
+/* Centering for auth container */
+.auth-content { /* Applied to both to center them */
+    display: flex; /* Changed from original .splash-content flex setup to accommodate new initial logic */
     flex-direction: column;
     justify-content: center;
     align-items: center; /* This is key for horizontal centering of block content in a flex container */
     animation: fadeIn 1s ease-out forwards;
     width: 100%; /* Ensure it takes full width for alignment */
-    /* Removed fixed height for dynamic content; rely on parent for total height or overflow */
-    padding: 20px; /* Add some padding around content */
+    padding: 20px;
     box-sizing: border-box;
-    text-align: center; /* Re-center text explicitly */
-}
-.splash-content { /* Specific padding/margin adjustments */
-    height: 100%; /* Make splash content take full height to center logo */
+    text-align: center;
+    height: auto; /* Allow height to adjust */
 }
 
 
-.app-logo-splash {
+.app-logo-splash { /* Used by auth-content h1 */
     width: 100px;
     height: 100px;
     background: linear-gradient(45deg, #00ffff, #ff00ff); /* Neon gradient */
@@ -732,20 +737,10 @@ body.light-mode {
     left: 50%;
     transform: translate(-50%, -50%);
 }
+/* Removed other splash-specific text/styles as these were inside .splash-content which is no longer the primary content display for splash screen. */
 
-.splash-screen h1 {
-    font-size: 2.8em;
-    margin-bottom: 10px;
-    color: var(--highlight-color-main);
-    text-shadow: 0 0 10px var(--highlight-color-main), 0 0 20px var(--highlight-color-main);
-}
 
-.splash-screen p {
-    font-size: 1.2em;
-    color: #88d4d4;
-}
-
-.loader {
+.loader { /* Used elsewhere too */
     border: 4px solid rgba(255, 255, 255, 0.3);
     border-top: 4px solid var(--highlight-color-main);
     border-radius: 50%;
@@ -760,57 +755,56 @@ body.light-mode {
     width: 100%;
     max-width: 420px;
     height: 100vh;
-    display: flex;
+    display: flex; /* Changed from hidden in HTML to controlled by JS via .hidden */
     justify-content: center;
-    align-items: center; /* Vertically centers the .auth-content */
+    align-items: center;
     background-color: var(--bg-color-lighter);
     box-shadow: 0 0 30px var(--shadow-color-main);
     border-radius: 12px;
     overflow: hidden;
     border: 1px solid var(--border-color-main);
     padding: 20px;
-    box-sizing: border-box; /* Include padding in width/height */
+    box-sizing: border-box;
     flex-direction: column;
     text-align: center;
 }
-.auth-content { /* Adjust padding for better look on small screens */
+.auth-content { /* Main content area for forms */
     width: 100%;
     background-color: var(--bg-color-main);
-    padding: 30px 20px; /* Reduced side padding slightly */
+    padding: 30px 20px;
     border-radius: 8px;
     box-shadow: 0 0 15px rgba(0, 255, 255, 0.1);
     border: 1px solid var(--border-color-main);
-    /* For Auth Screens within */
-    display: flex; /* Make it a flex container to manage children */
+    display: flex; /* Inner flex to arrange children vertically */
     flex-direction: column;
-    align-items: center; /* Center children horizontally */
+    align-items: center; /* Center login/signup forms */
 }
-.auth-content .auth-logo {
+.auth-content .auth-logo { /* Specific for auth page logo */
     width: 80px;
     height: 80px;
     margin: 0 auto 15px auto;
 }
-.auth-content h1 {
+.auth-content h1 { /* Specific for auth page title */
     font-size: 2.2em;
     color: var(--highlight-color-main);
     margin-bottom: 25px;
     text-shadow: 0 0 5px var(--highlight-color-main);
 }
-.auth-screen {
-    display: none; /* Hide by default */
-    width: 100%; /* Take full width of parent .auth-content */
-    flex-direction: column; /* Inner flex for form elements */
-    align-items: center; /* Center form elements horizontally */
+.auth-screen { /* Login/Signup specific screen container */
+    display: none; /* Initially hidden, made visible by JS 'active' class */
+    width: 100%;
+    flex-direction: column; /* Ensure child form groups stack vertically */
+    align-items: center; /* Center contents within form */
 }
 .auth-screen.active {
-    display: flex; /* Show active screen with flex */
+    display: flex; /* Only active screen is displayed as flex */
 }
-.auth-text {
+.auth-text { /* Text for links */
     font-size: 0.9em;
     margin-top: 15px;
     color: var(--text-color-light);
 }
-.auth-text a {
+.auth-text a { /* Link styling */
     color: var(--highlight-color-main);
     text-decoration: none;
     font-weight: bold;
@@ -818,23 +812,23 @@ body.light-mode {
 .auth-text a:hover {
     text-decoration: underline;
 }
-.status-message {
+.status-message { /* Feedback messages */
     margin-top: 15px;
     padding: 8px 10px;
     border-radius: 5px;
     font-size: 0.9em;
 }
-.status-message.error {
+.status-message.error { /* Error color */
     background-color: rgba(231, 76, 60, 0.2);
     color: #e74c3c;
     border: 1px solid #e74c3c;
 }
-.status-message.success {
+.status-message.success { /* Success color */
     background-color: rgba(51, 255, 87, 0.2);
     color: #33ff57;
     border: 1px solid #33ff57;
 }
-.status-message.info {
+.status-message.info { /* Info color */
     background-color: rgba(0, 255, 255, 0.1);
     color: #00ffff;
     border: 1px solid #00ffff;
@@ -1147,7 +1141,7 @@ h2 {
 }
 .profile-avatar::before {
     content: '👤'; /* Default placeholder emoji */
-    font-family: 'Montserrat', sans-serif;
+    font-family: 'Font Awesome 6 Free'; font-weight: 900;
     font-size: 24px;
     position: absolute;
     top: 50%; left: 50%;
@@ -1626,7 +1620,7 @@ input[type="file"] {
 }
 .logo-option-item::before {
     content: '👤'; /* Default placeholder emoji */
-    font-family: 'Montserrat', sans-serif;
+    font-family: 'Font Awesome 6 Free'; font-weight: 900;
     font-size: 28px;
     position: absolute;
     top: 50%; left: 50%;
@@ -2386,7 +2380,7 @@ input[type="file"] {
     }
 ```
 
-### **`script.js` (Major Revisions for Auth Flow and UI)**
+### **`script.js` (Major Revisions for Auth Flow, No Splash Screen, Debugging)**
 
 ```javascript
 // Firebase Configuration (from your input)
@@ -2408,9 +2402,11 @@ const db = firebase.firestore();
 const storage = firebase.storage();
 
 // --- DOM Elements ---
-const splashScreen = document.getElementById('splash-screen'); // Kept for its styling, though now just shows a background.
+// const splashScreen = document.getElementById('splash-screen'); // Splash screen is now removed from HTML.
 const authContainer = document.getElementById('auth-container'); // Container for login/signup screens
 const appContainer = document.getElementById('app-container'); // Main application container
+const loadTestMessage = document.getElementById('load-test-message'); // Element for debugging basic JS load
+
 
 // Auth Screens Elements
 const loginScreen = document.getElementById('login-screen');
@@ -2580,13 +2576,8 @@ let postsToLoadPerScroll = 10; // Number of posts to load on scroll
 let dataSaverEnabled = false; // Flag for data saver feature (logic implementation needed)
 let currentPostIdForComments = null; // Stores post ID when comments modal is open
 
-// Flags for Authentication Flow Control
 let isProcessingAuth = false; // Prevents multiple rapid authentication requests
-let hasRunInitialAuthCheck = false; // Ensures the `onAuthStateChanged` block runs its full logic only ONCE on app load
-
-// Promises for controlling app flow (e.g., minimum splash screen time)
-let splashScreenMinTimePromise; // Resolves after minimum splash screen time
-let splashScreenTimeout; // Fallback timeout if `onAuthStateChanged` is slow to fire.
+let hasRunInitialAuthCheck = false; // Ensures the `onAuthStateChanged` block runs its full logic only once per app load cycle
 
 // Text-to-Speech API
 const synth = window.speechSynthesis;
@@ -2694,7 +2685,7 @@ function showScreen(screenId) {
         }
     });
 
-    // Close sidebar if it's open when screen changes
+    // Close sidebar if open
     sidebar.classList.remove('open');
 }
 
@@ -2729,63 +2720,57 @@ applyLogoStyles(); // Call once when the script loads.
 
 // --- Core Authentication Flow Logic ---
 
-// Function to safely hide the splash screen once UI is ready
-function hideSplashScreenProperly() {
-    if (splashScreen.classList.contains('hidden') && splashScreen.style.display === 'none') {
-        return; // Already hidden
-    }
-    console.log("Hiding splash screen fully.");
-    splashScreen.style.opacity = '0';
-    setTimeout(() => {
-        splashScreen.classList.add('hidden');
-        splashScreen.style.display = 'none';
-    }, 500); // Wait for fade out
-}
-
-// Show authentication container (Login/Signup)
+// Show authentication container (Login/Signup) UI
 function showAuthContainerUI() {
-    hideSplashScreenProperly(); // Ensure splash is hidden
-    appContainer.classList.add('hidden'); // Ensure app is hidden
-    authContainer.style.display = 'flex'; // Use flex for centering
-    authContainer.classList.remove('hidden'); // Show auth container
+    console.log("Entering showAuthContainerUI()");
+    // Set explicit display to flex to correctly handle visibility AND layout
+    authContainer.style.display = 'flex';
+    authContainer.classList.remove('hidden'); // Ensure it's not marked as 'hidden' anymore
+    
+    appContainer.style.display = 'none'; // Ensure app container is hidden
+    appContainer.classList.add('hidden'); 
+    
     loginScreen.classList.add('active'); // Default to login screen active
     signupScreen.classList.remove('active'); // Ensure signup is inactive
     console.log("UI: Displaying Authentication screens.");
 }
 
-// Show main app container (Home Feed, Profile, etc.)
+// Show main app container (Home Feed, Profile, etc.) UI
 function showAppContainerUI() {
-    hideSplashScreenProperly(); // Ensure splash is hidden
-    authContainer.classList.add('hidden'); // Ensure auth is hidden
-    appContainer.style.display = 'flex'; // Or 'block', depending on its default layout
-    appContainer.classList.remove('hidden'); // Show app container
+    console.log("Entering showAppContainerUI()");
+    // Set explicit display to flex to correctly handle visibility AND layout
+    appContainer.style.display = 'flex';
+    appContainer.classList.remove('hidden'); // Ensure it's not marked as 'hidden' anymore
+
+    authContainer.style.display = 'none'; // Ensure auth container is hidden
+    authContainer.classList.add('hidden'); 
+    
     console.log("UI: Displaying Main App screens.");
 }
 
 
 // Central function to handle authentication state and UI redirection
-async function handleInitialAuthAndRedirect(user) {
-    // This `onAuthStateChanged` handler can fire multiple times (on load, login, logout).
-    // `hasRunInitialAuthCheck` flag ensures that the full initial UI setup logic
-    // runs only once per full page load, regardless of subsequent quick state changes.
+async function checkUserAndRedirect(user) {
+    console.log(`checkUserAndRedirect called. User: ${user ? user.uid : "None"}. Email Verified: ${user ? user.emailVerified : "N/A"}.`);
+    
+    // Only process this flow once per full page load, regardless of subsequent quick state changes.
+    // This is crucial to prevent re-rendering/re-initialization bugs on multiple onAuthStateChanged firings.
     if (hasRunInitialAuthCheck && user === auth.currentUser) {
-        console.log("onAuthStateChanged: Secondary fire, user state unchanged. Skipping initial redirect logic.");
+        console.log("checkUserAndRedirect: Already performed initial check, skipping.");
         return;
     }
-    hasRunInitialAuthCheck = true; // Mark as started immediately.
+    hasRunInitialAuthCheck = true; // Mark as started immediately to prevent other runs.
 
-    // Ensure minimum splash screen time has passed before processing UI transitions.
-    // This makes sure the splash screen is visible for a moment even if auth is instant.
-    console.log("onAuthStateChanged: Waiting for minimum splash screen display time to resolve...");
-    await splashScreenMinTimePromise; // PAUSE execution here until the minimum splash time is over.
-
-    clearTimeout(splashScreenTimeout); // Clear the fallback timeout, as auth state is being handled now.
-    console.log("Splash screen minimum time resolved, proceeding with user check.");
+    // Show the small test message if JavaScript is loading correctly.
+    if (loadTestMessage) {
+        loadTestMessage.style.display = 'block'; // Make the test message visible
+        console.log("Test message should be visible: JavaScript is loading!");
+    }
 
 
     if (user && user.emailVerified) {
         currentUser = user; // Set global current user
-        console.log(`User is authenticated: ${user.uid}, Email verified: ${user.emailVerified}. Checking profile status.`);
+        console.log(`User ${user.uid} is authenticated and verified. Attempting to load user profile.`);
         try {
             const userDocRef = db.collection('users').doc(currentUser.uid);
             const userDoc = await userDocRef.get();
@@ -2793,7 +2778,7 @@ async function handleInitialAuthAndRedirect(user) {
 
             // If user document is missing OR username/name are not set, force profile setup.
             if (!userDoc.exists || !userData.username || userData.username === "" || !userData.name || userData.name === "") {
-                console.log("User profile incomplete (missing username/name). Forcing profile setup.");
+                console.log("User profile incomplete (missing username or display name). Forcing profile setup.");
                 showAppContainerUI(); // Transition to the main app container.
                 showScreen('profile-screen'); // Navigate to the profile screen.
                 editProfileModal.classList.remove('hidden'); // Automatically open the edit profile modal.
@@ -2811,23 +2796,23 @@ async function handleInitialAuthAndRedirect(user) {
                 showToast("Logged in successfully!", 'success');
             }
         } catch (firestoreError) {
-            console.error("Firestore error while loading user profile:", firestoreError);
-            showToast("Error loading user profile. Please try logging in again.", 'error', 5000);
-            auth.signOut(); // Force logout on profile data error to reset.
-            showAuthContainerUI(); // Redirect back to authentication screen.
+            console.error("Firebase Firestore error while loading user profile:", firestoreError);
+            showToast("Error loading user profile. Please try logging in again.", 'error', 7000);
+            auth.signOut(); // Critical error, force logout.
+            showAuthContainerUI(); // Fallback to authentication UI.
         }
     } else { // No user is logged in OR user's email is not verified
         currentUser = null; // Ensure global user object is null.
-        console.log("User not authenticated or email not verified. Redirecting to Authentication UI.");
+        console.log("No authenticated and verified user found. Displaying Authentication UI.");
         showAuthContainerUI(); // Display the Login/Register screens.
 
-        if (user && !user.emailVerified) {
+        if (user && !user.emailVerified) { // If there's a user object but not verified
             console.log("User is authenticated but email not verified. Instructing verification.");
             updateAuthStatus(loginStatus, "Please verify your email to continue. Check your inbox (or spam folder) for a verification link.", 'info');
-            auth.signOut(); // It's best practice to sign out unverified users to force email verification flow.
+            auth.signOut(); // Sign out unverified users to streamline verification flow.
         } else {
             console.log("No active user session found. Showing login form.");
-            updateAuthStatus(loginStatus, "", 'hidden'); // Clear any previous login status messages.
+            updateAuthStatus(loginStatus, "", 'hidden'); // Clear any previous messages.
         }
     }
 }
@@ -2835,7 +2820,8 @@ async function handleInitialAuthAndRedirect(user) {
 
 // Attach the main authentication state listener to Firebase
 auth.onAuthStateChanged(user => {
-    handleInitialAuthAndRedirect(user); // Call our central handler
+    // console.log("onAuthStateChanged event fired. Current User:", user ? user.uid : "None");
+    checkUserAndRedirect(user); // Calls our central handler
 });
 
 
@@ -2896,7 +2882,7 @@ async function signInUser() {
     }
 
     try {
-        console.log("Attempting user sign-in...");
+        console.log("Attempting user sign-in for:", email);
         updateAuthStatus(loginStatus, "Logging in...", 'info');
         await auth.signInWithEmailAndPassword(email, password);
         // Success: `onAuthStateChanged` listener will pick this up and redirect UI.
@@ -2968,8 +2954,8 @@ async function registerUser() {
         await db.collection('users').doc(userCredential.user.uid).set({
             uid: userCredential.user.uid,
             email: userCredential.user.email,
-            username: "", // To be set in profile edit
-            name: "",     // To be set in profile edit
+            username: "", // Will be set in profile edit
+            name: "",     // Will be set in profile edit
             bio: "",
             whatsapp: "",
             instagram: "",
@@ -3006,7 +2992,7 @@ async function registerUser() {
         } else if (error.code === 'auth/invalid-email') {
             errorMessage = "Invalid email format. Please check and retry.";
         } else if (error.code === 'auth/weak-password') {
-            errorMessage = "Password is too weak. Please choose a stronger one (min 6 characters).";
+            errorMessage = "Password is too weak (min 6 chars).";
         } else if (error.code === 'auth/network-request-failed') {
             errorMessage = "Network error during registration. Check internet.";
         }
@@ -3025,7 +3011,7 @@ async function sendEmailVerification(user) {
         console.log("Verification email sent successfully.");
     } catch (error) {
         console.error("Error sending verification email:", error);
-        showToast("Failed to send verification email. Please try again later.", 'error');
+        showToast("Failed to send verification email. Try again later.", 'error');
     }
 }
 
@@ -3049,7 +3035,7 @@ async function sendPasswordReset() {
     try {
         console.log("Sending password reset email for:", email);
         await auth.sendPasswordResetEmail(email);
-        updateAuthStatus(resetStatus, "Password reset link sent to your email! Please check your inbox.", 'success');
+        updateAuthStatus(resetStatus, "Password reset link sent to your email!", 'success');
     } catch (error) {
         console.error("Firebase Forgot password error:", error.code, error.message);
         let errorMessage = "Failed to send reset link.";
@@ -3074,10 +3060,7 @@ document.getElementById('logout-btn').addEventListener('click', async () => {
         await auth.signOut();
         showToast("Logged out successfully.", 'info');
 
-        // Reset the flag so that onAuthStateChanged will perform full check next time
-        hasRunInitialAuthCheck = false;
-
-        // Clear all sensitive input fields for next user session or login.
+        // Clear input fields and reset state for new login/registration.
         loginEmailInput.value = '';
         loginPasswordInput.value = '';
         signupEmailInput.value = '';
@@ -3089,7 +3072,12 @@ document.getElementById('logout-btn').addEventListener('click', async () => {
         editWhatsappInput.value = '';
         editInstagramInput.value = '';
         profilePicUrlInput.value = '';
+        
+        // Reset flag so onAuthStateChanged will perform full check next time.
+        hasRunInitialAuthCheck = false; 
+
         // UI redirection will be handled by `onAuthStateChanged` listener.
+        // This ensures the correct UI (login/register) is shown based on Firebase's confirmed state.
     } catch (error) {
         console.error("Error during logout:", error);
         showToast("Failed to log out.", 'error');
@@ -3097,44 +3085,44 @@ document.getElementById('logout-btn').addEventListener('click', async () => {
 });
 
 
-// --- Initial App Load Trigger (Called when DOM is fully loaded) ---
+// --- Initial App Load Logic (Triggered on DOMContentLoaded) ---
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("DOM Content Loaded. Initializing app UI states.");
-    // 1. Hide all main app and authentication UI elements at start.
-    appContainer.classList.add('hidden');
-    authContainer.classList.add('hidden');
+    console.log("DOMContentLoaded event fired. Initializing app UI states.");
+    
+    // 1. Initially hide main app and authentication UI elements to control visibility from JS.
+    // CSS's .hidden class will ensure they are initially display:none.
+    appContainer.classList.add('hidden'); 
+    authContainer.classList.add('hidden'); 
 
-    // 2. The splash screen HTML element might technically be present
-    // but without display/opacity settings it would not show anything.
-    // Ensure `splashScreen` itself (the div) exists, if not present remove its DOM dependencies in script.
-    if (splashScreen) { // Check if element exists, important after removing markup
-        // The styling in style.css handles the initial appearance and transition.
-        splashScreen.classList.remove('hidden');
-        splashScreen.style.opacity = '1';
-        splashScreen.style.display = 'flex'; // Explicitly set display for centering if splash is meant to be visible for a duration.
+    // 2. Make the load test message visible. If this is not seen on screen, JS is failing to load/execute.
+    if (loadTestMessage) {
+        loadTestMessage.style.display = 'block'; 
+        console.log("Diagnostic: 'load-test-message' is now displayed. JavaScript should be running.");
+    } else {
+        console.warn("Diagnostic: 'load-test-message' element not found in DOM.");
     }
 
 
-    // 3. Set a minimum display time for the splash screen (e.g., 3 seconds).
-    // This promise ensures any subsequent UI rendering waits for at least this long.
+    // 3. Create a promise that resolves after a short, fixed delay (e.g., 50ms).
+    // This provides a tiny buffer to allow browser rendering to catch up, improving smooth UI transitions.
     splashScreenMinTimePromise = new Promise(resolve => {
         setTimeout(() => {
-            console.log("Promise: Minimum splash screen display time (3s) completed.");
-            resolve(); // Resolve the promise.
-        }, 3000); // 3 seconds
+            console.log("UI readiness buffer (50ms) resolved. Proceeding with auth check.");
+            resolve();
+        }, 50); // Minimal delay
     });
 
     // 4. Set a fallback timeout for onAuthStateChanged listener.
-    // If the Firebase SDK's `onAuthStateChanged` takes unusually long to fire (e.g., network issues),
-    // this ensures the UI still transitions after a reasonable maximum delay.
+    // In rare cases (e.g., severe network issues, Firebase SDK failing), `onAuthStateChanged` might not fire quickly.
+    // This ensures UI still proceeds after a fixed max delay, preventing a completely blank/stuck screen.
     splashScreenTimeout = setTimeout(() => {
-        if (!hasRunInitialAuthCheck) { // Only force the check if it hasn't run already.
-            console.warn("Fallback: Splash screen timed out (5s). Forcing initial authentication check.");
-            // Explicitly call the handler to transition the UI based on the current Firebase auth state.
-            // auth.currentUser will be either a User object or null at this point.
-            handleInitialAuthAndRedirect(auth.currentUser);
+        if (!hasRunInitialAuthCheck) { // Only force the check if it hasn't run already via the primary listener.
+            console.warn("Fallback: Forced authentication check triggered due to timeout. Proceeding with UI.");
+            // Explicitly call the `checkUserAndRedirect` handler.
+            // At this point, `auth.currentUser` will represent whatever state Firebase was able to determine.
+            checkUserAndRedirect(auth.currentUser);
         }
-    }, 5000); // Max total wait time for auth status to decide initial UI.
+    }, 2000); // 2 seconds total max initial wait time for any UI to appear. (Adjust as needed, shorter if possible).
 });
 
 
@@ -3160,9 +3148,8 @@ darkModeCheckbox.addEventListener('change', (e) => {
     showToast(`Dark Mode ${e.target.checked ? 'Enabled' : 'Disabled'}`, 'info');
 });
 
-// Initialize theme from local storage on load (already done in DOMContentLoaded block, no need to duplicate)
-/*
-document.addEventListener('DOMContentLoaded', () => {
+// Load and apply initial theme setting from local storage.
+document.addEventListener('DOMContentLoaded', () => { // Already in the primary DOMContentLoaded listener.
     const savedTheme = localStorage.getItem('theme') || 'dark';
     if (savedTheme === 'light') {
         body.classList.remove('dark-mode');
@@ -3174,7 +3161,6 @@ document.addEventListener('DOMContentLoaded', () => {
         darkModeCheckbox.checked = true;
     }
 });
-*/
 
 
 // --- Sidebar Navigation Control ---
@@ -3265,8 +3251,12 @@ postCategoryFilter.addEventListener('change', () => {
 });
 
 async function loadPosts() {
-    if (fetchingPosts || !currentUser) {
-        console.log("loadPosts: Skipping (already fetching or no current user).");
+    if (!currentUser) { // Ensure logged in
+        console.log("loadPosts: Skipping, no current user.");
+        return;
+    }
+    if (fetchingPosts) { // Prevent concurrent fetches
+        console.log("loadPosts: Skipping, already fetching.");
         return;
     }
 
@@ -3275,7 +3265,6 @@ async function loadPosts() {
     console.log("loadPosts: Starting post fetch for home feed.");
 
     try {
-        // Base query for posts
         let postsBaseRef = db.collection('posts')
                                 .where('expiryTime', '>', firebase.firestore.Timestamp.now()) // Only active posts
                                 .orderBy('expiryTime', 'desc') // Newer expire dates first (effectively newer posts)
@@ -3442,8 +3431,12 @@ async function loadPosts() {
 
 // Immersive Feed (Snap Scrolling) Loading Logic
 async function loadImmersiveFeedPosts() {
-    if (fetchingImmersivePosts || !currentUser) {
-        console.log("loadImmersiveFeedPosts: Skipping (already fetching or no current user).");
+    if (!currentUser) { // Ensure logged in
+        console.log("loadImmersiveFeedPosts: Skipping, no current user.");
+        return;
+    }
+    if (fetchingImmersivePosts) { // Prevent concurrent fetches
+        console.log("loadImmersiveFeedPosts: Skipping, already fetching.");
         return;
     }
 
@@ -3473,7 +3466,7 @@ async function loadImmersiveFeedPosts() {
             fetchingImmersivePosts = false; // Release flag before recursion
             feedLoadingSpinner.classList.add('hidden');
             if (immersiveFeed.children.length === 0 || immersiveFeed.innerHTML.includes('No immersive posts available.')) {
-                 immersiveFeed.innerHTML = '<p style="text-align: center; color: var(--text-color-light);">No immersive posts available.</p>';
+                 immersiveFeed.innerHTML = '<p style="text-align: center; color: var(--text-color-light);">No immersive posts available. Try uploading a public post!</p>';
                  return; // Avoid infinite recursion if DB is truly empty.
             } else {
                  immersiveFeed.innerHTML = ''; // Clear for fresh start of looped content.
@@ -4632,15 +4625,13 @@ saveProfileBtn.addEventListener('click', async () => {
     }
 
     // Name must be provided if it's currently empty, especially for new registrations
-    // editProfileModal.classList.contains('hidden') is incorrect for initial registration check, better to check currentData.name
-    // A simplified check is: if this is a NEW user completing profile, require name.
     const userDocRef = db.collection('users').doc(currentUser.uid);
     const userDoc = await userDocRef.get();
     const currentData = userDoc.data();
     
     if (currentData && (currentData.username === "" || currentData.name === "") && newName.length < 1) { // If it's first time profile fill and name is empty
-        showToast("Display Name cannot be empty during initial profile setup.", 'error');
-        return;
+         showToast("Display Name cannot be empty during initial profile setup.", 'error');
+         return;
     }
 
 
@@ -4654,9 +4645,9 @@ saveProfileBtn.addEventListener('click', async () => {
             profileLogo: newProfileLogo,
             profilePicUrl: finalProfilePicUrl, // Save direct URL
             isPrivate: isPrivate,
-            // These counts should have already been initialized on creation. Just ensuring data consistency for clarity.
-            // Firebase update on existing fields without increment/decrement will simply overwrite, which is fine here.
-            // If they are undefined, default to 0.
+            // Initialize earning/follower counts if they don't exist (important for new users saving profile for first time)
+            // If they already exist, Firebase update will merge and use existing values.
+            // These lines ensure values are set for NEWLY CREATED documents through initial registration flow.
             followersCount: currentData.followersCount !== undefined ? currentData.followersCount : 0,
             followingCount: currentData.followingCount !== undefined ? currentData.followingCount : 0,
             postCount: currentData.postCount !== undefined ? currentData.postCount : 0,
@@ -4684,7 +4675,7 @@ saveProfileBtn.addEventListener('click', async () => {
             console.log("Post updates batch committed successfully.");
         }
 
-        editProfileModal.classList.add('hidden'); // IMPORTANT: Now this should reliably hide the modal
+        editProfileModal.classList.add('hidden'); // This will now correctly hide the modal on save
         showToast("Profile updated successfully!", 'success');
         loadUserProfile(currentUser.uid); // Reload profile display
     } catch (error) {
@@ -4781,7 +4772,7 @@ async function handleUnfollow(targetUserId) {
             }
 
             const currentUserData = currentUserDoc.data();
-            // Check if actually following before attempting to unfollow.
+            // Check if this person is indeed a follower.
             if (!currentUserData.following || !currentUserData.following.includes(targetUserId)) {
                 showToast("Not currently following this user.", 'info');
                 return; // Exit transaction if not already following.
@@ -5099,7 +5090,7 @@ async function openChatWindow(partnerId) {
     currentChatPartnerId = partnerId;
     messageListContainer.classList.add('hidden'); // Hide chat list.
     chatWindowContainer.classList.remove('hidden'); // Show chat window.
-    chatMessages.innerHTML = '<div class="loader" style="margin: 20px auto;"></div>'; // Show loader for messages.
+    chatMessages.innerHTML = '<div class="loader" style="margin: 20px auto;"></div>'; // Show a loading spinner.
 
     try {
         const partnerDoc = await db.collection('users').doc(partnerId).get();
@@ -5123,12 +5114,12 @@ async function openChatWindow(partnerId) {
         // Real-time listener for messages between these two specific users.
         db.collection('messages')
             .where('participants', 'array-contains', currentUser.uid) // Query messages where current user is a participant.
-            .orderBy('timestamp', 'asc') // Order by timestamp to show chronologically.
+            .orderBy('timestamp', 'asc') // Order messages chronologically.
             .onSnapshot(snapshot => {
                 chatMessages.innerHTML = ''; // Clear previous messages.
                 snapshot.docs.forEach(doc => {
                     const message = doc.data();
-                    // Filter messages to show ONLY those between current user and current chat partner.
+                    // Filter messages relevant *only* to the current chat partner in the UI
                     const isRelevant = (message.senderId === currentUser.uid && message.receiverId === partnerId) ||
                                        (message.senderId === partnerId && message.receiverId === currentUser.uid);
                     // Client-side expiry check for display (Firestore rules enforce true expiry on backend).
@@ -5422,7 +5413,6 @@ async function performSearch() {
 
         postSnapshot.docs.forEach(doc => {
             const postData = { id: doc.id, ...doc.data() };
-            // Client-side simple check if post content includes query (case-insensitive).
             // Security rules will ultimately decide if user can read the private posts found.
             if (postData.content && postData.content.toLowerCase().includes(query)) {
                 foundResults = true;
@@ -5484,6 +5474,7 @@ async function handleRepost(postId) {
         showToast("Failed to repost. Please try again.", 'error');
     }
 }
+
 
 async function handleDeletePost(postId, postElement, isMonetized) {
     if (!currentUser) {
@@ -5755,8 +5746,6 @@ sendWithdrawalRequestBtn.addEventListener('click', async () => {
     }
 });
 
-// Cancel withdrawal request.
 cancelWithdrawalBtn.addEventListener('click', () => {
-    withdrawalModal.classList.add('hidden'); // Hide the modal.
-});
-```
+    withdrawalModal.classList.add('hidden');
+});```
