@@ -1,561 +1,16 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AddMint - Ultra Professional</title>
-    <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-</head>
-<body class="dark-mode"> 
     
-    <!-- This paragraph is for JavaScript load testing. It should be the ONLY thing initially visible IF JS loads. -->
-    <p id="js-load-indicator" style="position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); color:white; background:black; padding:10px; z-index:9999; display: none;">Loading Application...</p>
+    <style>
+        /* CSS copied from style.css for all-in-one file */
 
-    <!-- Auth Container for Login/Register (Hidden by default, JS will manage display) -->
-    <div id="auth-container" class="auth-container hidden">
-        <div class="auth-content">
-            <div class="app-logo-splash auth-logo"></div> <h1>AddMint</h1>
-            <section id="login-screen" class="auth-screen active">
-                <h2>Login</h2>
-                <div class="form-group">
-                    <label for="login-email">Email:</label>
-                    <input type="email" id="login-email" placeholder="Enter your email">
-                </div>
-                <div class="form-group">
-                    <label for="login-password">Password:</label>
-                    <input type="password" id="login-password" placeholder="Enter your password">
-                </div>
-                <button class="btn primary-btn" id="login-btn">Login</button>
-                <p class="auth-text">
-                    <a href="#" id="forgot-password-link">Forgot Password?</a>
-                </p>
-                <p class="auth-text">Don't have an account? <a href="#" id="show-signup">Register</a></p>
-                <p id="login-status" class="status-message"></p>
-            </section>
-
-            <section id="signup-screen" class="auth-screen hidden">
-                <h2>Register</h2>
-                <div class="form-group">
-                    <label for="signup-email">Email:</label>
-                    <input type="email" id="signup-email" placeholder="Enter your email">
-                </div>
-                <div class="form-group">
-                    <label for="signup-password">Password:</label>
-                    <input type="password" id="signup-password" placeholder="Choose a password (min 6 characters)">
-                </div>
-                <div class="form-group">
-                    <label for="signup-confirm-password">Confirm Password:</label>
-                    <input type="password" id="signup-confirm-password" placeholder="Re-enter your password">
-                </div>
-                <button class="btn primary-btn" id="signup-btn">Register</button>
-                <p class="auth-text">Already have an account? <a href="#" id="show-login">Login</a></p>
-                <p id="signup-status" class="status-message"></p>
-            </section>
-        </div>
-    </div>
-
-
-    <div id="forgot-password-modal" class="modal hidden">
-        <div class="modal-content">
-            <h3>Reset Password</h3>
-            <p>Enter your email address to receive a password reset link.</p>
-            <div class="form-group">
-                <label for="reset-email">Email:</label>
-                <input type="email" id="reset-email" placeholder="Your email address">
-            </div>
-            <button class="btn primary-btn" id="send-reset-email-btn">Send Reset Link</button>
-            <p id="reset-status" class="status-message"></p>
-            <button class="btn secondary-btn" id="close-reset-modal">Cancel</button>
-        </div>
-    </div>
-
-
-    <!-- Main Application Container (Hidden by default, JS will manage display) -->
-    <div id="app-container" class="app-container hidden">
-
-        <header class="app-header">
-            <div class="header-left">
-                <div class="menu-icon" id="menu-toggle">
-                    <div class="bar"></div>
-                    <div class="bar"></div>
-                    <div class="bar"></div>
-                </div>
-                <div class="app-title">AddMint</div>
-            </div>
-            <div class="header-center">
-                <!-- Removed: Coins, Credits, Limit -->
-            </div>
-            <div class="header-right">
-                <div class="icon-button" id="refresh-posts-btn" title="Refresh Feed">
-                    <i class="fas fa-sync-alt"></i>
-                </div>
-                <!-- Removed: Gift Claim Button -->
-            </div>
-        </header>
-
-        <nav id="sidebar" class="sidebar">
-            <div class="sidebar-header">
-                <div class="profile-avatar-small" id="sidebar-profile-avatar"></div>
-                <h3 id="sidebar-username">My User</h3> 
-                <div class="close-sidebar" id="close-sidebar">&times;</div>
-            </div>
-            <ul>
-                <li><a href="#" data-screen="home"><i class="fas fa-home"></i> Home Feed</a></li>
-                <li><a href="#" data-screen="feed"><i class="fas fa-stream"></i> Immersive Feed</a></li>
-                <li><a href="#" data-screen="profile"><i class="fas fa-user-circle"></i> My Profile</a></li>
-                <li><a href="#" data-screen="upload"><i class="fas fa-plus-circle"></i> Upload Post</a></li>
-                <li><a href="#" data-screen="messages"><i class="fas fa-comments"></i> Messages</a></li>
-                <li><a href="#" data-screen="search"><i class="fas fa-search"></i> Search Users</a></li>
-                <li><a href="#" data-screen="earnings"><i class="fas fa-dollar-sign"></i> My Earnings</a></li>
-                <li><a href="#" id="data-saver-toggle"><i class="fas fa-wifi"></i> Data Saver <span class="toggle-switch"><input type="checkbox" id="data-saver-checkbox"><label for="data-saver-checkbox"></label></span></a></li>
-                <li><a href="#" id="dark-mode-toggle"><i class="fas fa-moon"></i> Dark Mode <span class="toggle-switch"><input type="checkbox" id="dark-mode-checkbox" checked><label for="dark-mode-checkbox"></label></span></a></li>
-                <li><a href="https://www.instagram.com/addmint__" target="_blank"><i class="fab fa-instagram"></i> Our Instagram</a></li>
-                <li><a href="https://www.youtube.com/@add_mintmint" target="_blank"><i class="fab fa-youtube"></i> Our YouTube</a></li>
-                <li><a href="#" data-screen="about"><i class="fas fa-info-circle"></i> About Us</a></li>
-                <li><a href="#" data-screen="privacy"><i class="fas fa-shield-alt"></i> Privacy Policy</a></li>
-                <li><a href="#" id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
-            </ul>
-        </nav>
-
-        <main class="main-content">
-            <section id="home-screen" class="app-screen active">
-                <h2>Recent Posts</h2>
-                 <div class="category-filter">
-                    <select id="post-category-filter">
-                        <option value="all">All Categories</option>
-                        <option value="Breaking News">Breaking News</option>
-                        <option value="Trending News">Trending News</option>
-                        <option value="Top Stories">Top Stories</option>
-                        <option value="National News">National News</option>
-                        <option value="International News">International News</option>
-                        <option value="Politics">Politics</option>
-                        <option value="Economy">Economy</option>
-                        <option value="Business">Business</option>
-                        <option value="Finance">Finance</option>
-                        <option value="Stock Market">Stock Market</option>
-                        <option value="Technology">Technology</option>
-                        <option value="Science">Science</option>
-                        <option value="Environment">Environment</option>
-                        <option value="Entertainment">Entertainment</option>
-                        <option value="Movies">Movies</option>
-                        <option value="TV Shows">TV Shows</option>
-                        <option value="Music">Music</option>
-                        <option value="Celebrity Gossip">Celebrity Gossip</option>
-                        <option value="Lifestyle">Lifestyle</option>
-                        <option value="Fashion">Fashion</option>
-                        <option value="Beauty & Grooming">Beauty & Grooming</option>
-                        <option value="Food & Recipes">Food & Recipes</option>
-                        <option value="Travel & Tourism">Travel & Tourism</option>
-                        <option value="Sports">Sports</option>
-                        <option value="Cricket">Cricket</option>
-                        <option value="Football">Football</option>
-                        <option value="Tennis">Tennis</option>
-                        <option value="Olympics">Olympics</option>
-                        <option value="Esports">Esports</option>
-                        <option value="Health & Fitness">Health & Fitness</option>
-                        <option value="Yoga & Meditation">Yoga & Meditation</option>
-                        <option value="Education">Education</option>
-                        <option value="Career & Jobs">Career & Jobs</option>
-                        <option value="Startup & Entrepreneurship">Startup & Entrepreneurship</option>
-                        <option value="Automobile">Automobile</option>
-                        <option value="Real Estate">Real Estate</option>
-                        <option value="Religion & Spirituality">Religion & Spirituality</option>
-                        <option value="History & Culture">History & Culture</option>
-                        <option value="Regional News (State-wise)">Regional News (State-wise)</option>
-                        <option value="Weather Updates">Weather Updates</option>
-                        <option value="Opinion & Editorials">Opinion & Editorials</option>
-                        <option value="Viral & Social Media Trends">Viral & Social Media Trends</option>
-                    </select>
-                </div>
-                <div id="posts-feed" class="posts-feed">
-                    </div>
-                <div id="loading-spinner" class="loading-spinner hidden"></div>
-            </section>
-
-            <section id="feed-screen" class="app-screen">
-                <h2>Immersive Feed</h2>
-                <div id="immersive-feed" class="immersive-feed">
-                    <!-- Posts will be loaded here with snap scrolling -->
-                </div>
-                <div id="feed-loading-spinner" class="loading-spinner hidden"></div>
-            </section>
-
-            <section id="profile-screen" class="app-screen">
-                <div id="user-profile-display">
-                    <div class="profile-header-area">
-                        <div class="profile-avatar-large" id="my-profile-avatar"></div>
-                        <h2 id="my-profile-username">@myusername</h2>
-                        <p id="my-profile-name" class="profile-name"></p>
-                        <p id="my-profile-bio" class="profile-bio"></p>
-                        <div class="profile-stats">
-                            <div><span id="my-posts-count">0</span> Posts</div>
-                            <div class="clickable-stat" data-stat="followers"><span id="my-followers-count">0</span> Followers</div>
-                            <div class="clickable-stat" data-stat="following"><span id="my-following-count">0</span> Following</div>
-                        </div>
-                        <div class="profile-actions">
-                            <button class="btn primary-btn" id="edit-profile-btn"><i class="fas fa-edit"></i> Edit Profile</button>
-                            <button class="btn secondary-btn hidden" id="follow-user-btn"><i class="fas fa-user-plus"></i> Follow</button>
-                            <button class="btn danger-btn hidden" id="unfollow-user-btn"><i class="fas fa-user-minus"></i> Unfollow</button>
-                            <button class="btn primary-btn hidden" id="message-user-btn"><i class="fas fa-paper-plane"></i> Message</button>
-                            <a href="#" id="profile-whatsapp-link" class="btn social-btn hidden"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                            <a href="#" id="profile-instagram-link" class="btn social-btn hidden"><i class="fab fa-instagram"></i> Instagram</a>
-                        </div>
-                    </div>
-
-                    <div id="edit-profile-modal" class="modal hidden">
-                        <div class="modal-content">
-                            <h3>Edit Profile</h3>
-                            <p id="profile-modal-instruction">Please complete your profile to continue using the app.</p>
-                            <div class="form-group">
-                                <label for="edit-username">Username:</label>
-                                <input type="text" id="edit-username" placeholder="Enter new username">
-                                <span id="username-availability"></span>
-                            </div>
-                            <div class="form-group">
-                                <label for="edit-name">Display Name (Optional):</label>
-                                <input type="text" id="edit-name" placeholder="Enter your display name">
-                            </div>
-                            <div class="form-group">
-                                <label for="edit-bio">Bio (Optional):</label>
-                                <textarea id="edit-bio" placeholder="Tell us about yourself..."></textarea>
-                            </div>
-                            <div class="form-group">
-                                <label for="edit-whatsapp">WhatsApp (Optional):</label>
-                                <input type="text" id="edit-whatsapp" placeholder="e.g., +919876543210">
-                            </div>
-                            <div class="form-group">
-                                <label for="edit-instagram">Instagram ID (Optional):</label>
-                                <input type="text" id="edit-instagram" placeholder="e.g., my_insta_id">
-                            </div>
-                            <div class="form-group">
-                                <label for="profile-pic-url-input">Direct Profile Picture URL (Optional):</label>
-                                <input type="text" id="profile-pic-url-input" placeholder="e.g., https://example.com/mypic.jpg">
-                                <small>Enter a direct image link (like from imgbb.com).</small>
-                            </div>
-                            <div class="form-group">
-                                <label>Or Choose a Profile Logo:</label>
-                                <div id="profile-logo-options" class="logo-options-grid">
-                                    </div>
-                            </div>
-                            <div class="form-group">
-                                <label for="account-privacy-toggle">Account Privacy:</label>
-                                <div class="toggle-switch">
-                                    <input type="checkbox" id="account-privacy-toggle">
-                                    <label for="account-privacy-toggle"></label>
-                                </div>
-                                <span id="account-privacy-status">Public</span>
-                            </div>
-                            <button class="btn primary-btn" id="save-profile-btn">Save Changes</button>
-                            <button class="btn secondary-btn" id="cancel-edit-profile-btn">Cancel</button>
-                        </div>
-                    </div>
-
-                    <div id="follow-list-modal" class="modal hidden">
-                        <div class="modal-content">
-                            <h3 id="follow-list-title"></h3>
-                            <div id="follow-list-content">
-                                </div>
-                            <button class="btn secondary-btn" id="close-follow-list-modal">Close</button>
-                        </div>
-                    </div>
-
-                    <div class="profile-posts-area">
-                        <h3>Posts by <span id="current-profile-username-posts">Me</span></h3>
-                        <div class="profile-post-tabs">
-                            <button class="btn tab-btn active" data-tab="posts">My Posts</button>
-                            <button class="btn tab-btn" data-tab="reposts">My Reposts</button>
-                        </div>
-                        <div id="profile-posts-feed" class="posts-feed">
-                            </div>
-                        <div id="profile-reposts-feed" class="posts-feed hidden">
-                            </div>
-                    </div>
-                </div>
-            </section>
-
-            <section id="upload-screen" class="app-screen">
-                <h2>Upload New Post</h2>
-                <div class="form-group">
-                    <label for="post-category">Category:</label>
-                    <select id="post-category">
-                        <option value="General">General</option>
-                        <option value="Breaking News">Breaking News</option>
-                        <option value="Trending News">Trending News</option>
-                        <option value="Top Stories">Top Stories</option>
-                        <option value="National News">National News</option>
-                        <option value="International News">International News</option>
-                        <option value="Politics">Politics</option>
-                        <option value="Economy">Economy</option>
-                        <option value="Business">Business</option>
-                        <option value="Finance">Finance</option>
-                        <option value="Stock Market">Stock Market</option>
-                        <option value="Technology">Technology</option>
-                        <option value="Science">Science</option>
-                        <option value="Environment">Environment</option>
-                        <option value="Entertainment">Entertainment</option>
-                        <option value="Movies">Movies</option>
-                        <option value="TV Shows">TV Shows</option>
-                        <option value="Music">Music</option>
-                        <option value="Celebrity Gossip">Celebrity Gossip</option>
-                        <option value="Lifestyle">Lifestyle</option>
-                        <option value="Fashion">Fashion</option>
-                        <option value="Beauty & Grooming">Beauty & Grooming</option>
-                        <option value="Food & Recipes">Food & Recipes</option>
-                        <option value="Travel & Tourism">Travel & Tourism</option>
-                        <option value="Sports">Sports</option>
-                        <option value="Cricket">Cricket</option>
-                        <option value="Football">Football</option>
-                        <option value="Tennis">Tennis</option>
-                        <option value="Olympics">Olympics</option>
-                        <option value="Esports">Esports</option>
-                        <option value="Health & Fitness">Health & Fitness</option>
-                        <option value="Yoga & Meditation">Yoga & Meditation</option>
-                        <option value="Education">Education</label>
-                        <option value="Career & Jobs">Career & Jobs</option>
-                        <option value="Startup & Entrepreneurship">Startup & Entrepreneurship</option>
-                        <option value="Automobile">Automobile</option>
-                        <option value="Real Estate">Real Estate</option>
-                        <option value="Religion & Spirituality">Religion & Spirituality</option>
-                        <option value="History & Culture">History & Culture</option>
-                        <option value="Regional News (State-wise)">Regional News (State-wise)</option>
-                        <option value="Weather Updates">Weather Updates</option>
-                        <option value="Opinion & Editorials">Opinion & Editorials</option>
-                        <option value="Viral & Social Media Trends">Viral & Social Media Trends</option>
-                    </select>
-                </div>
-                <div class="form-group rich-text-editor">
-                    <label for="post-content">Post Content:</label>
-                    <div class="editor-toolbar">
-                        <button type="button" class="tool-btn" data-command="bold"><i class="fas fa-bold"></i></button>
-                        <button type="button" class="tool-btn" data-command="italic"><i class="fas fa-italic"></i></button>
-                        <button type="button" class="tool-btn" data-command="insertImage"><i class="fas fa-image"></i></button>
-                        <button type="button" class="tool-btn" data-command="insertYoutube"><i class="fab fa-youtube"></i></button>
-                        <button type="button" class="tool-btn" data-command="insertLink"><i class="fas fa-link"></i></button>
-                    </div>
-                    <textarea id="post-content" placeholder="What's on your mind? Use **bold**, *italic*, [link text](http://url.com), ![image alt](http://image.url), ![youtube video](http://youtube.com/watch?v=VIDEO_ID)"></textarea>
-                    <small>Min 60, Max 10000 characters.</small>
-                </div>
-                <div class="form-group">
-                    <label for="post-boost">Post will be active for:</label>
-                    <select id="post-boost" disabled>
-                        <option value="24">24 Hours (Free)</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="monetize-post-checkbox">Monetize this post?</label>
-                    <div class="toggle-switch">
-                        <input type="checkbox" id="monetize-post-checkbox">
-                        <label for="monetize-post-checkbox"></label>
-                    </div>
-                    <small>Earn from views on monetized posts.</small>
-                </div>
-                <button class="btn primary-btn" id="publish-post-btn">Publish Post</button>
-                <div id="upload-status"></div>
-            </section>
-
-            <section id="messages-screen" class="app-screen">
-                <h2>Messages</h2>
-                <div id="message-list-container">
-                    <h3>Recent Chats</h3>
-                    <ul id="recent-chats-list" class="recent-chats-list">
-                        </ul>
-                </div>
-
-                <div id="chat-window-container" class="chat-window-container hidden">
-                    <div class="chat-header">
-                        <button id="back-to-chats-btn" class="icon-button"><i class="fas fa-arrow-left"></i></button>
-                        <div class="profile-avatar small" id="chat-partner-avatar"></div>
-                        <span id="chat-partner-username">@ChatUser</span>
-                    </div>
-                    <div id="chat-messages" class="chat-messages">
-                        </div>
-                    <div class="chat-input-area">
-                        <textarea id="message-input" placeholder="Type your message..."></textarea>
-                        <button id="send-message-btn" class="btn primary-btn"><i class="fas fa-paper-plane"></i></button>
-                    </div>
-                    <div class="emoji-picker-chat hidden">
-                        <span class="emoji-option" data-emoji="👍">👍</span>
-                        <span class="emoji-option" data-emoji="❤️">❤️</span>
-                        <span class="emoji-option" data-emoji="😂">😂</span>
-                        <span class="emoji-option" data-emoji="😢">😢</span>
-                        <span class="emoji-option" data-emoji="🔥">🔥</span>
-                    </div>
-                </div>
-            </section>
-
-            <section id="search-screen" class="app-screen">
-                <h2>Search Users & Posts</h2>
-                <div class="search-input-group">
-                    <input type="text" id="search-query" placeholder="Search by username, keyword...">
-                    <button class="btn primary-btn" id="search-btn"><i class="fas fa-search"></i></button>
-                </div>
-                <div id="search-results" class="search-results-container">
-                    <h3>Users</h3>
-                    <ul id="search-user-list" class="search-list">
-                        </ul>
-                    <h3>Posts</h3>
-                    <div id="search-post-list" class="posts-feed">
-                        </div>
-                    <div id="no-search-results" class="hidden">No results found.</div>
-                </div>
-            </section>
-
-            <section id="earnings-screen" class="app-screen">
-                <h2>My Earnings</h2>
-                <div class="earnings-summary">
-                    <p>Total Monetized Views: <span id="total-monetized-views">0</span></p>
-                    <p>Total Unmonetized Views: <span id="total-unmonetized-views">0</span></p>
-                    <p>Estimated Earnings: <span id="estimated-earnings">0.00 $</span></p>
-                </div>
-                <button class="btn primary-btn" id="withdraw-btn">Withdraw Earnings</button>
-                <div id="withdrawal-status" class="hidden"></div>
-            </section>
-
-            <section id="about-screen" class="app-screen">
-                <h2>About AddMint</h2>
-                <p>AddMint is a revolutionary social media platform designed to connect people through shared interests and engaging content. We believe in fostering a positive and vibrant community where every voice can be heard.</p>
-                <p>Our mission is to provide a seamless and professional experience for all users, offering unique features like dynamic post feeds, real-time messaging, and interactive user profiles.</p>
-                <p>For support or inquiries, please contact us at support@addmint.com.</p>
-            </section>
-
-            <section id="privacy-screen" class="app-screen">
-                <h2>Privacy Policy</h2>
-                <p>Your privacy is paramount to us at AddMint. This policy outlines how we collect, use, and protect your personal information.</p>
-                <h3>Information We Collect:</h3>
-                <ul>
-                    <li><strong>Account Information:</strong> Username, email, password (hashed).</li>
-                    <li><strong>Profile Information:</strong> Optional WhatsApp number, Instagram ID, chosen profile logo or direct URL, display name, bio, account privacy.</li>
-                    <li><strong>Content Data:</strong> Posts, messages, likes, reactions, views.</li>
-                    <li><strong>Usage Data:</strong> Interactions with the app, features used, and technical data (e.g., device type).</li>
-                </ul>
-                <h3>How We Use Your Information:</h3>
-                <ul>
-                    <li>To provide and maintain our services.</li>
-                    <li>To personalize your experience and show relevant content.</li>
-                    <li>To communicate with you regarding updates, security alerts, and support.</li>
-                    <li>To monitor and analyze usage patterns for service improvement.</li>
-                    <li>To enforce our terms and conditions and prevent misuse.</li>
-                </ul>
-                <h3>Data Sharing:</h3>
-                <p>We do not share your personal information with third parties except as necessary to provide our services (e.g., Firebase for database), comply with legal obligations, or with your explicit consent.</p>
-                <h3>Data Security:</h3>
-                <p>We implement robust security measures, including encryption and access controls, to protect your data. However, no internet transmission is 100% secure.</p>
-                <h3>Your Choices:</h3>
-                <ul>
-                    <li>You can update your profile information at any time.</li>
-                    <li>You can delete your account by contacting support.</li>
-                    <li>You can control notification preferences.</li>
-                </ul>
-                <p>By using AddMint, you agree to the terms of this Privacy Policy. We may update this policy periodically, and we will notify you of any significant changes.</p>
-            </section>
-        </main>
-
-        <footer class="app-bottom-nav">
-            <a href="#" class="nav-item active" data-screen="home">
-                <div class="icon-wrapper home-icon"></div>
-                <span>Home</span>
-            </a>
-            <a href="#" class="nav-item" data-screen="search">
-                <div class="icon-wrapper search-icon"></div>
-                <span>Search</span>
-            </a>
-            <a href="#" class="nav-item" data-screen="upload">
-                <div class="icon-wrapper upload-icon"></div>
-                <span>Upload</span>
-            </a>
-            <a href="#" class="nav-item" data-screen="messages">
-                <div class="icon-wrapper messages-icon"></div>
-                <span>Messages</span>
-            </a>
-            <a href="#" class="nav-item" data-screen="profile">
-                <div class="icon-wrapper profile-icon"></div>
-                <span>Profile</span>
-            </a>
-        </footer>
-
-        <div id="ad-modal" class="modal hidden">
-            <div class="modal-content">
-                <h3>Watch Ad to Earn Reward</h3>
-                <p>Please watch a short ad to gain access to features.</p>
-                <div id="ad-placeholder">
-                    <p>Simulating Ad (5 seconds)...</p>
-                </div>
-                <button class="btn secondary-btn" id="close-ad-modal" disabled>Close Ad</button>
-            </div>
-        </div>
-
-        <div id="reward-popup" class="modal hidden">
-            <div class="modal-content reward-content">
-                <h3>Success! <i class="fas fa-trophy"></i></h3>
-                <p id="reward-message"></p>
-                <button class="btn primary-btn" id="close-reward-popup">Great!</button>
-            </div>
-        </div>
-
-        <div id="comments-modal" class="modal hidden">
-            <div class="modal-content">
-                <h3 id="comments-modal-title">Comments</h3>
-                <div id="comments-list">
-                    <!-- Comments will be loaded here -->
-                </div>
-                <div class="comment-input-area">
-                    <textarea id="new-comment-input" placeholder="Add a comment (max 100 chars)..."></textarea>
-                    <button class="btn primary-btn" id="add-comment-btn"><i class="fas fa-paper-plane"></i></button>
-                </div>
-                <button class="btn secondary-btn" id="close-comments-modal">Close</button>
-            </div>
-        </div>
-
-        <div id="withdrawal-modal" class="modal hidden">
-            <div class="modal-content">
-                <h3>Withdraw Earnings</h3>
-                <p>Your total monetized views: <span id="withdrawal-views-display">0</span></p>
-                <div class="form-group">
-                    <label for="withdrawal-method">Choose Method:</label>
-                    <select id="withdrawal-method">
-                        <option value="upi">UPI ID</option>
-                        <option value="paypal">PayPal Email</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="withdrawal-id-input" id="withdrawal-id-label">UPI ID:</label>
-                    <input type="text" id="withdrawal-id-input" placeholder="Enter UPI ID or PayPal Email">
-                </div>
-                <button class="btn primary-btn" id="confirm-withdrawal-btn">Check Details</button>
-                <div id="withdrawal-details-review" class="hidden">
-                    <h4>Review Your Details:</h4>
-                    <p>Method: <span id="review-method"></span></p>
-                    <p>ID: <span id="review-id"></span></p>
-                    <p>Views: <span id="review-views"></span></p>
-                    <div class="profile-actions">
-                        <button class="btn secondary-btn" id="edit-withdrawal-btn">Edit</button>
-                        <button class="btn primary-btn" id="send-withdrawal-request-btn">Send Request</button>
-                    </div>
-                </div>
-                <button class="btn secondary-btn" id="cancel-withdrawal-btn">Cancel</button>
-            </div>
-        </div>
-
-        <div id="toast-notification" class="toast-notification"></div>
-
-    </div>
-
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
-    <script src="script.js"></script>
-</body>
-</html>
-```
-
-### **`style.css` (Simplified initial hidden states for robustness)**
-
-`splash-screen` के CSS नियमों को अपडेट किया है, अब इसका उपयोग मुख्य रूप से `index.html` से हटाए जाने के कारण नहीं होगा। `auth-container` और `app-container` `hidden` क्लास पर निर्भर करेंगे जो उन्हें `display: none !important;` बनाती है, और फिर JavaScript उन्हें `display: flex` पर ओवरराइड करेगा।
-
-```css
 /* General Body and Container Styles */
 body {
     font-family: 'Montserrat', sans-serif;
@@ -637,28 +92,33 @@ body.light-mode {
     border: 1px solid var(--border-color-main);
 }
 
-/* Hidden class applied by default in HTML and managed by JS */
+/* Updated hidden class logic */
 .hidden {
-    display: none !important; 
+    display: none !important; /* Forces elements to be truly hidden by default */
 }
 
-/* Diagnostic message to confirm JavaScript is running */
-#js-load-indicator {
-    display: none; /* Controlled by JS */
-    /* Other styles for visibility and centering */
-    position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); 
-    color:white; background:black; padding:10px; z-index:9999;
+/* Diagnostic message */
+#load-status {
+    position:fixed; 
+    top:50%; 
+    left:50%; 
+    transform:translate(-50%, -50%); 
+    color:white; 
+    background:black; 
+    padding:10px; 
+    z-index:9999; 
+    display: none; /* Controlled by JavaScript now */
+    text-align: center;
 }
 
-
-/* Auth Container (Login/Signup) - Flex setup to properly center content via JS */
+/* Auth Container (Login/Signup) - Now handled more robustly by JS display flex/none */
 .auth-container {
     width: 100%;
     max-width: 420px;
     height: 100vh;
-    display: flex; /* Changed from default hidden to flex, controlled by JS. */
+    display: flex; 
     justify-content: center;
-    align-items: center; /* Vertically centers the .auth-content */
+    align-items: center; 
     background-color: var(--bg-color-lighter);
     box-shadow: 0 0 30px var(--shadow-color-main);
     border-radius: 12px;
@@ -676,14 +136,14 @@ body.light-mode {
     border-radius: 8px;
     box-shadow: 0 0 15px rgba(0, 255, 255, 0.1);
     border: 1px solid var(--border-color-main);
-    display: flex; /* Inner flex to arrange children vertically */
+    display: flex; 
     flex-direction: column;
-    align-items: center; /* Center login/signup forms */
+    align-items: center; 
 }
-.app-logo-splash { /* Used by auth-content h1 */
+.app-logo-splash { 
     width: 100px;
     height: 100px;
-    background: linear-gradient(45deg, #00ffff, #ff00ff); /* Neon gradient */
+    background: linear-gradient(45deg, #00ffff, #ff00ff); 
     border-radius: 50%;
     margin-bottom: 20px;
     position: relative;
@@ -692,7 +152,7 @@ body.light-mode {
     animation: pulse 2s infinite alternate;
 }
 .app-logo-splash::before {
-    content: 'A'; /* Simple 'A' for AddMint */
+    content: 'A'; 
     font-family: 'Montserrat', sans-serif;
     font-size: 60px;
     font-weight: bold;
@@ -704,67 +164,50 @@ body.light-mode {
 }
 
 
-/* Forms inside auth screens */
 .auth-screen { 
-    display: none; /* Controlled by JS using active class */
-    width: 100%; /* Take full width of parent .auth-content */
-    flex-direction: column; /* Inner flex for form elements */
-    align-items: center; /* Center form elements horizontally */
+    display: none; /* Default to hidden */
+    width: 100%; 
+    flex-direction: column; 
+    align-items: center; 
 }
 .auth-screen.active {
-    display: flex; /* Only active screen is displayed as flex */
+    display: flex; /* Active screen becomes visible flex */
 }
-
-/* Common form group, input, button styling */
-.form-group { margin-bottom: 15px; width: 100%; } /* Take full width */
-.form-group label { display: block; margin-bottom: 8px; font-weight: bold; color: var(--text-color-main); text-align: left; } /* Align label text to left */
-input[type="text"], input[type="email"], input[type="password"], textarea, select {
-    width: 100%; /* Make input fill container */
-    padding: 12px;
-    border: 1px solid var(--input-border);
-    border-radius: 6px;
-    background-color: var(--input-bg);
-    color: var(--text-color-main);
-    box-sizing: border-box; /* Include padding in width */
-    font-size: 1em;
-    box-shadow: 0 0 8px var(--shadow-color-main);
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-.btn { /* General button style */
-    display: inline-block;
-    padding: 12px 25px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 1.1em;
-    font-weight: bold;
-    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
-    text-align: center;
-    text-decoration: none;
-    width: 100%; /* Make buttons full width */
-    max-width: 300px; /* Limit max width for forms */
+.auth-text { 
+    font-size: 0.9em;
     margin-top: 15px;
+    color: var(--text-color-light);
 }
-.btn:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    transform: translateY(0);
-    box-shadow: none;
+.auth-text a { 
+    color: var(--highlight-color-main);
+    text-decoration: none;
+    font-weight: bold;
+}
+.auth-text a:hover {
+    text-decoration: underline;
+}
+.status-message { 
+    margin-top: 15px;
+    padding: 8px 10px;
+    border-radius: 5px;
+    font-size: 0.9em;
+}
+.status-message.error { 
+    background-color: rgba(231, 76, 60, 0.2);
+    color: #e74c3c;
+    border: 1px solid #e74c3c;
+}
+.status-message.success { 
+    background-color: rgba(51, 255, 87, 0.2);
+    color: #33ff57;
+    border: 1px solid #33ff57;
+}
+.status-message.info { 
+    background-color: rgba(0, 255, 255, 0.1);
+    color: #00ffff;
+    border: 1px solid #00ffff;
 }
 
-
-/* Existing component styles remain mostly the same from here */
-
-.loader { /* Reused from initial */
-    border: 4px solid rgba(255, 255, 255, 0.3);
-    border-top: 4px solid var(--highlight-color-main);
-    border-radius: 50%;
-    width: 30px;
-    height: 30px;
-    animation: spin 1s linear infinite;
-    margin-top: 20px;
-}
 
 /* Header */
 .app-header {
@@ -879,7 +322,6 @@ input[type="text"], input[type="email"], input[type="password"], textarea, selec
     position: relative;
     border: 2px solid var(--highlight-color-main);
     flex-shrink: 0;
-    box-shadow: 0 0 8px var(--shadow-color-strong);
     background-size: cover; /* For direct pic link */
     background-position: center; /* For direct pic link */
 }
@@ -2305,7 +1747,14 @@ input[type="file"] {
     }
 ```
 
-### **`script.js` (Final & Most Robust Fix for Initial Load & Black Screen)**
+### **3. `script.js` (Final & Most Robust, now with Load Indication & Cleaned Up Init)**
+
+इस `script.js` फ़ाइल को ऐप की inicialization logic, authentication flow, और UI के display order को संभालने के लिए **फिर से डिज़ाइन किया गया है**।
+
+*   यह **`load-status` (loading message)** को लोड करने के लिए एक सीधा `#load-status` तत्व का उपयोग करता है जो `<body>` के ठीक अंदर है। अगर JavaScript लोड हो रही है तो यह तुरंत दिखेगा।
+*   `checkUserAndRedirect` में **delay`s हटा दिए गए हैं, ताकि UI update जितनी जल्दी हो सके।**
+*   **Button disable/enable logic को मजबूत किया गया है।**
+*   `Firebase Error messages` को अब `showToast` के साथ दिखाया गया है ताकि यूजर को स्पष्ट फ़ीडबैक मिले।
 
 ```javascript
 // Firebase Configuration (from your input)
@@ -2320,14 +1769,25 @@ const firebaseConfig = {
     measurementId: "G-H7J7M23Z82"
 };
 
-// Initialize Firebase
-firebase.initializeApp(firebaseConfig);
+// Initialize Firebase (Error handling for initialization should be external in a full app)
+try {
+    firebase.initializeApp(firebaseConfig);
+    console.log("Firebase initialized successfully.");
+} catch (error) {
+    console.error("Firebase initialization failed:", error);
+    // Display a critical error message on the screen if possible, since app won't function.
+    if (document.getElementById('load-status')) {
+        document.getElementById('load-status').textContent = "Critical Error: Could not initialize app (Firebase issue). Check console.";
+        document.getElementById('load-status').style.backgroundColor = "red";
+    }
+}
+
 const auth = firebase.auth();
 const db = firebase.firestore();
 const storage = firebase.storage();
 
 // --- DOM Elements ---
-const jsLoadIndicator = document.getElementById('js-load-indicator'); // Diagnostic element
+const loadStatusElement = document.getElementById('load-status'); // For initial load/debug message
 const authContainer = document.getElementById('auth-container'); // Container for login/signup screens
 const appContainer = document.getElementById('app-container'); // Main application container
 
@@ -2401,6 +1861,7 @@ const profilePostTabs = document.querySelectorAll('.profile-post-tabs .tab-btn')
 
 const editProfileModal = document.getElementById('edit-profile-modal');
 const profileModalInstruction = document.getElementById('profile-modal-instruction');
+const saveProfileStatus = document.getElementById('save-profile-status'); // Added status element to edit modal
 const editUsernameInput = document.getElementById('edit-username');
 const usernameAvailability = document.getElementById('username-availability');
 const editNameInput = document.getElementById('edit-name');
@@ -2485,26 +1946,23 @@ const body = document.body;
 const postCategoryFilter = document.getElementById('post-category-filter');
 
 // --- Global Variables ---
-let currentUser = null; // Currently logged-in user
-let currentProfileViewingId = null; // ID of the profile currently being displayed
-let currentChatPartnerId = null; // ID of the user in the active chat
+let currentUser = null; 
+let currentProfileViewingId = null;
+let currentChatPartnerId = null;
 
-let lastVisiblePost = null; // For Home feed pagination
-let lastVisibleImmersivePost = null; // For Immersive feed pagination
+let lastVisiblePost = null; 
+let lastVisibleImmersivePost = null;
 
-let fetchingPosts = false; // Flag to prevent multiple concurrent post fetches (Home)
-let fetchingImmersivePosts = false; // Flag for Immersive feed
+let fetchingPosts = false; 
+let fetchingImmersivePosts = false; 
 
-let postsToLoadPerScroll = 10; // Number of posts to load on scroll
+let postsToLoadPerScroll = 10; 
 
-let dataSaverEnabled = false; // Flag for data saver feature (logic implementation needed)
-let currentPostIdForComments = null; // Stores post ID when comments modal is open
+let dataSaverEnabled = false; 
+let currentPostIdForComments = null; 
 
-let isProcessingAuth = false; // Prevents multiple rapid authentication requests
-let hasRunInitialAuthCheck = false; // Ensures the `onAuthStateChanged` block runs its full logic only once per app load cycle
-
-let uiInitializationDone = false; // Flag to control initial UI display after Firebase SDK is ready.
-
+let isProcessingAuth = false; // Flag to prevent multiple rapid auth requests (login/signup)
+let hasRunInitialAuthCheck = false; // Flag: Ensures onAuthStateChanged's main logic runs only once per page load
 
 // Text-to-Speech API
 const synth = window.speechSynthesis;
@@ -2568,6 +2026,7 @@ const PROFILE_LOGOS = [
 
 // Display a small toast notification on screen
 function showToast(message, type = 'info', duration = 3000) {
+    console.log(`Toast (${type}): ${message}`); // Log all toasts for debugging
     toastNotification.textContent = message;
     toastNotification.className = `toast-notification show ${type}`; // Add type for styling (e.g., 'error', 'success')
     setTimeout(() => {
@@ -2575,35 +2034,33 @@ function showToast(message, type = 'info', duration = 3000) {
     }, duration);
 }
 
-// Update authentication form status messages
+// Update authentication form status messages (login, signup, reset password modals)
 function updateAuthStatus(element, message, type) {
     element.textContent = message;
-    element.className = `status-message ${type}`;
-    // If message is empty or hidden, set display:none for better rendering.
-    if (type === 'hidden' || message === '') {
-        element.style.display = 'none';
-    } else {
-        element.style.display = 'block'; // Or whatever is default for this status message
-    }
+    element.className = `status-message ${type}`; // Set styling class
+    element.style.display = (type === 'hidden' || message === '') ? 'none' : 'block'; // Show/hide based on content/type
 }
 
 
-// Format numbers for display (e.g., 12000 -> 12k)
+// Format large numbers for display (e.g., 12000 -> 12k)
 function formatNumber(num) {
-    if (num === undefined || num === null) return 0;
-    if (num >= 1000000) return (num / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
-    if (num >= 1000) return (num / 1000).toFixed(1).replace(/\.0$/, '') + 'k';
-    return num;
+    if (num === undefined || num === null) return 0; // Handle undefined/null gracefully
+    if (num >= 1000000) return (num / 1000000).toFixed(1).replace(/\.0$/, '') + 'M'; // Millions
+    if (num >= 1000) return (num / 1000).toFixed(1).replace(/\.0$/, '') + 'k'; // Thousands
+    return num; // Default for smaller numbers
 }
 
-// Switch between app screens (Home, Profile, etc.)
+// Show specific application screen sections and update bottom navigation active state
 function showScreen(screenId) {
+    console.log(`UI: Attempting to show screen: ${screenId}`);
+    // Hide all screen sections first
     screenSections.forEach(screen => {
         screen.classList.remove('active');
     });
+    // Show the target screen by adding 'active' class
     document.getElementById(screenId).classList.add('active');
 
-    // Update active state in bottom navigation
+    // Update active state in bottom navigation menu
     bottomNavItems.forEach(item => {
         if (item.dataset.screen === screenId.replace('-screen', '')) {
             item.classList.add('active');
@@ -2614,144 +2071,146 @@ function showScreen(screenId) {
 
     // Close sidebar if open
     sidebar.classList.remove('open');
+    console.log(`UI: Screen ${screenId} is now active.`);
 }
 
-// Generate a random logo class from PROFILE_LOGOS
+// Generate a random logo class from the predefined PROFILE_LOGOS array
 function getRandomLogoClass() {
     const randomIndex = Math.floor(Math.random() * PROFILE_LOGOS.length);
-    return PROFILE_LOGOS[randomIndex].class; // Return just the class name
+    return PROFILE_LOGOS[randomIndex].class;
 }
 
-// Get the full CSS class name for a given logo name (e.g., 'logo-1' -> 'user-logo-1')
+// Get the corresponding CSS class name for a profile logo based on its stored 'class' string
 function getLogoCssClass(logoName) {
     const logo = PROFILE_LOGOS.find(l => l.class === logoName);
-    return logo ? `user-${logo.class}` : 'user-logo-1'; // Fallback to 'user-logo-1'
+    return logo ? `user-${logo.class}` : 'user-logo-1'; // Fallback to a default logo if not found
 }
 
-// Dynamically inject CSS for profile logos to allow pseudo-elements (emojis) and background colors
+// Dynamically inject CSS styles for profile logos. This makes the emoji and background color appear.
 function applyLogoStyles() {
     PROFILE_LOGOS.forEach(logo => {
+        // Prevent duplicate style tags
         if (!document.head.querySelector(`style[data-logo-class="${logo.class}"]`)) {
             const style = document.createElement('style');
-            style.setAttribute('data-logo-class', logo.class);
+            style.setAttribute('data-logo-class', logo.class); // Custom attribute for easy lookup
             style.innerHTML = `
                 .profile-avatar.user-${logo.class}, .profile-avatar-large.user-${logo.class}, .profile-avatar-small.user-${logo.class}, .logo-option-item.user-${logo.class} { background-color: ${logo.color}; }
-                .profile-avatar.user-${logo.class}::before, .profile-avatar-large.user-${logo.class}::before, .profile-avatar-small.user-${logo.class}::before, .logo-option-item.user-${logo.class}::before { content: '${logo.emoji}'; font-size: ${logo.class.includes('large') ? '60px' : logo.class.includes('small') ? '30px' : '24px'}; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: var(--button-primary-text); }
+                .profile-avatar.user-${logo.class}::before, .profile-avatar-large.user-${logo.class}::before, .profile-avatar-small.user-${logo.class}::before, .logo-option-item.user-${logo.class}::before { content: '${logo.emoji}'; font-family: 'Font Awesome 6 Free'; font-weight: 900; font-size: ${logo.class.includes('large') ? '60px' : logo.class.includes('small') ? '30px' : '24px'}; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: var(--button-primary-text); }
             `;
             document.head.appendChild(style);
         }
     });
 }
-applyLogoStyles(); // Call once when the script loads.
+applyLogoStyles(); // Call once when the script starts executing.
 
 
-// --- Core Authentication Flow Logic ---
+// --- Core Authentication Flow & UI Management ---
 
-// Show authentication container (Login/Signup) UI
+// Display the authentication container (Login/Signup screens).
 function showAuthContainerUI() {
-    console.log("Entering showAuthContainerUI(). Setting auth-container display to flex.");
-    appContainer.style.display = 'none'; // Hide main app
-    authContainer.style.display = 'flex'; // Show auth container using flex
-    authContainer.classList.remove('hidden'); // Ensure .hidden is removed
-    
-    loginScreen.classList.add('active'); // Default to login screen active
-    signupScreen.classList.remove('active'); // Ensure signup is inactive
-    console.log("UI: Authentication screens are now visible.");
+    console.log("Function: showAuthContainerUI() initiated.");
+    appContainer.classList.add('hidden'); // Hide main app UI
+    appContainer.style.display = 'none'; // Ensure no visibility conflict
+
+    authContainer.classList.remove('hidden'); // Make auth container visible
+    authContainer.style.display = 'flex'; // Set to flex to handle centering within auth-container
+
+    loginScreen.classList.add('active'); // Show login screen by default
+    signupScreen.classList.remove('active'); // Hide signup screen
+
+    console.log("UI: Authentication screens are now visible. App container is hidden.");
 }
 
-// Show main app container (Home Feed, Profile, etc.) UI
+// Display the main application container (Home Feed, Profile, etc.).
 function showAppContainerUI() {
-    console.log("Entering showAppContainerUI(). Setting app-container display to flex.");
-    authContainer.style.display = 'none'; // Hide auth
-    appContainer.style.display = 'flex'; // Show app container using flex
-    appContainer.classList.remove('hidden'); // Ensure .hidden is removed
-    console.log("UI: Main App screens are now visible.");
+    console.log("Function: showAppContainerUI() initiated.");
+    authContainer.classList.add('hidden'); // Hide auth UI
+    authContainer.style.display = 'none'; // Ensure no visibility conflict
+
+    appContainer.classList.remove('hidden'); // Make app container visible
+    appContainer.style.display = 'flex'; // Set to flex for main app layout
+
+    console.log("UI: Main Application screens are now visible. Auth container is hidden.");
 }
 
-
-// Central function to handle authentication state and UI redirection
+// Central handler for Firebase authentication state changes.
+// This function orchestrates which part of the UI to show (auth vs. main app).
 async function checkUserAndRedirect(user) {
-    console.log(`checkUserAndRedirect called. User: ${user ? user.uid : "None"}. Email Verified: ${user ? user.emailVerified : "N/A"}.`);
+    console.log(`checkUserAndRedirect called. User: ${user ? user.uid : "None"}. Email Verified: ${user ? user.emailVerified : "N/A"}. hasRunInitialAuthCheck: ${hasRunInitialAuthCheck}`);
     
-    // This `onAuthStateChanged` listener can fire multiple times. We want initial setup once.
-    // If hasRunInitialAuthCheck is true AND current Firebase user matches global `currentUser` (stable state)
-    // then skip re-initialization logic to prevent unnecessary re-renders.
+    // IMPORTANT: This `onAuthStateChanged` handler can fire multiple times (on app load, login, logout).
+    // The `hasRunInitialAuthCheck` flag ensures that the full UI redirection logic runs only once per initial page load,
+    // to prevent unwanted re-renders or conflicts from subsequent, rapid auth state changes.
+    // It's checked here at the beginning because the promise from DOMContentLoaded
+    // might resolve later than the actual onAuthStateChanged firing itself.
     if (hasRunInitialAuthCheck && user === auth.currentUser) {
-        console.log("checkUserAndRedirect: Already performed initial check for this state, skipping.");
-        return;
+        console.log("checkUserAndRedirect: Already processed initial auth state or user unchanged. Skipping full logic.");
+        return; // Prevent redundant re-runs.
     }
     hasRunInitialAuthCheck = true; // Mark as having started processing the initial auth state.
 
-    // Immediately hide the JS load indicator once we start processing auth, as we're about to show the main UI.
-    if (jsLoadIndicator) {
-        jsLoadIndicator.style.display = 'none';
-        console.log("Diagnostic: JavaScript load indicator hidden.");
+    // If JavaScript loaded, the indicator would have been shown. Hide it now.
+    if (loadStatusElement) {
+        loadStatusElement.style.display = 'none'; // Hide the "Loading Application..." message.
+        console.log("Diagnostic: Initial loading message hidden.");
     }
 
     if (user && user.emailVerified) {
-        currentUser = user; // Set global current user
-        console.log(`User ${user.uid} is authenticated and verified. Attempting to load user profile from Firestore.`);
+        currentUser = user; // Set the global current user object.
+        console.log(`User ${user.uid} is authenticated and email verified.`);
         try {
             const userDocRef = db.collection('users').doc(currentUser.uid);
             const userDoc = await userDocRef.get();
             const userData = userDoc.data();
 
-            // Check if user document exists AND if username and name fields are properly set (not empty strings).
-            if (!userDoc.exists || !userData.username || userData.username === "" || !userData.name || userData.name === "") {
-                console.log("User profile incomplete (missing username/name/doc). Forcing profile setup flow.");
-                showAppContainerUI(); // Display the main app container where profile modal will live.
-                showScreen('profile-screen'); // Navigate to the profile tab.
-                editProfileModal.classList.remove('hidden'); // Automatically open the edit profile modal.
+            // Condition for "incomplete profile": If user doc is missing, or username/name fields are empty.
+            if (!userDoc.exists || !userData || !userData.username || userData.username === "" || !userData.name || userData.name === "") {
+                console.log("User profile is incomplete (missing user document or essential fields like username/name). Redirecting to profile setup.");
+                showAppContainerUI(); // Display the main app UI first.
+                showScreen('profile-screen'); // Navigate to the profile screen.
+                editProfileModal.classList.remove('hidden'); // Force open the edit profile modal for completion.
                 profileModalInstruction.textContent = "Welcome! Please complete your profile (Username and Display Name are required) to continue using the app.";
-                myProfileUsername.textContent = "@NewUser"; // Temporary UI placeholders.
+                myProfileUsername.textContent = "@NewUser"; // Set temporary UI placeholders.
                 sidebarUsername.textContent = "New User";
-                sidebarProfileAvatar.className = `profile-avatar-small ${getLogoCssClass('logo-1')}`;
-                showToast("Welcome! Please complete your profile (Username and Display Name are required).", 'info', 5000);
+                sidebarProfileAvatar.className = `profile-avatar-small ${getLogoCssClass('logo-1')}`; // Assign a default avatar.
+                showToast("Welcome! Please complete your profile (Username and Display Name are required).", 'info', 7000);
             } else {
-                console.log("User profile is complete. Displaying main application UI.");
-                loadUserProfile(currentUser.uid); // Load all user-specific data and update sidebar/header.
-                showAppContainerUI(); // Display the full main app UI.
-                showScreen('home-screen'); // Default to home feed.
-                loadPosts(); // Start loading content for the feed.
+                console.log("User profile is complete. Proceeding to main application UI.");
+                loadUserProfile(currentUser.uid); // Load detailed user data and update UI components.
+                showAppContainerUI(); // Display the main application UI.
+                showScreen('home-screen'); // Navigate to the default home feed.
+                loadPosts(); // Start loading the content for the feed.
                 showToast("Logged in successfully!", 'success');
             }
         } catch (firestoreError) {
-            console.error("Firebase Firestore error while loading user profile (check rules or data structure):", firestoreError);
-            showToast("Error loading user profile. Please check your internet or try logging in again.", 'error', 7000);
-            auth.signOut(); // Critical error here, forcing logout.
+            console.error("Firestore error during user profile load:", firestoreError);
+            showToast("Error loading user profile data. Please check internet/Firebase Rules. Forcing logout.", 'error', 8000);
+            auth.signOut(); // Critical error implies potential rules or data issue, force logout to prevent infinite loops.
             showAuthContainerUI(); // Fallback to authentication UI.
         }
-    } else { // No user is logged in (user is null) OR user is logged in but email is NOT verified
-        currentUser = null; // Ensure global user object is null.
-        console.log("No authenticated and verified user. Displaying Authentication UI.");
-        showAuthContainerUI(); // Display Login/Register screens.
+    } else { // No user is logged in (`user` is null) OR `user` is logged in but `emailVerified` is false.
+        currentUser = null; // Ensure the global currentUser is null.
+        console.log("No authenticated AND verified user found. Redirecting to Authentication UI.");
+        showAuthContainerUI(); // Display the Login/Register screens.
 
-        if (user && !user.emailVerified) { // If there's a user object, but their email is unverified
-            console.log(`User ${user.uid} is authenticated but email is NOT verified. Instructing user for verification.`);
+        if (user && !user.emailVerified) { // If a user object exists but email is not verified
+            console.log(`User ${user.uid} authenticated but email is NOT verified. Showing verification message.`);
             updateAuthStatus(loginStatus, "Please verify your email to continue. Check your inbox (or spam folder) for a verification link.", 'info');
-            auth.signOut(); // Best practice: sign out unverified users to streamline verification flow on next login attempt.
+            auth.signOut(); // Sign out the unverified user to ensure they explicitly go through the verification process.
         } else {
-            console.log("No active user session found. Showing login form.");
-            updateAuthStatus(loginStatus, "", 'hidden'); // Clear any previous login status messages.
+            console.log("No active user session detected. Displaying default login form.");
+            updateAuthStatus(loginStatus, "", 'hidden'); // Clear any lingering login status messages.
         }
     }
 }
 
 
-// Attach the main authentication state listener to Firebase
-// This listener fires whenever the user's sign-in state changes (on app load, login, logout).
-auth.onAuthStateChanged(user => {
-    console.log("onAuthStateChanged event fired by Firebase SDK. User status detected.");
-    checkUserAndRedirect(user); // Call our central handler function.
-});
-
-
-// Login/Signup/Forgot Password UI interaction handlers
+// Attach event listeners for authentication form UI switches.
 showSignupLink.addEventListener('click', (e) => {
     e.preventDefault();
     loginScreen.classList.remove('active');
     signupScreen.classList.add('active');
-    updateAuthStatus(loginStatus, '', 'hidden'); // Clear statuses on screen switch
+    updateAuthStatus(loginStatus, '', 'hidden'); 
     updateAuthStatus(signupStatus, '', 'hidden');
     console.log("UI: Switched to Signup screen.");
 });
@@ -2760,7 +2219,7 @@ showLoginLink.addEventListener('click', (e) => {
     e.preventDefault();
     signupScreen.classList.remove('active');
     loginScreen.classList.add('active');
-    updateAuthStatus(loginStatus, '', 'hidden'); // Clear statuses on screen switch
+    updateAuthStatus(loginStatus, '', 'hidden');
     updateAuthStatus(signupStatus, '', 'hidden');
     console.log("UI: Switched to Login screen.");
 });
@@ -2768,8 +2227,8 @@ showLoginLink.addEventListener('click', (e) => {
 forgotPasswordLink.addEventListener('click', (e) => {
     e.preventDefault();
     forgotPasswordModal.classList.remove('hidden');
-    updateAuthStatus(resetStatus, '', 'hidden'); // Clear status on modal open
-    resetEmailInput.value = ''; // Clear email input
+    updateAuthStatus(resetStatus, '', 'hidden');
+    resetEmailInput.value = '';
     console.log("UI: Displayed Forgot Password modal.");
 });
 
@@ -2785,20 +2244,20 @@ sendResetEmailBtn.addEventListener('click', sendPasswordReset);
 
 // Handle user sign-in process
 async function signInUser() {
-    if (isProcessingAuth) { // Prevent multiple clicks/requests if auth is already in progress.
+    if (isProcessingAuth) { 
         console.warn("Authentication process already ongoing. Please wait.");
         return;
     }
-    isProcessingAuth = true; // Set flag to true.
-    loginBtn.disabled = true; // Disable login button.
+    isProcessingAuth = true; 
+    loginBtn.disabled = true; // Disable login button to prevent re-clicks.
 
     const email = loginEmailInput.value.trim();
     const password = loginPasswordInput.value.trim();
 
     if (!email || !password) {
         updateAuthStatus(loginStatus, "Please enter both email and password.", 'error');
-        isProcessingAuth = false; // Reset flag.
-        loginBtn.disabled = false; // Re-enable button.
+        isProcessingAuth = false; 
+        loginBtn.disabled = false; 
         return;
     }
 
@@ -2806,20 +2265,20 @@ async function signInUser() {
         console.log(`Attempting user sign-in for: ${email}`);
         updateAuthStatus(loginStatus, "Logging in...", 'info');
         await auth.signInWithEmailAndPassword(email, password);
-        // Success: The `onAuthStateChanged` listener will automatically pick this up and handle UI redirection.
-        console.log("Firebase signInWithEmailAndPassword succeeded.");
-        loginEmailInput.value = ''; // Clear inputs after attempt (whether success or fail).
+        // Success: `onAuthStateChanged` listener will automatically handle UI redirection.
+        console.log("Firebase signInWithEmailAndPassword succeeded. onAuthStateChanged will handle next steps.");
+        loginEmailInput.value = ''; 
         loginPasswordInput.value = '';
     } catch (error) {
-        console.error("Firebase Sign-in error caught:", error.code, error.message);
+        console.error("Firebase Sign-in error:", error.code, error.message);
         let errorMessage = "Login failed. Please check your email and password.";
-        // Provide user-friendly error messages based on Firebase error codes.
+        // Friendly error messages mapping Firebase Auth error codes.
         if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
             errorMessage = "Invalid email or password. Please try again.";
         } else if (error.code === 'auth/too-many-requests') {
             errorMessage = "Too many failed login attempts. Please try again later (rate limit).";
         } else if (error.code === 'auth/network-request-failed') {
-            errorMessage = "Network error. Please check your internet connection.";
+            errorMessage = "Network error. Check your internet connection.";
         } else if (error.code === 'auth/user-disabled') {
             errorMessage = "Your account has been disabled. Please contact support.";
         } else if (error.code === 'auth/invalid-email') {
@@ -2829,18 +2288,18 @@ async function signInUser() {
         }
         updateAuthStatus(loginStatus, errorMessage, 'error');
     } finally {
-        isProcessingAuth = false; // Always reset the flag.
-        loginBtn.disabled = false; // Always re-enable the button.
+        isProcessingAuth = false; // Always reset flag.
+        loginBtn.disabled = false; // Always re-enable button.
     }
 }
 
 // Handle user registration process
 async function registerUser() {
-    if (isProcessingAuth) { // Prevent multiple clicks/requests if auth is already in progress.
+    if (isProcessingAuth) { 
         console.warn("Authentication process already ongoing. Please wait.");
         return;
     }
-    isProcessingAuth = true; // Set flag.
+    isProcessingAuth = true; 
     signupBtn.disabled = true; // Disable signup button.
 
     const email = signupEmailInput.value.trim();
@@ -2870,7 +2329,7 @@ async function registerUser() {
         console.log("Attempting user registration for:", email);
         updateAuthStatus(signupStatus, "Registering user...", 'info');
         const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-        await sendEmailVerification(userCredential.user); // Send email verification immediately.
+        await sendEmailVerification(userCredential.user); // Send verification email immediately after creating user.
 
         // Create initial user document in Firestore with placeholder data.
         await db.collection('users').doc(userCredential.user.uid).set({
@@ -2898,7 +2357,7 @@ async function registerUser() {
 
         console.log("User registered and initial profile document created. Displaying verification message.");
         updateAuthStatus(signupStatus, "Registration successful! Please verify your email.", 'success');
-        signupEmailInput.value = '';
+        signupEmailInput.value = ''; // Clear input fields.
         signupPasswordInput.value = '';
         signupConfirmPasswordInput.value = '';
         // After successful registration, switch to login screen for verification instructions.
@@ -2917,7 +2376,7 @@ async function registerUser() {
         } else if (error.code === 'auth/weak-password') {
             errorMessage = "Password is too weak. Please choose a stronger one (min 6 characters).";
         } else if (error.code === 'auth/network-request-failed') {
-            errorMessage = "Network error during registration. Check internet connection.";
+            errorMessage = "Network error during registration. Check internet.";
         }
         updateAuthStatus(signupStatus, errorMessage, 'error');
     } finally {
@@ -2983,7 +2442,7 @@ document.getElementById('logout-btn').addEventListener('click', async () => {
         await auth.signOut();
         showToast("Logged out successfully.", 'info');
 
-        // Clear all input fields for security and a fresh start for the next user.
+        // Clear input fields and reset state for security and a fresh start for the next user.
         loginEmailInput.value = '';
         loginPasswordInput.value = '';
         signupEmailInput.value = '';
@@ -3012,40 +2471,40 @@ document.getElementById('logout-btn').addEventListener('click', async () => {
 document.addEventListener('DOMContentLoaded', () => {
     console.log("DOMContentLoaded event fired. Beginning app initialization sequence.");
     
-    // 1. Initially hide both main app and authentication UI elements using CSS .hidden.
-    // This prevents any "flash of unstyled content" or incorrect UI appearing before JS is ready.
+    // 1. Initially ensure both main app and authentication UI containers are hidden.
+    // They are hidden by CSS's `.hidden` class by default.
     appContainer.classList.add('hidden'); 
     authContainer.classList.add('hidden'); 
 
-    // 2. Make the `js-load-indicator` visible. This is your immediate confirmation that JS has loaded and is running.
-    if (jsLoadIndicator) {
-        jsLoadIndicator.style.display = 'block'; 
-        console.log("Diagnostic: 'js-load-indicator' is now visible. JavaScript is running.");
+    // 2. Make the `load-status` indicator visible. This immediately confirms that JS has loaded and is running.
+    if (loadStatusElement) {
+        loadStatusElement.textContent = "Loading Application...";
+        loadStatusElement.style.display = 'block'; 
+        console.log("Diagnostic: 'load-status' message is now displayed. JavaScript is loading successfully.");
     } else {
-        console.warn("Diagnostic: 'js-load-indicator' element not found in DOM. Cannot confirm JS execution visually.");
+        console.warn("Diagnostic: 'load-status' element not found in DOM. Cannot confirm JS execution visually via this element.");
     }
 
-    // 3. Create a promise that resolves after a tiny, fixed delay (e.g., 50ms).
-    // This provides a small buffer time for the browser's initial rendering and CSS application.
-    const initialRenderDelayPromise = new Promise(resolve => {
-        setTimeout(() => {
-            console.log("Initial render delay (50ms) resolved. Proceeding to authentication check.");
-            resolve(); // Fulfills the promise.
-        }, 50); 
-    });
+    // 3. Set a short timeout (e.g., 100ms) for initial DOM rendering stability.
+    // After this tiny delay, we initiate the primary authentication state check.
+    setTimeout(() => {
+        console.log("Initial DOM rendering buffer passed (100ms). Initiating Firebase auth check.");
+        // This is where we kick off the authentication flow.
+        // `auth.currentUser` provides the immediately known user state (null, unverified, or logged in).
+        checkUserAndRedirect(auth.currentUser); 
+    }, 100); 
 
-    // 4. Set a final fallback timeout for authentication state resolution.
-    // If Firebase SDK's `onAuthStateChanged` doesn't fire, or is too slow (e.g., due to network issues),
-    // this ensures the UI still transitions after a fixed maximum delay (e.g., 2 seconds from DOMContentLoad).
-    // It prevents the app from being stuck on a blank/loading screen indefinitely.
-    splashScreenTimeout = setTimeout(() => {
-        if (!hasRunInitialAuthCheck) { // Only if `onAuthStateChanged` handler hasn't processed its initial check.
-            console.warn("Fallback: Authentication state check timed out (2s total). Forcing UI transition based on current Firebase state.");
-            // Explicitly call the `checkUserAndRedirect` handler.
-            // At this point, `auth.currentUser` will be either a User object or null, reflecting Firebase's best known state.
-            checkUserAndRedirect(auth.currentUser);
+    // 4. Set a fallback timeout for the `onAuthStateChanged` listener.
+    // In rare cases (e.g., severe network issues, Firebase SDK failing to fire on time),
+    // this ensures the UI still transitions after a fixed maximum delay (e.g., 3 seconds from DOMContentLoaded).
+    // This is crucial to prevent the app from being stuck on a blank/loading screen indefinitely.
+    // The `checkUserAndRedirect` function already handles updating the UI.
+    setTimeout(() => {
+        if (!hasRunInitialAuthCheck) {
+            console.warn("Fallback: Authentication state check forced due to primary delay. UI should now proceed.");
+            checkUserAndRedirect(auth.currentUser); // Force check again.
         }
-    }, 2000); // 2 seconds total max wait time.
+    }, 3000); // Max 3 seconds for initial UI setup.
 });
 
 
@@ -3071,61 +2530,59 @@ darkModeCheckbox.addEventListener('change', (e) => {
     showToast(`Dark Mode ${e.target.checked ? 'Enabled' : 'Disabled'}`, 'info');
 });
 
-// Load and apply initial theme setting from local storage.
-document.addEventListener('DOMContentLoaded', () => { // Already handled within the primary DOMContentLoaded listener.
-    const savedTheme = localStorage.getItem('theme') || 'dark';
+// Load and apply initial theme setting from local storage on DOMContentLoaded.
+document.addEventListener('DOMContentLoaded', () => { 
+    const savedTheme = localStorage.getItem('theme') || 'dark'; // Default to dark theme if no preference.
     if (savedTheme === 'light') {
         body.classList.remove('dark-mode');
         body.classList.add('light-mode');
-        darkModeCheckbox.checked = false;
+        darkModeCheckbox.checked = false; // Reflect setting in UI.
     } else {
         body.classList.add('dark-mode');
         body.classList.remove('light-mode');
-        darkModeCheckbox.checked = true;
+        darkModeCheckbox.checked = true; // Reflect setting in UI.
     }
 });
 
 
 // --- Sidebar Navigation Control ---
 menuToggle.addEventListener('click', () => {
-    sidebar.classList.add('open');
+    sidebar.classList.add('open'); // Open sidebar.
 });
 
 closeSidebarBtn.addEventListener('click', () => {
-    sidebar.classList.remove('open');
+    sidebar.classList.remove('open'); // Close sidebar.
 });
 
 sidebar.querySelectorAll('ul li a').forEach(link => {
     link.addEventListener('click', (e) => {
         e.preventDefault();
-        const screenId = e.currentTarget.dataset.screen;
+        const screenId = e.currentTarget.dataset.screen; // Get target screen ID.
         if (screenId) {
-            showScreen(`${screenId}-screen`); // Switch to the selected main screen
+            showScreen(`${screenId}-screen`); // Switch to the selected main screen.
 
-            // Execute screen-specific loading functions
+            // Execute screen-specific loading functions based on the screen ID.
             if (screenId === 'profile') {
-                loadUserProfile(currentUser.uid); // Load own profile for sidebar link
-                currentProfileViewingId = currentUser.uid;
+                loadUserProfile(currentUser.uid); // Load own profile data for display.
+                currentProfileViewingId = currentUser.uid; // Set currently viewed profile ID.
             } else if (screenId === 'messages') {
-                loadRecentChats();
-                messageListContainer.classList.remove('hidden');
-                chatWindowContainer.classList.add('hidden'); // Ensure chat window is hidden when returning to chat list
+                loadRecentChats(); // Load recent chat conversations.
+                messageListContainer.classList.remove('hidden'); // Show message list.
+                chatWindowContainer.classList.add('hidden'); // Ensure chat window is hidden when returning to list.
             } else if (screenId === 'home') {
-                 // On returning to home, clear feed and reload from beginning.
-                 postsFeed.innerHTML = '';
-                 lastVisiblePost = null;
-                 loadPosts();
-                 postCategoryFilter.value = 'all'; // Reset category filter
+                 postsFeed.innerHTML = ''; // Clear feed for fresh load.
+                 lastVisiblePost = null; // Reset pagination.
+                 loadPosts(); // Load posts from beginning.
+                 postCategoryFilter.value = 'all'; // Reset category filter selection.
             } else if (screenId === 'feed') {
-                 // On returning to immersive feed, clear feed and reload from beginning.
-                 immersiveFeed.innerHTML = '';
-                 lastVisibleImmersivePost = null;
-                 loadImmersiveFeedPosts();
+                 immersiveFeed.innerHTML = ''; // Clear feed.
+                 lastVisibleImmersivePost = null; // Reset pagination.
+                 loadImmersiveFeedPosts(); // Load immersive feed posts.
             } else if (screenId === 'earnings') {
-                loadEarningsPage(); // Load earnings data.
+                loadEarningsPage(); // Load user's earning details.
             }
         }
-        sidebar.classList.remove('open'); // Close sidebar after selection.
+        sidebar.classList.remove('open'); // Close sidebar after clicking a link.
     });
 });
 
@@ -3134,10 +2591,10 @@ sidebar.querySelectorAll('ul li a').forEach(link => {
 bottomNavItems.forEach(item => {
     item.addEventListener('click', (e) => {
         e.preventDefault();
-        const screenId = e.currentTarget.dataset.screen;
-        showScreen(`${screenId}-screen`); // Switch to the selected main screen
+        const screenId = e.currentTarget.dataset.screen; // Get target screen ID.
+        showScreen(`${screenId}-screen`); // Switch to the selected screen.
 
-        // Execute screen-specific loading functions (similar to sidebar)
+        // Execute screen-specific loading functions (similar to sidebar navigation).
         if (screenId === 'profile') {
             loadUserProfile(currentUser.uid);
             currentProfileViewingId = currentUser.uid;
@@ -3151,14 +2608,13 @@ bottomNavItems.forEach(item => {
             loadPosts();
             postCategoryFilter.value = 'all';
         } else if (screenId === 'search') {
-            searchUserList.innerHTML = ''; // Clear search results on switch
+            searchUserList.innerHTML = ''; // Clear search results.
             searchPostList.innerHTML = '';
             noSearchResults.classList.add('hidden');
-            searchQueryInput.value = ''; // Clear search input
+            searchQueryInput.value = ''; // Clear search input field.
         } else if (screenId === 'upload') {
-            // Reset upload form inputs
+            // Reset upload form inputs.
             postContentInput.value = '';
-            // postImageInput.value = ''; // No direct image input anymore, replaced by rich text editor.
             monetizePostCheckbox.checked = false;
             uploadStatus.textContent = '';
         }
@@ -3168,35 +2624,35 @@ bottomNavItems.forEach(item => {
 
 // --- Post Loading and Infinite Scrolling (Home Feed) ---
 postCategoryFilter.addEventListener('change', () => {
-    postsFeed.innerHTML = ''; // Clear posts on category change
-    lastVisiblePost = null; // Reset pagination for new filter
-    loadPosts(); // Reload posts
+    postsFeed.innerHTML = ''; // Clear posts on category change.
+    lastVisiblePost = null; // Reset pagination.
+    loadPosts(); // Reload posts based on new filter.
 });
 
 async function loadPosts() {
-    if (!currentUser) { // Ensure logged in
-        console.log("loadPosts: Skipping, no current user.");
+    if (!currentUser) { 
+        console.log("loadPosts: Skipping. No user logged in.");
         return;
     }
-    if (fetchingPosts) { // Prevent concurrent fetches
-        console.log("loadPosts: Skipping, already fetching.");
+    if (fetchingPosts) { 
+        console.log("loadPosts: Skipping. Already fetching posts.");
         return;
     }
 
-    fetchingPosts = true;
-    loadingSpinner.classList.remove('hidden');
+    fetchingPosts = true; // Set flag to indicate fetching.
+    loadingSpinner.classList.remove('hidden'); // Show loading spinner.
     console.log("loadPosts: Starting post fetch for home feed.");
 
     try {
         let postsBaseRef = db.collection('posts')
-                         .where('expiryTime', '>', firebase.firestore.Timestamp.now()) // Only active (not expired) posts
-                         .orderBy('expiryTime', 'desc') // Newer expire dates first (effectively newer posts)
-                         .orderBy('timestamp', 'desc'); // Then by creation timestamp
+                         .where('expiryTime', '>', firebase.firestore.Timestamp.now()) // Only retrieve active (non-expired) posts.
+                         .orderBy('expiryTime', 'desc') // Sort by expiry date (newer posts first).
+                         .orderBy('timestamp', 'desc'); // Secondary sort by creation timestamp for consistent order.
 
 
         const selectedCategory = postCategoryFilter.value;
         if (selectedCategory !== 'all') {
-            postsBaseRef = postsBaseRef.where('category', '==', selectedCategory);
+            postsBaseRef = postsBaseRef.where('category', '==', selectedCategory); // Apply category filter.
             console.log(`loadPosts: Filtering by category: ${selectedCategory}`);
         }
 
@@ -3205,21 +2661,23 @@ async function loadPosts() {
         console.log(`loadPosts: Current user following ${followedUsers.length} users.`);
 
 
-        let fetchedPosts = []; // Collect all posts here
+        let fetchedPosts = []; // Array to collect all fetched posts (from followed and general).
 
-        // 1. Fetch posts from followed users (chunked if more than 10 followed users)
+        // 1. Fetch posts from followed users (chunked due to Firestore's 'in' query limit of 10).
         if (followedUsers.length > 0) {
-            const chunkSize = 10; // Firestore 'in' query limit
+            const chunkSize = 10; 
             for (let i = 0; i < followedUsers.length; i += chunkSize) {
                 const chunk = followedUsers.slice(i, i + chunkSize);
                 let currentFollowedQuery = postsBaseRef.where('userId', 'in', chunk);
                 
-                // For combined pagination, we're not using startAfter on chunked queries directly.
-                // We'll collect all, sort, and then decide what to show/paginate.
-                const followedSnapshot = await currentFollowedQuery.limit(postsToLoadPerScroll * 2).get(); // Fetch a bit more to ensure variety
+                // For combined pagination logic across different queries (followed vs. general), 
+                // it's generally simpler to fetch a larger batch and then paginate client-side, 
+                // or use a Cloud Function to pre-aggregate a custom feed for complex ordering.
+                // For this example, we fetch a bit more from followed users.
+                const followedSnapshot = await currentFollowedQuery.limit(postsToLoadPerScroll * 2).get();
 
                 followedSnapshot.docs.forEach(doc => {
-                    if (!fetchedPosts.some(p => p.id === doc.id)) { // Prevent duplicates
+                    if (!fetchedPosts.some(p => p.id === doc.id)) { // Prevent duplicates if same post is returned across chunks or mixed in with general.
                          fetchedPosts.push({ id: doc.id, ...doc.data() });
                     }
                 });
@@ -3227,73 +2685,61 @@ async function loadPosts() {
             }
         }
 
-        // 2. Fetch general public posts to fill up the feed or as main content if no followed users.
-        let generalPostsRef = postsBaseRef.where('isPrivate', '==', false);
+        // 2. Fetch general public posts to fill up the desired feed size or as main content if no followed users.
+        let generalPostsRef = postsBaseRef.where('isPrivate', '==', false); // Only public posts for this part of the feed.
         
-        // If it's the very first load or if no followed posts were retrieved, use general posts for pagination.
-        // If lastVisiblePost exists and fetchedPosts are few, means previous pagination hit end for followed.
-        // It's very complex to paginate across multiple WHERE clauses using Firestore directly this way.
-        // For 'never-ending' and complex feeds, Cloud Functions would typically pre-generate / paginate feeds.
-        
-        // Simpler pagination fallback for general public posts if we didn't fill up from followed.
-        // This will restart pagination for general posts only.
+        // Pagination logic for the general feed: If starting fresh or needed more content beyond followed posts.
         if (lastVisiblePost && (followedUsers.length === 0 || fetchedPosts.length < postsToLoadPerScroll)) {
              generalPostsRef = generalPostsRef.startAfter(lastVisiblePost);
-             console.log("loadPosts: Adding general posts with pagination.");
+             console.log("loadPosts: Fetching general posts with pagination (continuing).");
         } else if (!lastVisiblePost && fetchedPosts.length === 0) {
-            // First load, no followed, just general
-             console.log("loadPosts: First load, only general posts.");
+            // Initial load with no followed users found, fetch first general batch.
+             console.log("loadPosts: First load, no followed users, fetching initial general posts.");
         } else {
-             // We have enough from followed, or just mixing without deep pagination across feed types
-             // To ensure some general content is always loaded along side followed:
-             generalPostsRef = generalPostsRef; // No startAfter for mixed content load if not strictly paginating
+             // Already have enough from followed, or just mixing; won't use startAfter here as it complicates.
+             // If a fixed number is desired, slice fetchedPosts to postsToLoadPerScroll at end.
         }
 
         const generalPostsSnapshot = await generalPostsRef.limit(postsToLoadPerScroll).get();
         generalPostsSnapshot.docs.forEach(doc => {
-            if (!fetchedPosts.some(p => p.id === doc.id)) { // Avoid adding duplicates that might already be from followed.
+            if (!fetchedPosts.some(p => p.id === doc.id)) { // Prevent adding posts already found from followed users.
                fetchedPosts.push({ id: doc.id, ...doc.data() });
             }
         });
         if (!generalPostsSnapshot.empty) {
-            // Only update lastVisiblePost if general posts were actually added in this round of fetching
-            // And they contributed to advancing the pointer.
+            // Update the last visible post for subsequent general feed pagination.
             if (!lastVisiblePost || generalPostsSnapshot.docs[generalPostsSnapshot.docs.length - 1].id !== lastVisiblePost.id) {
                 lastVisiblePost = generalPostsSnapshot.docs[generalPostsSnapshot.docs.length - 1];
             }
         }
-        console.log(`loadPosts: Added ${generalPostsSnapshot.size} posts from general feed.`);
+        console.log(`loadPosts: Added ${generalPostsSnapshot.size} posts from general feed portion.`);
 
 
-        // 3. Post-fetch processing: Filter already-displayed posts and manage 'never-ending' logic.
+        // 3. Post-fetch processing: Filter already-displayed posts and implement 'never-ending' looping logic.
         const alreadyDisplayedPostIds = new Set(Array.from(postsFeed.children).map(el => el.dataset.postId));
         let newPostsToRender = fetchedPosts.filter(post => !alreadyDisplayedPostIds.has(post.id));
 
-        console.log(`loadPosts: Total fetched posts: ${fetchedPosts.length}, new posts to render: ${newPostsToRender.length}.`);
+        console.log(`loadPosts: Total unique posts fetched: ${fetchedPosts.length}, genuinely new posts to render: ${newPostsToRender.length}.`);
 
+        // If no genuinely new posts were found (all were duplicates/none fetched) but there might be more to loop through.
         if (newPostsToRender.length === 0 && fetchedPosts.length > 0 && postsFeed.children.length > 0) {
-            // If we fetched posts, but they were all duplicates already on screen, or no new content to add, then loop.
             showToast("No new unique posts found. Looping feed to older content...", 'info', 3000);
-            lastVisiblePost = null; // Reset pagination to loop back to the start.
+            lastVisiblePost = null; // Reset pagination to loop back to the beginning of the entire feed.
             console.log("loadPosts: Resetting lastVisiblePost for feed loop.");
             
-            // To immediately show looping, clear and reload if we couldn't add anything.
-            postsFeed.innerHTML = ''; // Clear for fresh start of looped content.
-            // Recurse to load the "new-loop" content. But prevent infinite recursion if database is truly empty.
-            if (postsToLoadPerScroll > 0) { // Check to prevent infinite empty calls
-                 fetchingPosts = false; // Release flag for recursive call.
-                 return loadPosts(); // Recursively call to get first batch of new loop.
-            }
+            postsFeed.innerHTML = ''; // Clear existing posts to show content from the beginning of the feed.
+            fetchingPosts = false; // Release lock for immediate recursive call.
+            return loadPosts(); // Recursively call loadPosts to fetch from the beginning of the feed.
 
         } else if (newPostsToRender.length === 0 && postsFeed.children.length === 0) {
-            // Case where NO posts at all were ever loaded initially.
+            // Special case: If after initial load (or after loop reset) there are still no posts available.
             showToast("No posts available in this feed. Start by uploading one!", 'info', 5000);
             postsFeed.innerHTML = '<p style="text-align: center; color: var(--text-color-light);">No posts available in this feed. Try uploading one!</p>';
             loadingSpinner.classList.add('hidden');
             fetchingPosts = false;
             return;
-        } else if (newPostsToRender.length === 0) { // Fetched some, but all are already displayed AND feed is not empty. Just say nothing new.
-             console.log("loadPosts: All fetched posts were already displayed.");
+        } else if (newPostsToRender.length === 0) { // All fetched posts were already on screen and not starting a loop yet.
+             console.log("loadPosts: All fetched posts were already displayed; no action taken.");
              showToast("No new posts at the moment.", 'info', 2000);
              loadingSpinner.classList.add('hidden');
              fetchingPosts = false;
@@ -3301,64 +2747,54 @@ async function loadPosts() {
         }
 
 
-        // Clear feed only if it's explicitly the start of a full loop or initial empty state.
-        if (lastVisiblePost === null && postsFeed.innerHTML.trim() !== '' && !newPostsToRender.some(p => !alreadyDisplayedPostIds.has(p.id))) {
-             // This condition is for when the feed is implicitly resetting because of no new content from original order.
-             postsFeed.innerHTML = ''; // Clear previous content if we are effectively starting fresh from top of looped data.
-        }
-
-
-        // Randomize and render the NEW posts
+        // Render new posts to the feed.
         let tempPostsForRendering = [...newPostsToRender];
         while (tempPostsForRendering.length > 0) {
             const randomLayout = Math.floor(Math.random() * 3); // 0: vertical, 1: horizontal, 2: table
+            const post = tempPostsForRendering.shift();
 
-            if (randomLayout === 0 || tempPostsForRendering.length < 4) { // Vertical or not enough for other layouts
-                const post = tempPostsForRendering.shift();
+            if (randomLayout === 0 || tempPostsForRendering.length < 4) { 
                 renderPost(post, postsFeed, 'vertical-post');
-            } else if (randomLayout === 1 && tempPostsForRendering.length >= 2) { // Horizontal (2-3 posts)
-                const numHorizontal = Math.min(tempPostsForRendering.length, Math.floor(Math.random() * 2) + 2); // 2 or 3
+            } else if (randomLayout === 1 && tempPostsForRendering.length >= 2) {
+                const numHorizontal = Math.min(tempPostsForRendering.length, Math.floor(Math.random() * 2) + 2); // 2 or 3 posts
                 const horizontalContainer = document.createElement('div');
                 horizontalContainer.className = 'horizontal-post-container';
                 for (let i = 0; i < numHorizontal; i++) {
-                    const post = tempPostsForRendering.shift();
-                    horizontalContainer.appendChild(createPostElement(post, 'horizontal-post'));
+                    horizontalContainer.appendChild(createPostElement(tempPostsForRendering.shift(), 'horizontal-post'));
                 }
                 postsFeed.appendChild(horizontalContainer);
-            } else if (randomLayout === 2 && tempPostsForRendering.length >= 4) { // Table (4-6 posts)
-                const numTable = Math.min(postsToLoadPerScroll.length, Math.floor(Math.random() * 3) + 4); // 4, 5, or 6
+            } else if (randomLayout === 2 && tempPostsForRendering.length >= 4) {
+                const numTable = Math.min(tempPostsForRendering.length, Math.floor(Math.random() * 3) + 4); // 4, 5, or 6 posts
                 const tableContainer = document.createElement('div');
                 tableContainer.className = 'table-post-container';
                 for (let i = 0; i < numTable; i++) {
-                    const post = tempPostsForRendering.shift();
-                    tableContainer.appendChild(createPostElement(post, 'table-post'));
+                    tableContainer.appendChild(createPostElement(tempPostsForRendering.shift(), 'table-post'));
                 }
                 postsFeed.appendChild(tableContainer);
-            } else { // Fallback to vertical if conditions not met
-                const post = tempPostsForRendering.shift();
-                renderPost(post, postsFeed, 'vertical-post');
+            } else { 
+                renderPost(post, postsFeed, 'vertical-post'); // Default fallback if no specific layout applies
             }
         }
-        console.log(`loadPosts: Successfully rendered ${newPostsToRender.length} new posts.`);
+        console.log(`loadPosts: Successfully rendered ${newPostsToRender.length} posts to the DOM.`);
 
     } catch (error) {
-        console.error("Critical error loading posts for home feed:", error);
-        showToast("Error loading posts. Please refresh your page or check console for details.", 'error', 7000);
+        console.error("Critical error loading posts for home feed (ensure Firebase Rules are correctly published):", error);
+        showToast("Error loading posts. Please refresh your page or check console for more details.", 'error', 7000);
     } finally {
-        loadingSpinner.classList.add('hidden');
-        fetchingPosts = false;
-        console.log("loadPosts: Post fetching finished.");
+        loadingSpinner.classList.add('hidden'); // Hide spinner regardless of success/fail
+        fetchingPosts = false; // Release the fetch lock
+        console.log("loadPosts: Post fetching process completed.");
     }
 }
 
 
-// Immersive Feed (Snap Scrolling) Loading Logic
+// Immersive Feed (Snap Scrolling) Loading Logic - Similar to loadPosts but for full-screen view.
 async function loadImmersiveFeedPosts() {
-    if (!currentUser) { // Ensure logged in
+    if (!currentUser) { 
         console.log("loadImmersiveFeedPosts: Skipping, no current user.");
         return;
     }
-    if (fetchingImmersivePosts) { // Prevent concurrent fetches
+    if (fetchingImmersivePosts) { 
         console.log("loadImmersiveFeedPosts: Skipping, already fetching.");
         return;
     }
@@ -3371,8 +2807,8 @@ async function loadImmersiveFeedPosts() {
         let postsRef = db.collection('posts')
                          .where('expiryTime', '>', firebase.firestore.Timestamp.now())
                          .where('isPrivate', '==', false) // Immersive feed only shows public posts
-                         .orderBy('expiryTime', 'desc') // Newer expire dates first
-                         .orderBy('timestamp', 'desc'); // Secondary sort for consistent ordering
+                         .orderBy('expiryTime', 'desc')
+                         .orderBy('timestamp', 'desc');
 
 
         if (lastVisibleImmersivePost) {
@@ -3411,9 +2847,8 @@ async function loadImmersiveFeedPosts() {
         
         if (newPostsToRender.length === 0 && fetchedPosts.length > 0 && immersiveFeed.children.length > 0) {
             console.log("loadImmersiveFeedPosts: Fetched posts were all duplicates, attempting loop reset.");
-            // All new fetched posts were already visible and there is content. Reset and re-loop.
             showToast("No new immersive posts. Looping feed...", 'info', 3000);
-            lastVisibleImmersivePost = null; // Reset pagination.
+            lastVisibleImmersivePost = null; 
             immersiveFeed.innerHTML = ''; // Clear for fresh content.
             fetchingImmersivePosts = false;
             return loadImmersiveFeedPosts(); // Recursive call to load from the beginning.
@@ -4219,8 +3654,9 @@ async function loadUserProfile(userId) {
                 messageUserBtn.classList.add('hidden');
                 profileWhatsappLink.classList.add('hidden');
                 profileInstagramLink.classList.add('hidden');
-                profilePostTabs.textContent = 'My Posts';
-                profilePostTabs.textContent = 'My Reposts';
+                // profilePostTabs is an HTMLCollection, iterate over it if needed
+                if (profilePostTabs) profilePostTabs.textContent = 'My Posts'; 
+                if (profilePostTabs) profilePostTabs.textContent = 'My Reposts';
             } else {
                 editProfileBtn.classList.add('hidden');
                 messageUserBtn.classList.remove('hidden'); // Always allow messaging
@@ -4239,19 +3675,20 @@ async function loadUserProfile(userId) {
                 if (userData.whatsapp) profileWhatsappLink.classList.remove('hidden'); else profileWhatsappLink.classList.add('hidden');
                 if (userData.instagram) profileInstagramLink.classList.remove('hidden'); else profileInstagramLink.classList.add('hidden');
 
-                profilePostTabs.textContent = `${userData.username}'s Posts`;
-                profilePostTabs.textContent = `${userData.username}'s Reposts`;
+                // For external user profile tabs, adjust their text
+                if (profilePostTabs) profilePostTabs.textContent = `${userData.username}'s Posts`;
+                if (profilePostTabs) profilePostTabs.textContent = `${userData.username}'s Reposts`;
 
                 // If target user's account is private and current user is not following,
                 // hide their posts and show a message.
                 if (userData.isPrivate && !(currentUserData.following && currentUserData.following.includes(userId))) {
                     profilePostsFeed.innerHTML = '<p style="text-align: center; color: var(--text-color-light);">This account is private. Follow to view posts.</p>';
                     profileRepostsFeed.innerHTML = '';
-                    profilePostTabs.classList.add('hidden');
-                    profilePostTabs.classList.add('hidden');
+                    if (profilePostTabs) profilePostTabs.classList.add('hidden');
+                    if (profilePostTabs) profilePostTabs.classList.add('hidden');
                 } else {
-                    profilePostTabs.classList.remove('hidden');
-                    profilePostTabs.classList.remove('hidden');
+                    if (profilePostTabs) profilePostTabs.classList.remove('hidden');
+                    if (profilePostTabs) profilePostTabs.classList.remove('hidden');
                 }
 
             }
@@ -4396,6 +3833,7 @@ async function loadProfileReposts(userId) {
 editProfileBtn.addEventListener('click', () => {
     editProfileModal.classList.remove('hidden');
     profileModalInstruction.textContent = "Edit your profile details:"; // General instruction when clicking 'Edit Profile'
+    updateAuthStatus(saveProfileStatus, '', 'hidden'); // Clear status messages on open.
     console.log("UI: Displayed Edit Profile modal.");
 });
 
@@ -4469,7 +3907,7 @@ function populateProfileLogoOptions(currentLogoClass, currentProfilePicUrl) {
     if (currentProfilePicUrl) {
         const directUrlOptionDiv = document.createElement('div');
         directUrlOptionDiv.className = `logo-option-item selected`; // Default selected
-        directUrlOptionDiv.style.backgroundImage = `url('${currentProfilePicUrl}')`;
+        directUrlOptionDiv.style.backgroundImage = `url('${currentProfilePicUrl}');`; // Use backgroundImage
         directUrlOptionDiv.dataset.type = 'url';
         directUrlOptionDiv.dataset.value = currentProfilePicUrl;
         profileLogoOptions.appendChild(directUrlOptionDiv);
@@ -4508,7 +3946,12 @@ function populateProfileLogoOptions(currentLogoClass, currentProfilePicUrl) {
 
 // Save Profile Changes
 saveProfileBtn.addEventListener('click', async () => {
-    if (!currentUser) return;
+    updateAuthStatus(saveProfileStatus, '', 'hidden'); // Clear previous save status.
+
+    if (!currentUser) {
+        showToast("Error: No authenticated user. Please log in.", 'error');
+        return;
+    }
 
     const newUsername = editUsernameInput.value.trim();
     const newName = editNameInput.value.trim();
@@ -4539,11 +3982,11 @@ saveProfileBtn.addEventListener('click', async () => {
     const isPrivate = accountPrivacyToggle.checked;
 
     if (newUsername === '') {
-        showToast("Username cannot be empty.", 'error');
+        updateAuthStatus(saveProfileStatus, "Username cannot be empty.", 'error');
         return;
     }
      if (newUsername.includes(" ") || newUsername.includes("@") || newUsername.includes("#")) {
-        showToast("Username cannot contain spaces or special characters like @ or #.", "error");
+        updateAuthStatus(saveProfileStatus, "Username cannot contain spaces or special characters like @ or #.", 'error');
         return;
     }
 
@@ -4552,13 +3995,16 @@ saveProfileBtn.addEventListener('click', async () => {
     const userDoc = await userDocRef.get();
     const currentData = userDoc.data();
     
-    if (currentData && (currentData.username === "" || currentData.name === "") && newName.length < 1) { // If it's first time profile fill and name is empty
-         showToast("Display Name cannot be empty during initial profile setup.", 'error');
-         return;
+    // Check if it's initial profile completion AND name is empty.
+    // If current username or name is empty AND newName is also empty, it means first fill is incomplete.
+    if (currentData && (currentData.username === "" || currentData.name === "") && newName.length < 1) { 
+        updateAuthStatus(saveProfileStatus, "Display Name is required for initial profile setup.", 'error');
+        return;
     }
 
 
     try {
+        updateAuthStatus(saveProfileStatus, "Saving profile changes...", 'info');
         await userDocRef.update({
             username: newUsername,
             name: newName,
@@ -4568,16 +4014,8 @@ saveProfileBtn.addEventListener('click', async () => {
             profileLogo: newProfileLogo,
             profilePicUrl: finalProfilePicUrl, // Save direct URL
             isPrivate: isPrivate,
-            // Initialize earning/follower counts if they don't exist (important for new users saving profile for first time)
-            // If they already exist, Firebase update will merge and use existing values.
-            // These lines ensure values are set for NEWLY CREATED documents through initial registration flow.
-            followersCount: currentData.followersCount !== undefined ? currentData.followersCount : 0,
-            followingCount: currentData.followingCount !== undefined ? currentData.followingCount : 0,
-            postCount: currentData.postCount !== undefined ? currentData.postCount : 0,
-            monetizedViewsCount: currentData.monetizedViewsCount !== undefined ? currentData.monetizedViewsCount : 0,
-            unmonetizedViewsCount: currentData.unmonetizedViewsCount !== undefined ? currentData.unmonetizedViewsCount : 0,
-            earnedAmount: currentData.earnedAmount !== undefined ? currentData.earnedAmount : 0.00,
-            reposts: currentData.reposts !== undefined ? currentData.reposts : []
+            // These fields are only updated for existing values if they changed, Firebase automatically merges
+            // Counters like followersCount are not updated directly here by the user, but by atomic operations.
         });
 
         // Update username and profile info in existing posts if changed (requires write permissions on posts too)
@@ -4598,12 +4036,13 @@ saveProfileBtn.addEventListener('click', async () => {
             console.log("Post updates batch committed successfully.");
         }
 
-        editProfileModal.classList.add('hidden'); // This will now correctly hide the modal on save
+        editProfileModal.classList.add('hidden'); // This will now correctly hide the modal on successful save
         showToast("Profile updated successfully!", 'success');
         loadUserProfile(currentUser.uid); // Reload profile display
+        console.log("Profile saved and modal hidden successfully.");
     } catch (error) {
         console.error("Error saving profile:", error);
-        showToast("Failed to save profile. Please try again. Error: " + (error.message || 'Unknown error'), 'error', 6000);
+        updateAuthStatus(saveProfileStatus, `Failed to save profile. ${error.message || 'Unknown error'}.`, 'error', 6000);
     }
 });
 
@@ -4641,7 +4080,7 @@ async function handleFollow(targetUserId) {
                 return; // Exit transaction if already following.
             }
 
-            // If target user is private, cannot follow directly. Need a request system.
+            // If target user is private, direct follow is not allowed (would need a follow request system).
             if (targetUserData.isPrivate) {
                 showToast("This account is private. Cannot follow directly.", 'info', 4000);
                 throw new Error("Private account, direct follow not allowed."); // Abort transaction.
@@ -5027,7 +4466,7 @@ async function openChatWindow(partnerId) {
             } else {
                 chatPartnerAvatar.style.backgroundImage = 'none';
                 const partnerLogoClass = getLogoCssClass(partnerDoc.data().profileLogo || 'logo-1');
-                partnerAvatarHtml = `<div class="profile-avatar small ${partnerLogoClass}"></div>`;
+                chatPartnerAvatar.className = `profile-avatar small ${partnerLogoClass}`;
             }
         } else {
             chatPartnerUsername.textContent = "@UnknownUser";
@@ -5425,7 +4864,7 @@ async function handleDeletePost(postId, postElement, isMonetized) {
                     // Delete the postViews record for this post.
                     const postViewsRef = db.collection('postViews').doc(postId);
                     const postViewsDoc = await transaction.get(postViewsRef);
-                    if (postViewsDoc.exists) {
+                    if (postViewsDoc.exists) { // Only attempt delete if it exists
                          transaction.delete(postViewsRef);
                     }
 
