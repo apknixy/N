@@ -1745,18 +1745,10 @@ input[type="file"] {
         padding: 15px;
         height: calc(100vh - 140px); /* Adjust height for smaller headers/footers */
     }
-```
-
-### **3. `script.js` (Final & Most Robust, now with Load Indication & Cleaned Up Init)**
-
-इस `script.js` फ़ाइल को ऐप की inicialization logic, authentication flow, और UI के display order को संभालने के लिए **फिर से डिज़ाइन किया गया है**।
-
-*   यह **`load-status` (loading message)** को लोड करने के लिए एक सीधा `#load-status` तत्व का उपयोग करता है जो `<body>` के ठीक अंदर है। अगर JavaScript लोड हो रही है तो यह तुरंत दिखेगा।
-*   `checkUserAndRedirect` में **delay`s हटा दिए गए हैं, ताकि UI update जितनी जल्दी हो सके।**
-*   **Button disable/enable logic को मजबूत किया गया है।**
-*   `Firebase Error messages` को अब `showToast` के साथ दिखाया गया है ताकि यूजर को स्पष्ट फ़ीडबैक मिले।
-
-```javascript
+</style>
+</head> 
+    <body>
+<script>
 // Firebase Configuration (from your input)
 const firebaseConfig = {
     apiKey: "AIzaSyDlZA4grzF3fx95-11E4s7ASXwkIij1k1w",
@@ -5112,4 +5104,6 @@ sendWithdrawalRequestBtn.addEventListener('click', async () => {
 cancelWithdrawalBtn.addEventListener('click', () => {
     withdrawalModal.classList.add('hidden');
 });
-```
+</script>
+</body></html>
+    
