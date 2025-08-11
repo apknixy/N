@@ -1,2519 +1,328 @@
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark-mode">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>AddMint - Ultra Professional</title>
+    <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    
-    <style>
-        /* CSS start here (copied from style.css for all-in-one file) */
-
-        /* General Body and Container Styles */
-        body {
-            font-family: 'Montserrat', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: var(--bg-color-main); /* Using CSS variables */
-            color: var(--text-color-main);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            overflow-x: hidden;
-            line-height: 1.6;
-            transition: background-color 0.3s ease, color 0.3s ease; /* For dark/light mode */
-        }
-
-        /* Dark Mode Variables (Default) */
-        body.dark-mode {
-            --bg-color-main: #1a1a2e;
-            --bg-color-lighter: #16213e;
-            --bg-color-darker: #0d2a4a;
-            --text-color-main: #e0e0e0;
-            --text-color-light: #bbb;
-            --text-color-accent: #00ffff;
-            --border-color-main: #0f3460;
-            --shadow-color-main: rgba(0, 255, 255, 0.2);
-            --shadow-color-strong: rgba(0, 255, 255, 0.4);
-            --highlight-color-main: #00ffff;
-            --highlight-color-secondary: #ff00ff;
-            --button-primary-bg: #00ffff;
-            --button-primary-text: #1a1a2e;
-            --button-secondary-bg: #334e68;
-            --button-secondary-text: #e0e0e0;
-            --input-bg: #1a1a2e;
-            --input-border: #00ffff;
-            --post-card-bg: #0f3460;
-            --chat-bubble-left-bg: #334e68;
-            --chat-bubble-right-bg: #00ffff;
-            --chat-bubble-right-text: #1a1a2e;
-        }
-
-        /* Light Mode Variables (Example, not fully implemented for all elements) */
-        body.light-mode {
-            --bg-color-main: #f0f2f5;
-            --bg-color-lighter: #ffffff;
-            --bg-color-darker: #e0e0e0;
-            --text-color-main: #333333;
-            --text-color-light: #666666;
-            --text-color-accent: #007bff;
-            --border-color-main: #cccccc;
-            --shadow-color-main: rgba(0, 0, 0, 0.1);
-            --shadow-color-strong: rgba(0, 0, 0, 0.2);
-            --highlight-color-main: #007bff;
-            --highlight-color-secondary: #6f42c1;
-            --button-primary-bg: #007bff;
-            --button-primary-text: #ffffff;
-            --button-secondary-bg: #e9ecef;
-            --button-secondary-text: #333333;
-            --input-bg: #ffffff;
-            --input-border: #ced4da;
-            --post-card-bg: #ffffff;
-            --chat-bubble-left-bg: #e9ecef;
-            --chat-bubble-right-bg: #007bff;
-            --chat-bubble-right-text: #ffffff;
-        }
-
-
-        .app-container {
-            width: 100%;
-            max-width: 420px; /* Typical mobile width */
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            background-color: var(--bg-color-lighter);
-            box-shadow: 0 0 30px var(--shadow-color-main); /* Subtle glow */
-            border-radius: 12px;
-            overflow: hidden;
-            position: relative; /* For sidebar positioning */
-            border: 1px solid var(--border-color-main);
-        }
-
-        /* Added by JS if necessary to initially hide until content is ready */
-        .hidden {
-            display: none !important; /* Forces elements to be truly hidden by default */
-        }
-
-        /* Diagnostic message - Visible only if JavaScript successfully loads and sets its display */
-        #load-status {
-            position:fixed; 
-            top:50%; 
-            left:50%; 
-            transform:translate(-50%, -50%); 
-            color:white; 
-            background:black; 
-            padding:10px; 
-            z-index:9999;
-            display: none; /* JS will change this to block */
-            text-align: center;
-        }
-
-        /* Auth Container (Login/Signup) - Now handled more robustly by JS display flex/none */
-        .auth-container {
-            width: 100%;
-            max-width: 420px;
-            height: 100vh;
-            display: flex; /* Changed from default hidden to flex, controlled by JS. */
-            justify-content: center;
-            align-items: center; /* Vertically centers the .auth-content */
-            background-color: var(--bg-color-lighter);
-            box-shadow: 0 0 30px var(--shadow-color-main);
-            border-radius: 12px;
-            overflow: hidden;
-            border: 1px solid var(--border-color-main);
-            padding: 20px;
-            box-sizing: border-box;
-            flex-direction: column;
-            text-align: center;
-        }
-        .auth-content { /* Main content area for forms */
-            width: 100%;
-            background-color: var(--bg-color-main);
-            padding: 30px 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 15px rgba(0, 255, 255, 0.1);
-            border: 1px solid var(--border-color-main);
-            display: flex; /* Inner flex to arrange children vertically */
-            flex-direction: column;
-            align-items: center; /* Center login/signup forms */
-        }
-        .app-logo-splash { /* Used by auth-content h1 */
-            width: 100px;
-            height: 100px;
-            background: linear-gradient(45deg, #00ffff, #ff00ff); 
-            border-radius: 50%;
-            margin-bottom: 20px;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.6), 0 0 40px rgba(255, 0, 255, 0.4);
-            animation: pulse 2s infinite alternate;
-        }
-        .app-logo-splash::before {
-            content: 'A'; 
-            font-family: 'Montserrat', sans-serif;
-            font-size: 60px;
-            font-weight: bold;
-            color: #1a1a2e;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-        }
-
-
-        .auth-screen { 
-            display: none; /* Default to hidden */
-            width: 100%; 
-            flex-direction: column; 
-            align-items: center; 
-        }
-        .auth-screen.active {
-            display: flex; /* Active screen becomes visible flex */
-        }
-        .auth-text { 
-            font-size: 0.9em;
-            margin-top: 15px;
-            color: var(--text-color-light);
-        }
-        .auth-text a { 
-            color: var(--highlight-color-main);
-            text-decoration: none;
-            font-weight: bold;
-        }
-        .auth-text a:hover {
-            text-decoration: underline;
-        }
-        .status-message { 
-            margin-top: 15px;
-            padding: 8px 10px;
-            border-radius: 5px;
-            font-size: 0.9em;
-        }
-        .status-message.error { 
-            background-color: rgba(231, 76, 60, 0.2);
-            color: #e74c3c;
-            border: 1px solid #e74c3c;
-        }
-        .status-message.success { 
-            background-color: rgba(51, 255, 87, 0.2);
-            color: #33ff57;
-            border: 1px solid #33ff57;
-        }
-        .status-message.info { 
-            background-color: rgba(0, 255, 255, 0.1);
-            color: #00ffff;
-            border: 1px solid #00ffff;
-        }
-
-
-        /* Header */
-        .app-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px;
-            background-color: var(--border-color-main);
-            color: white;
-            border-bottom: 1px solid var(--bg-color-darker);
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-            z-index: 10;
-        }
-
-        .header-left, .header-right {
-            display: flex;
-            align-items: center;
-        }
-        .header-center {
-            flex-grow: 1;
-            text-align: center;
-        }
-
-        .app-title {
-            font-size: 1.5em;
-            font-weight: bold;
-            margin-left: 15px;
-            color: var(--highlight-color-main);
-            text-shadow: 0 0 5px var(--highlight-color-main);
-        }
-
-        .icon-button {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 1.2em;
-            cursor: pointer;
-            margin-left: 15px;
-            transition: color 0.3s ease, transform 0.2s ease;
-        }
-
-        .icon-button:hover {
-            color: var(--highlight-color-main);
-            transform: scale(1.1);
-        }
-
-        .loader { 
-            border: 4px solid rgba(255, 255, 255, 0.3);
-            border-top: 4px solid var(--highlight-color-main);
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            animation: spin 1s linear infinite;
-            margin: 20px auto;
-        }
-
-        .menu-icon {
-            width: 30px;
-            height: 20px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            cursor: pointer;
-        }
-
-        .menu-icon .bar {
-            width: 100%;
-            height: 3px;
-            background-color: white;
-            border-radius: 2px;
-        }
-
-        /* Sidebar Navigation */
-        .sidebar {
-            position: fixed;
-            top: 0;
-            left: -300px; /* Hidden by default */
-            width: 280px;
-            height: 100%;
-            background-color: var(--border-color-main);
-            box-shadow: 5px 0 15px rgba(0, 0, 0, 0.5);
-            z-index: 20;
-            transition: left 0.3s ease-in-out;
-            padding-top: 20px;
-            display: flex;
-            flex-direction: column;
-        }
-        .sidebar-content {
-            flex-grow: 1;
-            overflow-y: auto;
-        }
-        #logout-btn-wrapper {
-             padding: 10px 20px;
-             border-top: 1px solid var(--bg-color-darker);
-        }
-
-        .sidebar.open {
-            left: 0;
-        }
-
-        .sidebar-header {
-            display: flex;
-            align-items: center;
-            padding: 15px 20px;
-            border-bottom: 1px solid var(--bg-color-darker);
-            margin-bottom: 20px;
-            position: relative;
-        }
-
-        .sidebar-header h3 {
-            margin: 0 0 0 15px;
-            color: var(--highlight-color-main);
-            font-size: 1.4em;
-            max-width: 150px; /* Prevent long names from pushing close button */
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .sidebar-header .close-sidebar {
-            position: absolute;
-            top: 15px;
-            right: 20px;
-            font-size: 2em;
-            color: white;
-            cursor: pointer;
-            line-height: 1;
-        }
-
-        .profile-avatar-small {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background-color: var(--highlight-color-main); /* Default for coded avatars */
-            overflow: hidden;
-            position: relative;
-            border: 2px solid var(--highlight-color-main);
-            flex-shrink: 0;
-            background-size: cover; /* For direct pic link */
-            background-position: center; /* For direct pic link */
-        }
-        .profile-avatar-small::before {
-            content: '👤'; /* Default large avatar */
-            font-family: 'Font Awesome 6 Free'; font-weight: 900;
-            font-size: 30px;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: var(--button-primary-text);
-        }
-        .profile-avatar-small[style*="background-image"]::before {
-            content: none; /* Hide default emoji if image is loaded */
-        }
-
-
-        .sidebar ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .sidebar ul li {
-            margin-bottom: 10px;
-        }
-
-        .sidebar ul li a {
-            display: flex;
-            align-items: center;
-            padding: 12px 20px;
-            color: var(--text-color-main);
-            text-decoration: none;
-            font-size: 1.1em;
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-        .sidebar ul li a .fas, .sidebar ul li a .fab {
-            margin-right: 15px;
-            width: 20px;
-            text-align: center;
-        }
-
-        .sidebar ul li a:hover {
-            background-color: var(--bg-color-main);
-            color: var(--highlight-color-main);
-        }
-
-        /* Data Saver Toggle */
-        .toggle-switch {
-            position: relative;
-            display: inline-block;
-            width: 40px;
-            height: 20px;
-            margin-left: auto; /* Push to the right */
-            flex-shrink: 0; /* Prevent shrinking */
-        }
-
-        .toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .toggle-switch label {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            -webkit-transition: .4s;
-            transition: .4s;
-            border-radius: 34px;
-        }
-
-        .toggle-switch label:before {
-            position: absolute;
-            content: "";
-            height: 16px;
-            width: 16px;
-            left: 2px;
-            bottom: 2px;
-            background-color: white;
-            -webkit-transition: .4s;
-            transition: .4s;
-            border-radius: 50%;
-        }
-
-        .toggle-switch input:checked + label {
-            background-color: var(--highlight-color-main);
-        }
-
-        .toggle-switch input:checked + label:before {
-            -webkit-transform: translateX(20px);
-            -ms-transform: translateX(20px);
-            transform: translateX(20px);
-        }
-
-
-        /* Main Content */
-        .main-content {
-            flex-grow: 1;
-            overflow-y: auto;
-            padding: 20px;
-            padding-bottom: 80px; /* Space for bottom nav */
-        }
-
-        .app-screen {
-            display: none;
-        }
-
-        .app-screen.active {
-            display: block;
-        }
-
-        section {
-            background-color: var(--bg-color-main);
-            padding: 20px;
-            margin-bottom: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 15px var(--shadow-color-main);
-            border: 1px solid var(--border-color-main);
-        }
-
-        h2 {
-            color: var(--highlight-color-main);
-            text-shadow: 0 0 5px var(--highlight-color-main);
-            border-bottom: 2px solid var(--border-color-main);
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-        }
-
-        /* Category Filter */
-        .category-filter {
-            margin-bottom: 20px;
-        }
-        .category-filter select {
-            width: 100%;
-            padding: 10px;
-            border-radius: 5px;
-            background-color: var(--input-bg);
-            color: var(--text-color-main);
-            border: 1px solid var(--input-border);
-        }
-
-
-        /* Post Feed Styles */
-        .posts-feed {
-            display: flex;
-            flex-direction: column;
-            gap: 20px; /* Space between posts */
-        }
-
-        .post-card {
-            background-color: var(--post-card-bg);
-            border-radius: 10px;
-            padding: 15px;
-            box-shadow: 0 0 10px rgba(0, 255, 255, 0.08);
-            border: 1px solid var(--bg-color-darker);
-            transition: box-shadow 0.3s ease-in-out, border-color 0.3s ease-in-out;
-            position: relative; /* For neon effect */
-        }
-
-        .post-card.neon-glow {
-            box-shadow: 0 0 5px var(--highlight-color-main), 0 0 15px var(--highlight-color-main), 0 0 25px var(--highlight-color-main), 0 0 35px var(--highlight-color-main);
-            border-color: var(--highlight-color-main);
-        }
-        
-        /* NEW: Remix effect */
-        .post-card.remixed {
-            background-color: #2a163e; /* Lighter purple/darker blue for remixed */
-            border-color: #ff00ff; /* Pink border */
-            box-shadow: 0 0 10px rgba(255, 0, 255, 0.2);
-        }
-        .remix-content-wrapper {
-            display: flex;
-            flex-direction: column; /* Stack them for better mobile view */
-            gap: 10px;
-            margin-top: 10px;
-            border-top: 1px dashed #0d2a4a;
-            padding-top: 15px;
-        }
-        .remix-original, .remix-reply {
-            padding: 10px;
-            border-radius: 8px;
-            background-color: #1a1a2e; /* Darker background for remix sections */
-            border: 1px solid #0f3460;
-        }
-        .remix-original h5, .remix-reply h5 {
-            margin-top: 0;
-            color: #00ffff;
-            font-size: 0.9em;
-            margin-bottom: 5px;
-        }
-        .remix-original p, .remix-reply p {
-            font-size: 0.9em;
-            color: #e0e0e0;
-            margin-bottom: 0;
-        }
-        /* End NEW: Remix effect */
-
-
-        .post-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .profile-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background-color: #00ffff; /* Default for coded avatars */
-            margin-right: 10px;
-            overflow: hidden;
-            position: relative;
-            border: 2px solid #00ffff;
-            flex-shrink: 0;
-            cursor: pointer; /* Make avatar clickable */
-        }
-        
-        .profile-avatar.user-logo-default::before {
-            content: '👤';
-            font-family: 'Font Awesome 6 Free'; 
-            font-weight: 900;
-            font-size: 24px;
-            position: absolute; 
-            top: 50%; left: 50%; 
-            transform: translate(-50%, -50%);
-            color: #1a1a2e;
-        }
-
-        .profile-avatar[style*="background-image"]::before {
-            content: none !important; /* Hide default emoji if direct image URL is set */
-        }
-        
-
-        .profile-avatar.small {
-            width: 30px;
-            height: 30px;
-            border-width: 1px;
-        }
-
-        .username {
-            font-weight: bold;
-            color: #fff;
-            flex-grow: 1;
-            cursor: pointer; /* Make username clickable */
-        }
-
-        .post-options {
-            position: relative;
-        }
-
-        .post-options .fa-ellipsis-v {
-            cursor: pointer;
-            font-size: 1.2em;
-            color: #888;
-        }
-
-        .options-dropdown {
-            display: none; /* Hidden by default, toggled by JS */
-            position: absolute;
-            top: 100%;
-            right: 0;
-            background-color: #1a1a2e;
-            border: 1px solid #0f3460;
-            border-radius: 5px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
-            z-index: 5;
-            min-width: 120px;
-            overflow: hidden;
-        }
-
-        .options-dropdown.show {
-            display: block;
-        }
-
-        .options-dropdown span {
-            display: block;
-            padding: 10px 15px;
-            cursor: pointer;
-            color: #e0e0e0;
-            transition: background-color 0.2s ease, color 0.2s ease;
-        }
-
-        .options-dropdown span:hover {
-            background-color: #0f3460;
-            color: #00ffff;
-        }
-
-        .post-content {
-            margin-bottom: 10px;
-        }
-
-        .post-content p {
-            margin: 0 0 10px 0;
-            word-wrap: break-word;
-        }
-
-        .post-content img {
-            max-width: 100%;
-            border-radius: 8px;
-            margin-top: 10px;
-            border: 1px solid #0d2a4a;
-        }
-
-        .post-content a {
-            color: #00ffff;
-            text-decoration: underline;
-            word-break: break-all;
-        }
-
-        .post-footer {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .post-actions {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .like-button, .views-count, .translate-button, .speak-button, .comment-button {
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            color: #bbb;
-            transition: color 0.2s ease;
-        }
-
-        .like-button i, .views-count i, .translate-button i, .speak-button i, .comment-button i {
-            margin-right: 5px;
-        }
-
-        .like-button .fas.fa-heart {
-            color: #ff007f; /* Red for liked */
-            animation: bounceIn 0.3s ease-out;
-        }
-        .speak-button.active i {
-            color: #00ffff; /* Highlight when speaking */
-        }
-
-
-        .post-reactions {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 0.9em;
-            color: #aaa;
-        }
-
-        .emoji-reaction-display {
-            display: flex;
-            gap: 5px;
-            flex-wrap: wrap; /* Allow wrapping if many emojis */
-        }
-
-        .emoji-reaction-display .emoji {
-            font-size: 1.2em;
-            display: flex; /* To align count */
-            align-items: center;
-        }
-
-        .emoji-reaction-display .count {
-            font-size: 0.8em;
-            margin-left: 2px;
-            color: #e0e0e0;
-        }
-
-        .total-reactions {
-            margin-left: 10px;
-            font-weight: bold;
-            color: #00ffff;
-        }
-
-        .emoji-picker, .emoji-picker-chat {
-            position: absolute;
-            bottom: 40px; /* Adjust based on footer position */
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: #1a1a2e;
-            border: 1px solid #0f3460;
-            border-radius: 8px;
-            padding: 8px;
-            display: flex;
-            gap: 10px;
-            box-shadow: 0 5px 20px rgba(0, 255, 255, 0.2);
-            z-index: 10;
-        }
-
-        .emoji-option {
-            font-size: 1.5em;
-            cursor: pointer;
-            transition: transform 0.2s ease;
-        }
-
-        .emoji-option:hover {
-            transform: scale(1.2);
-        }
-
-        /* Form & Button Styles */
-        .form-group {
-            margin-bottom: 15px;
-            width: 100%;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-            color: #e0e0e0;
-            text-align: left;
-        }
-        
-        .password-input-group {
-            position: relative;
-            width: 100%;
-        }
-
-        .password-toggle {
-            position: absolute;
-            top: 50%;
-            right: 10px;
-            transform: translateY(-50%);
-            cursor: pointer;
-            color: var(--text-color-light);
-        }
-
-        input[type="text"],
-        input[type="email"],
-        input[type="password"],
-        input[type="file"],
-        textarea,
-        select,
-        input[type="number"],
-        input[type="date"] {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #00ffff; /* Neon border */
-            border-radius: 6px;
-            background-color: #1a1a2e;
-            color: #e0e0e0;
-            box-sizing: border-box;
-            font-size: 1em;
-            box-shadow: 0 0 8px rgba(0, 255, 255, 0.2);
-            transition: border-color 0.3s ease, box-shadow 0.3s ease;
-        }
-        
-        input[readonly] {
-            background-color: #334e68;
-            cursor: not-allowed;
-        }
-
-        input[type="text"]:focus,
-        input[type="email"]:focus,
-        input[type="password"]:focus,
-        textarea:focus,
-        select:focus,
-        input[type="number"]:focus,
-        input[type="date"]:focus {
-            border-color: #ff00ff; /* Pink focus */
-            box-shadow: 0 0 15px rgba(255, 0, 255, 0.4);
-            outline: none;
-        }
-
-        textarea {
-            resize: vertical;
-            min-height: 100px;
-        }
-
-        input[type="file"] {
-            padding: 8px; /* Less padding for file input */
-        }
-
-        .btn {
-            display: inline-block;
-            padding: 12px 25px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1.1em;
-            font-weight: bold;
-            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
-            text-align: center;
-            text-decoration: none; /* For link buttons */
-            width: 100%;
-        }
-        .btn.small {
-            padding: 6px 12px;
-            font-size: 0.9em;
-            width: auto;
-        }
-
-
-        .btn.primary-btn {
-            background-color: #00ffff;
-            color: #1a1a2e;
-            box-shadow: 0 0 10px rgba(0, 255, 255, 0.4);
-        }
-
-        .btn.primary-btn:hover {
-            background-color: #00e0e0;
-            transform: translateY(-2px);
-            box-shadow: 0 0 15px rgba(0, 255, 255, 0.6);
-        }
-        .btn:disabled { /* General styling for disabled buttons */
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: translateY(0);
-            box-shadow: none;
-        }
-
-
-        .btn.secondary-btn {
-            background-color: #334e68;
-            color: #e0e0e0;
-            border: 1px solid #00ffff;
-        }
-
-        .btn.secondary-btn:hover {
-            background-color: #4a6684;
-            transform: translateY(-2px);
-            box-shadow: 0 0 10px rgba(0, 255, 255, 0.4);
-        }
-
-        .btn.danger-btn {
-            background-color: #e74c3c;
-            color: white;
-        }
-
-        .btn.danger-btn:hover {
-            background-color: #c0392b;
-            transform: translateY(-2px);
-        }
-
-        .btn.social-btn {
-            background-color: #2e8b57; /* WhatsApp Green */
-            color: white;
-            margin-right: 10px;
-        }
-
-        .btn.social-btn i {
-            margin-right: 8px;
-        }
-
-        .btn.social-btn:hover {
-            background-color: #226b41;
-        }
-
-        .profile-actions {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 20px;
-            justify-content: center;
-        }
-
-        /* Modals */
-        .modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 100;
-        }
-
-        .modal-content {
-            background-color: #1a1a2e;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 0 25px rgba(0, 255, 255, 0.3);
-            border: 1px solid #00ffff;
-            width: 90%;
-            max-width: 500px;
-            position: relative;
-            animation: fadeInScale 0.3s ease-out;
-            max-height: 90vh; /* Allow scrolling for tall modals */
-            overflow-y: auto;
-        }
-
-        .modal-content h3 {
-            color: #00ffff;
-            margin-top: 0;
-            margin-bottom: 20px;
-            text-align: center;
-            border-bottom: 1px solid #0f3460;
-            padding-bottom: 10px;
-        }
-
-        .modal-content .btn {
-            margin-top: 15px;
-            width: 100%;
-        }
-
-        .logo-options-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
-            gap: 10px;
-            max-height: 200px;
-            overflow-y: auto;
-            padding: 10px;
-            border: 1px solid #0f3460;
-            border-radius: 8px;
-            background-color: #0d2a4a;
-        }
-
-        .logo-option-item {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background-color: #333; /* Base color for logo previews */
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border: 2px solid transparent;
-            transition: border-color 0.2s ease, transform 0.2s ease;
-            background-size: cover;
-            background-position: center;
-            position: relative;
-        }
-
-        .logo-option-item.selected {
-            border-color: #00ffff;
-            box-shadow: 0 0 10px #00ffff;
-        }
-
-        .logo-option-item:hover {
-            transform: scale(1.1);
-        }
-        
-        .profile-avatar.user-logo-default::before { /* Default fallback if dynamic styles fail */
-            content: '👤';
-            font-family: 'Font Awesome 6 Free'; 
-            font-weight: 900;
-            font-size: 24px;
-            position: absolute; 
-            top: 50%; left: 50%; 
-            transform: translate(-50%, -50%);
-            color: #1a1a2e;
-        }
-
-        /* Profile Screen Specifics */
-        .profile-header-area {
-            text-align: center;
-            margin-bottom: 30px;
-            padding: 20px;
-            background-color: #0f3460;
-            border-radius: 10px;
-            box-shadow: 0 0 15px rgba(0, 255, 255, 0.1);
-            border: 1px solid #0d2a4a;
-        }
-
-        .profile-avatar-large {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            background-color: #00ffff; /* Default for coded avatars */
-            margin: 0 auto 20px auto;
-            overflow: hidden;
-            position: relative;
-            border: 4px solid #00ffff;
-            box-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
-            background-size: cover;
-            background-position: center;
-        }
-        /* Override default avatar emoji if background image is present */
-        .profile-avatar-large[style*="background-image"]::before {
-            content: none !important; 
-        }
-
-        .profile-name, .profile-bio {
-            color: #e0e0e0;
-            font-size: 0.95em;
-            margin-bottom: 5px;
-        }
-        .profile-stats {
-            display: flex;
-            justify-content: center;
-            gap: 25px;
-            margin-top: 15px;
-            font-size: 1.1em;
-        }
-
-        .profile-stats div {
-            text-align: center;
-            padding: 8px 12px;
-            background-color: #1a1a2e;
-            border-radius: 8px;
-            border: 1px solid #00ffff;
-            box-shadow: 0 0 8px rgba(0, 255, 255, 0.2);
-        }
-
-        .profile-stats span {
-            display: block;
-            font-weight: bold;
-            font-size: 1.2em;
-            color: #00ffff;
-        }
-
-        .clickable-stat {
-            cursor: pointer;
-            transition: background-color 0.2s ease, transform 0.2s ease;
-        }
-
-        .clickable-stat:hover {
-            background-color: #0d2a4a;
-            transform: translateY(-2px);
-        }
-
-        /* Chat Styles */
-        .message-list-container, .chat-window-container {
-            background-color: #0f3460;
-            border-radius: 10px;
-            padding: 15px;
-            box-shadow: 0 0 15px rgba(0, 255, 255, 0.1);
-            border: 1px solid #0d2a4a;
-            height: calc(100% - 40px);
-            display: flex;
-            flex-direction: column;
-        }
-
-        .recent-chats-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            overflow-y: auto;
-            flex-grow: 1;
-        }
-
-        .chat-item {
-            display: flex;
-            align-items: center;
-            padding: 12px 10px;
-            border-bottom: 1px solid #1a1a2e;
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-        }
-
-        .chat-item:hover {
-            background-color: #1a1a2e;
-        }
-
-        .chat-info {
-            margin-left: 10px;
-            flex-grow: 1;
-        }
-
-        .chat-username {
-            font-weight: bold;
-            color: #00ffff;
-            display: block;
-        }
-
-        .last-message {
-            font-size: 0.9em;
-            color: #bbb;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .chat-window-container {
-            height: calc(100vh - 160px);
-            padding: 0;
-        }
-
-        .chat-header {
-            display: flex;
-            align-items: center;
-            padding: 15px;
-            background-color: #0f3460;
-            border-bottom: 1px solid #0d2a4a;
-            color: white;
-        }
-
-        .chat-header .icon-button {
-            margin-right: 10px;
-        }
-
-        #chat-partner-username {
-            font-size: 1.2em;
-            font-weight: bold;
-            color: #00ffff;
-        }
-
-        .chat-messages {
-            flex-grow: 1;
-            overflow-y: auto;
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            background-color: #1a1a2e;
-        }
-
-        .message-bubble {
-            padding: 10px 15px;
-            border-radius: 18px;
-            max-width: 80%;
-            word-wrap: break-word;
-            font-size: 0.95em;
-            line-height: 1.4;
-            position: relative;
-        }
-
-        .message-bubble.right {
-            align-self: flex-end;
-            background-color: #00ffff;
-            color: #1a1a2e;
-            border-bottom-right-radius: 4px;
-        }
-
-        .message-bubble.left {
-            align-self: flex-start;
-            background-color: #334e68;
-            color: #e0e0e0;
-            border-bottom-left-radius: 4px;
-        }
-
-        .chat-input-area {
-            display: flex;
-            padding: 10px 15px;
-            border-top: 1px solid #0d2a4a;
-            background-color: #0f3460;
-        }
-
-        #message-input {
-            flex-grow: 1;
-            margin-right: 10px;
-            min-height: 40px;
-            max-height: 100px;
-            resize: none;
-            align-self: center;
-        }
-
-        #send-message-btn {
-            padding: 10px 15px;
-            font-size: 1.2em;
-            width: auto;
-        }
-
-        /* Search Screen */
-        .search-input-group {
-            display: flex;
-            margin-bottom: 20px;
-        }
-
-        #search-query {
-            flex-grow: 1;
-            margin-right: 10px;
-        }
-
-        .search-results-container h3 {
-            margin-top: 25px;
-            color: #00ffff;
-            border-bottom: 1px solid #0f3460;
-            padding-bottom: 5px;
-        }
-
-        .search-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            background-color: #0d2a4a;
-            border-radius: 8px;
-            border: 1px solid #0f3460;
-            max-height: 300px;
-            overflow-y: auto;
-        }
-
-        .search-user-item {
-            display: flex;
-            align-items: center;
-            padding: 10px 15px;
-            border-bottom: 1px solid #1a1a2e;
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-        }
-
-        .search-user-item:last-child {
-            border-bottom: none;
-        }
-
-        .search-user-item:hover {
-            background-color: #1a1a2e;
-        }
-
-        .search-username {
-            flex-grow: 1;
-            margin-left: 10px;
-            font-weight: bold;
-            color: #e0e0e0;
-        }
-
-        .search-user-item .follow-btn {
-            padding: 5px 10px;
-            font-size: 0.9em;
-            width: auto;
-        }
-
-        /* Monetization Screen Styles */
-        #monetization-screen .info-card {
-            background-color: #0f3460;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            border: 1px solid #0d2a4a;
-            box-shadow: 0 0 10px rgba(0, 255, 255, 0.08);
-            text-align: center;
-        }
-        #monetization-screen .info-card h4 {
-            color: #00ffff;
-            margin-top: 0;
-            margin-bottom: 10px;
-            font-size: 1.2em;
-        }
-        #monetization-screen .info-card p {
-            font-size: 1.1em;
-            color: var(--text-color-main);
-        }
-        #monetization-screen .info-card p strong {
-            font-size: 1.5em;
-            color: var(--highlight-color-main);
-            display: block;
-            margin-top: 10px;
-        }
-        #monetization-screen .info-card i {
-            margin-right: 8px;
-            color: #ff00ff;
-        }
-        #monetization-screen .info-card .btn {
-            margin-top: 20px;
-            width: auto;
-            padding: 10px 30px;
-        }
-        .review-details p {
-            background-color: var(--bg-color-darker);
-            padding: 10px;
-            border-radius: 5px;
-            border-left: 3px solid var(--highlight-color-main);
-            text-align: left;
-        }
-        .review-details p strong {
-            color: var(--highlight-color-main);
-        }
-
-
-        .profile-post-tabs {
-            display: flex;
-            justify-content: space-around;
-            margin-bottom: 20px;
-        }
-        .tab-btn {
-            flex-grow: 1;
-            background: none;
-            border: none;
-            border-bottom: 2px solid transparent;
-            color: var(--text-color-light);
-            padding: 10px;
-            cursor: pointer;
-            font-size: 1em;
-            font-weight: 600;
-        }
-        .tab-btn.active {
-            color: var(--highlight-color-main);
-            border-bottom-color: var(--highlight-color-main);
-        }
-        #username-availability {
-            font-size: 0.8em;
-            margin-top: 5px;
-            display: block;
-        }
-        #username-availability.success-text { color: #33ff57; }
-        #username-availability.error-text { color: #e74c3c; }
-
-
-        /* Bottom Navigation */
-        .app-bottom-nav {
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            background-color: #0f3460;
-            border-top: 1px solid #0d2a4a;
-            padding: 10px 0;
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
-            position: sticky;
-            bottom: 0;
-            width: 100%;
-            z-index: 10;
-        }
-
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-decoration: none;
-            color: #888;
-            font-size: 0.8em;
-            transition: color 0.3s ease, transform 0.2s ease;
-        }
-
-        .nav-item .icon-wrapper {
-            width: 30px;
-            height: 30px;
-            margin-bottom: 5px;
-            position: relative;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border: 1px solid transparent; /* For active state glow */
-            transition: border-color 0.3s ease;
-        }
-
-        /* Custom Coded Icons for Bottom Nav */
-        .home-icon::before { content: '\f015'; font-family: 'Font Awesome 6 Free'; font-weight: 900; font-size: 1.4em; color: #e0e0e0; }
-        .search-icon::before { content: '\f002'; font-family: 'Font Awesome 6 Free'; font-weight: 900; font-size: 1.4em; color: #e0e0e0; }
-        .upload-icon::before { content: '\f067'; font-family: 'Font Awesome 6 Free'; font-weight: 900; font-size: 1.4em; color: #e0e0e0; } /* Plus Circle */
-        .messages-icon::before { content: '\f075'; font-family: 'Font Awesome 6 Free'; font-weight: 900; font-size: 1.4em; color: #e0e0e0; } /* Comment Dots */
-        .profile-icon::before { content: '\f406'; font-family: 'Font Awesome 6 Free'; font-weight: 900; font-size: 1.4em; color: #e0e0e0; } /* User Circle Solid */
-
-        .nav-item.active {
-            color: #00ffff;
-            transform: translateY(-3px);
-        }
-
-        .nav-item.active .icon-wrapper {
-            border-color: #00ffff;
-            box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
-        }
-
-        .nav-item.active .icon-wrapper::before {
-            color: #00ffff;
-        }
-
-        /* Reward Popup */
-        .reward-content {
-            text-align: center;
-        }
-        .reward-content h3 {
-            color: #33ff57; /* Green for success */
-            text-shadow: 0 0 8px rgba(51, 255, 87, 0.6);
-            margin-bottom: 15px;
-        }
-        .reward-content i.fas.fa-trophy {
-            font-size: 1.5em;
-            margin-left: 10px;
-            vertical-align: middle;
-        }
-        #reward-message {
-            font-size: 1.1em;
-            color: #e0e0e0;
-            margin-bottom: 20px;
-        }
-
-        /* Toast Notification */
-        .toast-notification {
-            position: fixed;
-            bottom: 80px; /* Above bottom nav */
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: rgba(0, 0, 0, 0.8);
-            color: white;
-            padding: 12px 20px;
-            border-radius: 8px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-            z-index: 200;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
-            font-size: 0.95em;
-            min-width: 200px;
-            text-align: center;
-        }
-
-        .toast-notification.show {
-            opacity: 1;
-            visibility: visible;
-        }
-        .toast-notification.error { background-color: #e74c3c; }
-        .toast-notification.success { background-color: #27ae60; }
-        .toast-notification.info { background-color: #3498db; }
-
-
-        /* Language Selection Modal */
-        #language-select-modal .language-options {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            max-height: 250px;
-            overflow-y: auto;
-            margin-bottom: 20px;
-            padding: 10px;
-            border: 1px solid #0f3460;
-            border-radius: 8px;
-            background-color: #0d2a4a;
-        }
-        #language-select-modal .language-option {
-            padding: 10px;
-            border-radius: 6px;
-            background-color: #1a1a2e;
-            border: 1px solid #00ffff;
-            color: #e0e0e0;
-            cursor: pointer;
-            text-align: center;
-            transition: background-color 0.2s ease, transform 0.2s ease;
-        }
-        #language-select-modal .language-option.selected {
-            background-color: #00ffff;
-            color: #1a1a2e;
-            box-shadow: 0 0 10px rgba(0, 255, 255, 0.4);
-        }
-        #language-select-modal .language-option:hover {
-            transform: translateY(-2px);
-        }
-
-        /* Animation for shake effect on remix */
-        @keyframes shake {
-            0% { transform: translateX(0); }
-            20% { transform: translateX(-5px); }
-            40% { transform: translateX(5px); }
-            60% { transform: translateX(-5px); }
-            80% { transform: translateX(5px); }
-            100% { transform: translateX(0); }
-        }
-
-
-        /* Animations */
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        @keyframes pulse { 0% { transform: scale(1); box-shadow: 0 0 10px rgba(0, 255, 255, 0.6), 0 0 20px rgba(255, 0, 255, 0.4); } 100% { transform: scale(1.05); box-shadow: 0 0 20px rgba(0, 255, 255, 0.8), 0 0 30px rgba(255, 0, 255, 0.6); } }
-        @keyframes fadeInScale { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
-        @keyframes bounceIn { 0% { transform: scale(0.3); opacity: 0; } 50% { transform: scale(1.1); opacity: 1; } 70% { transform: scale(0.9); } 100% { transform: scale(1); } }
-
-        /* Responsive adjustments */
-        @media (max-width: 600px) {
-            .app-container, .auth-screen-wrapper { border-radius: 0; box-shadow: none; max-width: 100%; height: 100vh; }
-            body { align-items: flex-start; }
-            .main-content { padding: 10px; }
-            .app-header { padding: 10px; }
-            .app-title { font-size: 1.3em; margin-left: 10px; }
-            .icon-button { font-size: 1em; margin-left: 10px; }
-            .app-bottom-nav { padding: 8px 0; }
-            .nav-item { font-size: 0.7em; }
-            .nav-item .icon-wrapper { width: 25px; height: 25px; }
-            .home-icon::before, .search-icon::before, .upload-icon::before, .messages-icon::before, .profile-icon::before { font-size: 1.2em; }
-            .modal-content { width: 95%; padding: 20px; }
-            .profile-avatar-large { width: 80px; height: 80px; }
-            .profile-avatar-large::before { font-size: 45px; }
-            .profile-stats { gap: 15px; font-size: 1em; }
-            .profile-stats span { font-size: 1.1em; }
-            .btn { padding: 10px 15px; font-size: 1em; }
-            .profile-actions { flex-direction: column; align-items: center; }
-            .profile-actions .btn { width: 80%; }
-            .emoji-picker, .emoji-picker-chat { padding: 6px; gap: 8px; }
-            .emoji-option { font-size: 1.3em; }
-            .message-bubble { max-width: 90%; }
-            .toast-notification { bottom: 70px; font-size: 0.8em; min-width: unset; width: auto; padding: 10px 15px; }
-            .auth-content { padding: 20px 15px; }
-        }
-    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="dark-mode"> 
-    
-    <p id="load-status">Loading Application...</p>
+<body>
 
-    <!-- Auth Container -->
-    <div id="auth-container" class="auth-container hidden">
-        <div class="auth-content">
-            <div class="app-logo-splash auth-logo"></div> <h1>AddMint</h1>
-            <section id="login-screen" class="auth-screen active">
-                <h2>Login</h2>
-                <div class="form-group">
-                    <label for="login-email">Email:</label>
-                    <input type="email" id="login-email" placeholder="Enter your email">
-                </div>
-                <div class="form-group">
-                    <label for="login-password">Password:</label>
-                    <div class="password-input-group">
-                        <input type="password" id="login-password" placeholder="Enter your password">
-                        <span class="password-toggle" data-target="login-password"><i class="fas fa-eye"></i></span>
-                    </div>
-                </div>
-                <button class="btn primary-btn" id="login-btn">Login</button>
-                <p class="auth-text"><a href="#" id="forgot-password-link">Forgot Password?</a></p>
-                <p class="auth-text">Don't have an account? <a href="#" id="show-signup">Register</a></p>
-                <p id="login-status" class="status-message"></p>
-            </section>
-
-            <section id="signup-screen" class="auth-screen">
-                <h2>Register</h2>
-                <div class="form-group">
-                    <label for="signup-email">Email:</label>
-                    <input type="email" id="signup-email" placeholder="Enter your email">
-                </div>
-                <div class="form-group">
-                    <label for="signup-password">Password:</label>
-                    <div class="password-input-group">
-                        <input type="password" id="signup-password" placeholder="Create a password">
-                        <span class="password-toggle" data-target="signup-password"><i class="fas fa-eye"></i></span>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="signup-confirm-password">Confirm Password:</label>
-                    <div class="password-input-group">
-                        <input type="password" id="signup-confirm-password" placeholder="Confirm your password">
-                        <span class="password-toggle" data-target="signup-confirm-password"><i class="fas fa-eye"></i></span>
-                    </div>
-                </div>
-                <button class="btn primary-btn" id="signup-btn">Register</button>
-                <p class="auth-text">Already have an account? <a href="#" id="show-login">Login</a></p>
-                <p id="signup-status" class="status-message"></p>
-            </section>
+    <!-- Splash Screen -->
+    <div id="splash-screen" class="splash-screen">
+        <div class="splash-content">
+            <div class="app-logo-splash"></div>
+            <h1>AddMint</h1>
+            <p>Connecting the World, One Post at a Time</p>
+            <div class="loader"></div>
         </div>
     </div>
 
-    <!-- Forgot Password Modal -->
-    <div id="forgot-password-modal" class="modal hidden">
-        <div class="modal-content">
-            <h3>Reset Password</h3>
-            <p>Enter your email address to receive a password reset link.</p>
-            <div class="form-group">
-                <label for="reset-email">Email:</label>
-                <input type="email" id="reset-email" placeholder="Your email address">
-            </div>
-            <button class="btn primary-btn" id="send-reset-email-btn">Send Reset Link</button>
-            <p id="reset-status" class="status-message"></p>
-            <button class="btn secondary-btn" id="close-reset-modal">Cancel</button>
-        </div>
-    </div>
-
-    <!-- Main Application Container -->
+    <!-- Main App Container -->
     <div id="app-container" class="app-container hidden">
 
-        <header class="app-header">
-            <div class="header-left">
-                <div class="menu-icon" id="menu-toggle">
-                    <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+        <!-- Login Screen -->
+        <div id="login-screen" class="login-screen active">
+            <div class="login-content">
+                <div class="app-logo-splash"></div>
+                <h1>Welcome to AddMint</h1>
+                <p>Sign in to continue</p>
+                <div class="form-group">
+                    <input type="email" id="login-email" placeholder="Email">
                 </div>
-                <div class="app-title">AddMint</div>
-            </div>
-            <div class="header-right">
-                <div class="icon-button" id="refresh-posts-btn" title="Refresh Feed">
-                    <i class="fas fa-sync-alt"></i>
+                <div class="form-group">
+                    <input type="password" id="login-password" placeholder="Password">
                 </div>
+                <button id="login-btn" class="btn primary-btn">Login</button>
+                <p class="auth-toggle-link">Don't have an account? <a href="#" id="show-signup">Sign Up</a></p>
             </div>
-        </header>
+        </div>
 
-        <nav id="sidebar" class="sidebar">
-            <div class="sidebar-header">
-                <div class="profile-avatar-small" id="sidebar-profile-avatar"></div>
-                <h3 id="sidebar-username">My User</h3> 
-                <div class="close-sidebar" id="close-sidebar">&times;</div>
+        <!-- Signup Screen -->
+        <div id="signup-screen" class="login-screen">
+             <div class="login-content">
+                <div class="app-logo-splash"></div>
+                <h1>Create Account</h1>
+                <p>Join the community</p>
+                 <div class="form-group">
+                    <input type="text" id="signup-username" placeholder="Username (unique)">
+                </div>
+                <div class="form-group">
+                    <input type="email" id="signup-email" placeholder="Email">
+                </div>
+                <div class="form-group">
+                    <input type="password" id="signup-password" placeholder="Password (min. 6 characters)">
+                </div>
+                <button id="signup-btn" class="btn primary-btn">Sign Up</button>
+                <p class="auth-toggle-link">Already have an account? <a href="#" id="show-login">Login</a></p>
             </div>
-            <div class="sidebar-content">
+        </div>
+
+        <!-- Logged In Content -->
+        <div id="logged-in-content" class="hidden">
+            <header class="app-header">
+                <div class="header-left">
+                    <div class="menu-icon" id="menu-toggle">
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                    </div>
+                    <div class="app-title">AddMint</div>
+                </div>
+                <div class="header-right">
+                    <div class="icon-button" id="refresh-posts-btn" title="Refresh Feed">
+                        <i class="fas fa-sync-alt"></i>
+                    </div>
+                </div>
+            </header>
+
+            <nav id="sidebar" class="sidebar">
+                <div class="sidebar-header">
+                    <h3>AddMint Menu</h3>
+                    <div class="close-sidebar" id="close-sidebar">&times;</div>
+                </div>
                 <ul>
                     <li><a href="#" data-screen="home"><i class="fas fa-home"></i> Home Feed</a></li>
                     <li><a href="#" data-screen="profile"><i class="fas fa-user-circle"></i> My Profile</a></li>
+                    <li><a href="#" data-screen="earnings"><i class="fas fa-chart-line"></i> Earnings</a></li>
                     <li><a href="#" data-screen="upload"><i class="fas fa-plus-circle"></i> Upload Post</a></li>
-                    <li><a href="#" data-screen="messages"><i class="fas fa-comments"></i> Messages</a></li>
-                    <li><a href="#" data-screen="search"><i class="fas fa-search"></i> Search Users</a></li>
-                    <li><a href="#" data-screen="monetization"><i class="fas fa-dollar-sign"></i> My Earnings</a></li>
-                    <li><a href="#" id="data-saver-link"><i class="fas fa-wifi"></i> Data Saver <span class="toggle-switch"><input type="checkbox" id="data-saver-checkbox"><label for="data-saver-checkbox"></label></span></a></li>
-                    <li><a href="#" id="dark-mode-link"><i class="fas fa-moon"></i> Dark Mode <span class="toggle-switch"><input type="checkbox" id="dark-mode-checkbox" checked><label for="dark-mode-checkbox"></label></span></a></li>
+                    <li><a href="#" data-screen="search"><i class="fas fa-search"></i> Search</a></li>
+                    <li><a href="#"><i class="fas fa-moon"></i> Dark Mode <span class="toggle-switch"><input type="checkbox" id="dark-mode-checkbox" checked><label for="dark-mode-checkbox"></label></span></a></li>
+                    <li><a href="#"><i class="fas fa-wifi"></i> Data Saver <span class="toggle-switch"><input type="checkbox" id="data-saver-checkbox"><label for="data-saver-checkbox"></label></span></a></li>
+                    <li><a href="#" id="language-select"><i class="fas fa-language"></i> Language</a></li>
                     <li><a href="https://www.instagram.com/addmint__" target="_blank"><i class="fab fa-instagram"></i> Our Instagram</a></li>
                     <li><a href="https://www.youtube.com/@add_mintmint" target="_blank"><i class="fab fa-youtube"></i> Our YouTube</a></li>
                     <li><a href="#" data-screen="about"><i class="fas fa-info-circle"></i> About Us</a></li>
                     <li><a href="#" data-screen="privacy"><i class="fas fa-shield-alt"></i> Privacy Policy</a></li>
+                    <li><a href="#" id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
                 </ul>
-            </div>
-             <div id="logout-btn-wrapper">
-                <a href="#" id="logout-btn" class="btn danger-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
-            </div>
-        </nav>
+            </nav>
 
-        <main class="main-content">
-            <!-- Home Screen -->
-            <section id="home-screen" class="app-screen active">
-                <h2>Recent Posts</h2>
-                 <div class="category-filter">
-                    <select id="post-category-filter">
-                        <!-- Options populated by JS -->
-                    </select>
-                </div>
-                <div id="posts-feed" class="posts-feed"></div>
-                <div id="loading-spinner" class="loader hidden"></div>
-            </section>
+            <main class="main-content">
+                <section id="home-screen" class="app-screen">
+                    <h2>Home Feed</h2>
+                    <div id="user-suggestion-container" class="horizontal-scroll-container"></div>
+                    <div id="posts-feed" class="posts-feed"></div>
+                    <div id="loading-spinner" class="loading-spinner hidden"></div>
+                </section>
 
-            <!-- Profile Screen -->
-            <section id="profile-screen" class="app-screen">
-                <div id="user-profile-display">
-                    <div class="profile-header-area">
-                        <div class="profile-avatar-large" id="my-profile-avatar"></div>
-                        <h2 id="my-profile-username">@myusername</h2>
-                        <p id="my-profile-name" class="profile-name"></p>
-                        <p id="my-profile-bio" class="profile-bio"></p>
-                        <div class="profile-stats">
-                            <div><span id="my-posts-count">0</span> Posts</div>
-                            <div class="clickable-stat" data-stat="followers"><span id="my-followers-count">0</span> Followers</div>
-                            <div class="clickable-stat" data-stat="following"><span id="my-following-count">0</span> Following</div>
-                        </div>
-                        <div class="profile-actions">
-                            <button class="btn primary-btn" id="edit-profile-btn"><i class="fas fa-edit"></i> Edit Profile</button>
-                            <button class="btn secondary-btn hidden" id="follow-user-btn"><i class="fas fa-user-plus"></i> Follow</button>
-                            <button class="btn danger-btn hidden" id="unfollow-user-btn"><i class="fas fa-user-minus"></i> Unfollow</button>
-                            <button class="btn primary-btn hidden" id="message-user-btn"><i class="fas fa-paper-plane"></i> Message</button>
-                            <a href="#" id="profile-whatsapp-link" class="btn social-btn hidden" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                            <a href="#" id="profile-instagram-link" class="btn social-btn hidden" target="_blank"><i class="fab fa-instagram"></i> Instagram</a>
-                        </div>
+                <section id="feed-screen" class="app-screen feed-view">
+                    <div id="vertical-feed-container" class="vertical-feed-container">
+                        <!-- Vertical scroll posts will be injected here -->
                     </div>
+                </section>
 
-                    <div id="edit-profile-modal" class="modal hidden">
-                        <div class="modal-content">
-                            <h3>Edit Profile</h3>
-                            <p id="profile-modal-instruction" class="status-message info"></p>
-                            <div class="form-group">
-                                <label for="edit-username">Username:</label>
-                                <input type="text" id="edit-username" placeholder="Enter new username">
-                                <span id="username-availability"></span>
+                <section id="profile-screen" class="app-screen">
+                    <div id="user-profile-display">
+                        <div class="profile-header-area">
+                            <div class="profile-avatar-large-wrapper">
+                                <img id="my-profile-avatar" class="profile-avatar-large" src="placeholder.jpg" alt="Profile Avatar">
                             </div>
-                            <div class="form-group">
-                                <label for="edit-name">Display Name:</label>
-                                <input type="text" id="edit-name" placeholder="Enter your display name">
+                            <h2 id="my-profile-displayname">Display Name</h2>
+                            <p id="my-profile-username" class="profile-username-display">@username</p>
+                            <p id="my-profile-bio" class="profile-bio">This is the user's bio.</p>
+                            <div class="profile-stats">
+                                <div id="my-posts-count"><span>0</span> Posts</div>
+                                <div class="clickable-stat" data-stat="followers"><span id="my-followers-count">0</span> Followers</div>
+                                <div class="clickable-stat" data-stat="following"><span id="my-following-count">0</span> Following</div>
                             </div>
-                            <div class="form-group">
-                                <label for="edit-bio">Bio (Optional):</label>
-                                <textarea id="edit-bio" placeholder="Tell us about yourself..."></textarea>
+                            <div class="profile-actions">
+                                <button class="btn primary-btn" id="edit-profile-btn"><i class="fas fa-edit"></i> Edit Profile</button>
+                                <button class="btn secondary-btn hidden" id="follow-user-btn"><i class="fas fa-user-plus"></i> Follow</button>
+                                <button class="btn danger-btn hidden" id="unfollow-user-btn"><i class="fas fa-user-minus"></i> Unfollow</button>
                             </div>
-                            <div class="form-group">
-                                <label for="edit-whatsapp">WhatsApp (Optional):</label>
-                                <input type="text" id="edit-whatsapp" placeholder="e.g., +919876543210">
-                            </div>
-                            <div class="form-group">
-                                <label for="edit-instagram">Instagram ID (Optional):</label>
-                                <input type="text" id="edit-instagram" placeholder="e.g., my_insta_id">
-                            </div>
-                            <div class="form-group">
-                                <label for="profile-pic-url-input">Direct Profile Picture URL (Optional):</label>
-                                <input type="text" id="profile-pic-url-input" placeholder="e.g., https://example.com/mypic.jpg">
-                                <small>Enter a direct image link (like from imgbb.com).</small>
-                            </div>
-                            <div class="form-group">
-                                <label>Or Choose a Profile Logo:</label>
-                                <div id="profile-logo-options" class="logo-options-grid"></div>
-                            </div>
-                            <div class="form-group">
-                                <label>Account Privacy:</label>
-                                <div style="display: flex; align-items: center; gap: 10px;">
-                                    <span id="account-privacy-status">Public</span>
-                                    <div class="toggle-switch">
-                                        <input type="checkbox" id="account-privacy-toggle">
-                                        <label for="account-privacy-toggle"></label>
-                                    </div>
-                                </div>
-                            </div>
-                            <p id="save-profile-status" class="status-message"></p>
-                            <button class="btn primary-btn" id="save-profile-btn">Save Changes</button>
-                            <button class="btn secondary-btn" id="cancel-edit-profile-btn">Cancel</button>
+                        </div>
+
+                        <div class="profile-content-tabs">
+                            <div class="tab-item active" data-tab="posts"><i class="fas fa-th-large"></i> Posts</div>
+                            <div class="tab-item" data-tab="reposts"><i class="fas fa-retweet"></i> Reposts</div>
+                        </div>
+
+                        <div id="profile-posts-tab" class="profile-tab-content active">
+                            <div id="profile-posts-feed" class="posts-feed grid-layout"></div>
+                        </div>
+                        <div id="profile-reposts-tab" class="profile-tab-content">
+                             <div id="profile-reposts-feed" class="posts-feed grid-layout"></div>
                         </div>
                     </div>
+                </section>
 
-                    <div id="follow-list-modal" class="modal hidden">
-                        <div class="modal-content">
-                            <h3 id="follow-list-title"></h3>
-                            <div id="follow-list-content"></div>
-                            <button class="btn secondary-btn" id="close-follow-list-modal">Close</button>
+                <section id="upload-screen" class="app-screen">
+                    <h2>Create New Post</h2>
+                    <div class="form-group">
+                        <label for="post-content">Your Content (Min: 60, Max: 10000 characters)</label>
+                        <div class="rich-text-editor">
+                            <div class="editor-toolbar">
+                                <button class="toolbar-btn" data-command="bold"><i class="fas fa-bold"></i></button>
+                                <button class="toolbar-btn" data-command="italic"><i class="fas fa-italic"></i></button>
+                                <button class="toolbar-btn" id="add-image-btn"><i class="fas fa-image"></i></button>
+                                <button class="toolbar-btn" id="add-youtube-btn"><i class="fab fa-youtube"></i></button>
+                                <button class="toolbar-btn" id="add-link-btn"><i class="fas fa-link"></i></button>
+                            </div>
+                            <div id="post-content-editable" class="editable-area" contenteditable="true" placeholder="What's on your mind?"></div>
                         </div>
                     </div>
+                    <div class="form-group">
+                       <label>Monetize this post?</label>
+                       <div class="toggle-switch large-toggle">
+                           <input type="checkbox" id="monetize-post-checkbox" checked>
+                           <label for="monetize-post-checkbox"></label>
+                           <span id="monetize-info">Users will see ads on this post and views will count towards your earnings.</span>
+                       </div>
+                    </div>
+                    <button class="btn primary-btn" id="publish-post-btn">Publish Post (24h)</button>
+                    <div id="upload-status"></div>
+                </section>
 
-                    <div class="profile-posts-area">
-                        <h3>Posts by <span id="current-profile-username-posts">Me</span></h3>
-                        <div class="profile-post-tabs">
-                            <button class="btn tab-btn active" data-tab="posts">My Posts</button>
-                            <button class="btn tab-btn" data-tab="reposts">My Reposts</button>
+                <section id="search-screen" class="app-screen">
+                    <h2>Search Users & Posts</h2>
+                    <div class="search-input-group">
+                        <input type="text" id="search-query" placeholder="Search by username or keyword...">
+                        <button class="btn primary-btn" id="search-btn"><i class="fas fa-search"></i></button>
+                    </div>
+                    <div id="search-results" class="search-results-container">
+                        <h3>Users</h3>
+                        <ul id="search-user-list" class="search-list"></ul>
+                        <h3>Posts</h3>
+                        <div id="search-post-list" class="posts-feed"></div>
+                        <div id="no-search-results" class="hidden">No results found.</div>
+                    </div>
+                </section>
+
+                <section id="earnings-screen" class="app-screen">
+                    <h2>My Earnings</h2>
+                    <div class="earnings-summary-card">
+                        <div class="earning-stat">
+                            <h4>Monetized Views</h4>
+                            <p id="monetized-views-count">0</p>
                         </div>
-                        <div id="profile-posts-feed" class="posts-feed"></div>
-                        <div id="profile-reposts-feed" class="posts-feed hidden"></div>
+                        <div class="earning-stat">
+                            <h4>Estimated Earnings</h4>
+                            <p id="estimated-earnings">$0.00</p>
+                        </div>
+                        <div class="earning-stat">
+                             <h4>Unmonetized Views</h4>
+                             <p id="unmonetized-views-count">0</p>
+                        </div>
                     </div>
-                </div>
-            </section>
-            
-            <!-- Upload Screen -->
-            <section id="upload-screen" class="app-screen">
-                <h2>Upload New Post</h2>
-                <div class="form-group">
-                    <label for="post-category">Category:</label>
-                    <select id="post-category"></select>
-                </div>
-                <div class="form-group">
-                    <label for="post-content-input">Post Content:</label>
-                    <textarea id="post-content-input" placeholder="What's on your mind?" rows="8"></textarea>
-                    <small>Min 60, Max 10000 characters.</small>
-                </div>
-                <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
-                    <label for="monetize-post-checkbox" style="margin: 0;">Monetize this post?</label>
-                    <div class="toggle-switch">
-                        <input type="checkbox" id="monetize-post-checkbox">
-                        <label for="monetize-post-checkbox"></label>
+                     <div class="progress-bar-container">
+                        <p>Progress to Payout (100,000 Views)</p>
+                        <div class="progress-bar">
+                            <div id="payout-progress" class="progress-bar-fill"></div>
+                        </div>
+                        <span id="progress-text">0/100,000</span>
                     </div>
-                </div>
-                 <small>Earn from views on monetized posts.</small>
-                <button class="btn primary-btn" id="publish-post-btn" style="margin-top: 20px;">Publish Post</button>
-                <p id="upload-status" class="status-message"></p>
-            </section>
+                    <button class="btn primary-btn" id="withdraw-btn" disabled>Withdraw Funds</button>
+                    <p class="disclaimer">You need at least 100,000 monetized views to be eligible for a payout. Payout rates are estimated and may vary.</p>
+                </section>
 
-            <!-- Messages Screen -->
-            <section id="messages-screen" class="app-screen">
-                <h2>Messages</h2>
-                <div id="message-list-container">
-                    <h3>Recent Chats</h3>
-                    <ul id="recent-chats-list" class="recent-chats-list"></ul>
-                </div>
+                <section id="about-screen" class="app-screen">
+                    <h2>About AddMint</h2>
+                    <p>AddMint is a revolutionary social media platform designed to connect people through shared interests and engaging content. We believe in fostering a positive and vibrant community where every voice can be heard.</p>
+                </section>
 
-                <div id="chat-window-container" class="chat-window-container hidden">
-                    <div class="chat-header">
-                        <button id="back-to-chats-btn" class="icon-button"><i class="fas fa-arrow-left"></i></button>
-                        <div class="profile-avatar small" id="chat-partner-avatar"></div>
-                        <span id="chat-partner-username">@ChatUser</span>
-                    </div>
-                    <div id="chat-messages" class="chat-messages"></div>
-                    <div class="chat-input-area">
-                        <textarea id="message-input" placeholder="Type your message..."></textarea>
-                        <button id="send-message-btn" class="btn primary-btn"><i class="fas fa-paper-plane"></i></button>
-                    </div>
-                </div>
-            </section>
+                <section id="privacy-screen" class="app-screen">
+                    <h2>Privacy Policy</h2>
+                    <p>Your privacy is paramount to us at AddMint. This policy outlines how we collect, use, and protect your personal information...</p>
+                    <!-- Add full privacy policy text here -->
+                </section>
 
-            <!-- Search Screen -->
-            <section id="search-screen" class="app-screen">
-                <h2>Search Users & Posts</h2>
-                <div class="search-input-group">
-                    <input type="text" id="search-query" placeholder="Search by username, keyword...">
-                    <button class="btn primary-btn" id="search-btn" style="width: auto;"><i class="fas fa-search"></i></button>
-                </div>
-                <div id="search-results" class="search-results-container">
-                    <h3>Users</h3>
-                    <ul id="search-user-list" class="search-list"></ul>
-                    <h3>Posts</h3>
-                    <div id="search-post-list" class="posts-feed"></div>
-                    <p id="no-search-results" class="hidden" style="text-align: center;">No results found.</p>
-                </div>
-            </section>
+            </main>
 
-            <!-- Monetization Screen -->
-             <section id="monetization-screen" class="app-screen">
-                <h2>My Earnings</h2>
-                <div class="info-card">
-                    <h4><i class="fas fa-eye"></i> Total Monetized Views</h4>
-                    <p>This is the total number of views on all your posts where monetization was enabled.</p>
-                    <p><strong id="total-monetized-views-display">0</strong></p>
-                    <button class="btn primary-btn" id="withdraw-views-btn" disabled>Withdraw</button>
-                    <small id="withdraw-message" style="display: block; margin-top: 10px;">You need at least 100,000 views to withdraw.</small>
-                </div>
-            </section>
-
-            <!-- About & Privacy Screens -->
-            <section id="about-screen" class="app-screen">
-                <h2>About AddMint</h2>
-                <p>AddMint is a revolutionary social media platform designed to connect people through shared interests and engaging content. We believe in fostering a positive and vibrant community where every voice can be heard.</p>
-                <p>For support or inquiries, please contact us at support@addmint.com.</p>
-            </section>
-            <section id="privacy-screen" class="app-screen">
-                <h2>Privacy Policy</h2>
-                <p>Your privacy is paramount to us at AddMint. This policy outlines how we collect, use, and protect your personal information.</p>
-                <h3>Information We Collect:</h3>
-                <ul>
-                    <li><strong>Account Information:</strong> Username, email, password (hashed).</li>
-                    <li><strong>Content Data:</strong> Posts, messages, likes, views.</li>
-                </ul>
-                <h3>Data Sharing:</h3>
-                <p>We do not share your personal information with third parties except as necessary to provide our services or comply with legal obligations.</p>
-                <p>By using AddMint, you agree to the terms of this Privacy Policy.</p>
-            </section>
-        </main>
-        
-        <!-- Bottom Navigation -->
-        <footer class="app-bottom-nav">
-            <a href="#" class="nav-item active" data-screen="home"><div class="icon-wrapper home-icon"></div><span>Home</span></a>
-            <a href="#" class="nav-item" data-screen="search"><div class="icon-wrapper search-icon"></div><span>Search</span></a>
-            <a href="#" class="nav-item" data-screen="upload"><div class="icon-wrapper upload-icon"></div><span>Upload</span></a>
-            <a href="#" class="nav-item" data-screen="messages"><div class="icon-wrapper messages-icon"></div><span>Messages</span></a>
-            <a href="#" class="nav-item" data-screen="profile"><div class="icon-wrapper profile-icon"></div><span>Profile</span></a>
-        </footer>
-
-        <!-- Withdrawal Modals -->
-        <div id="withdraw-form-modal" class="modal hidden">
-            <div class="modal-content">
-                <h3>Withdrawal Request</h3>
-                <div class="form-group">
-                    <label>Total Monetized Views</label>
-                    <input type="text" id="withdraw-views-input" readonly>
-                </div>
-                <div class="form-group">
-                    <label for="withdraw-upi-id">UPI ID (Optional)</label>
-                    <input type="text" id="withdraw-upi-id" placeholder="yourname@bank">
-                </div>
-                 <div class="form-group">
-                    <label for="withdraw-paypal-email">PayPal Email (Optional)</label>
-                    <input type="email" id="withdraw-paypal-email" placeholder="you@example.com">
-                </div>
-                <small>Please provide at least one payment method.</small>
-                <button class="btn primary-btn" id="submit-withdrawal-request-btn">Submit Request</button>
-                <button class="btn secondary-btn" id="cancel-withdrawal-btn">Cancel</button>
-            </div>
+            <footer class="app-bottom-nav">
+                <a href="#" class="nav-item active" data-screen="home"><i class="fas fa-home"></i><span>Home</span></a>
+                <a href="#" class="nav-item" data-screen="search"><i class="fas fa-search"></i><span>Search</span></a>
+                <a href="#" class="nav-item" data-screen="feed"><i class="fas fa-film"></i><span>Feed</span></a>
+                <a href="#" class="nav-item" data-screen="upload"><i class="fas fa-plus-square"></i><span>Upload</span></a>
+                <a href="#" class="nav-item" data-screen="profile"><i class="fas fa-user"></i><span>Profile</span></a>
+            </footer>
         </div>
-        
-        <div id="withdraw-review-modal" class="modal hidden">
-            <div class="modal-content">
-                <h3>Confirm Your Details</h3>
-                <p>Please review your withdrawal information before finalizing.</p>
-                <div class="review-details">
-                    <p><strong>Name:</strong> <span id="review-name"></span></p>
-                    <p><strong>User ID:</strong> <span id="review-userid"></span></p>
-                    <p><strong>Total Views:</strong> <span id="review-views"></span></p>
-                    <p><strong>Payment Method:</strong> <span id="review-payment-method"></span></p>
-                    <p><strong>Payment Detail:</strong> <span id="review-payment-detail"></span></p>
-                </div>
-                <button class="btn primary-btn" id="finish-withdrawal-btn">Finish</button>
-                <button class="btn secondary-btn" id="back-to-form-btn">Go Back</button>
-            </div>
-        </div>
-
-        <div id="success-popup" class="modal hidden">
-             <div class="modal-content reward-content">
-                <h3>Request Submitted! <i class="fas fa-check-circle"></i></h3>
-                <p id="success-message"></p>
-                <button class="btn primary-btn" id="close-success-popup">OK</button>
-            </div>
-        </div>
-
-        <div id="toast-notification" class="toast-notification"></div>
-
     </div>
 
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-    <script>
-        /* JavaScript starts here */
+    <!-- Modals and Popups -->
+    <div id="edit-profile-modal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-modal-btn">&times;</span>
+            <h3>Edit Profile</h3>
+            <div class="form-group">
+                <label for="edit-profile-pic">Profile Picture (Direct Image URL):</label>
+                <input type="text" id="edit-profile-pic" placeholder="https://i.imgbb.com/your-image.jpg">
+            </div>
+            <div class="form-group">
+                <label for="edit-display-name">Display Name:</label>
+                <input type="text" id="edit-display-name" placeholder="Your display name">
+            </div>
+            <div class="form-group">
+                <label for="edit-username">Username (cannot be changed):</label>
+                <input type="text" id="edit-username" disabled>
+            </div>
+            <div class="form-group">
+                <label for="edit-bio">Bio:</label>
+                <textarea id="edit-bio" placeholder="Tell us about yourself"></textarea>
+            </div>
+            <div class="form-group">
+               <label>Account Privacy</label>
+               <div class="toggle-switch">
+                   <input type="checkbox" id="private-account-checkbox">
+                   <label for="private-account-checkbox"></label>
+                   <span>Private Account</span>
+               </div>
+            </div>
+            <button class="btn primary-btn" id="save-profile-btn">Save Changes</button>
+        </div>
+    </div>
 
-        // Firebase Configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyDlZA4grzF3fx95-11E4s7ASXwkIij1k1w",
-            authDomain: "addmint-7ab6b.firebaseapp.com",
-            databaseURL: "https://addmint-7ab6b-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "addmint-7ab6b",
-            storageBucket: "addmint-7ab6b.appspot.com",
-            messagingSenderId: "504015450137",
-            appId: "1:504015450137:web:694b176313582cce1e7a88",
-            measurementId: "G-H7J7M23Z82"
-        };
+    <div id="follow-list-modal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-modal-btn">&times;</span>
+            <h3 id="follow-list-title"></h3>
+            <div id="follow-list-content"></div>
+        </div>
+    </div>
 
-        // Initialize Firebase
-        try {
-            firebase.initializeApp(firebaseConfig);
-        } catch (error) {
-            console.error("Firebase initialization failed:", error);
-            document.getElementById('load-status').textContent = "Error: App failed to initialize.";
-        }
+     <div id="comments-modal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-modal-btn">&times;</span>
+            <h3>Comments</h3>
+            <div id="comments-list" class="comments-list"></div>
+            <div class="comment-input-area">
+                <input type="text" id="comment-input" placeholder="Add a comment...">
+                <button id="submit-comment-btn" class="btn primary-btn"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="withdraw-modal" class="modal hidden">
+        <div class="modal-content">
+             <span class="close-modal-btn">&times;</span>
+             <h3>Request Payout</h3>
+             <div class="form-group">
+                 <label>Total Monetized Views:</label>
+                 <input type="text" id="withdraw-views" disabled>
+             </div>
+             <p>Please provide your payout information. You can provide either a UPI ID or a PayPal email.</p>
+             <div class="form-group">
+                 <label for="withdraw-upi">UPI ID (Optional):</label>
+                 <input type="text" id="withdraw-upi" placeholder="yourname@bank">
+             </div>
+             <div class="form-group">
+                 <label for="withdraw-paypal">PayPal Email (Optional):</label>
+                 <input type="email" id="withdraw-paypal" placeholder="you@example.com">
+             </div>
+             <button id="submit-withdrawal-btn" class="btn primary-btn">Review & Submit</button>
+        </div>
+    </div>
 
-        const auth = firebase.auth();
-        const db = firebase.firestore();
+    <div id="toast-notification" class="toast-notification"></div>
 
-        // --- DOM Elements (Grouped for clarity) ---
-        const body = document.body;
-        const loadStatusElement = document.getElementById('load-status'); 
-        const authContainer = document.getElementById('auth-container'); 
-        const appContainer = document.getElementById('app-container'); 
-        const toastNotification = document.getElementById('toast-notification');
-
-        // Auth
-        const loginScreen = document.getElementById('login-screen');
-        const signupScreen = document.getElementById('signup-screen');
-        const loginEmailInput = document.getElementById('login-email');
-        const loginPasswordInput = document.getElementById('login-password');
-        const loginBtn = document.getElementById('login-btn');
-        const loginStatus = document.getElementById('login-status');
-        const showSignupLink = document.getElementById('show-signup');
-        const passwordToggles = document.querySelectorAll('.password-toggle');
-        const signupEmailInput = document.getElementById('signup-email');
-        const signupPasswordInput = document.getElementById('signup-password');
-        const signupConfirmPasswordInput = document.getElementById('signup-confirm-password');
-        const signupBtn = document.getElementById('signup-btn');
-        const signupStatus = document.getElementById('signup-status');
-        const showLoginLink = document.getElementById('show-login');
-        const forgotPasswordLink = document.getElementById('forgot-password-link');
-        const forgotPasswordModal = document.getElementById('forgot-password-modal');
-        const resetEmailInput = document.getElementById('reset-email');
-        const sendResetEmailBtn = document.getElementById('send-reset-email-btn');
-        const resetStatus = document.getElementById('reset-status');
-        const closeResetModalBtn = document.getElementById('close-reset-modal');
-
-        // Main App UI
-        const menuToggle = document.getElementById('menu-toggle');
-        const sidebar = document.getElementById('sidebar');
-        const closeSidebarBtn = document.getElementById('close-sidebar');
-        const mainContent = document.querySelector('.main-content');
-        const bottomNavItems = document.querySelectorAll('.app-bottom-nav .nav-item');
-        const screenSections = document.querySelectorAll('.app-screen');
-        const refreshPostsBtn = document.getElementById('refresh-posts-btn');
-        const postsFeed = document.getElementById('posts-feed');
-        const loadingSpinner = document.getElementById('loading-spinner');
-        const postCategoryFilter = document.getElementById('post-category-filter');
-        const darkModeCheckbox = document.getElementById('dark-mode-checkbox');
-        const dataSaverCheckbox = document.getElementById('data-saver-checkbox');
-
-        // Upload Screen
-        const postCategorySelect = document.getElementById('post-category');
-        const postContentInput = document.getElementById('post-content-input');
-        const monetizePostCheckbox = document.getElementById('monetize-post-checkbox');
-        const publishPostBtn = document.getElementById('publish-post-btn');
-        const uploadStatus = document.getElementById('upload-status');
-
-        // Profile Screen
-        const myProfileAvatar = document.getElementById('my-profile-avatar');
-        const myProfileUsername = document.getElementById('my-profile-username');
-        const myProfileName = document.getElementById('my-profile-name');
-        const myProfileBio = document.getElementById('my-profile-bio');
-        const myPostsCount = document.getElementById('my-posts-count');
-        const myFollowersCount = document.getElementById('my-followers-count');
-        const myFollowingCount = document.getElementById('my-following-count');
-        const editProfileBtn = document.getElementById('edit-profile-btn');
-        const followUserBtn = document.getElementById('follow-user-btn');
-        const unfollowUserBtn = document.getElementById('unfollow-user-btn');
-        const messageUserBtn = document.getElementById('message-user-btn');
-        const editProfileModal = document.getElementById('edit-profile-modal');
-        const profileModalInstruction = document.getElementById('profile-modal-instruction');
-        const saveProfileStatus = document.getElementById('save-profile-status');
-        const editUsernameInput = document.getElementById('edit-username');
-        const usernameAvailability = document.getElementById('username-availability');
-        const editNameInput = document.getElementById('edit-name');
-        const editBioInput = document.getElementById('edit-bio');
-        const editWhatsappInput = document.getElementById('edit-whatsapp');
-        const editInstagramInput = document.getElementById('edit-instagram');
-        const profilePicUrlInput = document.getElementById('profile-pic-url-input');
-        const profileLogoOptions = document.getElementById('profile-logo-options');
-        const accountPrivacyToggle = document.getElementById('account-privacy-toggle');
-        const accountPrivacyStatus = document.getElementById('account-privacy-status');
-        const saveProfileBtn = document.getElementById('save-profile-btn');
-        const cancelEditProfileBtn = document.getElementById('cancel-edit-profile-btn');
-        const followListModal = document.getElementById('follow-list-modal');
-        const followListTitle = document.getElementById('follow-list-title');
-        const followListContent = document.getElementById('follow-list-content');
-        const closeFollowListModalBtn = document.getElementById('close-follow-list-modal');
-
-        // Monetization & Withdrawal
-        const totalMonetizedViewsDisplay = document.getElementById('total-monetized-views-display');
-        const withdrawViewsBtn = document.getElementById('withdraw-views-btn');
-        const withdrawMessage = document.getElementById('withdraw-message');
-        const withdrawFormModal = document.getElementById('withdraw-form-modal');
-        const withdrawReviewModal = document.getElementById('withdraw-review-modal');
-        const successPopup = document.getElementById('success-popup');
-        const successMessage = document.getElementById('success-message');
-        const closeSuccessPopup = document.getElementById('close-success-popup');
-        const withdrawViewsInput = document.getElementById('withdraw-views-input');
-        const withdrawUpiId = document.getElementById('withdraw-upi-id');
-        const withdrawPaypalEmail = document.getElementById('withdraw-paypal-email');
-        const submitWithdrawalRequestBtn = document.getElementById('submit-withdrawal-request-btn');
-        const cancelWithdrawalBtn = document.getElementById('cancel-withdrawal-btn');
-        const reviewName = document.getElementById('review-name');
-        const reviewUserid = document.getElementById('review-userid');
-        const reviewViews = document.getElementById('review-views');
-        const reviewPaymentMethod = document.getElementById('review-payment-method');
-        const reviewPaymentDetail = document.getElementById('review-payment-detail');
-        const finishWithdrawalBtn = document.getElementById('finish-withdrawal-btn');
-        const backToFormBtn = document.getElementById('back-to-form-btn');
-
-
-        // --- Global Variables & State ---
-        let currentUser = null; 
-        let currentProfileViewingId = null;
-        let lastVisiblePost = null; 
-        let fetchingPosts = false; 
-        let dataSaverEnabled = false; 
-        let isProcessingAuth = false;
-        let hasRunInitialAuthCheck = false;
-        
-        // --- Constants ---
-        const WITHDRAWAL_THRESHOLD = 100000;
-        const PROFILE_LOGOS = [
-            { class: 'logo-1', emoji: '🧑', color: '#ff6347' }, { class: 'logo-2', emoji: '👩', color: '#6a5acd' },
-            { class: 'logo-3', emoji: '🚀', color: '#32cd32' }, { class: 'logo-4', emoji: '💡', color: '#ff8c00' },
-            { class: 'logo-5', emoji: '🌟', color: '#ffd700' }, { class: 'logo-6', emoji: '🌈', color: '#9932cc' },
-            { class: 'logo-7', emoji: '🦊', color: '#d2691e' }, { class: 'logo-8', emoji: '🐼', color: '#6495ed' },
-            { class: 'logo-9', emoji: '🦋', color: '#dda0dd' }, { class: 'logo-10', emoji: '🐢', color: '#20b2aa' }
-        ];
-        const POST_CATEGORIES = [
-            "All Categories", "Breaking News", "Trending News", "Top Stories", "National News", "International News",
-            "Politics", "Economy", "Business", "Finance", "Stock Market", "Technology", "Science", "Environment",
-            "Entertainment", "Movies", "TV Shows", "Music", "Celebrity Gossip", "Lifestyle", "Fashion",
-            "Food & Recipes", "Travel & Tourism", "Sports", "Cricket", "Football", "Tennis", "Olympics", "Esports",
-            "Health & Fitness", "Education", "Career & Jobs", "Startup & Entrepreneurship",
-            "Automobile", "Real Estate", "Religion & Spirituality", "History & Culture",
-            "Weather Updates", "Viral & Social Media Trends", "General"
-        ];
-        
-        // --- Utility Functions ---
-        function showToast(message, type = 'info', duration = 3000) {
-            toastNotification.textContent = message;
-            toastNotification.className = `toast-notification show ${type}`;
-            setTimeout(() => { toastNotification.className = 'toast-notification'; }, duration);
-        }
-
-        function updateAuthStatus(element, message, type) {
-            if (element) {
-                element.textContent = message;
-                element.className = `status-message ${type}`;
-                element.style.display = (type === 'hidden' || !message) ? 'none' : 'block';
-            }
-        }
-
-        function formatNumber(num) {
-            if (num === undefined || num === null) return '0';
-            return new Intl.NumberFormat('en-US').format(num);
-        }
-
-        function showScreen(screenId) {
-            screenSections.forEach(screen => screen.classList.remove('active'));
-            const activeScreen = document.getElementById(screenId);
-            if(activeScreen) activeScreen.classList.add('active');
-            bottomNavItems.forEach(item => {
-                item.classList.toggle('active', item.dataset.screen === screenId.replace('-screen', ''));
-            });
-            sidebar.classList.remove('open');
-        }
-
-        function getLogoCssClass(logoName) { return `user-logo-${logoName}`; }
-
-        function applyLogoStyles() {
-            let dynamicStyles = '';
-            PROFILE_LOGOS.forEach(logo => {
-                const className = getLogoCssClass(logo.class);
-                dynamicStyles += `
-                    .${className} { background-color: ${logo.color}; }
-                    .${className}::before { content: '${logo.emoji}'; font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: var(--button-primary-text); }
-                    .profile-avatar-large.${className}::before { font-size: 60px; }
-                    .profile-avatar-small.${className}::before { font-size: 30px; }
-                `;
-            });
-            const styleElement = document.createElement('style');
-            styleElement.innerHTML = dynamicStyles;
-            document.head.appendChild(styleElement);
-        }
-
-        function populateCategorySelects() {
-            const selects = [postCategoryFilter, postCategorySelect];
-            selects.forEach(select => {
-                if(select) {
-                    select.innerHTML = '';
-                    POST_CATEGORIES.forEach(category => {
-                        const option = document.createElement('option');
-                        option.value = category === "All Categories" ? "all" : category;
-                        option.textContent = category;
-                        select.appendChild(option);
-                    });
-                }
-            });
-        }
-
-        // --- Core Authentication Flow ---
-        function showAuthScreen(screenName) {
-             loginScreen.classList.toggle('active', screenName === 'login');
-             signupScreen.classList.toggle('active', screenName === 'signup');
-             updateAuthStatus(loginStatus, '', 'hidden');
-             updateAuthStatus(signupStatus, '', 'hidden');
-        }
-
-        async function sendEmailVerification(user) {
-            try {
-                await user.sendEmailVerification();
-            } catch(error) {
-                console.error("Error sending verification email:", error);
-                showToast("Could not send verification email.", "error");
-            }
-        }
-
-        async function checkUserAndRedirect(user) {
-            if (hasRunInitialAuthCheck && user === auth.currentUser) return;
-            hasRunInitialAuthCheck = true;
-            
-            if (loadStatusElement) loadStatusElement.style.display = 'none';
-
-            if (user && user.emailVerified) {
-                currentUser = user;
-                try {
-                    const userDoc = await db.collection('users').doc(currentUser.uid).get();
-                    if (!userDoc.exists || !userDoc.data().username || !userDoc.data().name) {
-                        showAppContainerUI();
-                        showScreen('profile-screen');
-                        editProfileModal.classList.remove('hidden');
-                        profileModalInstruction.textContent = "Welcome! Please complete your profile to continue.";
-                        myProfileUsername.textContent = "@NewUser";
-                        document.getElementById('sidebar-username').textContent = "New User";
-                        cancelEditProfileBtn.onclick = () => {
-                           auth.signOut();
-                           editProfileModal.classList.add('hidden');
-                        };
-                    } else {
-                        cancelEditProfileBtn.onclick = () => editProfileModal.classList.add('hidden');
-                        await loadUserData(currentUser.uid);
-                        showAppContainerUI();
-                        showScreen('home-screen');
-                        loadPosts();
-                    }
-                } catch (e) {
-                    showToast("Error loading profile. Logging out.", 'error');
-                    auth.signOut();
-                }
-            } else {
-                currentUser = null;
-                appContainer.classList.add('hidden');
-                authContainer.classList.remove('hidden');
-                showAuthScreen('login');
-                if (user && !user.emailVerified) {
-                    updateAuthStatus(loginStatus, "Please verify your email to continue.", 'info');
-                    auth.signOut();
-                }
-            }
-        }
-        
-        async function signInUser() {
-            if (isProcessingAuth) return;
-            isProcessingAuth = true;
-            loginBtn.disabled = true;
-            try {
-                await auth.signInWithEmailAndPassword(loginEmailInput.value.trim(), loginPasswordInput.value.trim());
-            } catch (error) {
-                updateAuthStatus(loginStatus, "Invalid email or password.", 'error');
-            } finally {
-                isProcessingAuth = false;
-                loginBtn.disabled = false;
-            }
-        }
-
-        async function registerUser() {
-            if (isProcessingAuth) return;
-            isProcessingAuth = true;
-            signupBtn.disabled = true;
-            const email = signupEmailInput.value.trim();
-            const password = signupPasswordInput.value.trim();
-            if (password !== signupConfirmPasswordInput.value.trim()) {
-                updateAuthStatus(signupStatus, "Passwords do not match.", 'error');
-            } else {
-                 try {
-                    const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-                    await db.collection('users').doc(userCredential.user.uid).set({
-                        uid: userCredential.user.uid, email: email, username: "", name: "",
-                        profileLogo: PROFILE_LOGOS[Math.floor(Math.random()*PROFILE_LOGOS.length)].class,
-                        totalMonetizedViews: 0, postCount: 0, followersCount: 0, followingCount: 0,
-                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                    await sendEmailVerification(userCredential.user);
-                    showAuthScreen('login');
-                    updateAuthStatus(loginStatus, "Success! Please verify your email, then login.", 'success');
-                } catch (error) {
-                    updateAuthStatus(signupStatus, error.message, 'error');
-                }
-            }
-            isProcessingAuth = false;
-            signupBtn.disabled = false;
-        }
-        
-        // --- Event Listeners Setup ---
-        document.addEventListener('DOMContentLoaded', () => {
-            loadStatusElement.style.display = 'block';
-            applyLogoStyles();
-            populateCategorySelects();
-            auth.onAuthStateChanged(checkUserAndRedirect);
-        });
-
-        loginBtn.addEventListener('click', signInUser);
-        signupBtn.addEventListener('click', registerUser);
-        showSignupLink.addEventListener('click', (e) => { e.preventDefault(); showAuthScreen('signup'); });
-        showLoginLink.addEventListener('click', (e) => { e.preventDefault(); showAuthScreen('login'); });
-        document.getElementById('logout-btn').addEventListener('click', () => auth.signOut());
-
-        // --- Post Loading and Rendering Logic ---
-        async function loadPosts() {
-            if (!currentUser || fetchingPosts) return;
-            fetchingPosts = true;
-            loadingSpinner.classList.remove('hidden');
-            try {
-                let query = db.collection('posts').orderBy('timestamp', 'desc');
-                if (lastVisiblePost) query = query.startAfter(lastVisiblePost);
-                const snapshot = await query.limit(10).get();
-                if (snapshot.empty && !lastVisiblePost) postsFeed.innerHTML = '<p>No posts found.</p>';
-                else {
-                    snapshot.docs.forEach(doc => {
-                        renderPost({ id: doc.id, ...doc.data() }, postsFeed);
-                    });
-                    lastVisiblePost = snapshot.docs[snapshot.docs.length - 1];
-                }
-            } catch (error) {
-                console.error("Error loading posts:", error);
-            } finally {
-                fetchingPosts = false;
-                loadingSpinner.classList.add('hidden');
-            }
-        }
-        
-        mainContent.addEventListener('scroll', () => {
-            if (mainContent.scrollTop + mainContent.clientHeight >= mainContent.scrollHeight - 100) {
-                loadPosts();
-            }
-        });
-        refreshPostsBtn.addEventListener('click', () => {
-            postsFeed.innerHTML = '';
-            lastVisiblePost = null;
-            loadPosts();
-        });
-        
-        function renderPost(postData, container) {
-            const postCard = document.createElement('div');
-            postCard.className = 'post-card';
-            postCard.dataset.postId = postData.id;
-            const isOwner = currentUser && postData.userId === currentUser.uid;
-            let avatarHtml = `<div class="profile-avatar ${getLogoCssClass(postData.userProfileLogo || 'logo-1')}"></div>`;
-            if(postData.profilePicUrl) avatarHtml = `<div class="profile-avatar" style="background-image: url('${postData.profilePicUrl}')"></div>`;
-
-            postCard.innerHTML = `
-                <div class="post-header">
-                    ${avatarHtml}
-                    <span class="username">@${postData.username || '...'}</span>
-                    <div class="post-options">
-                        <i class="fas fa-ellipsis-v"></i>
-                        <div class="options-dropdown">
-                            ${isOwner ? `<span class="delete-btn">Delete</span>` : `<span class="report-btn">Report</span>`}
-                        </div>
-                    </div>
-                </div>
-                <div class="post-content" data-original-content="${postData.content.replace(/"/g, '&quot;')}">
-                   <p>${postData.content}</p>
-                </div>
-                <div class="post-footer">
-                    <div class="post-actions">
-                        <span class="like-button"><i class="far fa-heart"></i> <span class="like-count">${formatNumber(postData.likes || 0)}</span></span>
-                        <span class="views-count"><i class="fas fa-eye"></i> <span>${formatNumber(postData.views || 0)}</span></span>
-                    </div>
-                </div>`;
-            container.appendChild(postCard);
-            addPostEventListeners(postCard, postData);
-        }
-        
-        function addPostEventListeners(postElement, postData) {
-            postElement.querySelector('.like-button')?.addEventListener('click', () => handleLike(postData.id, postElement));
-            postElement.querySelector('.delete-btn')?.addEventListener('click', () => handleDeletePost(postData.id, postElement));
-            const optionsBtn = postElement.querySelector('.post-options i');
-            optionsBtn?.addEventListener('click', (e) => {
-                e.stopPropagation();
-                postElement.querySelector('.options-dropdown').classList.toggle('show');
-            });
-            incrementViewCount(postData.id, postData.userId, postData.monetized);
-        }
-
-        async function handleLike(postId, postElement) {
-             if (!currentUser) return;
-             const postRef = db.collection('posts').doc(postId);
-             db.runTransaction(async t => {
-                 const doc = await t.get(postRef);
-                 const likedBy = doc.data().likedBy || [];
-                 const isLiked = likedBy.includes(currentUser.uid);
-                 t.update(postRef, {
-                     likes: firebase.firestore.FieldValue.increment(isLiked ? -1 : 1),
-                     likedBy: isLiked ? firebase.firestore.FieldValue.arrayRemove(currentUser.uid) : firebase.firestore.FieldValue.arrayUnion(currentUser.uid)
-                 });
-             }).then(() => {
-                 // Optimistic UI update could go here, or re-fetch. For now, it updates on next load.
-             }).catch(console.error);
-        }
-
-        async function handleDeletePost(postId, postElement) {
-            if (confirm("Delete this post permanently?")) {
-                await db.collection('posts').doc(postId).delete();
-                await db.collection('users').doc(currentUser.uid).update({ postCount: firebase.firestore.FieldValue.increment(-1) });
-                postElement.remove();
-                showToast("Post deleted.", "success");
-            }
-        }
-
-        async function incrementViewCount(postId, postOwnerId, isMonetized) {
-            if (!currentUser || currentUser.uid === postOwnerId) return; // Don't count self-views
-            const viewKey = `viewed_${postId}`;
-            if (sessionStorage.getItem(viewKey)) return;
-            sessionStorage.setItem(viewKey, 'true');
-
-            const postRef = db.collection('posts').doc(postId);
-            const ownerRef = db.collection('users').doc(postOwnerId);
-            const batch = db.batch();
-            batch.update(postRef, { views: firebase.firestore.FieldValue.increment(1) });
-            if (isMonetized) {
-                batch.update(ownerRef, { totalMonetizedViews: firebase.firestore.FieldValue.increment(1) });
-            }
-            await batch.commit().catch(console.error);
-        }
-
-        // --- User Profile Logic ---
-        async function loadUserData(userId) {
-            if (!userId) return;
-            currentProfileViewingId = userId;
-            const userDoc = await db.collection('users').doc(userId).get();
-            if(userDoc.exists) updateProfileDisplay(userDoc.data());
-        }
-
-        function updateProfileDisplay(userData) {
-            // Update sidebar
-            document.getElementById('sidebar-username').textContent = userData.name || userData.username;
-            // Update profile page
-            myProfileUsername.textContent = `@${userData.username}`;
-            myProfileName.textContent = userData.name;
-            myProfileBio.textContent = userData.bio;
-            myPostsCount.textContent = formatNumber(userData.postCount);
-            myFollowersCount.textContent = formatNumber(userData.followersCount);
-            myFollowingCount.textContent = formatNumber(userData.followingCount);
-            
-            let avatar = document.getElementById('my-profile-avatar');
-            if (userData.profilePicUrl) {
-                avatar.style.backgroundImage = `url('${userData.profilePicUrl}')`;
-                avatar.className = 'profile-avatar-large';
-            } else {
-                avatar.style.backgroundImage = '';
-                avatar.className = `profile-avatar-large ${getLogoCssClass(userData.profileLogo)}`;
-            }
-            
-            // Update monetization screen
-            const views = userData.totalMonetizedViews || 0;
-            totalMonetizedViewsDisplay.textContent = formatNumber(views);
-            if (views >= WITHDRAWAL_THRESHOLD) {
-                withdrawViewsBtn.disabled = false;
-                withdrawMessage.textContent = "You are eligible to withdraw!";
-            } else {
-                withdrawViewsBtn.disabled = true;
-                withdrawMessage.textContent = `You need at least ${formatNumber(WITHDRAWAL_THRESHOLD)} views to withdraw.`;
-            }
-        }
-        
-        saveProfileBtn.addEventListener('click', async () => {
-             const newUsername = editUsernameInput.value.trim();
-             if(!newUsername) {
-                updateAuthStatus(saveProfileStatus, 'Username is required.', 'error');
-                return;
-             }
-             const selectedLogo = profileLogoOptions.querySelector('.selected');
-             const updateData = {
-                 username: newUsername,
-                 username_lowercase: newUsername.toLowerCase(),
-                 name: editNameInput.value.trim(),
-                 bio: editBioInput.value.trim(),
-                 profilePicUrl: profilePicUrlInput.value.trim(),
-                 profileLogo: profilePicUrlInput.value.trim() ? '' : selectedLogo.dataset.value,
-                 isPrivate: accountPrivacyToggle.checked,
-             };
-             await db.collection('users').doc(currentUser.uid).update(updateData);
-             editProfileModal.classList.add('hidden');
-             loadUserData(currentUser.uid);
-             showToast("Profile saved!", "success");
-        });
-        
-        // --- Monetization and Withdrawal ---
-        withdrawViewsBtn.addEventListener('click', async () => {
-            const userDoc = await db.collection('users').doc(currentUser.uid).get();
-            const views = userDoc.data().totalMonetizedViews || 0;
-            withdrawViewsInput.value = formatNumber(views);
-            withdrawFormModal.classList.remove('hidden');
-        });
-
-        cancelWithdrawalBtn.addEventListener('click', () => withdrawFormModal.classList.add('hidden'));
-
-        submitWithdrawalRequestBtn.addEventListener('click', async () => {
-            const upi = withdrawUpiId.value.trim();
-            const paypal = withdrawPaypalEmail.value.trim();
-            if (!upi && !paypal) {
-                showToast("Please provide UPI ID or PayPal Email.", "error");
-                return;
-            }
-            const userDoc = await db.collection('users').doc(currentUser.uid).get();
-            const userData = userDoc.data();
-            
-            reviewName.textContent = userData.name;
-            reviewUserid.textContent = currentUser.uid;
-            reviewViews.textContent = formatNumber(userData.totalMonetizedViews);
-            reviewPaymentMethod.textContent = upi ? 'UPI' : 'PayPal';
-            reviewPaymentDetail.textContent = upi ? upi : paypal;
-
-            withdrawFormModal.classList.add('hidden');
-            withdrawReviewModal.classList.remove('hidden');
-        });
-
-        backToFormBtn.addEventListener('click', () => {
-            withdrawReviewModal.classList.add('hidden');
-            withdrawFormModal.classList.remove('hidden');
-        });
-
-        finishWithdrawalBtn.addEventListener('click', async () => {
-            finishWithdrawalBtn.disabled = true;
-            try {
-                const requestData = {
-                    userId: reviewUserid.textContent,
-                    userName: reviewName.textContent,
-                    totalViews: parseInt(reviewViews.textContent.replace(/,/g, '')),
-                    paymentMethod: reviewPaymentMethod.textContent,
-                    paymentDetail: reviewPaymentDetail.textContent,
-                    status: 'pending',
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                };
-
-                // This creates the request in Firestore. A backend function would then read this and send the email.
-                await db.collection('withdrawal_requests').add(requestData);
-                
-                // Reset user's monetized views
-                await db.collection('users').doc(currentUser.uid).update({ totalMonetizedViews: 0 });
-
-                console.log("SIMULATING EMAIL TO apknixy@gmail.com with data:", requestData);
-                
-                withdrawReviewModal.classList.add('hidden');
-                successMessage.textContent = `Your request has been submitted. Payment will be processed to ${requestData.paymentDetail} within 1-20 business days.`;
-                successPopup.classList.remove('hidden');
-                loadUserData(currentUser.uid); // Refresh the earnings screen display
-
-            } catch (error) {
-                console.error("Error submitting withdrawal request:", error);
-                showToast("Failed to submit request. Please try again.", "error");
-            } finally {
-                finishWithdrawalBtn.disabled = false;
-            }
-        });
-        
-        closeSuccessPopup.addEventListener('click', () => successPopup.classList.add('hidden'));
-
-        publishPostBtn.addEventListener('click', async () => {
-            if (!currentUser) return;
-            const content = postContentInput.value.trim();
-            if (content.length < 10) return showToast("Post too short.", "error");
-            
-            const userDoc = await db.collection('users').doc(currentUser.uid).get();
-            const userData = userDoc.data();
-
-            await db.collection('posts').add({
-                userId: currentUser.uid,
-                username: userData.username,
-                profilePicUrl: userData.profilePicUrl,
-                userProfileLogo: userData.profileLogo,
-                content: content,
-                monetized: monetizePostCheckbox.checked,
-                likes: 0,
-                views: 0,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-            });
-
-            await db.collection('users').doc(currentUser.uid).update({ postCount: firebase.firestore.FieldValue.increment(1) });
-            
-            postContentInput.value = '';
-            showScreen('home-screen');
-            loadPosts();
-            showToast("Post published!", "success");
-        });
-
-    </script>
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    
+    <!-- Main App Script -->
+    <script src="script.js"></script>
 </body>
 </html>
-
