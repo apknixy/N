@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html>
+<html b:css='false' b:defaultwidgetversion='2' b:layoutsversion='3' xmlns='http://www.w3.org/1999/xhtml' xmlns:b='http://www.google.com/p/b/widgets' xmlns:data='http://www.google.com/schema/data' xmlns:expr='http://www.google.com/expressions'>
+<head>
+<title><data:blog.pageTitle/></title>
+<b:include data='blog' name='all-head-content'/>
+<b:skin><![CDATA[
+/* GLOBAL STYLES */
+body { background:#f8f9fa; font-family:'Segoe UI',Roboto,sans-serif; color:#333; margin:0; }
+.container { max-width:1100px; margin:0 auto; padding:0 15px; }
+
+/* HEADER & NAV */
+header#header-wrapper { background:#fff; border-bottom:1px solid #eee; padding:15px 0; }
+.nav-menu { background:#007bff; color:#fff; padding:10px 0; }
+
+/* LAYOUT STRUCTURE */
+#main-wrapper { width:70%; float:left; padding:20px 0; }
+#sidebar-wrapper { width:28%; float:right; padding:20px 0; }
+.clear { clear:both; }
+
+/* WIDGET SLOTS */
+.section { margin-bottom:20px; }
+.widget-content { background:#fff; padding:15px; border-radius:8px; box-shadow:0 2px 5px rgba(0,0,0,0.05); }
+
+/* AMP / WEB STORIES FULL SCREEN HACK */
+.is-story #header-wrapper, .is-story #sidebar-wrapper, .is-story .nav-menu { display:none !important; }
+.is-story #main-wrapper { width:100% !important; padding:0 !important; }
+
+/* MOBILE RESPONSIVE */
+@media (max-width:768px){
+  #main-wrapper, #sidebar-wrapper { width:100%; float:none; }
+}
+]]></b:skin>
+</head>
+<body>
+  <header id='header-wrapper'>
+    <div class='container'>
+      <b:section id='header-logo' maxwidgets='1' showaddelement='yes'>
+        <b:widget id='Header1' locked='false' title='Roasify Logo' type='Header'/>
+      </b:section>
+    </div>
+  </header>
+
+  <nav class='nav-menu'>
+    <div class='container'>
+      <b:section id='nav-section' showaddelement='yes'/>
+    </div>
+  </nav>
+
+  <div class='container'>
+    <b:section class='section' id='top-ads' showaddelement='yes'/>
+
+    <div id='main-wrapper'>
+      <b:section id='main' showaddelement='yes'>
+        <b:widget id='Blog1' locked='true' title='Blog Posts' type='Blog'/>
+      </b:section>
+      
+      <b:section class='section' id='middle-ads' showaddelement='yes'/>
+    </div>
+
+    <aside id='sidebar-wrapper'>
+      <b:section id='sidebar' showaddelement='yes'/>
+    </aside>
+    
+    <div class='clear'/>
+
+    <b:section class='section' id='bottom-ads' showaddelement='yes'/>
+  </div>
+
+  <footer style='background:#333; color:#fff; padding:30px 0; text-align:center;'>
+    <b:section id='footer-section' showaddelement='yes'/>
+    <p>&copy; 2026 Roasify Online</p>
+  </footer>
+
+  <script>
+    if (window.location.href.indexOf('label/Story') > -1 || window.location.href.indexOf('story-') > -1) {
+      document.body.classList.add('is-story');
+    }
+  </script>
+</body>
+</html>
